@@ -79,8 +79,8 @@
   var stage = document.querySelector('.stage__inner');
   var devices = [].slice.call(document.querySelectorAll('.stage .device'));
   // How far each device drifts apart while the hero scrolls away (px at full scroll)
-  var SPREAD = { 'device--left': [0, -140], 'device--center': [-110, 60], 'device--right': [110, 90] };
-  var INTRO_DELAY = { 'device--left': 350, 'device--center': 600, 'device--right': 800 };
+  var SPREAD = { 'device--left': [60, -140], 'device--center': [-110, 60] };
+  var INTRO_DELAY = { 'device--left': 350, 'device--center': 650 };
 
   devices.forEach(function (d) {
     var screen = d.querySelector('.device__screen');
@@ -128,6 +128,7 @@
       stage.style.setProperty('--ry', (-10 + cur.x * 16).toFixed(2) + 'deg');
       stage.style.setProperty('--rx', (6 - cur.y * 10 + sp * 14).toFixed(2) + 'deg');
       devices.forEach(function (d, i) {
+        if (d.classList.contains('is-focused') || d._flying) return;
         var k = ease(Math.min(Math.max((t - d._delay) / 1300, 0), 1));
         // hovering a device calms it down so it can be tapped comfortably
         d._calm = (d._calm == null ? 1 : d._calm) + ((d.matches(':hover') ? 0 : 1) - (d._calm == null ? 1 : d._calm)) * 0.08;
@@ -178,6 +179,88 @@
     };
     setTimeout(nextToast, 1900);
   }
+
+  // Focus mode: tap a hero device and it flies to the centre of the screen, big and usable.
+  // The same DOM node is moved (FLIP animation), so the live app keeps its state.
+  (function () {
+    var OPEN_ICON = '<svg viewBox="0 0 24 24"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>';
+    var CAPS = {
+      'device--center': '<b>AlpenGo Guest</b> — tap anything: tabs, lift status, a restaurant, then book a table.',
+      'device--tablet': '<b>AlpenGo Business</b> — tap a table, switch tabs, drag tables in Configure. Bookings from the phone land here.'
+    };
+    var overlay = document.createElement('div');
+    overlay.className = 'focus';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.hidden = true;
+    overlay.innerHTML = '<div class="focus__slot"></div><button class="focus__close" type="button" aria-label="Close">×</button><p class="focus__cap"></p>';
+    document.body.appendChild(overlay);
+    var slot = overlay.querySelector('.focus__slot');
+    var active = null, home = null, lastFocus = null;
+    var dur = reduceMotion ? 0 : 720, curve = 'cubic-bezier(.2,.85,.2,1)';
+
+    function flip(el, from, done) {
+      var to = el.getBoundingClientRect();
+      if (!dur || !el.animate) { if (done) done(); return; }
+      var dx = from.left + from.width / 2 - (to.left + to.width / 2);
+      var dy = from.top + from.height / 2 - (to.top + to.height / 2);
+      var k = from.width / to.width;
+      el._flying = true;
+      var a = el.animate([
+        { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + k + ')' },
+        { transform: 'none' }
+      ], { duration: dur, easing: curve });
+      a.onfinish = function () { el._flying = false; if (done) done(); };
+    }
+    function open(d) {
+      if (active) return;
+      var from = d.getBoundingClientRect();
+      lastFocus = document.activeElement;
+      home = { parent: d.parentNode, next: d.nextSibling };
+      active = d;
+      overlay.querySelector('.focus__cap').innerHTML = CAPS[d.classList.contains('device--tablet') ? 'device--tablet' : 'device--center'];
+      overlay.hidden = false;
+      slot.appendChild(d);
+      d.classList.add('is-focused');
+      document.documentElement.classList.add('is-focus-lock');
+      requestAnimationFrame(function () { overlay.classList.add('is-on'); });
+      flip(d, from);
+      overlay.querySelector('.focus__close').focus({ preventScroll: true });
+    }
+    function close() {
+      if (!active) return;
+      var d = active, from = d.getBoundingClientRect();
+      active = null;
+      overlay.classList.remove('is-on');
+      d.classList.remove('is-focused');
+      home.parent.insertBefore(d, home.next);
+      d._flying = true; // keep the hero loop off it until it has landed
+      flip(d, from, function () { d._flying = false; });
+      setTimeout(function () { overlay.hidden = true; document.documentElement.classList.remove('is-focus-lock'); }, reduceMotion ? 0 : 450);
+      if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+    }
+    devices.forEach(function (d) {
+      var badge = document.createElement('span');
+      badge.className = 'device__open';
+      badge.setAttribute('aria-hidden', 'true');
+      badge.innerHTML = OPEN_ICON + 'Open & try';
+      d.appendChild(badge);
+      // the first tap opens the device; once open, taps go to the app inside
+      d.addEventListener('click', function (e) {
+        if (d.classList.contains('is-focused')) return;
+        e.preventDefault(); e.stopPropagation();
+        open(d);
+      }, true);
+      d.setAttribute('tabindex', '0');
+      d.setAttribute('role', 'button');
+      d.addEventListener('keydown', function (e) {
+        if (!d.classList.contains('is-focused') && (e.key === 'Enter' || e.key === ' ') && e.target === d) { e.preventDefault(); open(d); }
+      });
+    });
+    overlay.addEventListener('click', function (e) { if (e.target === overlay || e.target === slot) close(); });
+    overlay.querySelector('.focus__close').addEventListener('click', close);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && active) close(); });
+  })();
 
   // Spotlight cards: glow follows the pointer
   if (finePointer) {

@@ -6,6 +6,7 @@
 
   // ---- Config: one place for categories → anchors (missing ids are skipped) ----
   var RAIL = [
+    { id: 'home', label: 'Home', short: 'Home', icon: 'home', start: '#top', items: [] },
     {
       id: 'apps', label: 'Apps', short: 'Apps', icon: 'phone', start: '#alpengo',
       items: [
@@ -43,6 +44,7 @@
   if (document.querySelector('.prail')) return;
 
   var ICONS = {
+    home: '<path d="M3.5 11 12 4l8.5 7"/><path d="M6 9.5V20h4.5v-5.5h3V20H18V9.5"/>',
     phone: '<rect x="6.5" y="2.75" width="11" height="18.5" rx="2.75"/><path d="M10.5 17.9h3"/>',
     browser: '<rect x="3" y="4.5" width="18" height="15" rx="2.75"/><path d="M3 9h18"/><circle cx="6.1" cy="6.75" r=".55" fill="currentColor" stroke="none"/><circle cx="8.1" cy="6.75" r=".55" fill="currentColor" stroke="none"/>',
     hire: '<path d="M5 12h13M13 6.5 18.5 12 13 17.5"/>',
@@ -85,7 +87,7 @@
       '<span class="prail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' + ICONS[c.cfg.icon] + '</svg></span>' +
       '<span class="prail__label">' + c.cfg.label + '</span>' +
       '<span class="prail__short" aria-hidden="true">' + c.cfg.short + '</span>' +
-      '<span class="prail__count"><span class="prail__sr">, </span>' + c.items.length + '<span class="prail__sr"> project' + (c.items.length === 1 ? '' : 's') + '</span></span>';
+      (c.items.length ? '<span class="prail__count"><span class="prail__sr">, </span>' + c.items.length + '<span class="prail__sr"> project' + (c.items.length === 1 ? '' : 's') + '</span></span>' : '');
     head.setAttribute('title', c.cfg.label);
     li.appendChild(head);
     c.head = head; c.li = li;
@@ -182,9 +184,11 @@
     e.preventDefault();
     var kb = e.detail === 0;
     lockCat = catObj; lockProj = proj || null; clearTimeout(lockT);
-    lockT = setTimeout(release, 1600);
-    window.scrollTo({ top: targetTop(t), behavior: mq.matches ? 'instant' : 'smooth' });
-    try { history.replaceState(null, '', href); } catch (err) {}
+    lockT = setTimeout(release, 2000);
+    var to = t === document.body ? 0 : targetTop(t);
+    if (window.__glide) window.__glide(to); // eased glide shared with the section guide
+    else window.scrollTo({ top: to, behavior: mq.matches ? 'instant' : 'smooth' });
+    try { history.replaceState(null, '', href === '#top' ? location.pathname : href); } catch (err) {}
     if (kb) {
       if (!t.hasAttribute('tabindex')) t.setAttribute('tabindex', '-1');
       t.focus({ preventScroll: true });
