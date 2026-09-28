@@ -6,12 +6,12 @@
 
   // Interactive tour on the AlpenGo case study (files in site/img/alpengo/).
   var TOUR = [
-    { file: 'biz-floor-plan', app: 'Partner app', title: 'Live floor plan', text: 'Tables turn free, reserved or occupied the moment a booking changes — pushed over Socket.io, with overstay warnings for the host.' },
-    { file: 'biz-floor-edit', app: 'Partner app', title: 'Floor-plan editor', text: 'Owners draw their own room: drag, resize and number tables, add the bar, walls and entrance.' },
+    { file: 'tab-floor-live', kind: 'tablet', app: 'Partner app', title: 'Live floor plan', text: 'Tables turn free, reserved or occupied the moment a booking changes — pushed over Socket.io, with overstay warnings for the host.' },
+    { file: 'tab-floor-edit', kind: 'tablet', app: 'Partner app', title: 'Floor-plan editor', text: 'Owners draw their own room: drag, resize and number tables, add the bar, walls and entrance.' },
     { file: 'guest-concierge-day', app: 'Guest app', title: 'Fabi, the AI concierge', text: 'Guests ask in their own language — “where can we eat fondue tonight?” — and Fabi answers from resort data through the Claude API.' },
     { file: 'guest-booking-calendar-day', app: 'Guest app', title: 'Booking in three taps', text: 'Pick a day, party size and a free slot. Availability comes from the restaurant’s own tables, so nothing is double-booked.' },
     { file: 'guest-home-night', app: 'Guest app', title: 'Today in the resort', text: 'Weather at altitude, lift status, events and recommendations. The theme follows the sky — sunrise by day, dusk after 18:00.' },
-    { file: 'biz-superadmin', app: 'Admin console', title: 'Command center', text: 'The resort team sees sign-ups, users, tickets and live system alerts across every business on the platform.' }
+    { file: 'tab-superadmin', kind: 'tablet', app: 'Admin console', title: 'Command center', text: 'The resort team sees sign-ups, users, tickets and live system alerts across every business on the platform.' }
   ];
   var TOUR_MS = 6000;
 
@@ -72,21 +72,96 @@
     if (e.key === 'Escape' && !menu.hidden) { setMenu(false); toggle.focus(); }
   });
 
-  // Hero: 3D phones follow the pointer
+  // Hero: intro, shared floating motion, inertial pointer parallax, scroll spread,
+  // screens cycling inside the devices and live-event toasts.
+  var heroEl = document.querySelector('.hero');
+  var stageEl = document.querySelector('.stage');
   var stage = document.querySelector('.stage__inner');
-  if (stage && finePointer && !reduceMotion) {
-    var hero = document.querySelector('.hero');
-    hero.addEventListener('pointermove', function (e) {
-      var r = hero.getBoundingClientRect();
-      var x = (e.clientX - r.left) / r.width - 0.5;
-      var y = (e.clientY - r.top) / r.height - 0.5;
-      stage.style.setProperty('--ry', (-10 + x * 18).toFixed(2) + 'deg');
-      stage.style.setProperty('--rx', (6 - y * 12).toFixed(2) + 'deg');
+  var devices = [].slice.call(document.querySelectorAll('.stage .device'));
+  // How far each device drifts apart while the hero scrolls away (px at full scroll)
+  var SPREAD = { 'device--left': [0, -140], 'device--center': [-110, 60], 'device--right': [110, 90] };
+  var INTRO_DELAY = { 'device--left': 350, 'device--center': 600, 'device--right': 800 };
+
+  devices.forEach(function (d) {
+    var screen = d.querySelector('.device__screen');
+    var first = screen.querySelector('img');
+    (d.dataset.screens || '').split(',').slice(1).forEach(function (name) {
+      var img = document.createElement('img');
+      img.src = 'site/img/alpengo/' + name + '.webp';
+      img.alt = '';
+      img.loading = 'lazy';
+      img.width = first.width; img.height = first.height;
+      screen.appendChild(img);
     });
-    hero.addEventListener('pointerleave', function () {
-      stage.style.removeProperty('--ry');
-      stage.style.removeProperty('--rx');
-    });
+    var key = Object.keys(SPREAD).filter(function (k) { return d.classList.contains(k); })[0];
+    d._spread = SPREAD[key];
+    d._delay = INTRO_DELAY[key];
+    d._depth = parseFloat(d.dataset.depth) || 1;
+  });
+  stageEl.classList.add('is-live');
+
+  if (!reduceMotion) {
+    var t0 = performance.now();
+    var ptr = { x: 0, y: 0 }, cur = { x: 0, y: 0 }, heroOn = true, running = false;
+    if (finePointer) {
+      heroEl.addEventListener('pointermove', function (e) {
+        var r = heroEl.getBoundingClientRect();
+        ptr.x = (e.clientX - r.left) / r.width - 0.5;
+        ptr.y = (e.clientY - r.top) / r.height - 0.5;
+      });
+      heroEl.addEventListener('pointerleave', function () { ptr.x = 0; ptr.y = 0; });
+    }
+    if (hasIO) new IntersectionObserver(function (en) { heroOn = en[0].isIntersecting; if (heroOn && !running) { running = true; requestAnimationFrame(frame); } }).observe(heroEl);
+    var ease = function (x) { return 1 - Math.pow(1 - x, 4); };
+    var frame = function (now) {
+      if (!heroOn) { running = false; return; }
+      var t = now - t0;
+      cur.x += (ptr.x - cur.x) * 0.06;
+      cur.y += (ptr.y - cur.y) * 0.06;
+      var sp = Math.min(Math.max(window.scrollY / heroEl.offsetHeight, 0), 1);
+      stage.style.setProperty('--ry', (-10 + cur.x * 16).toFixed(2) + 'deg');
+      stage.style.setProperty('--rx', (6 - cur.y * 10 + sp * 14).toFixed(2) + 'deg');
+      devices.forEach(function (d, i) {
+        var k = ease(Math.min(Math.max((t - d._delay) / 1300, 0), 1));
+        // one shared 7s rhythm, phases spread so neighbours never move toward each other at once
+        var fy = Math.sin(t / 7000 * Math.PI * 2 + i * 2.1) * 9 * d._depth;
+        var x = cur.x * 36 * d._depth + d._spread[0] * sp;
+        var y = cur.y * 26 * d._depth + fy + d._spread[1] * sp + (1 - k) * 140;
+        d.style.translate = x.toFixed(1) + 'px ' + y.toFixed(1) + 'px';
+        d.style.opacity = (k * (1 - sp * 0.6)).toFixed(3);
+        d.style.filter = k < 1 ? 'blur(' + ((1 - k) * 14).toFixed(1) + 'px)' : '';
+      });
+      requestAnimationFrame(frame);
+    };
+    running = true;
+    requestAnimationFrame(frame);
+
+    // Screens inside each device take turns changing
+    var tick = 0;
+    setInterval(function () {
+      if (!heroOn || document.hidden) return;
+      var d = devices[tick % devices.length];
+      var imgs = d.querySelectorAll('.device__screen img');
+      if (imgs.length > 1) {
+        var i = [].indexOf.call(imgs, d.querySelector('.device__screen img.is-on'));
+        imgs[i].classList.remove('is-on');
+        imgs[(i + 1) % imgs.length].classList.add('is-on');
+      }
+      tick++;
+    }, 2600);
+
+    // Live-event toasts: at most two visible, one appears as the oldest leaves
+    var toasts = document.querySelectorAll('.toast');
+    var ti = 0;
+    var nextToast = function () {
+      if (heroOn && !document.hidden) {
+        toasts[ti % toasts.length].classList.add('is-on');
+        toasts[(ti + toasts.length - 2) % toasts.length].classList.remove('is-on');
+        ti++;
+      }
+      setTimeout(nextToast, 2400);
+    };
+    setTimeout(nextToast, 1900);
   }
 
   // Spotlight cards: glow follows the pointer
@@ -102,16 +177,20 @@
 
   // Product tour
   var tour = document.getElementById('tour');
-  var screens = tour.querySelector('.device__screens');
+  var phoneScreens = tour.querySelector('.device--tour .device__screens');
+  var tabletScreens = tour.querySelector('.tour__tablet .device__screens');
+  var tourDevice = tour.querySelector('.tour__device');
   var list = tour.querySelector('.tour__list');
   var tourIndex = 0, tourTimer = null, tourVisible = false, tourPaused = reduceMotion;
   TOUR.forEach(function (t, i) {
     var img = document.createElement('img');
     img.src = 'site/img/alpengo/' + t.file + '.webp';
     img.alt = t.app + ' — ' + t.title;
-    img.width = 520; img.height = 1125;
+    var tablet = t.kind === 'tablet';
+    img.width = tablet ? 1800 : 520; img.height = tablet ? 1257 : 1125;
     if (i > 0) img.loading = 'lazy';
-    screens.appendChild(img);
+    (tablet ? tabletScreens : phoneScreens).appendChild(img);
+    t.img = img;
 
     var li = document.createElement('li');
     var btn = document.createElement('button');
@@ -132,7 +211,6 @@
     list.appendChild(li);
   });
   var tabs = list.querySelectorAll('.tour__btn');
-  var imgs = screens.querySelectorAll('img');
   tour.style.setProperty('--dur', TOUR_MS + 'ms');
   if (tourPaused) tour.classList.add('is-paused');
   function showTour(i) {
@@ -144,7 +222,8 @@
       var bar = b.querySelector('.tour__bar');
       bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = '';
     });
-    imgs.forEach(function (im, j) { im.classList.toggle('is-active', j === i); });
+    TOUR.forEach(function (t, j) { t.img.classList.toggle('is-active', j === i); });
+    tourDevice.classList.toggle('is-tablet', TOUR[i].kind === 'tablet');
     clearTimeout(tourTimer);
     if (!tourPaused && tourVisible) tourTimer = setTimeout(function () { showTour((tourIndex + 1) % TOUR.length); }, TOUR_MS);
   }
@@ -156,6 +235,14 @@
     var n = (tourIndex + d + TOUR.length) % TOUR.length;
     showTour(n); tabs[n].focus();
   });
+  if (finePointer && !reduceMotion) {
+    tourDevice.addEventListener('pointermove', function (e) {
+      var r = tourDevice.getBoundingClientRect();
+      tourDevice.style.setProperty('--tx', ((e.clientX - r.left) / r.width - 0.5).toFixed(3));
+      tourDevice.style.setProperty('--ty', ((e.clientY - r.top) / r.height - 0.5).toFixed(3));
+    });
+    tourDevice.addEventListener('pointerleave', function () { tourDevice.style.setProperty('--tx', 0); tourDevice.style.setProperty('--ty', 0); });
+  }
   showTour(0);
   if (hasIO) {
     new IntersectionObserver(function (entries) {

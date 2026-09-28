@@ -17,6 +17,8 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2314172a'/%3E%3Cpath d='M12 48 28 18l8 14 6-9 10 25z' fill='%23E8B563'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="site/fonts/fonts.css">
   <link rel="stylesheet" href="site/styles.css">
+  <link rel="stylesheet" href="site/live.css">
+  <link rel="stylesheet" href="site/rail.css">
 </head>
 <body id="top">
   <a class="skip" href="#main">Skip to content</a>
@@ -36,6 +38,7 @@
       </a>
       <nav class="nav__links" aria-label="Main">
         <a href="#alpengo">AlpenGo</a>
+        <a href="#jang">Jàng</a>
         <a href="#work">Work</a>
         <a href="#services">Services</a>
         <a href="#contact" class="btn btn--small">Hire me</a>
@@ -44,6 +47,7 @@
     </div>
     <div class="nav__mobile" id="mobile-menu" hidden>
       <a href="#alpengo">AlpenGo case study</a>
+      <a href="#jang">Jàng</a>
       <a href="#work">Work</a>
       <a href="#services">Services</a>
       <a href="#contact">Hire me</a>
@@ -58,7 +62,7 @@
       <div class="wrap hero__grid">
         <div class="hero__content">
           <p class="kicker reveal"><span class="kicker__dot"></span>Available for new projects</p>
-          <h1 class="reveal">I build products<br><em class="gold">people actually use.</em></h1>
+          <h1 class="headline"><span class="line"><span>I build products</span></span><span class="line"><span><em class="gold">people actually use.</em></span></span></h1>
           <p class="hero__lead reveal">Full-stack web &amp; mobile developer. From a tourism super-app with real-time bookings and an AI concierge, to scroll-driven 3D landing pages and AI chatbots for small businesses.</p>
           <div class="hero__cta reveal">
             <a class="btn" href="#alpengo">Explore AlpenGo <span aria-hidden="true">→</span></a>
@@ -66,11 +70,23 @@
           </div>
         </div>
 
-        <div class="stage reveal" aria-label="AlpenGo app screens">
+        <div class="stage" aria-label="AlpenGo app screens">
           <div class="stage__inner">
-            <figure class="device device--left device--tablet"><img src="site/img/alpengo/tab-superadmin.webp" alt="AlpenGo admin console command center on a tablet" width="1800" height="1257"></figure>
-            <figure class="device device--right"><img src="site/img/alpengo/guest-concierge-day.webp" alt="Fabi, the AI concierge" width="520" height="1125"></figure>
-            <figure class="device device--center"><img src="site/img/alpengo/guest-home-night.webp" alt="Gerlos Life guest app home screen" width="520" height="1125"></figure>
+            <figure class="device device--left device--tablet" data-depth="0.45" data-screens="tab-superadmin,tab-floor-live,tab-timeline">
+              <div class="device__screen"><img src="site/img/alpengo/tab-superadmin.webp" alt="AlpenGo admin console on a tablet" width="1800" height="1257" class="is-on"></div>
+            </figure>
+<figure class="device device--right" data-depth="0.8">
+              <div class="device__screen device__screen--live" id="hero-chat" aria-label="Live demo: ask Fabi, the AI concierge"></div>
+            </figure>
+            <figure class="device device--center" data-depth="1" data-screens="guest-home-night,guest-restaurants-night,guest-restaurant-detail-day">
+              <div class="device__screen"><img src="site/img/alpengo/guest-home-night.webp" alt="AlpenGo guest app home screen" width="520" height="1125" class="is-on"></div>
+            </figure>
+          </div>
+          <div class="toasts" aria-hidden="true">
+            <div class="toast toast--1"><span class="toast__icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span><div><strong>New booking</strong><span>Table 5 · 4 guests · 19:30</span></div></div>
+            <div class="toast toast--2"><span class="toast__icon"><svg viewBox="0 0 24 24"><path d="M12 3 3 20h18z"/><path d="M8 13l4-3 4 3"/></svg></span><div><strong>Isskogelbahn is open</strong><span>Lift status · live</span></div></div>
+            <div class="toast toast--3"><span class="toast__icon"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg></span><div><strong>Fabi · AI concierge</strong><span>Fondue tonight? Try Dahuam.202</span></div></div>
+            <div class="toast toast--4"><span class="toast__icon"><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></span><div><strong>Reservation confirmed</strong><span>Push sent to the guest</span></div></div>
           </div>
           <p class="stage__cap"><span>AlpenGo</span> · real screens from the apps</p>
         </div>
@@ -110,12 +126,35 @@
           <div class="tour__device">
             <div class="tour__glow" aria-hidden="true"></div>
             <figure class="device device--tour" aria-live="polite"><div class="device__screens"></div></figure>
+            <figure class="tour__tablet" aria-live="polite"><div class="tour__bezel"><div class="device__screens"></div><span class="tour__cam"></span><span class="tour__glare"></span></div><span class="tour__shadow"></span></figure>
           </div>
           <div class="tour__panel">
             <h3>Take the tour</h3>
             <p class="tour__intro">Six moments from the real apps. Click any step — or let it play.</p>
             <ol class="tour__list" role="tablist" aria-label="AlpenGo features"></ol>
           </div>
+        </div>
+
+
+        <!-- Live, clickable prototype -->
+        <div class="live reveal" id="live"><span id="fabi" class="anchor"></span>
+          <div class="live__head">
+            <div>
+              <h3>Try it <em class="gold">live</em></h3>
+              <p>A working prototype of the guest app — tap around, open the lift status, ask Fabi. Book a table and watch it land on the restaurant’s tablet in real time.</p>
+            </div>
+            <span class="live__badge"><i></i>Interactive demo</span>
+          </div>
+          <div class="live__stage">
+            <figure class="device live__phone"><div class="device__screen device__screen--live" id="live-app"></div></figure>
+            <div class="live__beam" aria-hidden="true"><span>Socket.io</span><svg viewBox="0 0 90 60"><path d="M0 30 C 30 10, 60 50, 90 30"/><circle cx="0" cy="30" r="5"/></svg></div>
+            <figure class="device device--tablet live__tablet"><div class="device__screen device__screen--live" id="live-tablet"></div></figure>
+          </div>
+          <ol class="live__steps">
+            <li><strong>Pick a restaurant</strong> — from Dining or tonight’s events.</li>
+            <li><strong>Book a table</strong> — choose guests and a time.</li>
+            <li><strong>Watch the tablet</strong> — the host accepts, you get a push.</li>
+          </ol>
         </div>
 
         <div class="case__problem reveal">
@@ -291,14 +330,59 @@
       </div>
     </section>
 
+    <!-- JANG -->
+    <section class="jang" id="jang" aria-labelledby="jang-title">
+      <div class="wrap">
+        <p class="label reveal"><span>02</span>Mobile app · Real product</p>
+        <div class="jang__panel reveal">
+          <div class="jang__head">
+            <div>
+              <h2 id="jang-title">Jàng <em>learn Wolof</em></h2>
+              <p class="jang__sub">A Duolingo-style app for learning Wolof, the language of Senegal — built for a German client. A no-code web admin lets the content author edit every lesson, word and recording, and changes reach open apps live.</p>
+            </div>
+            <ul class="jang__facts">
+              <li><strong>8</strong>modules · 48 lessons</li>
+              <li><strong>127</strong>real words</li>
+              <li><strong>15</strong>exercise types</li>
+              <li><strong>5</strong>languages</li>
+            </ul>
+          </div>
+
+          <div class="jang__phones">
+            <figure class="jphone"><div class="jphone__frame"><img src="site/img/jang/learn-home.webp" alt="Jàng home: your Wolof journey with streak, goals and Ndanka the hippo" width="520" height="1125" loading="lazy"></div><figcaption><strong>Your Wolof journey</strong>Streaks, daily goal, milestones and Ndanka’s nudges</figcaption></figure>
+            <figure class="jphone jphone--up"><div class="jphone__frame"><img src="site/img/jang/lesson-picture-choice-correct.webp" alt="Listen and choose the right picture exercise" width="520" height="1125" loading="lazy"></div><figcaption><strong>Listen &amp; choose</strong>One of 15 exercise types, with instant feedback</figcaption></figure>
+            <figure class="jphone"><div class="jphone__frame"><img src="site/img/jang/module-detail.webp" alt="Family module with photo header and lesson steps" width="520" height="1125" loading="lazy"></div><figcaption><strong>Modules</strong>Real photos, six steps per module, progress per step</figcaption></figure>
+          </div>
+
+          <div class="jang__admin">
+            <p class="jang__cap">Web admin · no code needed</p>
+            <div class="jang__bento">
+              <figure class="jbrowser jbrowser--big"><div class="jbrowser__bar"><i></i><i></i><i></i><span>admin · jang</span></div><img src="site/img/jang/admin-dashboard.webp" alt="Admin dashboard with draggable modules" width="1800" height="1125" loading="lazy"><figcaption>Drag-and-drop course builder</figcaption></figure>
+              <figure class="jbrowser"><div class="jbrowser__bar"><i></i><i></i><i></i><span>word editor</span></div><img src="site/img/jang/admin-word-quiz.webp" alt="Word editor with AI photo generation and live phone preview" width="1200" height="750" loading="lazy"><figcaption>AI photos &amp; translations, live phone preview</figcaption></figure>
+              <figure class="jbrowser"><div class="jbrowser__bar"><i></i><i></i><i></i><span>dialogue builder</span></div><img src="site/img/jang/admin-conversation-editor.webp" alt="Conversation editor with a live phone preview" width="1200" height="750" loading="lazy"><figcaption>Dialogue builder with a live phone preview</figcaption></figure>
+            </div>
+          </div>
+
+          <div class="jang__hl">
+            <article><h4>Memory Fire</h4><p>A spaced-repetition model predicts which words are fading and Ndanka invites you to rescue them.</p></article>
+            <article><h4>Ndanka, drawn in code</h4><p>A custom-animated hippo mascot that gives hints, cheers and reminders.</p></article>
+            <article><h4>AI in the CMS</h4><p>Cloud Functions generate lesson photos with Gemini and translate content into five languages.</p></article>
+            <article><h4>Offline-first</h4><p>Content loads from memory, then cache, then the bundle — lessons work on a plane.</p></article>
+          </div>
+          <div class="jang__stack"><span>React Native</span><span>Expo</span><span>TypeScript</span><span>Reanimated</span><span>Firebase</span><span>Cloud Functions</span><span>Gemini</span><span>React + Vite</span><span>EAS Update</span></div>
+        </div>
+      </div>
+    </section>
+
     <!-- OTHER WORK -->
     <section class="work" id="work" aria-labelledby="work-title">
       <div class="wrap">
-        <p class="label reveal"><span>02</span>More work</p>
+        <p class="label reveal"><span>03</span>More work</p>
         <h2 id="work-title" class="reveal">Selected <em class="gold">projects</em></h2>
         <p class="section__lead">Live demos you can open and click through. Brands, people and numbers in the demos are fictional.</p>
 
-        <article class="feature reveal">
+        <h3 class="work__cat reveal" id="websites"><span>Websites</span><small>3D product page · business sites</small></h3>
+        <article class="feature reveal" id="aura">
           <div class="feature__media">
             <video src="site/video/scroll-3d-video.mp4" poster="site/img/scroll-3d-hero.webp" muted loop playsinline controls preload="none" data-autoplay aria-label="AURA One scroll-driven 3D demo video"></video>
           </div>
@@ -314,7 +398,47 @@
           </div>
         </article>
 
-        <article class="feature feature--flip reveal">
+        <div class="grid">
+          <article class="card spot reveal" id="ember-oak">
+            <a class="card__media" tabindex="-1" aria-hidden="true" href="portfolio/coffee-shop/" target="_blank" rel="noopener">
+              <img src="site/img/coffee-shop-desktop.webp" alt="Ember & Oak coffee shop website" loading="lazy" width="1400" height="875">
+              <img class="card__phone" src="site/img/coffee-shop-mobile.webp" alt="" loading="lazy" width="600" height="1298">
+            </a>
+            <div class="card__body">
+              <p class="eyebrow">Local business</p>
+              <h3>Ember &amp; Oak</h3>
+              <p>Warm coffee-shop site with a tabbed menu, reviews, opening hours, map and newsletter.</p>
+              <a class="link" href="portfolio/coffee-shop/" target="_blank" rel="noopener">Live site<span class="sr-only"> – Ember &amp; Oak</span> →</a>
+            </div>
+          </article>
+          <article class="card spot reveal" id="novaline">
+            <a class="card__media" tabindex="-1" aria-hidden="true" href="portfolio/agency/" target="_blank" rel="noopener">
+              <img src="site/img/agency-desktop.webp" alt="Novaline digital agency website" loading="lazy" width="1400" height="875">
+              <img class="card__phone" src="site/img/agency-mobile.webp" alt="" loading="lazy" width="600" height="1298">
+            </a>
+            <div class="card__body">
+              <p class="eyebrow">Digital agency</p>
+              <h3>Novaline</h3>
+              <p>Dark, bold agency site: gradient hero, case studies, stats, process and scroll-reveal animation.</p>
+              <a class="link" href="portfolio/agency/" target="_blank" rel="noopener">Live site<span class="sr-only"> – Novaline</span> →</a>
+            </div>
+          </article>
+          <article class="card spot reveal" id="mila-hart">
+            <a class="card__media" tabindex="-1" aria-hidden="true" href="portfolio/designer-portfolio/" target="_blank" rel="noopener">
+              <img src="site/img/designer-portfolio-desktop.webp" alt="Mila Hart designer portfolio website" loading="lazy" width="1400" height="875">
+              <img class="card__phone" src="site/img/designer-portfolio-mobile.webp" alt="" loading="lazy" width="600" height="1298">
+            </a>
+            <div class="card__body">
+              <p class="eyebrow">Personal brand</p>
+              <h3>Mila Hart</h3>
+              <p>Minimal editorial portfolio with a filterable project grid, timeline and big contact block.</p>
+              <a class="link" href="portfolio/designer-portfolio/" target="_blank" rel="noopener">Live site<span class="sr-only"> – Mila Hart</span> →</a>
+            </div>
+          </article>
+        </div>
+
+        <h3 class="work__cat reveal" id="ai"><span>AI chatbots</span><small>Claude-powered assistants</small></h3>
+        <article class="feature feature--flip reveal" id="ai-assistant">
           <div class="feature__media">
             <video src="site/video/ai-video.mp4" poster="site/img/ai-assistant-desktop.webp" muted loop playsinline controls preload="none" data-autoplay aria-label="AI assistant demo video"></video>
           </div>
@@ -330,51 +454,13 @@
           </div>
         </article>
 
-        <div class="grid">
-          <article class="card spot reveal">
-            <a class="card__media" tabindex="-1" aria-hidden="true" href="portfolio/coffee-shop/" target="_blank" rel="noopener">
-              <img src="site/img/coffee-shop-desktop.webp" alt="Ember & Oak coffee shop website" loading="lazy" width="1400" height="875">
-              <img class="card__phone" src="site/img/coffee-shop-mobile.webp" alt="" loading="lazy" width="600" height="1298">
-            </a>
-            <div class="card__body">
-              <p class="eyebrow">Local business</p>
-              <h3>Ember &amp; Oak</h3>
-              <p>Warm coffee-shop site with a tabbed menu, reviews, opening hours, map and newsletter.</p>
-              <a class="link" href="portfolio/coffee-shop/" target="_blank" rel="noopener">Live site<span class="sr-only"> – Ember &amp; Oak</span> →</a>
-            </div>
-          </article>
-          <article class="card spot reveal">
-            <a class="card__media" tabindex="-1" aria-hidden="true" href="portfolio/agency/" target="_blank" rel="noopener">
-              <img src="site/img/agency-desktop.webp" alt="Novaline digital agency website" loading="lazy" width="1400" height="875">
-              <img class="card__phone" src="site/img/agency-mobile.webp" alt="" loading="lazy" width="600" height="1298">
-            </a>
-            <div class="card__body">
-              <p class="eyebrow">Digital agency</p>
-              <h3>Novaline</h3>
-              <p>Dark, bold agency site: gradient hero, case studies, stats, process and scroll-reveal animation.</p>
-              <a class="link" href="portfolio/agency/" target="_blank" rel="noopener">Live site<span class="sr-only"> – Novaline</span> →</a>
-            </div>
-          </article>
-          <article class="card spot reveal">
-            <a class="card__media" tabindex="-1" aria-hidden="true" href="portfolio/designer-portfolio/" target="_blank" rel="noopener">
-              <img src="site/img/designer-portfolio-desktop.webp" alt="Mila Hart designer portfolio website" loading="lazy" width="1400" height="875">
-              <img class="card__phone" src="site/img/designer-portfolio-mobile.webp" alt="" loading="lazy" width="600" height="1298">
-            </a>
-            <div class="card__body">
-              <p class="eyebrow">Personal brand</p>
-              <h3>Mila Hart</h3>
-              <p>Minimal editorial portfolio with a filterable project grid, timeline and big contact block.</p>
-              <a class="link" href="portfolio/designer-portfolio/" target="_blank" rel="noopener">Live site<span class="sr-only"> – Mila Hart</span> →</a>
-            </div>
-          </article>
-        </div>
       </div>
     </section>
 
     <!-- SERVICES -->
     <section class="services" id="services" aria-labelledby="services-title">
       <div class="wrap">
-        <p class="label reveal"><span>03</span>What I can build for you</p>
+        <p class="label reveal"><span>04</span>What I can build for you</p>
         <h2 id="services-title" class="reveal">Services</h2>
         <div class="svc">
           <article class="spot reveal">
@@ -409,7 +495,7 @@
     <section class="contact" id="contact" aria-labelledby="contact-title">
       <div class="contact__horizon" aria-hidden="true"></div>
       <div class="wrap contact__inner">
-        <p class="label label--center reveal"><span>04</span>Let’s talk</p>
+        <p class="label label--center reveal"><span>05</span>Let’s talk</p>
         <h2 id="contact-title" class="reveal">Have a project <em class="gold">in mind?</em></h2>
         <p class="reveal">Tell me what you want to build. I usually reply within a few hours.</p>
         <a class="btn btn--large reveal" id="hire-link" href="https://www.fiverr.com/zolotuhindev" target="_blank" rel="noopener">Message me on Fiverr <span aria-hidden="true">→</span></a>
@@ -430,5 +516,7 @@
   </dialog>
 
   <script src="site/main.js" defer></script>
+  <script src="site/live.js" defer></script>
+  <script src="site/rail.js" defer></script>
 </body>
 </html>
