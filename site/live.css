@@ -14,18 +14,19 @@
 .ga__status i::after { content: ''; position: absolute; inset: 1.5px 5px 1.5px 1.5px; background: #f4f6fa; border-radius: 1.5px; }
 .ga__island { position: absolute; top: 11px; left: 50%; width: 118px; height: 34px; margin-left: -59px; border-radius: 20px; background: #000; z-index: 31; pointer-events: none; }
 
-.ga__views { position: absolute; inset: 0; perspective: 1100px; }
-.ga__view { position: absolute; inset: 0; padding: 62px 18px 110px; overflow-y: auto; scrollbar-width: none; backface-visibility: hidden; transform-origin: 50% 50%; }
+.ga__views { position: absolute; inset: 0; perspective: 900px; overflow: hidden; background: #07080d; }
+.ga__view { position: absolute; inset: 0; background: linear-gradient(170deg, #1b2a4a 0%, #3b2e5c 35%, #5c3a5a 65%, #7a4a52 86%, #93583f 100%); padding: 62px 18px 110px; overflow-y: auto; scrollbar-width: none; backface-visibility: hidden; transform-origin: 50% 50%; }
 .ga__view::-webkit-scrollbar { display: none; }
 .ga__view[hidden] { display: block; visibility: hidden; pointer-events: none; }
-.ga__view.in-next { animation: gaInNext .62s cubic-bezier(.2, .8, .2, 1) both; }
-.ga__view.out-next { animation: gaOutNext .62s cubic-bezier(.2, .8, .2, 1) both; }
-.ga__view.in-prev { animation: gaInPrev .62s cubic-bezier(.2, .8, .2, 1) both; }
-.ga__view.out-prev { animation: gaOutPrev .62s cubic-bezier(.2, .8, .2, 1) both; }
-@keyframes gaInNext { from { transform: translateX(46%) rotateY(-38deg) scale(.92); opacity: 0; } }
-@keyframes gaOutNext { to { transform: translateX(-46%) rotateY(38deg) scale(.92); opacity: 0; } }
-@keyframes gaInPrev { from { transform: translateX(-46%) rotateY(38deg) scale(.92); opacity: 0; } }
-@keyframes gaOutPrev { to { transform: translateX(46%) rotateY(-38deg) scale(.92); opacity: 0; } }
+.ga__view.in-next, .ga__view.in-prev, .ga__view.out-next, .ga__view.out-prev { animation-duration: .8s; animation-timing-function: cubic-bezier(.65, 0, .25, 1); animation-fill-mode: both; }
+.ga__view.in-next { animation-name: cubeInNext; transform-origin: 0% 50%; }
+.ga__view.out-next { animation-name: cubeOutNext; transform-origin: 100% 50%; }
+.ga__view.in-prev { animation-name: cubeInPrev; transform-origin: 100% 50%; }
+.ga__view.out-prev { animation-name: cubeOutPrev; transform-origin: 0% 50%; }
+@keyframes cubeInNext { from { transform: translateX(100%) rotateY(90deg); filter: brightness(.55); } }
+@keyframes cubeOutNext { to { transform: translateX(-100%) rotateY(-90deg); filter: brightness(.55); } }
+@keyframes cubeInPrev { from { transform: translateX(-100%) rotateY(-90deg); filter: brightness(.55); } }
+@keyframes cubeOutPrev { to { transform: translateX(100%) rotateY(90deg); filter: brightness(.55); } }
 
 .ga__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
 .ga__brand { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: .22em; color: var(--g-gold); }
@@ -311,3 +312,6 @@
 .device:has(.device__screen--live)::before { display: none; }
 .ga.is-fabi .ga__fab { opacity: 0; pointer-events: none; transform: scale(.6); }
 .ga__fab { transition: opacity .3s, transform .3s; }
+.stage__live { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; color: #6fd6a3 !important; box-shadow: inset 0 0 0 1px rgba(111, 214, 163, .4); font-weight: 600; margin-right: 4px; }
+.stage__live i { width: 6px; height: 6px; border-radius: 50%; background: #6fd6a3; animation: livePulse 1.8s infinite; }
+.stage .device__screen--live { cursor: pointer; }

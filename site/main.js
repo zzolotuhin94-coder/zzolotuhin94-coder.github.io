@@ -113,20 +113,28 @@
     }
     if (hasIO) new IntersectionObserver(function (en) { heroOn = en[0].isIntersecting; if (heroOn && !running) { running = true; requestAnimationFrame(frame); } }).observe(heroEl);
     var ease = function (x) { return 1 - Math.pow(1 - x, 4); };
+    var smallScreen = window.matchMedia('(max-width: 760px)').matches;
     var frame = function (now) {
       if (!heroOn) { running = false; return; }
       var t = now - t0;
-      cur.x += (ptr.x - cur.x) * 0.06;
-      cur.y += (ptr.y - cur.y) * 0.06;
+      // while the visitor is using one of the live devices, hold the scene still
+      var using = stageEl.matches(':hover') && !!stageEl.querySelector('.device:hover');
+      if (!using) {
+        cur.x += (ptr.x - cur.x) * 0.06;
+        cur.y += (ptr.y - cur.y) * 0.06;
+      }
       var sp = Math.min(Math.max(window.scrollY / heroEl.offsetHeight, 0), 1);
+      if (smallScreen) sp = 0; // on phones the devices stay put so they can be tapped
       stage.style.setProperty('--ry', (-10 + cur.x * 16).toFixed(2) + 'deg');
       stage.style.setProperty('--rx', (6 - cur.y * 10 + sp * 14).toFixed(2) + 'deg');
       devices.forEach(function (d, i) {
         var k = ease(Math.min(Math.max((t - d._delay) / 1300, 0), 1));
+        // hovering a device calms it down so it can be tapped comfortably
+        d._calm = (d._calm == null ? 1 : d._calm) + ((d.matches(':hover') ? 0 : 1) - (d._calm == null ? 1 : d._calm)) * 0.08;
         // one shared 7s rhythm, phases spread so neighbours never move toward each other at once
-        var fy = Math.sin(t / 7000 * Math.PI * 2 + i * 2.1) * 9 * d._depth;
-        var x = cur.x * 36 * d._depth + d._spread[0] * sp;
-        var y = cur.y * 26 * d._depth + fy + d._spread[1] * sp + (1 - k) * 140;
+        var fy = Math.sin(t / 7000 * Math.PI * 2 + i * 2.1) * 9 * d._depth * d._calm;
+        var x = cur.x * 36 * d._depth * d._calm + d._spread[0] * sp;
+        var y = cur.y * 26 * d._depth * d._calm + fy + d._spread[1] * sp + (1 - k) * 140;
         d.style.translate = x.toFixed(1) + 'px ' + y.toFixed(1) + 'px';
         d.style.opacity = (k * (1 - sp * 0.6)).toFixed(3);
         d.style.filter = k < 1 ? 'blur(' + ((1 - k) * 14).toFixed(1) + 'px)' : '';
@@ -153,7 +161,14 @@
     // Live-event toasts: at most two visible, one appears as the oldest leaves
     var toasts = document.querySelectorAll('.toast');
     var ti = 0;
+    // once the visitor starts using the live devices, the decorative toasts step aside
+    var toastsOff = false;
+    stageEl.addEventListener('pointerdown', function () {
+      toastsOff = true;
+      toasts.forEach(function (x) { x.classList.remove('is-on'); });
+    });
     var nextToast = function () {
+      if (toastsOff) return;
       if (heroOn && !document.hidden) {
         toasts[ti % toasts.length].classList.add('is-on');
         toasts[(ti + toasts.length - 2) % toasts.length].classList.remove('is-on');

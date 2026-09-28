@@ -23,12 +23,14 @@
   ];
   var byId = function (id) { return RESTAURANTS.filter(function (r) { return r.id === id; })[0]; };
 
-  // Shared event bus between the phone and the tablet
-  var bus = {
-    h: {},
-    on: function (e, f) { (this.h[e] = this.h[e] || []).push(f); },
-    emit: function (e, d) { (this.h[e] || []).forEach(function (f) { f(d); }); }
-  };
+  // Event bus shared by the phone(s) and the tablet of one demo (hero and #live each get their own)
+  function makeBus() {
+    return {
+      h: {},
+      on: function (e, f) { (this.h[e] = this.h[e] || []).push(f); },
+      emit: function (e, d) { (this.h[e] || []).forEach(function (f) { f(d); }); }
+    };
+  }
 
   // Scale each fixed-size UI to its frame
   function fit(screen, ui, baseW) {
@@ -139,7 +141,7 @@
   }
 
   /* ---------- Guest app ---------- */
-  function GuestApp(ui) {
+  function GuestApp(ui, bus) {
     ui.classList.add('ga');
     var state = { tab: 0, booking: null, guests: 2, slot: '19:30', rest: null };
     ui.innerHTML =
@@ -230,7 +232,7 @@
       if (reduceMotion) { prev.remove(); return; }
       next.classList.add(dir > 0 ? 'in-next' : 'in-prev');
       prev.classList.add(dir > 0 ? 'out-next' : 'out-prev');
-      setTimeout(function () { prev.remove(); next.classList.remove('in-next', 'in-prev'); }, 640);
+      setTimeout(function () { prev.remove(); next.classList.remove('in-next', 'in-prev'); }, 820);
     }
 
     function goTab(i) {
@@ -331,7 +333,7 @@
     }
 
     bus.on('accepted', async function (d) {
-      if (!state.booking) return;
+      if (!state.booking || state.booking.ok) return;
       state.booking.ok = true;
       state.booking.table = d.table;
       var w = sheet.querySelector('.ga__wait');
@@ -349,7 +351,7 @@
   }
 
   /* ---------- Partner tablet ---------- */
-  function PartnerTablet(ui) {
+  function PartnerTablet(ui, bus) {
     ui.classList.add('pt');
     var TABLES = [
       { n: 1, seats: 2, x: 40, y: 70, w: 92, h: 92, round: 1, s: 'occ', who: 'Lukas G.' },
@@ -439,7 +441,7 @@
   }
 
   /* ---------- Beam between phone and tablet ---------- */
-  function Beam(root) {
+  function Beam(root, bus) {
     if (!root) return;
     var dot = root.querySelector('circle');
     var fire = function (color, reverse) {
@@ -453,18 +455,20 @@
   }
 
   /* ---------- Mount ---------- */
-  function mount(screenSel, baseW, build) {
+  function mount(screenSel, baseW, build, bus) {
     var screen = document.querySelector(screenSel);
     if (!screen) return;
     var ui = el('<div class="ui' + (baseW > 400 ? ' ui--tab' : '') + '"></div>');
     screen.appendChild(ui);
     fit(screen, ui, baseW);
-    build(ui);
+    build(ui, bus);
   }
 
-  mount('#live-app', 390, GuestApp);
-  mount('#live-tablet', 1194, PartnerTablet);
-  Beam(document.querySelector('.live__beam'));
+  // Try-it-live section
+  var liveBus = makeBus();
+  mount('#live-app', 390, GuestApp, liveBus);
+  mount('#live-tablet', 1194, PartnerTablet, liveBus);
+  Beam(document.querySelector('.live__beam'), liveBus);
 
   // Guided steps under the live demo tick off as the visitor goes
   var steps = document.querySelectorAll('.live__steps li');
@@ -473,26 +477,35 @@
     document.querySelector('#live-app').addEventListener('click', function (e) {
       if (e.target.closest('.ga__rest, [data-rest], .ga__view--detail')) tick(0);
     });
-    bus.on('booking', function () { tick(0); tick(1); });
-    bus.on('accepted', function () { tick(2); });
+    liveBus.on('booking', function () { tick(0); tick(1); });
+    liveBus.on('accepted', function () { tick(2); });
   }
 
-  // Hero: the right phone is a live Fabi chat
-  mount('#hero-chat', 390, function (ui) {
+  // Hero: all three devices are live and wired together
+  var heroBus = makeBus();
+  mount('#hero-app', 390, GuestApp, heroBus);
+  mount('#hero-tablet', 1194, PartnerTablet, heroBus);
+  mount('#hero-chat', 390, function (ui, bus) {
     ui.classList.add('ga');
     ui.innerHTML = '<div class="ga__island"></div><div class="ga__status"><span>19:32</span><span>5G <i></i></span></div><div class="hero-chat" style="height:100%"></div><div class="ga__push" role="status"></div>';
     var push = ui.querySelector('.ga__push');
+    var pending = null;
     FabiChat(ui.querySelector('.hero-chat'), {
       onBook: async function (r, btn) {
         btn.disabled = true;
-        btn.innerHTML = '<span class="ga__spin"></span>';
-        await wait(900);
-        btn.textContent = 'Booked ✓ · Table 5 · 19:30';
-        push.innerHTML = '<b>AG</b><span><strong>Reservation confirmed ✓</strong>' + r.name + ' · Table 5 at 19:30</span>';
-        push.classList.add('is-on');
-        await wait(3200);
-        push.classList.remove('is-on');
+        btn.innerHTML = '<span class="ga__spin"></span> Sending to the restaurant…';
+        pending = { rest: r, guests: 2, time: '19:30', ok: false, btn: btn };
+        bus.emit('booking', pending);
       }
     });
-  });
+    bus.on('accepted', async function (d) {
+      if (!pending) return;
+      var b = pending; pending = null;
+      b.btn.textContent = 'Booked ✓ · Table ' + d.table + ' · ' + b.time;
+      push.innerHTML = '<b>AG</b><span><strong>Reservation confirmed ✓</strong>' + b.rest.name + ' · Table ' + d.table + ' at ' + b.time + '</span>';
+      push.classList.add('is-on');
+      await wait(3400);
+      push.classList.remove('is-on');
+    });
+  }, heroBus);
 })();
