@@ -22,9 +22,12 @@
     { group: 'Guest app', file: 'guest-home-night', title: 'Today in the resort', text: 'Weather at altitude, lifts and tonight’s events' },
     { group: 'Guest app', file: 'guest-concierge-day', title: 'Fabi, the AI concierge', text: 'Claude-powered answers about the resort' },
     { group: 'Guest app', file: 'guest-booking-calendar-day', title: 'Booking calendar', text: 'Live availability by party size and time' },
-    { group: 'Partner app', file: 'biz-floor-plan', title: 'Live floor plan', text: 'Free / occupied / reserved tables in real time' },
-    { group: 'Partner app', file: 'biz-floor-edit', title: 'Floor-plan editor', text: 'Drag, resize and add tables, walls and the bar' },
-    { group: 'Partner app', file: 'biz-reservations', title: 'Reservations', text: 'Today’s bookings with filters and arrival status' }
+    { group: 'Partner app & admin console · tablet', kind: 'tablet', file: 'tab-superadmin', title: 'Command center', text: 'Sign-ups, users, tickets, live system alerts, health and backups' },
+    { group: 'Partner app & admin console · tablet', kind: 'tablet', file: 'tab-timeline', title: 'Occupancy calendar', text: 'Rooms × days view of every stay' },
+    { group: 'Partner app & admin console · tablet', kind: 'tablet', file: 'tab-rooms', title: 'Hotel rooms', text: 'Housekeeping status per room' },
+    { group: 'Partner app & admin console · tablet', kind: 'tablet', file: 'tab-home', title: 'Live dashboard', text: 'Today’s bookings and quick actions' },
+    { group: 'Partner app & admin console · tablet', kind: 'tablet', file: 'tab-menu-builder', title: 'Menu builder', text: 'PDF upload, photo scan or manual dishes' },
+    { group: 'Partner app & admin console · tablet', kind: 'tablet', file: 'tab-floor-edit', title: 'Floor-plan editor', text: 'Drag, resize and add tables, walls and the bar' }
   ];
 
   var GALLERIES = {
@@ -161,29 +164,43 @@
     }, { threshold: 0.4 }).observe(tour);
   }
 
-  // AlpenGo gallery
+  // Screen gallery: one block per app; tablet screens render as a bento (one large, two small)
   var phones = document.getElementById('alpengo-phones');
-  var lastGroup = null;
+  var groups = [];
   ALPENGO_SCREENS.forEach(function (s) {
-    if (s.group !== lastGroup) {
-      var label = document.createElement('span');
-      label.className = 'phones__label';
-      label.textContent = s.group;
-      phones.appendChild(label);
-      lastGroup = s.group;
-    }
-    var fig = document.createElement('figure');
-    fig.className = 'phone';
-    fig.innerHTML =
-      '<div class="phone__frame"><img loading="lazy" width="520" height="1125" alt="" draggable="false"></div>' +
-      '<figcaption class="phone__cap"><strong></strong><span></span></figcaption>';
-    var img = fig.querySelector('img');
-    img.src = 'site/img/' + (s.dir || 'alpengo') + '/' + s.file + '.webp';
-    img.alt = s.group + ' — ' + s.title;
-    fig.querySelector('strong').textContent = s.title;
-    fig.querySelector('span').textContent = s.text;
-    phones.appendChild(fig);
+    var g = groups[groups.length - 1];
+    if (!g || g.name !== s.group) groups.push(g = { name: s.group, kind: s.kind || 'phone', items: [] });
+    g.items.push(s);
   });
+  groups.forEach(function (g) {
+    var block = document.createElement('div');
+    block.className = 'shots';
+    var label = document.createElement('p');
+    label.className = 'shots__label';
+    label.textContent = g.name;
+    var row = document.createElement('div');
+    row.className = 'shots__row shots__row--' + g.kind;
+    g.items.forEach(function (s) {
+      var tablet = g.kind === 'tablet';
+      var fig = document.createElement('figure');
+      fig.className = tablet ? 'tablet' : 'phone';
+      fig.innerHTML =
+        '<div class="' + fig.className + '__frame"><img loading="lazy" alt=""></div>' +
+        '<figcaption class="phone__cap"><strong></strong><span></span></figcaption>';
+      var img = fig.querySelector('img');
+      img.width = tablet ? 1194 : 520;
+      img.height = tablet ? 834 : 1125;
+      img.src = 'site/img/' + (s.dir || 'alpengo') + '/' + s.file + '.webp';
+      img.alt = g.name + ' — ' + s.title;
+      fig.querySelector('strong').textContent = s.title;
+      fig.querySelector('span').textContent = s.text;
+      row.appendChild(fig);
+    });
+    block.appendChild(label);
+    block.appendChild(row);
+    phones.appendChild(block);
+  });
+
   // Count-up numbers
   function countUp(el) {
     var end = +el.dataset.count, t0 = null;
