@@ -79,7 +79,7 @@
   var stage = document.querySelector('.stage__inner');
   var devices = [].slice.call(document.querySelectorAll('.stage .device'));
   // How far each device drifts apart while the hero scrolls away (px at full scroll)
-  var SPREAD = { 'device--left': [60, -140], 'device--center': [-110, 60] };
+  var SPREAD = { 'device--left': [30, -50], 'device--center': [-30, 30] };
   var INTRO_DELAY = { 'device--left': 350, 'device--center': 650 };
 
   devices.forEach(function (d) {
@@ -99,6 +99,10 @@
     d._depth = parseFloat(d.dataset.depth) || 1;
   });
   stageEl.classList.add('is-live');
+  // scale the fixed 640×560 hero canvas to the available width
+  function fitStage() { stageEl.style.setProperty('--cs', Math.min(1, stageEl.clientWidth / 640).toFixed(4)); }
+  fitStage();
+  if ('ResizeObserver' in window) new ResizeObserver(fitStage).observe(stageEl); else window.addEventListener('resize', fitStage);
 
   if (!reduceMotion) {
     var t0 = performance.now();
@@ -125,20 +129,20 @@
       }
       var sp = Math.min(Math.max(window.scrollY / heroEl.offsetHeight, 0), 1);
       if (smallScreen) sp = 0; // on phones the devices stay put so they can be tapped
-      stage.style.setProperty('--ry', (-10 + cur.x * 16).toFixed(2) + 'deg');
-      stage.style.setProperty('--rx', (6 - cur.y * 10 + sp * 14).toFixed(2) + 'deg');
+      stage.style.setProperty('--ry', (-6 + cur.x * 7).toFixed(2) + 'deg');
+      stage.style.setProperty('--rx', (3 - cur.y * 5 + sp * 6).toFixed(2) + 'deg');
       devices.forEach(function (d, i) {
         if (d.classList.contains('is-focused') || d._flying) return;
         var k = ease(Math.min(Math.max((t - d._delay) / 1300, 0), 1));
         // hovering a device calms it down so it can be tapped comfortably
         d._calm = (d._calm == null ? 1 : d._calm) + ((d.matches(':hover') ? 0 : 1) - (d._calm == null ? 1 : d._calm)) * 0.08;
         // one shared 7s rhythm, phases spread so neighbours never move toward each other at once
-        var fy = Math.sin(t / 7000 * Math.PI * 2 + i * 2.1) * 9 * d._depth * d._calm;
-        var x = cur.x * 36 * d._depth * d._calm + d._spread[0] * sp;
-        var y = cur.y * 26 * d._depth * d._calm + fy + d._spread[1] * sp + (1 - k) * 140;
+        var fy = Math.sin(t / 8000 * Math.PI * 2 + i * 1.3) * 6 * d._calm;
+        var x = cur.x * 12 * d._depth * d._calm + d._spread[0] * sp;
+        var y = cur.y * 8 * d._depth * d._calm + fy + d._spread[1] * sp + (1 - k) * 70;
         d.style.translate = x.toFixed(1) + 'px ' + y.toFixed(1) + 'px';
         d.style.opacity = (k * (1 - sp * 0.6)).toFixed(3);
-        d.style.filter = k < 1 ? 'blur(' + ((1 - k) * 14).toFixed(1) + 'px)' : '';
+        d.style.filter = k < 1 ? 'blur(' + ((1 - k) * 10).toFixed(1) + 'px)' : '';
       });
       requestAnimationFrame(frame);
     };
@@ -161,15 +165,16 @@
 
     // Live-event toasts: at most two visible, one appears as the oldest leaves
     var toasts = document.querySelectorAll('.toast');
+    if (!toasts.length) toasts = null;
     var ti = 0;
     // once the visitor starts using the live devices, the decorative toasts step aside
     var toastsOff = false;
     stageEl.addEventListener('pointerdown', function () {
       toastsOff = true;
-      toasts.forEach(function (x) { x.classList.remove('is-on'); });
+      if (toasts) toasts.forEach(function (x) { x.classList.remove('is-on'); });
     });
     var nextToast = function () {
-      if (toastsOff) return;
+      if (toastsOff || !toasts) return;
       if (heroOn && !document.hidden) {
         toasts[ti % toasts.length].classList.add('is-on');
         toasts[(ti + toasts.length - 2) % toasts.length].classList.remove('is-on');
@@ -197,7 +202,7 @@
     document.body.appendChild(overlay);
     var slot = overlay.querySelector('.focus__slot');
     var active = null, home = null, lastFocus = null;
-    var dur = reduceMotion ? 0 : 720, curve = 'cubic-bezier(.2,.85,.2,1)';
+    var dur = reduceMotion ? 0 : 760, curve = 'cubic-bezier(.16,1,.3,1)';
 
     function flip(el, from, done) {
       var to = el.getBoundingClientRect();

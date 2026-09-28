@@ -155,11 +155,7 @@
 body.rail-docked main, body.rail-docked .footer { padding-left: 312px; }
 body.rail-docked .nav__inner { width: min(1200px, 100% - 32px - 312px); margin-left: calc(312px + (100% - 312px - min(1200px, 100% - 32px - 312px)) / 2); }
 /* hero devices: scale + nudge so the whole group stays inside the viewport with a margin */
-body.rail-docked .stage { transform-origin: 50% 45%; scale: .84; translate: -16px 0; }
-@media (max-width: 1599px) { body.rail-docked .stage { scale: .78; translate: -19px 0; } }
-@media (max-width: 1439px) { body.rail-docked .stage { scale: .72; translate: -20px 0; } }
-@media (max-width: 1365px) { body.rail-docked .stage { scale: .66; translate: -18px 0; } }
-
+@media (max-width: 1599px) { @media (max-width: 1439px) { @media (max-width: 1365px) { 
 /* "Start a project" row */
 .prail__cat--hire { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--r-line); }
 .prail__cat--hire .prail__head, .prail__cat--hire .prail__label { color: var(--r-gold); }
