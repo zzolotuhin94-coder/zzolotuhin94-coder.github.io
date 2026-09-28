@@ -109,6 +109,7 @@
     var vw = document.documentElement.clientWidth || window.innerWidth;
     var m;
     if (vw < 1180) m = 'bar';
+    else if (vw >= 1280) m = 'dock'; // wide screens: docked, always open, the page makes room for it
     else {
       var wrap = $(CONTENT_SEL), left = wrap ? wrap.getBoundingClientRect().left : (vw - Math.min(1200, vw - 32)) / 2;
       m = left >= 84 ? 'full' : 'dots';
@@ -116,16 +117,18 @@
     if (m !== mode) {
       mode = m;
       nav.setAttribute('data-mode', m);
-      setOpen(false, true);
+      document.body.classList.toggle('rail-docked', m === 'dock');
+      setOpen(m === 'dock', true);
       snap();
     }
   }
 
   // ---- Expand / collapse (desktop only) ----
   var open = false, openT = 0;
-  function canExpand() { return mode === 'full' || mode === 'dots'; }
+  function canExpand() { return mode === 'full' || mode === 'dots' || mode === 'dock'; }
   function setOpen(v, now) {
     clearTimeout(openT);
+    if (mode === 'dock') v = true;
     if (v && !canExpand()) v = false;
     if (now) { apply(v); return; }
     openT = setTimeout(function () { apply(v); }, v ? 70 : 220);
@@ -192,7 +195,7 @@
     var endEl = $(END_SEL) || $('footer');
     var afterHero = hero ? hero.getBoundingClientRect().bottom < vh * 0.55 : top(cats[0].start) < vh * 0.7;
     var beforeEnd = endEl ? top(endEl) > vh * 0.62 : true;
-    setShown(afterHero && beforeEnd && !menuOpen);
+    setShown(mode === 'dock' ? !menuOpen : (afterHero && beforeEnd && !menuOpen));
 
     // active category = last category start above the reading line
     var order = cats.slice().sort(function (a, b) { return top(a.start) - top(b.start); });

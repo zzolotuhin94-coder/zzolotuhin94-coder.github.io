@@ -258,6 +258,91 @@
     });
     tourDevice.addEventListener('pointerleave', function () { tourDevice.style.setProperty('--tx', 0); tourDevice.style.setProperty('--ty', 0); });
   }
+  // 3D device models: stacked layers give the body thickness, a back plate shows when turned
+  var LOGO_BACK = '<span class="m3d__cams"><i></i><i></i><i></i></span><img src="site/img/alpengo-logo.webp" alt="">';
+  function modelBody(el, depth, backHtml, backClass) {
+    el.classList.add('m3d-body');
+    el.style.setProperty('--depth', depth + 'px');
+    for (var z = 1; z <= depth; z++) {
+      var layer = document.createElement('span');
+      layer.className = 'm3d__layer';
+      layer.setAttribute('aria-hidden', 'true');
+      layer.style.transform = 'translateZ(' + (-z) + 'px)';
+      el.appendChild(layer);
+    }
+    var back = document.createElement('span');
+    back.className = 'm3d__back' + (backClass ? ' ' + backClass : '');
+    back.setAttribute('aria-hidden', 'true');
+    back.innerHTML = backHtml || LOGO_BACK;
+    el.appendChild(back);
+  }
+  // Drag (mouse or horizontal swipe) spins the model with inertia, then it eases back to the front
+  function spinner(dragEl, varsEl, onGrab) {
+    var rx = 0, ry = 0, vx = 0, vy = 0, drag = null, idle = 0, raf = null;
+    function apply() {
+      varsEl.style.setProperty('--mrx', rx.toFixed(2) + 'deg');
+      varsEl.style.setProperty('--mry', ry.toFixed(2) + 'deg');
+    }
+    function loop(now) {
+      raf = null;
+      if (drag) return;
+      rx = Math.max(-65, Math.min(65, rx + vx)); ry += vy;
+      vx *= 0.93; vy *= 0.93;
+      if (Math.abs(vx) + Math.abs(vy) < 0.05) {
+        if (!idle) idle = now;
+        if (now - idle > 1600) {
+          var home = Math.round(ry / 360) * 360;
+          rx += (0 - rx) * 0.06; ry += (home - ry) * 0.06;
+          if (Math.abs(rx) < 0.05 && Math.abs(ry - home) < 0.05) { rx = 0; ry = 0; apply(); dragEl.classList.remove('is-grab'); return; }
+        }
+      } else idle = 0;
+      apply();
+      raf = requestAnimationFrame(loop);
+    }
+    dragEl.addEventListener('pointerdown', function (e) {
+      if (e.button !== 0) return;
+      drag = { x: e.clientX, y: e.clientY, t: performance.now(), id: e.pointerId, moved: false };
+      vx = vy = 0; idle = 0;
+    });
+    window.addEventListener('pointermove', function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (!drag.moved) {
+        if (Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+        // vertical swipes on touch keep scrolling the page
+        if (e.pointerType !== 'mouse' && Math.abs(dy) > Math.abs(dx)) { drag = null; return; }
+        drag.moved = true;
+        dragEl.classList.add('is-grab', 'was-grabbed');
+        try { dragEl.setPointerCapture(e.pointerId); } catch (err) {}
+        if (onGrab) onGrab();
+      }
+      var now = performance.now(), dt = Math.max(now - drag.t, 1);
+      var sy = dx * 0.45, sx = -dy * 0.35;
+      ry += sy; rx = Math.max(-65, Math.min(65, rx + sx));
+      vy = sy / dt * 16; vx = sx / dt * 16;
+      drag.x = e.clientX; drag.y = e.clientY; drag.t = now;
+      apply();
+    });
+    var end = function () {
+      if (!drag) return;
+      var moved = drag.moved;
+      drag = null;
+      if (moved && !raf) raf = requestAnimationFrame(loop);
+    };
+    window.addEventListener('pointerup', end);
+    window.addEventListener('pointercancel', end);
+  }
+  var ROTATE_ICON = '<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15.5-6.2M21 12a9 9 0 0 1-15.5 6.2"/><path d="M18.5 2v4h-4M5.5 22v-4h4"/></svg>';
+
+  // Tour: both the phone and the tablet are models, the whole stage is the drag area
+  modelBody(tour.querySelector('.device--tour'), 10);
+  modelBody(tour.querySelector('.tour__bezel'), 8, null, 'm3d__back--tablet');
+  var tourHint = document.createElement('span');
+  tourHint.className = 'tour__hint';
+  tourHint.innerHTML = ROTATE_ICON + 'Drag to rotate';
+  tourDevice.appendChild(tourHint);
+  spinner(tourDevice, tourDevice, function () { tourPaused = true; tour.classList.add('is-paused'); clearTimeout(tourTimer); });
+
   showTour(0);
   if (hasIO) {
     new IntersectionObserver(function (entries) {
@@ -301,6 +386,15 @@
     block.appendChild(label);
     block.appendChild(row);
     phones.appendChild(block);
+  });
+
+  // Gallery and Jàng devices are spinnable models too
+  document.querySelectorAll('.phone__frame, .tablet__frame, .jphone__frame').forEach(function (f) {
+    var tablet = f.classList.contains('tablet__frame');
+    var jang = f.classList.contains('jphone__frame');
+    modelBody(f, tablet ? 7 : 9, jang ? '<span class="m3d__cams"><i></i><i></i><i></i></span><b class="m3d__word">Jàng</b>' : null, (tablet ? 'm3d__back--tablet' : '') + (jang ? ' m3d__back--jang' : ''));
+    f.classList.add('m3d');
+    spinner(f, f);
   });
 
   // Count-up numbers

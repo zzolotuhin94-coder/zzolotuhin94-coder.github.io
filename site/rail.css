@@ -147,3 +147,11 @@
   .prail, .prail.is-shown { transform: translate3d(0, -50%, 0); }
   .prail[data-mode="bar"], .prail[data-mode="bar"].is-shown { transform: translate3d(-50%, 0, 0); }
 }
+
+/* Docked mode (≥1280px): always open, the page shifts right to make room */
+.prail[data-mode="dock"] { left: 20px; }
+.prail[data-mode="dock"] .prail__panel { width: 252px; }
+body.rail-docked main, body.rail-docked .footer { padding-left: 288px; }
+body.rail-docked .nav__inner { width: min(1200px, 100% - 32px - 288px); margin-left: calc(288px + (100% - 288px - min(1200px, 100% - 32px - 288px)) / 2); }
+body.rail-docked .stage { scale: .84; transform-origin: 38% 45%; }
+@media (max-width: 1439px) { body.rail-docked .stage { scale: .76; } }
