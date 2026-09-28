@@ -175,3 +175,7 @@ body.rail-docked .stage { transform-origin: 50% 45%; scale: .84; translate: -16p
 @media (prefers-reduced-motion: reduce) {
   .prail[data-mode="bar"].is-shown.is-tucked { transform: translate3d(-50%, calc(100% + 14px + env(safe-area-inset-bottom, 0px)), 0); }
 }
+@media (max-width: 374px) {
+  .prail[data-mode="bar"] .prail__head { gap: 5px; padding: 0 11px 0 9px; }
+  .prail[data-mode="bar"] .prail__short { font-size: 13px; }
+}

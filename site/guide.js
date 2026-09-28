@@ -88,6 +88,16 @@
   });
   var q = false;
   window.addEventListener('scroll', function () { if (!q) { q = true; requestAnimationFrame(function () { q = false; update(); }); } }, { passive: true });
-  window.addEventListener('resize', update);
+  // sit exactly in the middle of the gap between the docked rail and the page content
+  function place() {
+    var rail = document.querySelector('.prail__panel');
+    var wrap = document.querySelector('main .wrap');
+    if (!rail || !wrap || !document.body.classList.contains('rail-docked')) return;
+    var a = rail.getBoundingClientRect().right, b = wrap.getBoundingClientRect().left;
+    el.style.left = Math.round((a + b) / 2 - el.offsetWidth / 2) + 'px';
+  }
+  window.addEventListener('resize', function () { update(); place(); });
   update();
+  place();
+  setTimeout(place, 800); // after the rail has settled into dock mode
 })();
