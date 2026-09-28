@@ -22,12 +22,15 @@
     { group: 'Guest app', file: 'guest-home-night', title: 'Today in the resort', text: 'Weather at altitude, lifts and tonight’s events' },
     { group: 'Guest app', file: 'guest-concierge-day', title: 'Fabi, the AI concierge', text: 'Claude-powered answers about the resort' },
     { group: 'Guest app', file: 'guest-booking-calendar-day', title: 'Booking calendar', text: 'Live availability by party size and time' },
-    { group: 'Partner app & admin console · tablet', kind: 'tablet', file: 'tab-superadmin', title: 'Command center', text: 'Sign-ups, users, tickets, live system alerts, health and backups' },
-    { group: 'Partner app & admin console · tablet', kind: 'tablet', file: 'tab-timeline', title: 'Occupancy calendar', text: 'Rooms × days view of every stay' },
-    { group: 'Partner app & admin console · tablet', kind: 'tablet', file: 'tab-rooms', title: 'Hotel rooms', text: 'Housekeeping status per room' },
-    { group: 'Partner app & admin console · tablet', kind: 'tablet', file: 'tab-home', title: 'Live dashboard', text: 'Today’s bookings and quick actions' },
-    { group: 'Partner app & admin console · tablet', kind: 'tablet', file: 'tab-menu-builder', title: 'Menu builder', text: 'PDF upload, photo scan or manual dishes' },
-    { group: 'Partner app & admin console · tablet', kind: 'tablet', file: 'tab-floor-edit', title: 'Floor-plan editor', text: 'Drag, resize and add tables, walls and the bar' }
+    { group: 'Partner app & admin · tablet', kind: 'tablet', file: 'tab2-alpin-unified-dashboard', title: 'One business, every module', text: 'Restaurant, apartments and transfers on one dashboard — in the gold Alpine Dusk theme' },
+    { group: 'Partner app & admin · tablet', kind: 'tablet', file: 'tab2-alpin-timeline', title: 'Occupancy calendar', text: 'Rooms × days view of every stay' },
+    { group: 'Partner app & admin · tablet', kind: 'tablet', file: 'tab2-room-service', title: 'Room service', text: 'Orders from the guest app, accepted in one tap' },
+    { group: 'Partner app & admin · tablet', kind: 'tablet', file: 'tab2-hotel-home-3', title: 'Hotel dashboard', text: 'Arrivals, departures, calendar and live activity' },
+    { group: 'Partner app & admin · tablet', kind: 'tablet', file: 'tab2-superadmin-kpis', title: 'Platform analytics', text: 'Bookings, stays and rides per destination — for the resort team' },
+    { group: 'Partner app & admin · tablet', kind: 'tablet', file: 'tab2-floor-guest-detail', title: 'Live floor plan', text: 'Guest details, special requests, move or free a table' },
+    { group: 'Driver app', file: 'driver-home', title: 'Driver dashboard', text: 'Online switch, today’s earnings and the active ride' },
+    { group: 'Driver app', file: 'driver-home-requests', title: 'Incoming rides', text: 'Ski rack, 4×4, child seat — accept or decline' },
+    { group: 'Driver app', file: 'driver-chat', title: 'Chat with the guest', text: 'One-tap replies in German and English while driving' }
   ];
 
   var GALLERIES = {
