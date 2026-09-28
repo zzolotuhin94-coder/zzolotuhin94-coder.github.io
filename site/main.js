@@ -8,6 +8,7 @@
     { group: 'Guest app', file: 'guest-home-night', title: 'Today in Gerlos', text: 'Weather, lifts and tonight’s events — night theme after 18:00' },
     { group: 'Guest app', file: 'guest-restaurants-night', title: 'Reserve a table', text: 'Every restaurant in the village, open-now filter' },
     { group: 'Guest app', file: 'guest-restaurant-detail-day', title: 'Restaurant page', text: 'Services, hours, reviews, call or book' },
+    { group: 'Guest app', file: 'guest-booking-sheet-day', title: 'How to book', text: 'Via Fabi the AI concierge, OpenTable or e-mail' },
     { group: 'Guest app', file: 'guest-booking-calendar-day', title: 'Booking calendar', text: 'Live availability by party size and time' },
     { group: 'Guest app', file: 'guest-concierge-day', title: 'Fabi, the AI concierge', text: 'Claude-powered answers about the resort' },
     { group: 'Guest app', file: 'guest-myday-day', title: 'My Day', text: 'Personal plan with concierge tips — day theme' },
