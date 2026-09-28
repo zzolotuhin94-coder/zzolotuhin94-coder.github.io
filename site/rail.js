@@ -25,7 +25,8 @@
     {
       id: 'ai', label: 'AI chatbots', short: 'AI', icon: 'spark', start: '#ai',
       items: [
-        { href: '#fabi', name: 'Fabi concierge' },
+        // Fabi lives inside the AlpenGo case (the #live demo): while that block is under the reading line, AI chatbots is active
+        { href: '#fabi', name: 'Fabi concierge', zone: '#live' },
         { href: '#ai-assistant', name: 'Ember & Oak assistant' }
       ]
     }
@@ -34,12 +35,17 @@
   var HERO_SEL = '.hero';     // rail appears after this scrolls away
   var END_SEL = '#contact';   // rail hides over this (falls back to footer)
   var CONTENT_SEL = 'main .wrap';
+  var COVER_SEL = '.live__stage, .hero .stage'; // mobile bar steps aside while these demos reach the bottom of the screen
+  var BAR_ZONE = 90;
+  var HIRE = { href: '#contact', label: 'Start a project', short: 'Hire', after: '#services' }; // final call-to-action row
+  var DIM_SEL = '.stage, .live__stage'; // docked rail fades while the pointer is inside a live prototype
 
   if (document.querySelector('.prail')) return;
 
   var ICONS = {
     phone: '<rect x="6.5" y="2.75" width="11" height="18.5" rx="2.75"/><path d="M10.5 17.9h3"/>',
     browser: '<rect x="3" y="4.5" width="18" height="15" rx="2.75"/><path d="M3 9h18"/><circle cx="6.1" cy="6.75" r=".55" fill="currentColor" stroke="none"/><circle cx="8.1" cy="6.75" r=".55" fill="currentColor" stroke="none"/>',
+    hire: '<path d="M5 12h13M13 6.5 18.5 12 13 17.5"/>',
     spark: '<path d="M20 11.5c0 4.14-3.58 7.5-8 7.5-1.13 0-2.2-.22-3.18-.61L4 19.5l1.2-3.6A7.1 7.1 0 0 1 4 11.5C4 7.36 7.58 4 12 4s8 3.36 8 7.5Z"/><path d="M12 8.2l.85 2.15 2.15.85-2.15.85L12 14.2l-.85-2.15-2.15-.85 2.15-.85Z" fill="currentColor" stroke="none"/>'
   };
 
@@ -50,7 +56,7 @@
   // ---- Resolve config against the page ----
   var cats = [];
   RAIL.forEach(function (c) {
-    var items = c.items.map(function (it) { return { href: it.href, name: it.name, target: $(it.href) }; })
+    var items = c.items.map(function (it) { return { href: it.href, name: it.name, target: $(it.href), zone: it.zone ? $(it.zone) : null }; })
       .filter(function (it) { return it.target; });
     var startEl = $(c.start) || (items[0] && items[0].target);
     if (!startEl) return;
@@ -98,6 +104,20 @@
     }
     list.appendChild(li);
   });
+  // "Start a project" row: highlighted instead of a category once the visitor is past the work
+  var hire = null;
+  var hireTarget = $(HIRE.href);
+  if (hireTarget) {
+    var hli = el('li', 'prail__cat prail__cat--hire');
+    var ha = el('a', 'prail__head');
+    ha.href = HIRE.href;
+    ha.title = HIRE.label;
+    ha.innerHTML = '<span class="prail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + ICONS.hire + '</svg></span>' +
+      '<span class="prail__label">' + HIRE.label + '</span><span class="prail__short" aria-hidden="true">' + HIRE.short + '</span>';
+    hli.appendChild(ha);
+    list.appendChild(hli);
+    hire = { li: hli, head: ha, items: [], start: $(HIRE.after) || hireTarget, isHire: true };
+  }
   document.body.appendChild(nav);
 
   var projects = [];
@@ -177,6 +197,7 @@
   ['wheel', 'touchstart', 'keydown'].forEach(function (ev) {
     window.addEventListener(ev, function (e) { if (lockCat && !(ev === 'keydown' && nav.contains(e.target))) release(); }, { passive: true });
   });
+  if (hire) hire.head.addEventListener('click', function (e) { go(e, HIRE.href, hire); });
   cats.forEach(function (c) {
     c.head.addEventListener('click', function (e) { go(e, c.startHref, c); });
     c.items.forEach(function (it) { it.link.addEventListener('click', function (e) { go(e, it.href, c, it); }); });
@@ -184,6 +205,13 @@
 
   // ---- Scroll spy ----
   var active = null, shown = false, menuOpen = false;
+  var lastY = window.pageYOffset, tucked = false;
+  function setTucked(v) {
+    if (v === tucked) return;
+    tucked = v;
+    nav.classList.toggle('is-tucked', v);
+  }
+  nav.addEventListener('focusin', function () { setTucked(false); });
   function top(n) { return n.getBoundingClientRect().top; }
   function update() {
     raf = 0;
@@ -195,20 +223,47 @@
     var endEl = $(END_SEL) || $('footer');
     var afterHero = hero ? hero.getBoundingClientRect().bottom < vh * 0.55 : top(cats[0].start) < vh * 0.7;
     var beforeEnd = endEl ? top(endEl) > vh * 0.62 : true;
-    setShown(mode === 'dock' ? !menuOpen : (afterHero && beforeEnd && !menuOpen));
+    var covered = false;
+    if (mode === 'bar') {
+      document.querySelectorAll(COVER_SEL).forEach(function (n) {
+        var r = n.getBoundingClientRect();
+        if (r.height && r.top < vh && r.bottom > vh - BAR_ZONE) covered = true;
+      });
+    }
+    // bar: hides on scroll-down, comes back on scroll-up, and leaves for good once the contact section shows
+    var y0 = window.pageYOffset;
+    if (mode === 'bar') {
+      if (hireTarget && top(hireTarget) < vh) beforeEnd = false;
+      if (!lockCat && !nav.contains(document.activeElement)) {
+        if (y0 > lastY + 4 && y0 > 80) setTucked(true);
+        else if (y0 < lastY - 4) setTucked(false);
+      }
+    } else setTucked(false);
+    if (Math.abs(y0 - lastY) > 4 || mode !== 'bar') lastY = y0;
+    setShown(mode === 'dock' ? !menuOpen : (afterHero && beforeEnd && !menuOpen && !covered));
+
+    // a project with a zone (a block nested in another category's section) wins while the line is inside it
+    var zoneHit = null;
+    projects.forEach(function (it) {
+      if (!it.zone) return;
+      var r = it.zone.getBoundingClientRect();
+      if (r.top <= line && r.bottom > line) zoneHit = it;
+    });
 
     // active category = last category start above the reading line
     var order = cats.slice().sort(function (a, b) { return top(a.start) - top(b.start); });
     var cur = order[0];
     order.forEach(function (c) { if (top(c.start) <= line) cur = c; });
+    if (zoneHit) cur = zoneHit.cat;
+    if (hire && top(hire.start) <= line) { cur = hire; zoneHit = null; }
     if (lockCat) cur = lockCat;
     setActive(cur);
 
     // active project(s) of the active category; cards sharing a row light up together
     var passed = null;
-    cur.items.forEach(function (it) { var t = top(it.target); if (t <= line && (!passed || t >= passed)) passed = t; });
+    cur.items.forEach(function (it) { if (it.zone) return; var t = top(it.target); if (t <= line && (!passed || t >= passed)) passed = t; });
     projects.forEach(function (it) {
-      var on = lockProj ? it === lockProj : (passed != null && it.cat === cur && Math.abs(top(it.target) - passed) < 12);
+      var on = cur.isHire ? false : lockProj ? it === lockProj : zoneHit ? it === zoneHit : (passed != null && !it.zone && it.cat === cur && Math.abs(top(it.target) - passed) < 12);
       if (on === it.link.classList.contains('is-active')) return;
       it.link.classList.toggle('is-active', on);
       if (on) it.link.setAttribute('aria-current', 'location'); else it.link.removeAttribute('aria-current');
@@ -258,6 +313,12 @@
   }
   if (window.ResizeObserver) new ResizeObserver(snap).observe(panel);
   panel.addEventListener('transitionend', snap);
+
+  // ---- Docked rail steps back while a live prototype is in use ----
+  document.querySelectorAll(DIM_SEL).forEach(function (n) {
+    n.addEventListener('pointerenter', function (e) { if (e.pointerType !== 'touch') nav.classList.add('is-dim'); });
+    n.addEventListener('pointerleave', function () { nav.classList.remove('is-dim'); });
+  });
 
   // ---- Mobile menu ----
   var menu = document.getElementById('mobile-menu');

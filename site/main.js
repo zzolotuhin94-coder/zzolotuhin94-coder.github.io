@@ -221,7 +221,11 @@
     app.textContent = t.app;
     btn.querySelector('.tour__title').appendChild(app);
     btn.querySelector('.tour__text').textContent = t.text;
-    btn.addEventListener('click', function () { tourPaused = true; tour.classList.add('is-paused'); showTour(i); });
+    btn.addEventListener('click', function () {
+      tourPaused = true; tour.classList.add('is-paused'); showTour(i);
+      // on stacked layouts the device sits above the list — bring it into view
+      if (window.innerWidth < 1081) tourDevice.scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
     li.appendChild(btn);
     list.appendChild(li);
   });
@@ -397,16 +401,67 @@
     spinner(f, f);
   });
 
+  // Windows open smoothly as they scroll into view (scrubbed: scrolling back closes them again)
+  (function () {
+    var wins = [].slice.call(document.querySelectorAll('.win, .jang__panel'));
+    if (!wins.length) return;
+    wins.forEach(function (w) { w.classList.remove('reveal'); w.classList.add('is-in'); });
+    if (reduceMotion) { wins.forEach(function (w) { w.classList.add('is-open'); }); return; }
+    var queued = false;
+    function update() {
+      queued = false;
+      var vh = window.innerHeight;
+      wins.forEach(function (w) {
+        var top = w.getBoundingClientRect().top;
+        // closed while the window's top is at the bottom edge, fully open once it reaches ~40% of the screen
+        var p = Math.min(Math.max((vh - top) / (vh * 0.6), 0), 1);
+        var o = 1 - Math.pow(1 - p, 3);
+        if (Math.abs((w._o || -1) - o) < 0.002) return;
+        w._o = o;
+        w.style.setProperty('--o', o.toFixed(4));
+        w.classList.toggle('is-open', o > 0.999);
+      });
+    }
+    function queue() { if (!queued) { queued = true; requestAnimationFrame(update); } }
+    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', queue);
+    update();
+  })();
+
+  // Every Fiverr button points to the profile
+  document.querySelectorAll('[data-fiverr]').forEach(function (a) { a.href = FIVERR_URL; });
+
+  // Magnetic final CTA
+  if (finePointer && !reduceMotion) {
+    document.querySelectorAll('.btn--magnetic').forEach(function (b) {
+      var zone = b.parentElement;
+      zone.addEventListener('pointermove', function (e) {
+        var r = b.getBoundingClientRect();
+        var dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+        var d = Math.hypot(dx, dy);
+        if (d < 160) b.style.transform = 'translate(' + (dx * 0.12).toFixed(1) + 'px,' + (dy * 0.18).toFixed(1) + 'px)';
+        else b.style.transform = '';
+      });
+      zone.addEventListener('pointerleave', function () { b.style.transform = ''; });
+    });
+  }
+
+  // Header turns light over the cream Jàng panel
+  var jp = document.querySelector('.jang__panel');
+  if (jp && hasIO) {
+    new IntersectionObserver(function (en) { nav.classList.toggle('nav--light', en[0].isIntersecting); }, { rootMargin: '0px 0px -94% 0px' }).observe(jp);
+  }
+
   // Count-up numbers
   function countUp(el) {
     var end = +el.dataset.count, t0 = null;
     function step(t) {
       if (!t0) t0 = t;
       var p = Math.min((t - t0) / 1600, 1);
-      el.textContent = Math.round(end * (1 - Math.pow(1 - p, 3)));
+      el.textContent = Math.round(end * (0.6 + 0.4 * (1 - Math.pow(1 - p, 3))));
       if (p < 1) requestAnimationFrame(step);
     }
-    el.textContent = '0';
+    el.textContent = Math.round(end * 0.6);
     requestAnimationFrame(step);
   }
   var counters = document.querySelectorAll('[data-count]');

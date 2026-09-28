@@ -3,7 +3,10 @@
 (function () {
   var IMG = 'site/img/live/';
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var wait = function (ms) { return new Promise(function (r) { setTimeout(r, reduceMotion ? 0 : ms); }); };
+  // Delays stand for real-world latency (socket, host accepting, push) — they stay even with reduced motion;
+  // only purely decorative motion (word-by-word typing, transitions) is skipped.
+  var wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+  var uid = 0;
   var el = function (html) { var t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstChild; };
   var ICON = {
     today: '<svg viewBox="0 0 24 24"><path d="M3 20 10 8l4 6 3-4 4 10z"/></svg>',
@@ -32,9 +35,17 @@
     };
   }
 
-  // Scale each fixed-size UI to its frame
+  // Scale each fixed-size UI to its frame. Tablets in a narrow frame switch to a compact layout
+  // (720px base instead of 1194px: no side bar / top nav, bigger type) so they stay readable.
+  var TAB_COMPACT_W = 720, TAB_COMPACT_BELOW = 560;
   function fit(screen, ui, baseW) {
-    var set = function () { ui.style.setProperty('--s', screen.clientWidth / baseW); };
+    var set = function () {
+      var w = screen.clientWidth;
+      if (!w) return;
+      var compact = baseW > 400 && w < TAB_COMPACT_BELOW;
+      ui.classList.toggle('is-compact', compact);
+      ui.style.setProperty('--s', w / (compact ? TAB_COMPACT_W : baseW));
+    };
     set();
     if ('ResizeObserver' in window) new ResizeObserver(set).observe(screen);
     else window.addEventListener('resize', set);
@@ -117,11 +128,11 @@
       await wait(1100);
       typing.remove();
       var m = bot('');
-      var words = x.a.split(' ');
+      var words = reduceMotion ? [x.a] : x.a.split(' ');
       for (var i = 0; i < words.length; i++) {
         m.textContent += (i ? ' ' : '') + words[i];
         if (i % 3 === 0) scroll();
-        await wait(38);
+        if (!reduceMotion) await wait(38);
       }
       await wait(250);
       log.appendChild(card(x.card)); scroll();
@@ -143,7 +154,7 @@
   /* ---------- Guest app ---------- */
   function GuestApp(ui, bus) {
     ui.classList.add('ga');
-    var state = { tab: 0, booking: null, guests: 2, slot: '19:30', rest: null };
+    var state = { tab: 0, bookings: [], guests: 2, slot: '19:30', rest: null };
     ui.innerHTML =
       '<div class="ga__island"></div><div class="ga__status"><span>19:32</span><span>5G <i></i></span></div>' +
       '<div class="ga__views"></div>' +
@@ -153,7 +164,7 @@
         var p = t.split(':');
         return '<button class="ga__tab' + (i ? '' : ' is-on') + '" type="button" data-tab="' + i + '">' + ICON[p[1]] + p[0] + '</button>';
       }).join('') + '</nav>' +
-      '<div class="ga__scrim"></div><div class="ga__sheet" role="dialog" aria-modal="true"></div>' +
+      '<div class="ga__scrim"></div><div class="ga__sheet" role="dialog" aria-modal="true" aria-label="Details" tabindex="-1" inert></div>' +
       '<div class="ga__push" role="status"></div>';
 
     var views = ui.querySelector('.ga__views');
@@ -162,6 +173,8 @@
     var push = ui.querySelector('.ga__push');
     var pill = ui.querySelector('.ga__tabpill');
     var tabs = ui.querySelectorAll('.ga__tab');
+    var tabbar = ui.querySelector('.ga__tabs');
+    var fab = ui.querySelector('.ga__fab');
     var current = null;
 
     function header(title) {
@@ -204,21 +217,26 @@
       },
       fabi: function () {
         var v = el('<section class="ga__view" style="padding-bottom:104px"><div class="fc-host" style="height:100%"></div></section>');
-        FabiChat(v.querySelector('.fc-host'), { onBook: function (r) { openBooking(r.id, '19:30'); } });
+        // Fabi suggested "a free table for 2 at 19:30" — the booking sheet opens with exactly that
+        FabiChat(v.querySelector('.fc-host'), { onBook: function (r) { openBooking(r.id, '19:30', 2); } });
         return v;
       },
       day: function () {
-        var b = state.booking;
+        var list = state.bookings.slice().sort(function (a, c) { return a.time < c.time ? -1 : a.time > c.time ? 1 : a.n - c.n; });
         var v = el('<section class="ga__view">' + header('Hello, <span style="color:var(--g-gold)">Guest</span>') +
           '<div class="ga__card ga__rec"><small>YOUR RECOMMENDATION FOR NOW</small><p>The sun sets at 18:52 — the terrace at Dahuam.202 is the warmest seat in the village.</p><span>— your concierge, Fabi</span></div>' +
           '<h3>Your day today</h3><div class="ga__tl">' +
           '<div class="ga__card ga__tli is-done"><time>09:00</time><strong>Breakfast in the hotel</strong><small>Done</small></div>' +
           '<div class="ga__card ga__tli is-done"><time>10:30</time><strong>Isskogelbahn — first run</strong><small>Done</small></div>' +
-          (b ? '<div class="ga__card ga__tli is-new"><time>' + b.time + '</time><strong>Dinner at ' + b.rest.name + '</strong><small>Table ' + (b.table || '—') + ' · ' + b.guests + ' guests · ' + (b.ok ? 'confirmed ✓' : 'waiting for the host…') + '</small></div>'
+          (list.length ? list.map(function (b) {
+            return '<div class="ga__card ga__tli' + (b.seen ? '' : ' is-new') + '"><time>' + b.time + '</time><strong>Dinner at ' + b.rest.name + '</strong><small>Table ' + (b.table || '—') + ' · ' + b.guests + ' guest' + (b.guests === 1 ? '' : 's') + ' · ' + (b.ok ? 'confirmed ✓' : 'waiting for the host…') + '</small></div>';
+          }).join('') + '<button class="ga__card ga__tli ga__tli--add" type="button" data-go="1"><time>Tonight</time><strong>Add another reservation</strong><small style="color:var(--g-gold)">Reserve a table ›</small></button>'
             : '<button class="ga__card ga__tli" type="button" data-go="1" style="width:100%;text-align:left"><time>19:30</time><strong>Dinner — no table yet</strong><small style="color:var(--g-gold)">Reserve a table ›</small></button>') +
           '</div></section>');
         var go = v.querySelector('[data-go]');
         if (go) go.addEventListener('click', function () { goTab(1); });
+        state.bookings.forEach(function (b) { b.seen = true; });
+        v.dataset.screen = 'day';
         return v;
       }
     };
@@ -235,6 +253,16 @@
       setTimeout(function () { prev.remove(); next.classList.remove('in-next', 'in-prev'); }, 820);
     }
 
+    // Re-render My Day in place when a booking changes while it is on screen
+    function refreshDay() {
+      if (!current || current.dataset.screen !== 'day' || current.classList.contains('in-next') || current.classList.contains('in-prev')) return;
+      var top = current.scrollTop;
+      var next = screens.day();
+      views.replaceChild(next, current);
+      current = next;
+      next.scrollTop = top;
+    }
+
     function goTab(i) {
       closeSheet();
       var dir = i === state.tab && current && current.classList.contains('ga__view--detail') ? -1 : (i >= state.tab ? 1 : -1);
@@ -246,7 +274,7 @@
       show(screens[ORDER[i]](), dir);
     }
     tabs.forEach(function (t) { t.addEventListener('click', function () { goTab(+t.dataset.tab); }); });
-    ui.querySelector('.ga__fab').addEventListener('click', function () { goTab(2); });
+    fab.addEventListener('click', function () { goTab(2); });
 
     function openDetail(id) {
       var r = byId(id);
@@ -278,33 +306,66 @@
     }
 
     /* Sheets */
-    function openSheet(html) {
+    // The sheet is inert while closed (not focusable, not announced); while open, the app behind it is inert.
+    var opener = null, sheetOpen = false;
+    var behind = function (v) { [views, tabbar, fab].forEach(function (n) { n.inert = v; }); };
+    function openSheet(html, label, kind) {
       sheet.innerHTML = '<div class="ga__handle"></div>' + html;
+      sheet.setAttribute('aria-label', label || 'Details');
+      sheet.dataset.kind = kind || '';
+      delete sheet.dataset.booking;
+      if (!sheetOpen) opener = document.activeElement;
+      sheetOpen = true;
+      sheet.inert = false;
+      behind(true);
+      focusSheet();
       requestAnimationFrame(function () { sheet.classList.add('is-on'); scrim.classList.add('is-on'); });
     }
-    function closeSheet() { sheet.classList.remove('is-on'); scrim.classList.remove('is-on'); }
+    function focusSheet() {
+      // only move focus if the visitor is working inside this app (a mouse click elsewhere shouldn't be hijacked)
+      if (!ui.contains(document.activeElement) && document.activeElement !== document.body) return;
+      var f = sheet.querySelector('button:not([disabled])') || sheet;
+      f.focus({ preventScroll: true });
+    }
+    function closeSheet() {
+      if (!sheetOpen) return;
+      sheetOpen = false;
+      var hadFocus = sheet.contains(document.activeElement);
+      sheet.classList.remove('is-on'); scrim.classList.remove('is-on');
+      sheet.inert = true;
+      behind(false);
+      if (hadFocus) {
+        var back = opener && opener.isConnected && ui.contains(opener) ? opener : (current && current.querySelector('button')) || tabs[state.tab];
+        if (back) back.focus({ preventScroll: true });
+      }
+      opener = null;
+    }
     scrim.addEventListener('click', closeSheet);
+    ui.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && sheetOpen) { e.stopPropagation(); closeSheet(); }
+    });
 
     function liftSheet() {
       openSheet('<h4>Lift status · Gerlos</h4><p>Live from the lift operators · updated 19:30</p>' +
         '<div class="ga__lift"><i></i><span>Isskogelbahn</span><small>Open · until 16:00</small></div>' +
         '<div class="ga__lift is-closed"><i></i><span>Königsleitenbahn</span><small>Closed · opens 09:00</small></div>' +
         '<div class="ga__lift"><i></i><span>Übungslift Gerlos</span><small>Open · until 16:30</small></div>' +
-        '<button class="ga__acc" type="button" aria-expanded="false">Season 2026/27 hours</button><div class="ga__accbody">Winter season from 5 December to 11 April. First lift 08:30, last ascent 16:00. Night skiing on Thursdays until 21:00.</div>');
+        '<button class="ga__acc" type="button" aria-expanded="false">Season 2026/27 hours</button><div class="ga__accbody">Winter season from 5 December to 11 April. First lift 08:30, last ascent 16:00. Night skiing on Thursdays until 21:00.</div>', 'Lift status');
       var acc = sheet.querySelector('.ga__acc');
       acc.addEventListener('click', function () { acc.setAttribute('aria-expanded', acc.getAttribute('aria-expanded') !== 'true'); });
     }
 
-    function openBooking(id, slot) {
+    function openBooking(id, slot, guests) {
       var r = byId(id);
       state.rest = r;
       if (slot) state.slot = slot;
+      if (guests) state.guests = guests;
       var slots = ['18:30', '19:00', '19:30', '20:00', '20:30', '21:00'];
       openSheet('<h4>Book a table</h4><p>' + r.name + ' · Today, 28 Sep</p>' +
         '<div class="ga__label">Guests</div><div class="ga__stepper"><button type="button" data-g="-1">−</button><strong><span data-guests>' + state.guests + '</span> guests</strong><button type="button" data-g="1">+</button></div>' +
         '<div class="ga__label">Available times</div><div class="ga__slots">' + slots.map(function (s) {
           return '<button class="ga__slot' + (s === state.slot ? ' is-on' : '') + '" type="button"' + (s === '19:00' ? ' disabled' : '') + '>' + s + '</button>';
-        }).join('') + '</div><button class="ga__btn ga__btn--gold ga__confirm" type="button"></button>');
+        }).join('') + '</div><button class="ga__btn ga__btn--gold ga__confirm" type="button"></button>', 'Book a table', 'book');
       var confirm = sheet.querySelector('.ga__confirm');
       var label = function () { confirm.textContent = 'Confirm · ' + state.guests + ' guests · ' + state.slot; };
       label();
@@ -322,27 +383,45 @@
         });
       });
       confirm.addEventListener('click', async function () {
-        confirm.disabled = true;
+        var sheetWasFocused = sheet.contains(document.activeElement);
+        confirm.disabled = true; // (a disabled button drops focus — it goes back to the sheet below)
+        confirm.setAttribute('aria-label', 'Sending');
         confirm.innerHTML = '<span class="ga__spin"></span>';
+        if (sheetWasFocused) sheet.focus({ preventScroll: true });
         await wait(700);
-        state.booking = { rest: r, guests: state.guests, time: state.slot, ok: false };
-        sheet.innerHTML = '<div class="ga__handle"></div><div class="ga__done"><svg class="ga__check" viewBox="0 0 80 80"><circle cx="40" cy="40" r="36"/><path d="M25 41l10 10 20-22"/></svg>' +
-          '<h4>Request sent</h4><p>' + r.name + ' · Today ' + state.slot + ' · ' + state.guests + ' guests</p><div class="ga__wait">● Waiting for the restaurant to confirm…</div></div>';
-        bus.emit('booking', state.booking);
+        if (!sheetOpen || sheet.dataset.kind !== 'book' || !sheet.contains(confirm)) return; // closed meanwhile
+        var b = { id: 'b' + (++uid), n: uid, rest: r, guests: state.guests, time: state.slot, ok: false };
+        state.bookings.push(b);
+        sheet.innerHTML = '<div class="ga__handle"></div><div class="ga__done"><svg class="ga__check" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="36"/><path d="M25 41l10 10 20-22"/></svg>' +
+          '<h4>Request sent</h4><p>' + r.name + ' · Today ' + b.time + ' · ' + b.guests + ' guest' + (b.guests === 1 ? '' : 's') + '</p><div class="ga__wait" role="status">● Waiting for the restaurant to confirm…</div></div>';
+        sheet.setAttribute('aria-label', 'Request sent');
+        sheet.dataset.kind = 'done';
+        sheet.dataset.booking = b.id;
+        if (sheetWasFocused || document.activeElement === document.body) sheet.focus({ preventScroll: true });
+        refreshDay();
+        bus.emit('booking', b);
       });
     }
 
+    var doneShowing = function (b) { return sheetOpen && sheet.dataset.kind === 'done' && sheet.dataset.booking === b.id; };
     bus.on('accepted', async function (d) {
-      if (!state.booking || state.booking.ok) return;
-      state.booking.ok = true;
-      state.booking.table = d.table;
-      var w = sheet.querySelector('.ga__wait');
-      if (w) { w.textContent = '✓ Confirmed · Table ' + d.table; w.classList.add('is-ok'); }
-      push.innerHTML = '<b>AG</b><span><strong>Reservation confirmed ✓</strong>' + state.booking.rest.name + ' · Table ' + d.table + ' is ready at ' + state.booking.time + '</span>';
+      var b = d.booking;
+      if (state.bookings.indexOf(b) < 0 || b.ok) return; // someone else's booking
+      b.ok = true;
+      b.table = d.table;
+      if (doneShowing(b)) {
+        var w = sheet.querySelector('.ga__wait');
+        if (w) { w.textContent = '✓ Confirmed · Table ' + d.table; w.classList.add('is-ok'); }
+      }
+      refreshDay();
+      push.innerHTML = '<b>AG</b><span><strong>Reservation confirmed ✓</strong>' + b.rest.name + ' · Table ' + d.table + ' is ready at ' + b.time + '</span>';
       push.classList.add('is-on');
+      var mine = push.dataset.b = b.id;
       await wait(3600);
-      push.classList.remove('is-on');
+      if (push.dataset.b === mine) push.classList.remove('is-on');
       await wait(300);
+      // only move on if the visitor is still looking at this booking's confirmation
+      if (!doneShowing(b)) return;
       closeSheet();
       goTab(3);
     });
@@ -351,92 +430,155 @@
   }
 
   /* ---------- Partner tablet ---------- */
+  // One tablet per restaurant: each venue keeps its own floor plan and lists; a booking brings its venue on screen.
+  var LAYOUT = [
+    { n: 1, seats: 2, x: 40, y: 70, w: 92, h: 92, round: 1 }, { n: 2, seats: 2, x: 170, y: 70, w: 92, h: 92, round: 1 },
+    { n: 3, seats: 4, x: 300, y: 70, w: 150, h: 92 }, { n: 4, seats: 4, x: 488, y: 70, w: 150, h: 92 },
+    { n: 5, seats: 2, x: 40, y: 200, w: 92, h: 92, round: 1 }, { n: 6, seats: 6, x: 170, y: 200, w: 210, h: 92 },
+    { n: 7, seats: 2, x: 418, y: 200, w: 92, h: 92, round: 1 }, { n: 8, seats: 4, x: 548, y: 200, w: 90, h: 150 },
+    { n: 9, seats: 4, x: 40, y: 330, w: 150, h: 92 }, { n: 10, seats: 2, x: 228, y: 330, w: 92, h: 92, round: 1 },
+    { n: 11, seats: 4, x: 358, y: 330, w: 150, h: 92 }, { n: 12, seats: 8, x: 40, y: 460, w: 300, h: 92 }
+  ];
+  var VENUES = {
+    dahuam: { occ: { 1: 'Lukas G.', 3: 'Familie Hofer', 6: 'Markus Wagner', 10: 'Eva L.' }, res: { 4: 'Anna B. · 20:00', 11: 'Paul E. · 21:00' },
+      tonight: [['Familie Hofer', '18:00', 4, 'Seated', 3], ['Markus Wagner', '18:30', 6, 'Seated', 6], ['Anna Berger', '20:00', 4, 'Confirmed', 4], ['Paul Egger', '21:00', 3, 'Confirmed', 11]] },
+    luise: { occ: { 2: 'Jonas K.', 4: 'Sophie M.', 7: 'Tim R.', 12: 'Ski club Gerlos' }, res: { 3: 'Lena F. · 20:30', 9: 'Max H. · 21:00' },
+      tonight: [['Ski club Gerlos', '18:00', 8, 'Seated', 12], ['Sophie Maier', '18:45', 4, 'Seated', 4], ['Lena Fischer', '20:30', 4, 'Confirmed', 3], ['Max Huber', '21:00', 3, 'Confirmed', 9]] },
+    jaeger: { occ: { 3: 'Familie Gruber', 5: 'Clara W.', 8: 'Stefan P.' }, res: { 6: 'Wanderverein · 20:00', 10: 'Ida S. · 21:30' },
+      tonight: [['Familie Gruber', '18:15', 4, 'Seated', 3], ['Stefan Pichler', '19:00', 4, 'Seated', 8], ['Wanderverein', '20:00', 6, 'Confirmed', 6], ['Ida Steiner', '21:30', 2, 'Confirmed', 10]] }
+  };
+  function venueState(id) {
+    var v = VENUES[id] || VENUES.dahuam;
+    return {
+      id: id,
+      tables: LAYOUT.map(function (t) {
+        var o = { n: t.n, seats: t.seats, s: 'free', who: '' };
+        if (v.occ[t.n]) { o.s = 'occ'; o.who = v.occ[t.n]; } else if (v.res[t.n]) { o.s = 'res'; o.who = v.res[t.n]; }
+        return o;
+      }),
+      waiting: [],
+      tonight: v.tonight.map(function (r) { return { name: r[0], time: r[1], guests: r[2], status: r[3], table: r[4] }; })
+    };
+  }
+
   function PartnerTablet(ui, bus) {
     ui.classList.add('pt');
-    var TABLES = [
-      { n: 1, seats: 2, x: 40, y: 70, w: 92, h: 92, round: 1, s: 'occ', who: 'Lukas G.' },
-      { n: 2, seats: 2, x: 170, y: 70, w: 92, h: 92, round: 1, s: 'free' },
-      { n: 3, seats: 4, x: 300, y: 70, w: 150, h: 92, s: 'occ', who: 'Familie Hofer' },
-      { n: 4, seats: 4, x: 488, y: 70, w: 150, h: 92, s: 'res', who: 'Anna B. · 20:00' },
-      { n: 5, seats: 2, x: 40, y: 200, w: 92, h: 92, round: 1, s: 'free' },
-      { n: 6, seats: 6, x: 170, y: 200, w: 210, h: 92, s: 'occ', who: 'Markus Wagner' },
-      { n: 7, seats: 2, x: 418, y: 200, w: 92, h: 92, round: 1, s: 'free' },
-      { n: 8, seats: 4, x: 548, y: 200, w: 90, h: 150, s: 'free' },
-      { n: 9, seats: 4, x: 40, y: 330, w: 150, h: 92, s: 'free' },
-      { n: 10, seats: 2, x: 228, y: 330, w: 92, h: 92, round: 1, s: 'occ', who: 'Eva L.' },
-      { n: 11, seats: 4, x: 358, y: 330, w: 150, h: 92, s: 'res', who: 'Paul E. · 21:00' },
-      { n: 12, seats: 8, x: 40, y: 460, w: 300, h: 92, s: 'free' }
-    ];
     ui.innerHTML =
       '<aside class="pt__side"><span>' + ICON.today + '</span><span class="is-on"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span><span>' + ICON.bell + '</span><span>' + ICON.user + '</span></aside>' +
-      '<div class="pt__main"><div class="pt__bar"><div><strong>AlpenGO Business</strong><small data-venue>Dahuam.202 Restobar</small></div>' +
+      '<div class="pt__main"><div class="pt__bar"><div><strong>AlpenGO Business</strong><small data-venue></small></div>' +
       '<nav class="pt__nav"><span>Dashboard</span><b>Floor plan</b><span>Bookings</span><span>Analytics</span><span>Guests</span></nav><span class="pt__live"><i></i>Live</span></div>' +
       '<div class="pt__tools"><span class="pt__clock">19:32</span><span class="pt__seg"><span class="is-on">Seating mode</span><span>Configure</span></span><span class="pt__occ"><b data-occ></b> full</span></div>' +
       '<div class="pt__body"><div class="pt__list"><div class="pt__sec"><span>Waiting</span><span data-wcount>0</span></div><div data-waiting></div>' +
-      '<div class="pt__sec"><span>Tonight</span><span>5</span></div><div data-tonight>' +
-      '<div class="pt__row"><strong>Familie Hofer<span>18:00 · 4</span></strong><small>Seated · Table 3</small></div>' +
-      '<div class="pt__row"><strong>Markus Wagner<span>18:30 · 6</span></strong><small>Seated · Table 6</small></div>' +
-      '<div class="pt__row"><strong>Anna Berger<span>20:00 · 4</span></strong><small>Confirmed · Table 4</small></div>' +
-      '<div class="pt__row"><strong>Paul Egger<span>21:00 · 3</span></strong><small>Confirmed · Table 11</small></div></div></div>' +
-      '<div class="pt__floor"><div class="pt__legend"><span class="l-free">Free</span><span class="l-occ">Occupied</span><span class="l-res">Reserved</span></div><div class="pt__toast"></div></div></div></div>';
+      '<div class="pt__sec"><span>Tonight</span><span data-tcount>0</span></div><div data-tonight></div></div>' +
+      '<div class="pt__floor"><div class="pt__legend"><span class="l-free">Free</span><span class="l-occ">Occupied</span><span class="l-res">Reserved</span></div><div class="pt__plan"></div><div class="pt__toast"></div></div></div></div>';
     var floor = ui.querySelector('.pt__floor');
+    var plan = ui.querySelector('.pt__plan');
     var toast = ui.querySelector('.pt__toast');
-    var waiting = ui.querySelector('[data-waiting]');
-    var tonight = ui.querySelector('[data-tonight]');
+    var waitingEl = ui.querySelector('[data-waiting]');
+    var tonightEl = ui.querySelector('[data-tonight]');
     var nodes = {};
-    TABLES.forEach(function (t) {
+    LAYOUT.forEach(function (t) {
       var d = el('<div class="pt__table' + (t.round ? ' is-round' : '') + '"></div>');
       d.style.cssText = 'left:' + (t.x + 20) + 'px;top:' + (t.y + 10) + 'px;width:' + t.w + 'px;height:' + t.h + 'px';
       nodes[t.n] = d;
-      floor.appendChild(d);
-      paint(t);
+      plan.appendChild(d);
     });
-    function paint(t) {
-      var d = nodes[t.n];
-      d.classList.toggle('is-occ', t.s === 'occ');
-      d.classList.toggle('is-res', t.s === 'res');
-      d.innerHTML = '<b>' + t.n + '</b><span>' + t.seats + ' seats</span>' + (t.who ? '<em>' + t.who + '</em>' : '');
-    }
-    function occ() {
-      var busy = TABLES.filter(function (t) { return t.s !== 'free'; }).length;
-      ui.querySelector('[data-occ]').textContent = Math.round(busy / TABLES.length * 100) + '%';
-    }
-    occ();
+    // the floor plan scales down with its panel (compact layout) instead of being cut off
+    var fitPlan = function () {
+      var w = floor.clientWidth, h = floor.clientHeight;
+      if (w && h) plan.style.setProperty('--ps', Math.min(1, (w - 16) / 680, (h - 30) / 580).toFixed(3));
+    };
+    if ('ResizeObserver' in window) new ResizeObserver(fitPlan).observe(floor);
+    fitPlan();
 
-    var pending = null;
+    var venues = {};
+    var get = function (id) { return venues[id] || (venues[id] = venueState(id)); };
+    var cur = get('dahuam');
+
+    function rowHtml(r) {
+      return '<div class="pt__row' + (r.app ? ' is-app' : '') + (r.fresh ? ' is-in' : '') + '"><strong>' + r.name + '<span>' + r.time + ' · ' + r.guests + '</span></strong><small><span class="pt__tag">' + r.status + '</span> Table ' + r.table + '</small></div>';
+    }
+    function render() {
+      ui.querySelector('[data-venue]').textContent = byId(cur.id).name;
+      waitingEl.innerHTML = cur.waiting.map(function (w) {
+        return '<div class="pt__row is-app' + (w.fresh ? ' is-in' : '') + '" data-id="' + w.b.id + '"><strong>Guest (app)<span>' + w.b.time + ' · ' + w.b.guests + '</span></strong><small><span class="pt__tag pt__tag--wait">Waiting</span> suggested Table ' + w.t.n + '</small>' +
+          '<div class="pt__acts"><button class="pt__accept" type="button" data-act="accept">Accept</button><button class="pt__decline" type="button" data-act="decline">Decline</button></div></div>';
+      }).join('');
+      tonightEl.innerHTML = cur.tonight.map(rowHtml).join('');
+      ui.querySelector('[data-wcount]').textContent = cur.waiting.length;
+      ui.querySelector('[data-tcount]').textContent = cur.tonight.length;
+      cur.waiting.forEach(function (w) { w.fresh = false; });
+      cur.tonight.forEach(function (r) { r.fresh = false; });
+      cur.tables.forEach(function (t) {
+        var d = nodes[t.n];
+        d.classList.toggle('is-occ', t.s === 'occ');
+        d.classList.toggle('is-res', t.s === 'res');
+        d.classList.toggle('is-pending', cur.waiting.some(function (w) { return w.t === t; }));
+        d.innerHTML = '<b>' + t.n + '</b><span>' + t.seats + ' seats</span>' + (t.who ? '<em>' + t.who + '</em>' : '');
+      });
+      var busy = cur.tables.filter(function (t) { return t.s !== 'free'; }).length;
+      ui.querySelector('[data-occ]').textContent = Math.round(busy / cur.tables.length * 100) + '%';
+      if (!cur.waiting.length) toast.classList.remove('is-on');
+    }
+    function show(v) {
+      if (v === cur) return;
+      cur = v;
+      toast.classList.remove('is-on');
+      render();
+      ui.classList.remove('is-switch'); void ui.offsetWidth; ui.classList.add('is-switch');
+    }
+    render();
+
+    waitingEl.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-act]');
+      if (!btn) return;
+      var id = btn.closest('[data-id]').dataset.id;
+      var w = cur.waiting.filter(function (x) { return x.b.id === id; })[0];
+      if (w) accept(w, cur); // the demo always seats the guest, even on "Decline"
+    });
+
+    async function accept(w, v) {
+      if (w.done) return; w.done = true;
+      if (v === cur) {
+        var b = waitingEl.querySelector('[data-id="' + w.b.id + '"] .pt__accept');
+        if (b) b.classList.add('is-press');
+      }
+      await wait(260);
+      v.waiting.splice(v.waiting.indexOf(w), 1);
+      w.t.s = 'res'; w.t.who = 'Guest · ' + w.b.time;
+      v.tonight.unshift({ name: 'Guest (app)', time: w.b.time, guests: w.b.guests, status: 'Confirmed', table: w.t.n, app: true, fresh: true });
+      if (v === cur) {
+        render();
+        var n = nodes[w.t.n];
+        n.classList.add('is-pop');
+        setTimeout(function () { n.classList.remove('is-pop'); }, 500);
+      }
+      bus.emit('accepted', { booking: w.b, table: w.t.n });
+    }
+
     bus.on('booking', async function (b) {
-      ui.querySelector('[data-venue]').textContent = b.rest.name;
-      var t = TABLES.filter(function (x) { return x.s === 'free' && x.seats >= b.guests; }).sort(function (a, c) { return a.seats - c.seats; })[0] || TABLES[11];
-      pending = { b: b, t: t };
-      await wait(650); // travel time over the socket
-      toast.innerHTML = '🔔 <span><b>New booking</b> · ' + b.guests + ' guests · ' + b.time + '</span>';
-      toast.classList.add('is-on');
-      ui.querySelector('[data-wcount]').textContent = '1';
-      var row = el('<div class="pt__row is-new"><strong>Guest (app)<span>' + b.time + ' · ' + b.guests + '</span></strong><small><span class="pt__tag pt__tag--wait">Waiting</span> suggested Table ' + t.n + '</small>' +
-        '<div class="pt__acts"><button class="pt__accept" type="button">Accept</button><button class="pt__decline" type="button">Decline</button></div></div>');
-      waiting.appendChild(row);
-      nodes[t.n].classList.add('is-pending');
-      var accept = row.querySelector('.pt__accept');
-      var done = false;
-      var go = async function () {
-        if (done) return; done = true;
-        accept.classList.add('is-press');
-        await wait(260);
-        row.remove();
-        ui.querySelector('[data-wcount]').textContent = '0';
-        nodes[t.n].classList.remove('is-pending');
-        t.s = 'res'; t.who = 'Guest · ' + b.time; paint(t);
-        nodes[t.n].classList.add('is-pop');
-        setTimeout(function () { nodes[t.n].classList.remove('is-pop'); }, 500);
-        occ();
-        tonight.insertBefore(el('<div class="pt__row is-new"><strong>Guest (app)<span>' + b.time + ' · ' + b.guests + '</span></strong><small><span class="pt__tag">Confirmed</span> Table ' + t.n + '</small></div>'), tonight.firstChild);
-        toast.classList.remove('is-on');
-        bus.emit('accepted', { table: t.n });
+      var v = get(b.rest.id);
+      show(v);
+      var free = function (t) { return t.s === 'free' && !v.waiting.some(function (w) { return w.t === t; }); };
+      var pick = function () {
+        return v.tables.filter(function (x) { return free(x) && x.seats >= b.guests; }).sort(function (a, c) { return a.seats - c.seats; })[0] ||
+          v.tables.filter(free).sort(function (a, c) { return c.seats - a.seats; })[0];
       };
-      accept.addEventListener('click', go);
-      row.querySelector('.pt__decline').addEventListener('click', go); // the demo always seats the guest
+      var t = pick();
+      if (!t) { // fully booked: the evening turns over (keeps the demo going after many bookings)
+        v.tables.forEach(function (x) { if (x.s === 'occ') { x.s = 'free'; x.who = ''; } });
+        t = pick();
+      }
+      var w = { b: b, t: t, fresh: true };
+      v.waiting.push(w); // hold the table right away so a second booking gets another one
+      await wait(650); // travel time over the socket
+      if (v === cur) {
+        render();
+        toast.innerHTML = '🔔 <span><b>New booking</b> · ' + b.guests + ' guests · ' + b.time + '</span>';
+        toast.classList.add('is-on');
+      }
       await wait(2600);
-      go();
+      accept(w, v);
     });
   }
 
@@ -481,6 +623,34 @@
     liveBus.on('accepted', function () { tick(2); });
   }
 
+  // Stacked layout (phone above tablet): follow the request down to the tablet, then back up to the phone
+  var liveTab = document.querySelector('#live-tablet'), livePhone = document.querySelector('#live-app');
+  if (liveTab && livePhone) {
+    var stacked = window.matchMedia('(max-width: 1080px)');
+    var autoY = null;
+    var bring = function (node, block) {
+      var r = node.getBoundingClientRect(), vh = window.innerHeight;
+      if (r.top >= 72 && r.bottom <= vh - 8) return false; // already fully visible
+      var y = block === 'start' ? r.top - 80 : r.top + r.height / 2 - vh / 2; // 'start' clears the fixed header
+      window.scrollTo({ top: window.scrollY + y, behavior: reduceMotion ? 'auto' : 'smooth' });
+      return true;
+    };
+    liveBus.on('booking', function () {
+      if (!stacked.matches) return;
+      autoY = null;
+      if (bring(liveTab, 'center')) setTimeout(function () { autoY = window.scrollY; }, 900);
+    });
+    liveBus.on('accepted', function () {
+      if (!stacked.matches) return;
+      var y = autoY; autoY = null;
+      setTimeout(function () {
+        // only return if the visitor hasn't scrolled somewhere else in the meantime
+        if (y == null || Math.abs(window.scrollY - y) > 40) return;
+        bring(livePhone, 'start');
+      }, 900);
+    });
+  }
+
   // Hero: all three devices are live and wired together
   var heroBus = makeBus();
   mount('#hero-app', 390, GuestApp, heroBus);
@@ -489,23 +659,34 @@
     ui.classList.add('ga');
     ui.innerHTML = '<div class="ga__island"></div><div class="ga__status"><span>19:32</span><span>5G <i></i></span></div><div class="hero-chat" style="height:100%"></div><div class="ga__push" role="status"></div>';
     var push = ui.querySelector('.ga__push');
-    var pending = null;
+    var mine = [];
     FabiChat(ui.querySelector('.hero-chat'), {
       onBook: async function (r, btn) {
         btn.disabled = true;
         btn.innerHTML = '<span class="ga__spin"></span> Sending to the restaurant…';
-        pending = { rest: r, guests: 2, time: '19:30', ok: false, btn: btn };
-        bus.emit('booking', pending);
+        var b = { id: 'b' + (++uid), n: uid, rest: r, guests: 2, time: '19:30', ok: false, btn: btn };
+        mine.push(b);
+        bus.emit('booking', b);
       }
     });
     bus.on('accepted', async function (d) {
-      if (!pending) return;
-      var b = pending; pending = null;
-      b.btn.textContent = 'Booked ✓ · Table ' + d.table + ' · ' + b.time;
+      var b = d.booking;
+      if (mine.indexOf(b) < 0 || b.ok) return; // booked from the other phone
+      b.ok = true;
+      if (b.btn.isConnected) b.btn.textContent = 'Booked ✓ · Table ' + d.table + ' · ' + b.time;
       push.innerHTML = '<b>AG</b><span><strong>Reservation confirmed ✓</strong>' + b.rest.name + ' · Table ' + d.table + ' at ' + b.time + '</span>';
       push.classList.add('is-on');
+      var id = push.dataset.b = b.id;
       await wait(3400);
-      push.classList.remove('is-on');
+      if (push.dataset.b === id) push.classList.remove('is-on');
     });
   }, heroBus);
+
+  // Pause the infinite decorative animations (fab pulse, live dots, beam dash…) while they are off-screen
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (en) {
+      en.forEach(function (e) { e.target.classList.toggle('is-offscreen', !e.isIntersecting); });
+    }, { rootMargin: '100px 0px' });
+    document.querySelectorAll('.stage, .live, .device__screen--live').forEach(function (n) { io.observe(n); });
+  }
 })();

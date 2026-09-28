@@ -41,7 +41,7 @@
         <a href="#jang">Jàng</a>
         <a href="#work">Work</a>
         <a href="#services">Services</a>
-        <a href="#contact" class="btn btn--small">Hire me</a>
+        <a href="#contact" class="btn btn--small">Start a project</a>
       </nav>
       <button class="nav__toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span></button>
     </div>
@@ -65,9 +65,10 @@
           <h1 class="headline"><span class="line"><span>I build products</span></span><span class="line"><span><em class="gold">people actually use.</em></span></span></h1>
           <p class="hero__lead reveal">Full-stack web &amp; mobile developer. From a tourism super-app with real-time bookings and an AI concierge, to scroll-driven 3D landing pages and AI chatbots for small businesses.</p>
           <div class="hero__cta reveal">
-            <a class="btn" href="#alpengo">Explore AlpenGo <span aria-hidden="true">→</span></a>
-            <a class="btn btn--ghost" href="#work">All projects</a>
+            <a class="btn" href="https://www.fiverr.com/zolotuhindev" target="_blank" rel="noopener" data-fiverr>Start a project on Fiverr <span aria-hidden="true">→</span></a>
+            <a class="btn btn--ghost" href="#live">Try the live demo</a>
           </div>
+          <p class="hero__proof reveal"><span>4-app platform shipped</span><span>3 languages</span><span>Source code is yours</span></p>
         </div>
 
         <div class="stage" aria-label="AlpenGo app screens">
@@ -88,7 +89,7 @@
             <div class="toast toast--3"><span class="toast__icon"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg></span><div><strong>Fabi · AI concierge</strong><span>Fondue tonight? Try Dahuam.202</span></div></div>
             <div class="toast toast--4"><span class="toast__icon"><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></span><div><strong>Reservation confirmed</strong><span>Push sent to the guest</span></div></div>
           </div>
-          <p class="stage__cap"><span class="stage__live"><i></i>Live</span> <span>AlpenGo</span> · tap the phones — book a table and watch the tablet</p>
+          <p class="stage__cap"><span class="stage__live"><i></i>Live</span> <span>AlpenGo</span> · <span class="stage__hide-m">tap the phones — </span>book a table and watch the tablet</p>
         </div>
       </div>
 
@@ -106,7 +107,8 @@
     <section class="case" id="alpengo" aria-labelledby="alpengo-title">
       <div class="wrap">
         <p class="label reveal"><span>01</span>Main case study · Real product</p>
-        <div class="case__head reveal">
+        <div class="win win--intro">
+        <div class="case__head">
           <img class="case__logo" src="site/img/alpengo-logo.webp" alt="AlpenGo logo" width="120" height="98">
           <div>
             <h2 id="alpengo-title">Alpen<em class="gold">Go</em></h2>
@@ -114,15 +116,16 @@
           </div>
         </div>
 
-        <div class="case__meta reveal">
+        <div class="case__meta">
           <div><span>Role</span>Solo developer — product, design, mobile, backend</div>
           <div><span>Platform</span>iOS &amp; Android (Expo), web admin, Node.js API</div>
           <div><span>Scale</span>~43,000 lines · 28 migrations · 17 API modules</div>
           <div><span>Languages</span>German, Dutch, English</div>
         </div>
+        </div><!-- /win intro -->
 
         <!-- Interactive product tour -->
-        <div class="tour reveal" id="tour">
+        <div class="tour win" id="tour">
           <div class="tour__device">
             <div class="tour__glow" aria-hidden="true"></div>
             <figure class="device device--tour" aria-live="polite"><div class="device__screens"></div></figure>
@@ -130,14 +133,14 @@
           </div>
           <div class="tour__panel">
             <h3>Take the tour</h3>
-            <p class="tour__intro">Six moments from the real apps. Click any step — or let it play.</p>
+            <p class="tour__intro">Six moments from the shipped apps — tap a step, let it play, or grab a device and spin it.</p>
             <ol class="tour__list" role="tablist" aria-label="AlpenGo features"></ol>
           </div>
         </div>
 
 
         <!-- Live, clickable prototype -->
-        <div class="live reveal" id="live"><span id="fabi" class="anchor"></span>
+        <div class="live win" id="live"><span id="fabi" class="anchor"></span>
           <div class="live__head">
             <div>
               <h3>Try it <em class="gold">live</em></h3>
@@ -157,7 +160,9 @@
           </ol>
         </div>
 
-        <div class="case__problem reveal">
+        <a class="cta-band" href="https://www.fiverr.com/zolotuhindev" target="_blank" rel="noopener" data-fiverr><span>Want this for your business? I build apps like AlpenGo.</span><b>Start a project <i aria-hidden="true">→</i></b></a>
+
+        <div class="win win--problem"><div class="case__problem">
           <div>
             <h3>The problem</h3>
             <p>A resort village runs on dozens of small businesses — hotels, restaurants, ski lifts, taxis, event organisers — each with its own website, phone line and paper reservation book. Guests don't know what's open today, which lift is running or where there's a free table at 8 pm. Venues lose bookings to phone tag.</p>
@@ -166,15 +171,16 @@
             <h3>The solution</h3>
             <p>One platform with four parts that talk to each other in real time. A guest books a table in the app → it appears instantly on the restaurant's floor plan → the host accepts it → the guest gets a push notification. A lift opens in the morning → every guest who asked for it is notified.</p>
           </div>
-        </div>
+        </div></div>
 
-        <h3 class="case__h reveal">Four parts, <em class="gold">one system</em></h3>
+        <div class="win">
+        <h3 class="case__h">Four parts, <em class="gold">one system</em></h3>
         <div class="parts reveal">
           <article class="part spot">
             <div class="part__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10 18h4"/></svg>
             </div>
-            <h4>Gerlos Life — guest app</h4>
+            <h4>AlpenGo Guest — for visitors</h4>
             <p class="part__tech">React Native · Expo · offline-first</p>
             <ul>
               <li>Hotels, restaurants, ski-lift status, weather, events and a map</li>
@@ -189,7 +195,7 @@
             <div class="part__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="10" r="2"/><circle cx="15.5" cy="10" r="2"/><rect x="7" y="14.5" width="10" height="2.5" rx="1"/></svg>
             </div>
-            <h4>AlpenGO Business — partner app</h4>
+            <h4>AlpenGo Business — for venues</h4>
             <p class="part__tech">React Native · Zustand · Reanimated</p>
             <ul>
               <li>Reservations and waitlist with accept / decline in one tap</li>
@@ -230,8 +236,10 @@
             </ul>
           </article>
         </div>
+        </div>
 
-        <h3 class="case__h reveal">How it fits <em class="gold">together</em></h3>
+        <div class="win">
+        <h3 class="case__h">How it fits <em class="gold">together</em></h3>
         <figure class="arch reveal">
           <svg viewBox="0 0 960 400" role="img" aria-labelledby="arch-title arch-desc">
             <title id="arch-title">AlpenGo architecture</title>
@@ -277,10 +285,20 @@
               <text x="600" y="334" class="t1">Sentry</text>
             </g>
           </svg>
+          <ol class="arch__flow" aria-hidden="true">
+            <li class="af af--row"><span>Guest app</span><span>Partner app</span><span>Admin console</span></li>
+            <li class="af__link">REST + Socket.io</li>
+            <li class="af af--core"><strong>Node.js API</strong><small>Express · JWT · rate limits · reservation state machine</small></li>
+            <li class="af__link">&nbsp;</li>
+            <li class="af af--row"><span>PostgreSQL</span><span>Claude AI</span></li>
+            <li class="af af--row af--ext"><span>Expo Push</span><span>Stripe</span><span>Sentry</span></li>
+          </ol>
           <figcaption>Every client shares one API. Socket.io rooms per user and per venue push changes the moment they happen — no refresh, no polling.</figcaption>
         </figure>
+        </div>
 
-        <h3 class="case__h reveal">Engineering <em class="gold">highlights</em></h3>
+        <div class="win">
+        <h3 class="case__h">Engineering <em class="gold">highlights</em></h3>
         <div class="highlights reveal">
           <article class="spot">
             <span class="num">01</span>
@@ -313,7 +331,9 @@
             <p>Helmet, JWT and rate limiting on the API, Sentry for errors, audit logging of admin actions, scheduled jobs, backups and a system-health view for the resort team.</p>
           </article>
         </div>
+        </div>
 
+        <div class="win">
         <div class="gallery-head">
           <h3 class="case__h">Real screens <em class="gold">from the apps</em></h3>
           <span class="m3d-hint"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15.5-6.2M21 12a9 9 0 0 1-15.5 6.2"/><path d="M18.5 2v4h-4M5.5 22v-4h4"/></svg>Drag any device to rotate it</span>
@@ -321,6 +341,7 @@
         </div>
         <div class="phones" id="alpengo-phones" aria-label="App screenshots"></div>
         <p class="phones__note">Captured from the running apps; guest and business names are sample data.</p>
+        </div>
       </div>
 
       <div class="marquee" aria-label="Technologies">
@@ -380,9 +401,10 @@
       <div class="wrap">
         <p class="label reveal"><span>03</span>More work</p>
         <h2 id="work-title" class="reveal">Selected <em class="gold">projects</em></h2>
-        <p class="section__lead">Live demos you can open and click through. Brands, people and numbers in the demos are fictional.</p>
+        <p class="section__lead">Open them — every demo is live and clickable.</p>
 
-        <h3 class="work__cat reveal" id="websites"><span>Websites</span><small>3D product page · business sites</small></h3>
+        <div class="win win--work">
+        <h3 class="work__cat" id="websites"><span>Websites</span><small>3D product page · business sites</small></h3>
         <article class="feature reveal" id="aura">
           <div class="feature__media">
             <video src="site/video/scroll-3d-video.mp4" poster="site/img/scroll-3d-hero.webp" muted loop playsinline controls preload="none" data-autoplay aria-label="AURA One scroll-driven 3D demo video"></video>
@@ -437,8 +459,13 @@
             </div>
           </article>
         </div>
+          <p class="work__fine">Brands, people and numbers in the demo sites are fictional.</p>
+        </div>
 
-        <h3 class="work__cat reveal" id="ai"><span>AI chatbots</span><small>Claude-powered assistants</small></h3>
+        <a class="cta-band" href="https://www.fiverr.com/zolotuhindev" target="_blank" rel="noopener" data-fiverr><span>Need a site like these? Landing pages from $80.</span><b>Get a quote <i aria-hidden="true">→</i></b></a>
+
+        <div class="win win--work">
+        <h3 class="work__cat" id="ai"><span>AI chatbots</span><small>Claude-powered assistants</small></h3>
         <article class="feature feature--flip reveal" id="ai-assistant">
           <div class="feature__media">
             <video src="site/video/ai-video.mp4" poster="site/img/ai-assistant-desktop.webp" muted loop playsinline controls preload="none" data-autoplay aria-label="AI assistant demo video"></video>
@@ -450,10 +477,11 @@
             <ul class="tags"><li>Claude API</li><li>Streaming</li><li>Tool use</li><li>Node.js</li><li>Embeddable widget</li></ul>
             <div class="feature__links">
               <button class="btn" data-lightbox="ai">Screenshots</button>
-              <span class="note">Runs on a Node server — video recorded in demo mode.</span>
+              <span class="note">Live widget available on request — demo recorded in sandbox mode.</span>
             </div>
           </div>
         </article>
+        </div>
 
       </div>
     </section>
@@ -463,23 +491,34 @@
       <div class="wrap">
         <p class="label reveal"><span>04</span>What I can build for you</p>
         <h2 id="services-title" class="reveal">Services</h2>
+        <div class="win">
         <div class="svc">
           <article class="spot reveal">
             <h3>App MVP</h3>
-            <p>A working iOS / Android app with a real backend — the same stack as AlpenGo. Auth, database, push notifications, payments, admin tools.</p>
+            <p class="svc__sub">Launch-ready iOS &amp; Android app</p>
+            <p>A working app with a real backend — the same stack as AlpenGo.</p>
+            <ul class="svc__list"><li><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>Auth, database &amp; admin tools</li><li><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>Push notifications &amp; payments</li><li><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>Tested on real phones</li></ul>
             <p class="svc__stack">React Native · Expo · Node.js · PostgreSQL</p>
+            <div class="svc__foot"><div class="svc__price"><small>price</small>Custom quote</div><span class="svc__time">Scoped with you</span></div>
+            <a class="btn btn--ghost svc__cta" href="https://www.fiverr.com/zolotuhindev" target="_blank" rel="noopener" data-fiverr>Get a quote <span aria-hidden="true">→</span></a>
           </article>
-          <article class="spot reveal">
+          <article class="spot reveal svc--pop"><span class="svc__chip">Most popular</span>
             <h3>Websites &amp; landing pages</h3>
-            <p>Fast, responsive sites from one landing page to a full business website, including 3D and scroll animations when the product deserves it.</p>
+            <p class="svc__sub">Sites that load fast and convert</p>
+            <p>From one landing page to a full business site — with 3D and scroll animation when the product deserves it.</p>
+            <ul class="svc__list"><li><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>Responsive, SEO-ready</li><li><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>Contact forms &amp; animations</li><li><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>Deployed to your domain</li></ul>
             <p class="svc__stack">HTML · CSS · JavaScript · React · Three.js</p>
-            <p class="svc__price">from $80</p>
+            <div class="svc__foot"><div class="svc__price"><small>from</small>$80</div><span class="svc__time">3–10 days</span></div>
+            <a class="btn svc__cta" href="https://www.fiverr.com/zolotuhindev" target="_blank" rel="noopener" data-fiverr>Start a website <span aria-hidden="true">→</span></a>
           </article>
           <article class="spot reveal">
             <h3>AI chatbots</h3>
-            <p>An assistant trained on your business that answers customers 24/7, captures leads and plugs into your site with one line of code.</p>
+            <p class="svc__sub">24/7 assistant trained on your business</p>
+            <p>Answers customers, captures leads and plugs into your site with one line of code.</p>
+            <ul class="svc__list"><li><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>Knows your menu, hours &amp; prices</li><li><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>Leads to email or Google Sheets</li><li><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>Your brand colours</li></ul>
             <p class="svc__stack">Claude API · Node.js · tool use</p>
-            <p class="svc__price">from $150</p>
+            <div class="svc__foot"><div class="svc__price"><small>from</small>$150</div><span class="svc__time">5–14 days</span></div>
+            <a class="btn btn--ghost svc__cta" href="https://www.fiverr.com/zolotuhindev" target="_blank" rel="noopener" data-fiverr>Add a chatbot <span aria-hidden="true">→</span></a>
           </article>
         </div>
 
@@ -489,17 +528,20 @@
           <li><strong>Build</strong><span>Clean, documented code with regular progress updates.</span></li>
           <li><strong>Launch</strong><span>Deployed, tested on real phones, source code is yours.</span></li>
         </ol>
+        </div>
       </div>
     </section>
 
     <!-- CONTACT -->
     <section class="contact" id="contact" aria-labelledby="contact-title">
       <div class="contact__horizon" aria-hidden="true"></div>
-      <div class="wrap contact__inner">
+      <div class="wrap"><div class="win win--contact"><div class="contact__inner">
         <p class="label label--center reveal"><span>05</span>Let’s talk</p>
-        <h2 id="contact-title" class="reveal">Have a project <em class="gold">in mind?</em></h2>
-        <p class="reveal">Tell me what you want to build. I usually reply within a few hours.</p>
-        <a class="btn btn--large reveal" id="hire-link" href="https://www.fiverr.com/zolotuhindev" target="_blank" rel="noopener">Message me on Fiverr <span aria-hidden="true">→</span></a>
+        <h2 id="contact-title" class="reveal">Let’s build something <em class="gold">people remember.</em></h2>
+        <p class="reveal">Send a two-line brief — I reply within a few hours with a plan and a fixed quote.</p>
+        <a class="btn btn--large btn--magnetic reveal" id="hire-link" href="https://www.fiverr.com/zolotuhindev" target="_blank" rel="noopener">Message me on Fiverr <span aria-hidden="true">→</span></a>
+        <ul class="contact__chips reveal"><li>Fixed price</li><li>Source code is yours</li><li>Tested on real phones</li></ul>
+      </div></div>
       </div>
     </section>
   </main>
