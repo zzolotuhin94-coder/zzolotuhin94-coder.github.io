@@ -41,10 +41,29 @@
     stops.forEach(function (s, i) { if (absTop(s) - sy <= line) idx = i; });
     return idx;
   }
+  // Our own eased scroll: native smooth scroll rushes long distances, this glides
+  var anim = null;
+  function stopAnim() { if (anim) { cancelAnimationFrame(anim.raf); anim = null; document.documentElement.style.scrollBehavior = ''; } }
+  ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(function (ev) { window.addEventListener(ev, function (e) { if (anim && !(e.target.closest && e.target.closest('.guide, .totop'))) stopAnim(); }, { passive: true }); });
+  function glide(to) {
+    stopAnim();
+    var from = window.pageYOffset, dist = to - from;
+    if (reduce || Math.abs(dist) < 2) { window.scrollTo(0, to); return; }
+    var dur = Math.min(1800, 700 + Math.abs(dist) * 0.09);
+    var ease = function (t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+    document.documentElement.style.scrollBehavior = 'auto'; // don't let CSS smooth-scroll fight the animation
+    var t0 = performance.now();
+    anim = {};
+    (function step(now) {
+      var k = Math.min((now - t0) / dur, 1);
+      window.scrollTo(0, from + dist * ease(k));
+      if (k < 1) anim.raf = requestAnimationFrame(step); else stopAnim();
+    })(t0);
+  }
+  window.__glide = glide;
   function go(i) {
     i = Math.max(0, Math.min(stops.length - 1, i));
-    var y = i === 0 ? 0 : absTop(stops[i]) - HEADER;
-    window.scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
+    glide(i === 0 ? 0 : absTop(stops[i]) - HEADER);
   }
   var cur = -1;
   function update() {

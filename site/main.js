@@ -149,9 +149,9 @@
     setInterval(function () {
       if (!heroOn || document.hidden) return;
       var d = devices[tick % devices.length];
-      var imgs = d.querySelectorAll('.device__screen img');
+      var imgs = d.querySelectorAll('.device__screen > img');
       if (imgs.length > 1) {
-        var i = [].indexOf.call(imgs, d.querySelector('.device__screen img.is-on'));
+        var i = [].indexOf.call(imgs, d.querySelector('.device__screen > img.is-on'));
         imgs[i].classList.remove('is-on');
         imgs[(i + 1) % imgs.length].classList.add('is-on');
       }
