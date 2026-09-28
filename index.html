@@ -13,7 +13,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://zzolotuhin94-coder.github.io/">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="theme-color" content="#14172a">
+  <meta name="theme-color" content="#07080d">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2314172a'/%3E%3Cpath d='M12 48 28 18l8 14 6-9 10 25z' fill='%23E8B563'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="site/fonts/fonts.css">
   <link rel="stylesheet" href="site/styles.css">
@@ -21,11 +21,18 @@
 <body id="top">
   <a class="skip" href="#main">Skip to content</a>
 
+  <div class="backdrop" aria-hidden="true">
+    <div class="aurora aurora--1"></div>
+    <div class="aurora aurora--2"></div>
+    <div class="aurora aurora--3"></div>
+    <div class="grain"></div>
+  </div>
+
   <header class="nav">
     <div class="wrap nav__inner">
-      <a class="brand" href="#top" aria-label="Home">
-        <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 52 26 16l10 18 7-11 15 29z"/></svg>
-        <span>Dmitrijs Zolotuhins</span>
+      <a class="brand" href="#top" aria-label="Dmitrijs Zolotuhins — home">
+        <span class="brand__mark" aria-hidden="true">DZ</span>
+        <span class="brand__name">Dmitrijs Zolotuhins</span>
       </a>
       <nav class="nav__links" aria-label="Main">
         <a href="#alpengo">AlpenGo</a>
@@ -46,25 +53,35 @@
   <main id="main">
     <!-- HERO -->
     <section class="hero">
-      <div class="hero__sky" aria-hidden="true"></div>
-      <svg class="hero__mountains" viewBox="0 0 1440 320" preserveAspectRatio="none" aria-hidden="true">
-        <path class="m1" d="M0 230 140 150l90 50 150-120 120 90 110-70 160 120 130-90 150 110 120-80 140 90 130-60v130H0z"/>
-        <path class="m2" d="M0 270 180 200l120 50 170-90 140 100 150-60 170 80 160-70 150 70 200-60v130H0z"/>
-        <path class="m3" d="M0 300 220 250l200 40 220-50 200 40 240-40 180 30 180-20v70H0z"/>
-      </svg>
-      <div class="wrap hero__content">
-        <p class="eyebrow reveal">Full-stack web &amp; mobile developer</p>
-        <h1 class="reveal">I build products<br><em>people actually use.</em></h1>
-        <p class="hero__lead reveal">From a tourism super-app with real-time bookings and an AI concierge, to scroll-driven 3D landing pages and AI chatbots for small businesses. React Native, React, Node.js, PostgreSQL, Three.js and the Claude API.</p>
-        <div class="hero__cta reveal">
-          <a class="btn" href="#alpengo">See the AlpenGo case study</a>
-          <a class="btn btn--ghost" href="#work">All projects</a>
+      <div class="hero__beam" aria-hidden="true"></div>
+      <div class="hero__horizon" aria-hidden="true"></div>
+      <div class="wrap hero__grid">
+        <div class="hero__content">
+          <p class="kicker reveal"><span class="kicker__dot"></span>Available for new projects</p>
+          <h1 class="reveal">I build products<br><em class="gold">people actually use.</em></h1>
+          <p class="hero__lead reveal">Full-stack web &amp; mobile developer. From a tourism super-app with real-time bookings and an AI concierge, to scroll-driven 3D landing pages and AI chatbots for small businesses.</p>
+          <div class="hero__cta reveal">
+            <a class="btn" href="#alpengo">Explore AlpenGo <span aria-hidden="true">→</span></a>
+            <a class="btn btn--ghost" href="#work">All projects</a>
+          </div>
         </div>
+
+        <div class="stage reveal" aria-label="AlpenGo app screens">
+          <div class="stage__inner">
+            <figure class="device device--left"><img src="site/img/alpengo/biz-floor-plan.webp" alt="AlpenGO Business live floor plan" width="520" height="1125"></figure>
+            <figure class="device device--right"><img src="site/img/alpengo/guest-concierge-day.webp" alt="Fabi, the AI concierge" width="520" height="1125"></figure>
+            <figure class="device device--center"><img src="site/img/alpengo/guest-home-night.webp" alt="Gerlos Life guest app home screen" width="520" height="1125"></figure>
+          </div>
+          <p class="stage__cap"><span>AlpenGo</span> · real screens from the apps</p>
+        </div>
+      </div>
+
+      <div class="wrap">
         <dl class="stats reveal">
-          <div><dt>~43k</dt><dd>lines in the AlpenGo platform</dd></div>
-          <div><dt>4</dt><dd>apps in one product: guest, partner, admin, API</dd></div>
-          <div><dt>3</dt><dd>languages shipped: DE / NL / EN</dd></div>
-          <div><dt>6</dt><dd>live projects in this portfolio</dd></div>
+          <div><dt><span data-count="43">43</span>k</dt><dd>lines of code in AlpenGo</dd></div>
+          <div><dt><span data-count="4">4</span></dt><dd>apps in one product</dd></div>
+          <div><dt><span data-count="28">28</span></dt><dd>database migrations</dd></div>
+          <div><dt><span data-count="6">6</span></dt><dd>live projects here</dd></div>
         </dl>
       </div>
     </section>
@@ -72,31 +89,36 @@
     <!-- ALPENGO -->
     <section class="case" id="alpengo" aria-labelledby="alpengo-title">
       <div class="wrap">
-        <div class="case__head">
+        <p class="label reveal"><span>01</span>Main case study · Real product</p>
+        <div class="case__head reveal">
           <img class="case__logo" src="site/img/alpengo-logo.webp" alt="AlpenGo logo" width="120" height="98">
           <div>
-            <p class="eyebrow eyebrow--gold">Main case study · Real product</p>
-            <h2 id="alpengo-title">AlpenGo / Gerlos Life</h2>
-            <p class="case__sub">A tourism super-app platform for an Alpine resort in the Zillertal, Austria. Guests plan their day, book tables and talk to an AI concierge; restaurants and hotels manage everything from their own app; the resort runs the whole network from one console.</p>
+            <h2 id="alpengo-title">Alpen<em class="gold">Go</em></h2>
+            <p class="case__sub">A tourism super-app platform for an Alpine resort in the Zillertal, Austria. Guests plan their day, book tables and talk to an AI concierge; restaurants and hotels run everything from their own app; the resort manages the whole network from one console.</p>
           </div>
         </div>
 
-        <div class="case__meta">
+        <div class="case__meta reveal">
           <div><span>Role</span>Solo developer — product, design, mobile, backend</div>
           <div><span>Platform</span>iOS &amp; Android (Expo), web admin, Node.js API</div>
-          <div><span>Scale</span>~43,000 lines · 28 DB migrations · 17 API modules</div>
-          <div><span>Stack</span>React Native, Zustand, Reanimated, Express, PostgreSQL, Socket.io, Stripe, Sentry, Claude</div>
+          <div><span>Scale</span>~43,000 lines · 28 migrations · 17 API modules</div>
+          <div><span>Languages</span>German, Dutch, English</div>
         </div>
 
-        <!-- Screens gallery (filled by main.js from site/img/alpengo/) -->
-        <div class="phones__head">
-          <h3>Real screens from the apps</h3>
-          <span class="phones__hint" aria-hidden="true">Scroll →</span>
+        <!-- Interactive product tour -->
+        <div class="tour reveal" id="tour">
+          <div class="tour__device">
+            <div class="tour__glow" aria-hidden="true"></div>
+            <figure class="device device--tour" aria-live="polite"><div class="device__screens"></div></figure>
+          </div>
+          <div class="tour__panel">
+            <h3>Take the tour</h3>
+            <p class="tour__intro">Six moments from the real apps. Click any step — or let it play.</p>
+            <ol class="tour__list" role="tablist" aria-label="AlpenGo features"></ol>
+          </div>
         </div>
-        <div class="phones" id="alpengo-phones" tabindex="0" aria-label="App screenshots, scroll horizontally"></div>
-        <p class="phones__note">Captured from the running apps; guest and business names in the partner app are sample data.</p>
 
-        <div class="case__problem">
+        <div class="case__problem reveal">
           <div>
             <h3>The problem</h3>
             <p>A resort village runs on dozens of small businesses — hotels, restaurants, ski lifts, taxis, event organisers — each with its own website, phone line and paper reservation book. Guests don't know what's open today, which lift is running or where there's a free table at 8 pm. Venues lose bookings to phone tag.</p>
@@ -107,9 +129,9 @@
           </div>
         </div>
 
-        <h3 class="case__h">Four parts, one system</h3>
-        <div class="parts">
-          <article class="part">
+        <h3 class="case__h reveal">Four parts, <em class="gold">one system</em></h3>
+        <div class="parts reveal">
+          <article class="part spot">
             <div class="part__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10 18h4"/></svg>
             </div>
@@ -124,7 +146,7 @@
               <li>Day / night theme that follows the Alpine sunrise and dusk</li>
             </ul>
           </article>
-          <article class="part">
+          <article class="part spot">
             <div class="part__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="10" r="2"/><circle cx="15.5" cy="10" r="2"/><rect x="7" y="14.5" width="10" height="2.5" rx="1"/></svg>
             </div>
@@ -140,7 +162,7 @@
               <li>Adapts to the business type — restaurant, hotel, taxi or activity</li>
             </ul>
           </article>
-          <article class="part">
+          <article class="part spot">
             <div class="part__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
             </div>
@@ -154,7 +176,7 @@
               <li>Audit log, system health, backups</li>
             </ul>
           </article>
-          <article class="part">
+          <article class="part spot">
             <div class="part__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7" ry="2.5"/><path d="M5 5.5v6c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-6M5 11.5v6c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-6"/></svg>
             </div>
@@ -170,8 +192,8 @@
           </article>
         </div>
 
-        <h3 class="case__h">How it fits together</h3>
-        <figure class="arch">
+        <h3 class="case__h reveal">How it fits <em class="gold">together</em></h3>
+        <figure class="arch reveal">
           <svg viewBox="0 0 960 400" role="img" aria-labelledby="arch-title arch-desc">
             <title id="arch-title">AlpenGo architecture</title>
             <desc id="arch-desc">Guest app, partner app and admin console talk to the Node.js API over REST and Socket.io. The API uses PostgreSQL and connects to Claude, Stripe, Expo Push and Sentry.</desc>
@@ -219,42 +241,52 @@
           <figcaption>Every client shares one API. Socket.io rooms per user and per venue push changes the moment they happen — no refresh, no polling.</figcaption>
         </figure>
 
-        <h3 class="case__h">Engineering highlights</h3>
-        <div class="highlights">
-          <article>
+        <h3 class="case__h reveal">Engineering <em class="gold">highlights</em></h3>
+        <div class="highlights reveal">
+          <article class="spot">
             <span class="num">01</span>
             <h4>Real-time from tap to table</h4>
             <p>A booking travels guest app → API → PostgreSQL → Socket.io → partner app in well under a second. The host's floor plan lights up, the guest sees <em>confirmed</em> without refreshing.</p>
           </article>
-          <article>
+          <article class="spot">
             <span class="num">02</span>
             <h4>A reservation state machine</h4>
             <p>Six states — pending, confirmed, rejected, arrived, completed, cancelled — with explicit allowed transitions, time windows and capacity checks, so a table can't be double-booked for the same slot.</p>
           </article>
-          <article>
+          <article class="spot">
             <span class="num">03</span>
             <h4>AI concierge that knows the valley</h4>
             <p>Guests ask “where can we eat with kids tonight?” in their own language. The concierge answers from resort data through the Claude API, and conversations are stored and archived on the server.</p>
           </article>
-          <article>
+          <article class="spot">
             <span class="num">04</span>
             <h4>Drag-and-drop floor plans</h4>
             <p>Restaurants draw their own room: tables are dragged, resized and numbered on a canvas built with Reanimated and gesture handlers, then used for live occupancy during service.</p>
           </article>
-          <article>
+          <article class="spot">
             <span class="num">05</span>
             <h4>Offline-first by design</h4>
             <p>Mountains have dead zones. Data is fetched fresh, cached locally and served from cache when the network drops — with bundled data as a last resort, the app is never blank.</p>
           </article>
-          <article>
+          <article class="spot">
             <span class="num">06</span>
             <h4>Built to be operated</h4>
             <p>Helmet, JWT and rate limiting on the API, Sentry for errors, audit logging of admin actions, scheduled jobs, backups and a system-health view for the resort team.</p>
           </article>
         </div>
 
-        <div class="stack" aria-label="Technologies">
-          <span>React Native</span><span>Expo</span><span>Zustand</span><span>Reanimated</span><span>React Navigation</span><span>i18n</span><span>Node.js</span><span>Express</span><span>PostgreSQL</span><span>Socket.io</span><span>JWT</span><span>Stripe</span><span>Sentry</span><span>Expo Push</span><span>Claude API</span>
+        <div class="gallery-head">
+          <h3 class="case__h">Real screens <em class="gold">from the apps</em></h3>
+          
+        </div>
+        <div class="phones" id="alpengo-phones" aria-label="App screenshots"></div>
+        <p class="phones__note">Captured from the running apps; guest and business names are sample data.</p>
+      </div>
+
+      <div class="marquee" aria-label="Technologies">
+        <div class="marquee__track">
+          <span>React Native</span><span>Expo</span><span>Zustand</span><span>Reanimated</span><span>Node.js</span><span>Express</span><span>PostgreSQL</span><span>Socket.io</span><span>JWT</span><span>Stripe</span><span>Sentry</span><span>Expo Push</span><span>Claude API</span><span>i18n</span>
+          <span aria-hidden="true">React Native</span><span aria-hidden="true">Expo</span><span aria-hidden="true">Zustand</span><span aria-hidden="true">Reanimated</span><span aria-hidden="true">Node.js</span><span aria-hidden="true">Express</span><span aria-hidden="true">PostgreSQL</span><span aria-hidden="true">Socket.io</span><span aria-hidden="true">JWT</span><span aria-hidden="true">Stripe</span><span aria-hidden="true">Sentry</span><span aria-hidden="true">Expo Push</span><span aria-hidden="true">Claude API</span><span aria-hidden="true">i18n</span>
         </div>
       </div>
     </section>
@@ -262,8 +294,8 @@
     <!-- OTHER WORK -->
     <section class="work" id="work" aria-labelledby="work-title">
       <div class="wrap">
-        <p class="eyebrow">More work</p>
-        <h2 id="work-title">Selected projects</h2>
+        <p class="label reveal"><span>02</span>More work</p>
+        <h2 id="work-title" class="reveal">Selected <em class="gold">projects</em></h2>
         <p class="section__lead">Live demos you can open and click through. Brands, people and numbers in the demos are fictional.</p>
 
         <article class="feature reveal">
@@ -299,7 +331,7 @@
         </article>
 
         <div class="grid">
-          <article class="card reveal">
+          <article class="card spot reveal">
             <a class="card__media" tabindex="-1" aria-hidden="true" href="portfolio/coffee-shop/" target="_blank" rel="noopener">
               <img src="site/img/coffee-shop-desktop.webp" alt="Ember & Oak coffee shop website" loading="lazy" width="1400" height="875">
               <img class="card__phone" src="site/img/coffee-shop-mobile.webp" alt="" loading="lazy" width="600" height="1298">
@@ -311,7 +343,7 @@
               <a class="link" href="portfolio/coffee-shop/" target="_blank" rel="noopener">Live site<span class="sr-only"> – Ember &amp; Oak</span> →</a>
             </div>
           </article>
-          <article class="card reveal">
+          <article class="card spot reveal">
             <a class="card__media" tabindex="-1" aria-hidden="true" href="portfolio/agency/" target="_blank" rel="noopener">
               <img src="site/img/agency-desktop.webp" alt="Novaline digital agency website" loading="lazy" width="1400" height="875">
               <img class="card__phone" src="site/img/agency-mobile.webp" alt="" loading="lazy" width="600" height="1298">
@@ -323,7 +355,7 @@
               <a class="link" href="portfolio/agency/" target="_blank" rel="noopener">Live site<span class="sr-only"> – Novaline</span> →</a>
             </div>
           </article>
-          <article class="card reveal">
+          <article class="card spot reveal">
             <a class="card__media" tabindex="-1" aria-hidden="true" href="portfolio/designer-portfolio/" target="_blank" rel="noopener">
               <img src="site/img/designer-portfolio-desktop.webp" alt="Mila Hart designer portfolio website" loading="lazy" width="1400" height="875">
               <img class="card__phone" src="site/img/designer-portfolio-mobile.webp" alt="" loading="lazy" width="600" height="1298">
@@ -342,21 +374,21 @@
     <!-- SERVICES -->
     <section class="services" id="services" aria-labelledby="services-title">
       <div class="wrap">
-        <p class="eyebrow">What I can build for you</p>
-        <h2 id="services-title">Services</h2>
+        <p class="label reveal"><span>03</span>What I can build for you</p>
+        <h2 id="services-title" class="reveal">Services</h2>
         <div class="svc">
-          <article class="reveal">
+          <article class="spot reveal">
             <h3>App MVP</h3>
             <p>A working iOS / Android app with a real backend — the same stack as AlpenGo. Auth, database, push notifications, payments, admin tools.</p>
             <p class="svc__stack">React Native · Expo · Node.js · PostgreSQL</p>
           </article>
-          <article class="reveal">
+          <article class="spot reveal">
             <h3>Websites &amp; landing pages</h3>
             <p>Fast, responsive sites from one landing page to a full business website, including 3D and scroll animations when the product deserves it.</p>
             <p class="svc__stack">HTML · CSS · JavaScript · React · Three.js</p>
             <p class="svc__price">from $80</p>
           </article>
-          <article class="reveal">
+          <article class="spot reveal">
             <h3>AI chatbots</h3>
             <p>An assistant trained on your business that answers customers 24/7, captures leads and plugs into your site with one line of code.</p>
             <p class="svc__stack">Claude API · Node.js · tool use</p>
@@ -375,11 +407,12 @@
 
     <!-- CONTACT -->
     <section class="contact" id="contact" aria-labelledby="contact-title">
-      <svg class="contact__mountains" viewBox="0 0 1440 200" preserveAspectRatio="none" aria-hidden="true"><path d="M0 200V120l160-70 120 50 170-90 150 80 140-50 170 90 150-60 160 70 220-60v140z"/></svg>
+      <div class="contact__horizon" aria-hidden="true"></div>
       <div class="wrap contact__inner">
-        <h2 id="contact-title">Have a project in mind?</h2>
-        <p>Tell me what you want to build. I usually reply within a few hours.</p>
-        <a class="btn btn--gold" id="hire-link" href="https://www.fiverr.com/zolotuhindev" target="_blank" rel="noopener">Message me on Fiverr</a>
+        <p class="label label--center reveal"><span>04</span>Let’s talk</p>
+        <h2 id="contact-title" class="reveal">Have a project <em class="gold">in mind?</em></h2>
+        <p class="reveal">Tell me what you want to build. I usually reply within a few hours.</p>
+        <a class="btn btn--large reveal" id="hire-link" href="https://www.fiverr.com/zolotuhindev" target="_blank" rel="noopener">Message me on Fiverr <span aria-hidden="true">→</span></a>
       </div>
     </section>
   </main>
