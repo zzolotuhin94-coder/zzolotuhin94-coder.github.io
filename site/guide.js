@@ -21,6 +21,7 @@
   el.className = 'guide';
   el.setAttribute('aria-label', 'Section guide');
   el.innerHTML =
+    '<button class="guide__btn guide__top" type="button" aria-label="Back to top"><svg viewBox="0 0 24 24"><path d="M6 12l6-6 6 6M6 18l6-6 6 6"/></svg><span class="guide__tip"><b>Top</b>Back to the start</span></button>' +
     '<button class="guide__btn guide__btn--up" type="button" aria-label="Previous section">' + ARROW_UP + '<span class="guide__tip"></span></button>' +
     '<div class="guide__count" aria-live="polite"><span data-i>01</span><small data-n></small></div>' +
     '<div class="guide__bar"><i></i></div>' +
@@ -61,6 +62,24 @@
     up.setAttribute('aria-label', i > 0 ? 'Back: ' + name(stops[i - 1]) : 'First section');
   }
   up.addEventListener('click', function () { go(current() - 1); });
+  el.querySelector('.guide__top').addEventListener('click', function () { go(0); });
+
+  // Floating back-to-top button with a page-progress ring (all screen sizes)
+  var top = document.createElement('button');
+  top.className = 'totop';
+  top.type = 'button';
+  top.setAttribute('aria-label', 'Back to top');
+  top.innerHTML = '<svg class="totop__ring" viewBox="0 0 56 56" aria-hidden="true"><defs><linearGradient id="totopGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f7e6bf"/><stop offset="1" stop-color="#b8864a"/></linearGradient></defs><circle class="bg" cx="28" cy="28" r="26"/><circle class="fg" cx="28" cy="28" r="26"/></svg>' +
+    '<svg class="totop__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg><span class="totop__label">Back to top</span>';
+  document.body.appendChild(top);
+  top.addEventListener('click', function () { go(0); });
+  function topUpdate() {
+    var y = window.pageYOffset, max = document.documentElement.scrollHeight - window.innerHeight;
+    top.classList.toggle('is-on', y > window.innerHeight * 0.9);
+    top.style.setProperty('--tp', max > 0 ? (y / max).toFixed(4) : 0);
+  }
+  window.addEventListener('scroll', function () { requestAnimationFrame(topUpdate); }, { passive: true });
+  topUpdate();
   down.addEventListener('click', function () {
     var i = current();
     // if the current window's top is still well below the header, finish arriving there first

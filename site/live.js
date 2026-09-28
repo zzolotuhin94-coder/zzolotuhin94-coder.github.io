@@ -166,7 +166,7 @@
         var p = t.split(':');
         return '<button class="ga__tab' + (i ? '' : ' is-on') + '" type="button" data-tab="' + i + '">' + ICON[p[1]] + p[0] + '</button>';
       }).join('') + '</nav>' +
-      '<div class="ga__scrim"></div><div class="ga__sheet" role="dialog" aria-modal="true" aria-label="Details" tabindex="-1" inert></div>' +
+      '<div class="ga__scrim"></div><div class="ga__sheet" tabindex="-1" aria-hidden="true" inert></div>' +
       '<div class="ga__push" role="status"></div>';
 
     var views = ui.querySelector('.ga__views');
@@ -330,6 +330,7 @@
       if (!sheetOpen) opener = document.activeElement;
       sheetOpen = true;
       sheet.inert = false;
+      sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.removeAttribute('aria-hidden');
       behind(true);
       focusSheet();
       requestAnimationFrame(function () { sheet.classList.add('is-on'); scrim.classList.add('is-on'); });
@@ -346,6 +347,7 @@
       var hadFocus = sheet.contains(document.activeElement);
       sheet.classList.remove('is-on'); scrim.classList.remove('is-on');
       sheet.inert = true;
+      sheet.removeAttribute('role'); sheet.removeAttribute('aria-modal'); sheet.setAttribute('aria-hidden', 'true');
       behind(false);
       if (hadFocus) {
         var back = opener && opener.isConnected && ui.contains(opener) ? opener : (current && current.querySelector('button')) || tabs[state.tab];
@@ -355,7 +357,15 @@
     }
     scrim.addEventListener('click', closeSheet);
     ui.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && sheetOpen) { e.stopPropagation(); closeSheet(); }
+      if (!sheetOpen) return;
+      if (e.key === 'Escape') { e.stopPropagation(); closeSheet(); return; }
+      if (e.key === 'Tab' && (sheet.contains(document.activeElement))) { // modal: keep focus inside the sheet
+        var f = [].slice.call(sheet.querySelectorAll('button:not([disabled])'));
+        var i = f.indexOf(document.activeElement);
+        if (!f.length) { e.preventDefault(); return; }
+        if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus({ preventScroll: true }); }
+        else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus({ preventScroll: true }); }
+      }
     });
 
     function liftSheet() {

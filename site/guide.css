@@ -22,3 +22,19 @@ body.rail-docked .guide { display: flex; }
 .guide__tip b { color: var(--gold); font-weight: 600; margin-right: 6px; }
 .guide__btn:hover .guide__tip, .guide__btn:focus-visible .guide__tip { opacity: 1; transform: translate(0, -50%); }
 @media (prefers-reduced-motion: reduce) { .guide__btn--down svg { animation: none; } }
+
+/* Back to top: a mini button in the guide capsule + a floating ring button on every screen */
+.guide__top { width: 32px; height: 32px; margin-bottom: -2px; }
+.guide__top svg { width: 16px; height: 16px; }
+.totop { position: fixed; right: 24px; bottom: 24px; z-index: 46; width: 56px; height: 56px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; display: grid; place-items: center; color: var(--gold-hi); background: rgba(9, 10, 16, .66); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1), 0 16px 40px -14px rgba(0, 0, 0, .8); opacity: 0; transform: translateY(16px) scale(.9); pointer-events: none; transition: opacity .4s var(--ease), transform .5s var(--ease), box-shadow .3s; }
+.totop.is-on { opacity: 1; transform: none; pointer-events: auto; }
+.totop:hover { box-shadow: inset 0 0 0 1px rgba(227, 189, 120, .6), 0 0 26px -4px rgba(227, 189, 120, .6), 0 16px 40px -14px rgba(0, 0, 0, .8); }
+.totop:hover .totop__arrow { transform: translateY(-3px); }
+.totop svg.totop__ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.totop__ring circle { fill: none; stroke-width: 2; }
+.totop__ring .bg { stroke: rgba(255, 255, 255, .1); }
+.totop__ring .fg { stroke: url(#totopGold); stroke-linecap: round; stroke-dasharray: 163.4; stroke-dashoffset: calc(163.4 * (1 - var(--tp, 0))); }
+.totop__arrow { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; transition: transform .35s var(--ease); }
+.totop__label { position: absolute; right: calc(100% + 12px); top: 50%; transform: translate(6px, -50%); white-space: nowrap; padding: 7px 11px; border-radius: 10px; font: 500 12.5px/1 var(--sans); color: var(--text); background: rgba(9, 10, 16, .92); box-shadow: inset 0 0 0 1px rgba(227, 189, 120, .35); opacity: 0; pointer-events: none; transition: opacity .25s, transform .3s var(--ease); }
+.totop:hover .totop__label, .totop:focus-visible .totop__label { opacity: 1; transform: translate(0, -50%); }
+@media (max-width: 1179px) { .totop { right: 16px; bottom: calc(96px + env(safe-area-inset-bottom)); width: 50px; height: 50px; } }
