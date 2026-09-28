@@ -24,6 +24,8 @@
     { id: 'luise', name: 'Die gute Luise', rating: 4.8, near: 2, cuisine: 'Bar · Kitchen · Pinseria', open: 'Open until 23:00', tags: ['Next to the village lift', 'Live music'], tonight: ['Live jazz', '20:30 · local trio'], text: 'Bar, kitchen and pinseria next to the village lift. Crispy Roman pinsa, Zillertal beer and live jazz on weekends.' },
     { id: 'jaeger', name: 'Jägerstüberl', rating: 4.3, near: 3, cuisine: 'Austrian · Tyrolean home cooking', open: 'Open until midnight', tags: ['Tyrolean classics', 'Stube'], tonight: ['Kaspressknödel night', 'All evening'], text: 'Classic Tyrolean Stube with Kaspressknödel, Schnitzel and Kaiserschmarrn like grandma makes it.' }
   ];
+  // Decorative photos as background images: the hero's screenshot cycler (main.js) treats every <img> inside a device as a slide
+  var pic = function (id) { return '<span class="ga__img" aria-hidden="true" style="background-image:url(' + IMG + id + '.webp)"></span>'; };
   var byId = function (id) { return RESTAURANTS.filter(function (r) { return r.id === id; })[0]; };
 
   // Event bus shared by the phone(s) and the tablet of one demo (hero and #live each get their own)
@@ -104,7 +106,7 @@
           '<div class="fc__lift"><span>Übungslift Gerlos</span><b>Open</b></div></div>');
       }
       var r = byId(kind);
-      var c = el('<div class="fc__card"><img alt="" src="' + IMG + r.id + '.webp"><div class="fc__cardb"><strong>' + r.name +
+      var c = el('<div class="fc__card">' + pic(r.id) + '<div class="fc__cardb"><strong>' + r.name +
         '<span>★ ' + r.rating + '</span></strong><p>' + r.tonight[0] + ' · ' + r.tonight[1] + '</p>' +
         '<button class="ga__btn ga__btn--gold" type="button">Book a table · 19:30</button></div></div>');
       var btn = c.querySelector('button');
@@ -202,7 +204,7 @@
           '<div class="ga__sort"><button class="ga__chip is-on" type="button" data-sort="near">Nearby</button><button class="ga__chip" type="button" data-sort="rating">Top rated</button></div><div class="ga__list"></div></section>');
         var list = v.querySelector('.ga__list');
         RESTAURANTS.forEach(function (r) {
-          var c = el('<button class="ga__card ga__rest" type="button"><img alt="" src="' + IMG + r.id + '.webp"><div><strong>' + r.name + '<span>★ ' + r.rating + '</span></strong><p>' + r.cuisine + '</p><span class="ga__open">' + r.open + '</span><span class="ga__pill">Book</span></div></button>');
+          var c = el('<button class="ga__card ga__rest" type="button">' + pic(r.id) + '<div><strong>' + r.name + '<span>★ ' + r.rating + '</span></strong><p>' + r.cuisine + '</p><span class="ga__open">' + r.open + '</span><span class="ga__pill">Book</span></div></button>');
           c.dataset.id = r.id;
           c.addEventListener('click', function () { openDetail(r.id); });
           list.appendChild(c);
@@ -242,20 +244,31 @@
     };
     var ORDER = ['today', 'dining', 'fabi', 'day'];
 
-    function show(next, dir) {
+    // iOS-style transitions: 'tab' = soft crossfade, 'push' = detail slides in over a dimmed parallax,
+    // 'pop' = the reverse. Reduced motion swaps instantly.
+    var T_MS = { tab: 420, push: 480, pop: 480 };
+    var T_CLS = ['t-tab-in', 't-tab-out', 't-push-in', 't-push-out', 't-pop-in', 't-pop-out'];
+    function show(next, kind) {
       var prev = current;
+      // a transition still running: drop views that are already on their way out
+      [].slice.call(views.children).forEach(function (n) { if (n !== prev) n.remove(); });
       views.appendChild(next);
       current = next;
       if (!prev) return;
-      if (reduceMotion) { prev.remove(); return; }
-      next.classList.add(dir > 0 ? 'in-next' : 'in-prev');
-      prev.classList.add(dir > 0 ? 'out-next' : 'out-prev');
-      setTimeout(function () { prev.remove(); next.classList.remove('in-next', 'in-prev'); }, 820);
+      if (reduceMotion || !T_MS[kind]) { prev.remove(); return; }
+      T_CLS.forEach(function (c) { prev.classList.remove(c); });
+      prev.inert = true;
+      next.classList.add('t-' + kind + '-in', 'is-anim');
+      prev.classList.add('t-' + kind + '-out', 'is-anim');
+      setTimeout(function () {
+        prev.remove();
+        next.classList.remove('t-' + kind + '-in', 'is-anim');
+      }, T_MS[kind] + 40);
     }
 
     // Re-render My Day in place when a booking changes while it is on screen
     function refreshDay() {
-      if (!current || current.dataset.screen !== 'day' || current.classList.contains('in-next') || current.classList.contains('in-prev')) return;
+      if (!current || current.dataset.screen !== 'day' || current.classList.contains('is-anim')) return;
       var top = current.scrollTop;
       var next = screens.day();
       views.replaceChild(next, current);
@@ -265,20 +278,20 @@
 
     function goTab(i) {
       closeSheet();
-      var dir = i === state.tab && current && current.classList.contains('ga__view--detail') ? -1 : (i >= state.tab ? 1 : -1);
-      if (i === state.tab && !(current && current.classList.contains('ga__view--detail'))) return;
+      var fromDetail = !!(current && current.classList.contains('ga__view--detail'));
+      if (i === state.tab && !fromDetail) return;
       state.tab = i;
       tabs.forEach(function (t, j) { t.classList.toggle('is-on', j === i); });
       ui.classList.toggle('is-fabi', i === 2);
       pill.style.transform = 'translateX(' + (i * 100) + '%)';
-      show(screens[ORDER[i]](), dir);
+      show(screens[ORDER[i]](), fromDetail ? 'pop' : 'tab');
     }
     tabs.forEach(function (t) { t.addEventListener('click', function () { goTab(+t.dataset.tab); }); });
     fab.addEventListener('click', function () { goTab(2); });
 
     function openDetail(id) {
       var r = byId(id);
-      var v = el('<section class="ga__view ga__view--detail"><div class="ga__hero"><img alt="" src="' + IMG + r.id + '.webp"></div>' +
+      var v = el('<section class="ga__view ga__view--detail"><div class="ga__hero">' + pic(r.id) + '</div>' +
         '<button class="ga__back" type="button" aria-label="Back">' + ICON.back + '</button>' +
         '<div class="ga__dbody"><h2>' + r.name + '</h2><div class="ga__rating"><b>★ ' + r.rating + '</b> · ' + r.cuisine + '</div>' +
         '<div class="ga__tags">' + r.tags.map(function (t) { return '<span>' + t + '</span>'; }).join('') + '</div><p>' + r.text + '</p>' +
@@ -286,7 +299,7 @@
         '<div class="ga__actions"><button class="ga__btn" type="button">Call</button><button class="ga__btn ga__btn--gold" type="button" data-book>Book a table</button></div></div></section>');
       v.querySelector('.ga__back').addEventListener('click', function () { goTab(state.tab); });
       v.querySelector('[data-book]').addEventListener('click', function () { openBooking(r.id); });
-      show(v, 1);
+      show(v, 'push');
     }
 
     function sortList(list, by) {
@@ -426,7 +439,7 @@
       goTab(3);
     });
 
-    show(screens.today(), 1);
+    show(screens.today());
   }
 
   /* ---------- Partner tablet ---------- */

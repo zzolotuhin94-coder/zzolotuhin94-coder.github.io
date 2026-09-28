@@ -14,19 +14,25 @@
 .ga__status i::after { content: ''; position: absolute; inset: 1.5px 5px 1.5px 1.5px; background: #f4f6fa; border-radius: 1.5px; }
 .ga__island { position: absolute; top: 11px; left: 50%; width: 118px; height: 34px; margin-left: -59px; border-radius: 20px; background: #000; z-index: 31; pointer-events: none; }
 
-.ga__views { position: absolute; inset: 0; perspective: 900px; overflow: hidden; overflow: clip; background: #07080d; }
-.ga__view { position: absolute; inset: 0; background: linear-gradient(170deg, #1b2a4a 0%, #3b2e5c 35%, #5c3a5a 65%, #7a4a52 86%, #93583f 100%); padding: 62px 18px 110px; overflow-y: auto; scrollbar-width: none; backface-visibility: hidden; transform-origin: 50% 50%; }
+.ga__views { position: absolute; inset: 0; overflow: hidden; overflow: clip; } /* no dark base: the .ga gradient behind matches every view, so crossfades never dip */
+.ga__view { position: absolute; inset: 0; background: linear-gradient(170deg, #1b2a4a 0%, #3b2e5c 35%, #5c3a5a 65%, #7a4a52 86%, #93583f 100%); padding: 62px 18px 110px; overflow-y: auto; scrollbar-width: none; }
 .ga__view::-webkit-scrollbar { display: none; }
 .ga__view[hidden] { display: block; visibility: hidden; pointer-events: none; }
-.ga__view.in-next, .ga__view.in-prev, .ga__view.out-next, .ga__view.out-prev { animation-duration: .8s; animation-timing-function: cubic-bezier(.65, 0, .25, 1); animation-fill-mode: both; }
-.ga__view.in-next { animation-name: cubeInNext; transform-origin: 0% 50%; }
-.ga__view.out-next { animation-name: cubeOutNext; transform-origin: 100% 50%; }
-.ga__view.in-prev { animation-name: cubeInPrev; transform-origin: 100% 50%; }
-.ga__view.out-prev { animation-name: cubeOutPrev; transform-origin: 0% 50%; }
-@keyframes cubeInNext { from { transform: translateX(100%) rotateY(90deg); filter: brightness(.55); } }
-@keyframes cubeOutNext { to { transform: translateX(-100%) rotateY(-90deg); filter: brightness(.55); } }
-@keyframes cubeInPrev { from { transform: translateX(-100%) rotateY(-90deg); filter: brightness(.55); } }
-@keyframes cubeOutPrev { to { transform: translateX(100%) rotateY(90deg); filter: brightness(.55); } }
+/* Screen transitions (iOS-like) */
+.ga__view.is-anim { animation-fill-mode: both; will-change: transform, opacity; }
+.ga__view[class*="-out"] { pointer-events: none; }
+.ga__view.t-tab-in { animation: gaTabIn .42s cubic-bezier(.2, .8, .2, 1) both; }
+.ga__view.t-tab-out { animation: gaTabOut .42s cubic-bezier(.2, .8, .2, 1) both; }
+.ga__view.t-push-in { animation: gaPushIn .48s cubic-bezier(.32, .72, 0, 1) both; box-shadow: -18px 0 36px -12px rgba(0, 0, 0, .55); z-index: 2; }
+.ga__view.t-push-out { animation: gaPushOut .48s cubic-bezier(.32, .72, 0, 1) both; z-index: 1; }
+.ga__view.t-pop-out { animation: gaPopOut .48s cubic-bezier(.32, .72, 0, 1) both; box-shadow: -18px 0 36px -12px rgba(0, 0, 0, .55); z-index: 2; }
+.ga__view.t-pop-in { animation: gaPopIn .48s cubic-bezier(.32, .72, 0, 1) both; z-index: 1; }
+@keyframes gaTabIn { from { opacity: 0; transform: scale(.97); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes gaTabOut { from { opacity: 1; transform: none; } to { opacity: 0; transform: scale(1.015); } }
+@keyframes gaPushIn { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes gaPushOut { from { transform: none; filter: brightness(1); } to { transform: translateX(-28%); filter: brightness(.6); } }
+@keyframes gaPopOut { from { transform: none; } to { transform: translateX(100%); } }
+@keyframes gaPopIn { from { transform: translateX(-28%); filter: brightness(.6); } to { transform: none; filter: brightness(1); } }
 
 .ga__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
 .ga__brand { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: .22em; color: var(--g-gold); }
@@ -73,7 +79,8 @@
 .ga__sort { display: flex; gap: 8px; margin-bottom: 14px; }
 .ga__rest { position: relative; overflow: hidden; margin-bottom: 14px; width: 100%; text-align: left; display: block; transition: transform .25s; }
 .ga__rest:hover { transform: translateY(-2px); }
-.ga__rest img { width: 100%; height: 118px; object-fit: cover; display: block; }
+.ui .ga__img { display: block; background: #2a2440 center / cover no-repeat; }
+.ga__rest .ga__img { width: 100%; height: 118px; object-fit: cover; display: block; }
 .ga__rest div { padding: 12px 14px 14px; }
 .ga__rest strong { font-size: 16px; display: flex; justify-content: space-between; }
 .ga__rest strong span { color: var(--g-gold); font-size: 14px; }
@@ -84,7 +91,7 @@
 
 .ga__view--detail { padding: 0 0 110px; }
 .ga__hero { position: relative; height: 260px; }
-.ga__hero img { width: 100%; height: 100%; object-fit: cover; }
+.ga__hero .ga__img { width: 100%; height: 100%; object-fit: cover; }
 .ga__hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(27, 42, 74, .5), transparent 30%, transparent 55%, #3b2e5c); }
 .ga__back { position: absolute; top: 56px; left: 16px; width: 38px; height: 38px; border-radius: 50%; background: rgba(20, 20, 25, .5); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: grid; place-items: center; z-index: 2; }
 .ga__dbody { padding: 0 18px; margin-top: -30px; position: relative; }
@@ -194,7 +201,7 @@
 .fc__typing i:nth-child(3) { animation-delay: .3s; }
 @keyframes dot { 0%, 60%, 100% { transform: translateY(0); opacity: .5; } 30% { transform: translateY(-5px); opacity: 1; } }
 .fc__card { max-width: 92%; overflow: hidden; border-radius: 18px; background: rgba(255, 255, 255, .1); box-shadow: inset 0 0 0 1px var(--g-line); animation: popIn .5s cubic-bezier(.2, .9, .2, 1.1) both; }
-.fc__card img { width: 100%; height: 92px; object-fit: cover; display: block; }
+.fc__card .ga__img { width: 100%; height: 92px; object-fit: cover; display: block; }
 .fc__cardb { padding: 10px 12px 12px; }
 .fc__cardb strong { font-size: 14px; display: flex; justify-content: space-between; }
 .fc__cardb strong span { color: var(--g-gold); font-size: 13px; }
