@@ -19,9 +19,9 @@
   // Screen gallery: three key screens per app. Order = order on the page.
   // Add a Jang group here once its screenshots are in site/img/jang/ (use dir: 'jang').
   var ALPENGO_SCREENS = [
-    { group: 'Guest app', file: 'guest-home-night', title: 'Today in the resort', text: 'Weather at altitude, lifts and tonight’s events' },
-    { group: 'Guest app', file: 'guest-concierge-day', title: 'Fabi, the AI concierge', text: 'Claude-powered answers about the resort' },
-    { group: 'Guest app', file: 'guest-booking-calendar-day', title: 'Booking calendar', text: 'Live availability by party size and time' },
+    { group: 'Guest app', file: 'g2-taxi-driver-assigned', title: 'A taxi in the Alps', text: 'Driver assigned — follow the car live on the map, chat or call' },
+    { group: 'Guest app', file: 'g2-hotels-list', title: 'Hotels & your stay', text: 'Book a room; during the stay, room service is one tap away' },
+    { group: 'Guest app', file: 'g2-room-service', title: 'Room service', text: 'Order breakfast or dinner straight to your room' },
     { group: 'Partner app & admin · tablet', kind: 'tablet', file: 'tab2-alpin-unified-dashboard', title: 'One business, every module', text: 'Restaurant, apartments and transfers on one dashboard — in the gold Alpine Dusk theme' },
     { group: 'Partner app & admin · tablet', kind: 'tablet', file: 'tab2-alpin-timeline', title: 'Occupancy calendar', text: 'Rooms × days view of every stay' },
     { group: 'Partner app & admin · tablet', kind: 'tablet', file: 'tab2-room-service', title: 'Room service', text: 'Orders from the guest app, accepted in one tap' },
