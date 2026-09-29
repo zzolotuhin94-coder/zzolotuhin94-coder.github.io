@@ -666,3 +666,7 @@ html.is-focus-lock { overflow: hidden; }
   .reveal { opacity: 1; transform: none; }
   .headline .line > span { transform: none; }
 }
+
+/* Aurum Forge by Zolotuhin — founder line under the wordmark */
+.brand__name { display: inline-flex; flex-direction: column; align-items: flex-start; }
+.brand__by { display: block; margin-top: 4px; font: 600 8.5px/1 var(--sans); letter-spacing: .32em; text-transform: uppercase; color: rgba(227, 205, 160, .75); }
