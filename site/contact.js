@@ -230,7 +230,7 @@ var CONTACT = {
       ];
       if (name) lines.push('Name: ' + name);
       if (byEmail && mail.value.trim()) lines.push('Email: ' + mail.value.trim());
-      lines.push('', '— sent from zolotuhin.dev');
+      lines.push('', '— sent from the Aurum Forge site');
       var body = lines.join('\n');
 
       if (byEmail) {
