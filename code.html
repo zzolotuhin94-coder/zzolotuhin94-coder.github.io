@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Code samples · zolotuhin.dev</title>
+  <meta name="description" content="Real, commented excerpts from AlpenGo — a reservation state machine, Socket.io rooms, a Claude-powered concierge and React Native stores. By Dimi Zolotuhin, full-stack product developer.">
+  <meta property="og:title" content="Code samples · zolotuhin.dev">
+  <meta property="og:description" content="Real, commented excerpts from AlpenGo: state machine, Socket.io rooms, Claude API, Zustand.">
+  <meta property="og:image" content="https://zzolotuhin94-coder.github.io/site/og.png">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#07080d">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2314172a'/%3E%3Cpath d='M12 48 28 18l8 14 6-9 10 25z' fill='%23E8B563'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="site/fonts/fonts.css">
+  <link rel="stylesheet" href="site/styles.css">
+  <link rel="stylesheet" href="site/contact.css">
+  <link rel="stylesheet" href="site/code.css">
+</head>
+<body id="top" class="codepage">
+  <a class="skip" href="#main">Skip to content</a>
+
+  <div class="backdrop" aria-hidden="true">
+    <div class="aurora aurora--1"></div>
+    <div class="aurora aurora--2"></div>
+    <div class="aurora aurora--3"></div>
+    <div class="grain"></div>
+  </div>
+
+  <header class="nav">
+    <div class="wrap nav__inner">
+      <a class="brand" href="index.html" aria-label="zolotuhin.dev — home">
+        <span class="brand__mark" aria-hidden="true">z</span>
+        <span class="brand__name">zolotuhin<span class="brand__tld">.dev</span></span>
+      </a>
+      <nav class="nav__links" aria-label="Main">
+        <a href="index.html#alpengo">AlpenGo</a>
+        <a href="index.html#work">Work</a>
+        <a href="index.html#services">Services</a>
+        <a href="code.html" aria-current="page">Code</a>
+        <a class="nav__gh" href="https://github.com/zzolotuhin94-coder" target="_blank" rel="noopener" data-contact="github" aria-label="GitHub profile" title="GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49l-.01-1.9c-2.78.62-3.37-1.21-3.37-1.21-.46-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.35 1.12 2.92.85.09-.66.35-1.12.63-1.37-2.22-.26-4.55-1.14-4.55-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05A9.36 9.36 0 0 1 12 6.84c.85 0 1.71.12 2.51.34 1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.8-4.57 5.05.36.32.68.94.68 1.9l-.01 2.81c0 .27.18.6.69.49A10.26 10.26 0 0 0 22 12.25C22 6.58 17.52 2 12 2z"/></svg></a>
+        <a href="index.html#contact" class="btn btn--small">Start a project</a>
+      </nav>
+      <button class="nav__toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span></button>
+    </div>
+    <div class="nav__mobile" id="mobile-menu" hidden>
+      <a href="index.html">Portfolio</a>
+      <a href="index.html#alpengo">AlpenGo case study</a>
+      <a href="index.html#services">Services</a>
+      <a href="index.html#contact">Hire me</a>
+      <a class="nav__mobile-gh" href="https://github.com/zzolotuhin94-coder" target="_blank" rel="noopener" data-contact="github"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49l-.01-1.9c-2.78.62-3.37-1.21-3.37-1.21-.46-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.35 1.12 2.92.85.09-.66.35-1.12.63-1.37-2.22-.26-4.55-1.14-4.55-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05A9.36 9.36 0 0 1 12 6.84c.85 0 1.71.12 2.51.34 1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.8-4.57 5.05.36.32.68.94.68 1.9l-.01 2.81c0 .27.18.6.69.49A10.26 10.26 0 0 0 22 12.25C22 6.58 17.52 2 12 2z"/></svg>GitHub</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="cp-hero">
+      <div class="wrap">
+        <a class="cp-back" href="index.html#alpengo"><span aria-hidden="true">←</span> Back to the AlpenGo case study</a>
+        <p class="label"><span>&lt;/&gt;</span>Code samples</p>
+        <h1 class="cp-title">Real code, <em class="gold">not screenshots.</em></h1>
+        <p class="cp-lead">Six short excerpts from AlpenGo’s API and partner app: how bookings stay consistent, how updates reach exactly the right screen, and how the AI concierge stays safe and affordable.</p>
+        <p class="cp-note"><span class="cp-note__ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg></span><span><strong>Excerpts from AlpenGo — my own product, built from scratch.</strong> The repositories are private; a full code walkthrough is available on request. Comments are translated to English and the code is lightly condensed; no keys, hosts or private data.</span></p>
+        <ul class="cp-facts">
+          <li><strong>~110k</strong> lines of code</li>
+          <li><strong>5</strong> apps, one API</li>
+          <li><strong>82</strong> migrations</li>
+          <li><strong>36</strong> API modules</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="cp-main" aria-label="Code excerpts">
+      <div class="wrap"><div class="win cp-win">
+        <div class="cp-tabs" role="tablist" aria-label="Code excerpts">
+          <button class="cp-tab" role="tab" id="tab-state-machine" aria-controls="p-state-machine" aria-selected="true" tabindex="0" data-tab="state-machine"><span class="cp-tab__n">01</span><span class="cp-tab__t">Reservation state machine</span><span class="cp-tab__l">JS</span></button>
+          <button class="cp-tab" role="tab" id="tab-no-double-booking" aria-controls="p-no-double-booking" aria-selected="false" tabindex="-1" data-tab="no-double-booking"><span class="cp-tab__n">02</span><span class="cp-tab__t">No double bookings</span><span class="cp-tab__l">JS</span></button>
+          <button class="cp-tab" role="tab" id="tab-socket-rooms" aria-controls="p-socket-rooms" aria-selected="false" tabindex="-1" data-tab="socket-rooms"><span class="cp-tab__n">03</span><span class="cp-tab__t">Socket.io rooms</span><span class="cp-tab__l">JS</span></button>
+          <button class="cp-tab" role="tab" id="tab-claude-concierge" aria-controls="p-claude-concierge" aria-selected="false" tabindex="-1" data-tab="claude-concierge"><span class="cp-tab__n">04</span><span class="cp-tab__t">Claude AI concierge</span><span class="cp-tab__l">JS</span></button>
+          <button class="cp-tab" role="tab" id="tab-floor-plan-store" aria-controls="p-floor-plan-store" aria-selected="false" tabindex="-1" data-tab="floor-plan-store"><span class="cp-tab__n">05</span><span class="cp-tab__t">Floor-plan store</span><span class="cp-tab__l">TS</span></button>
+          <button class="cp-tab" role="tab" id="tab-zustand-store" aria-controls="p-zustand-store" aria-selected="false" tabindex="-1" data-tab="zustand-store"><span class="cp-tab__n">06</span><span class="cp-tab__t">Zustand business store</span><span class="cp-tab__l">TS</span></button>
+        </div>
+        <div class="cp-panel" role="tabpanel" id="p-state-machine" aria-labelledby="tab-state-machine">
+          <div class="cp-code">
+            <div class="cp-file">
+              <span class="cp-file__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="cp-file__path"><span class="cp-file__name">server/lib/reservationStateMachine.js</span><span class="cp-file__extra">+ routes/reservations.js</span></span>
+              <span class="cp-file__meta"><span class="cp-lang cp-lang--js">JavaScript</span><span class="cp-file__lines">48 lines</span></span>
+              <button class="cp-copy" type="button" aria-label="Copy code: Reservation state machine"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15H4.5A1.5 1.5 0 0 1 3 13.5v-9A1.5 1.5 0 0 1 4.5 3h9A1.5 1.5 0 0 1 15 4.5V5"/></svg><span>Copy</span></button>
+            </div>
+<pre class="cp-pre" tabindex="0" aria-label="Reservation state machine source code"><code data-lang="js">// The allowed transition graph for reservations.status. Before this file
+// existed, ANY valid status could move to ANY other one ('completed' back
+// to 'pending', for example). Self-transitions stay legal for 'confirmed'
+// and 'arrived' — that is the re-seating path (same status, new tables).
+const TRANSITIONS = {
+  pending:   ['confirmed', 'rejected', 'cancelled'],
+  confirmed: ['confirmed', 'arrived', 'no_show', 'cancelled'],
+  arrived:   ['arrived', 'completed', 'cancelled'],
+  completed: [],
+  rejected:  [],
+  cancelled: [],
+  no_show:   [],
+};
+
+const ALL_STATUSES = Object.keys(TRANSITIONS);
+const TERMINAL_STATUSES = ALL_STATUSES.filter((s) =&gt; TRANSITIONS[s].length === 0);
+
+function isValidTransition(fromStatus, toStatus) {
+  if (!TRANSITIONS[fromStatus]) return false;
+  return TRANSITIONS[fromStatus].includes(toStatus);
+}
+
+module.exports = { TRANSITIONS, ALL_STATUSES, TERMINAL_STATUSES, isValidTransition };
+
+// server/routes/reservations.js — PATCH /api/reservations/:id (excerpt)
+async function handleReservationStatusUpdate(req, res, forcedStatus) {
+  const status = forcedStatus || req.body.status;
+  if (!ALL_STATUSES.includes(status)) {
+    return res.status(400).json({ error: `Unknown status: ${status}` });
+  }
+
+  // The ownership scope (partner_id) is part of THIS query, not only of the
+  // final UPDATE — a partner can't even probe the status of someone else's
+  // booking through an error message.
+  const { rows } = await pool.query(
+    `SELECT status FROM reservations WHERE id = $1
+       AND restaurant_id IN (SELECT restaurant_slug FROM venues WHERE partner_id = $2)`,
+    [req.params.id, req.partner.partnerId]
+  );
+  if (rows.length === 0) return res.status(404).json({ error: 'Not found.' });
+
+  const current = rows[0].status;
+  if (!isValidTransition(current, status)) {
+    // 409, not 400: the request is well-formed, the resource's state forbids it.
+    return res.status(409).json({ error: `Cannot go from ${current} to ${status}.` });
+  }
+  // ...table checks, one transaction, then broadcast after COMMIT
+}</code></pre>
+          </div>
+          <aside class="cp-why" aria-label="Why it’s built this way">
+            <p class="cp-why__k">Why it’s built this way</p>
+            <h3>Reservation state machine</h3>
+            <ul><li><b>The policy is data, not a pile of if-statements.</b> One object is the whole lifecycle — easy to review, easy to test, impossible to half-apply.</li><li><b>Terminal states are derived</b>, not hand-listed: add a state and the list stays correct.</li><li><b>Illegal moves return 409 Conflict</b> — the request is valid, the booking’s state forbids it. The app can tell “you can’t do that now” from “you sent garbage”.</li><li><b>Ownership lives in the same query</b>, so a partner can’t even learn the status of another venue’s booking from an error message.</li></ul>
+            <p class="cp-why__stack">Node.js · Express · PostgreSQL</p>
+          </aside>
+        </div>
+        <div class="cp-panel" role="tabpanel" id="p-no-double-booking" aria-labelledby="tab-no-double-booking" hidden>
+          <div class="cp-code">
+            <div class="cp-file">
+              <span class="cp-file__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="cp-file__path"><span class="cp-file__name">server/lib/timeWindows.js</span><span class="cp-file__extra">+ routes/reservations.js</span></span>
+              <span class="cp-file__meta"><span class="cp-lang cp-lang--js">JavaScript</span><span class="cp-file__lines">52 lines</span></span>
+              <button class="cp-copy" type="button" aria-label="Copy code: No double bookings"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15H4.5A1.5 1.5 0 0 1 3 13.5v-9A1.5 1.5 0 0 1 4.5 3h9A1.5 1.5 0 0 1 15 4.5V5"/></svg><span>Copy</span></button>
+            </div>
+<pre class="cp-pre" tabindex="0" aria-label="No double bookings source code"><code data-lang="js">// Every booking occupies a fixed window (default 2 h). One helper decides
+// whether two windows collide — used by availability, the floor-plan picker
+// and the final confirm, so all three always agree.
+const DEFAULT_DURATION_MINUTES = 120;
+
+function timeToMinutes(time) {
+  const [h, m] = time.split(':').map(Number);
+  return h * 60 + m;
+}
+
+// Half-open intervals: 18:00–20:00 and 20:00–22:00 do NOT overlap,
+// so back-to-back seatings on the same table stay possible.
+function windowsOverlap(startA, durA, startB, durB) {
+  const aStart = timeToMinutes(startA);
+  const aEnd = aStart + durA;
+  const bStart = timeToMinutes(startB);
+  const bEnd = bStart + durB;
+  return aStart &lt; bEnd &amp;&amp; bStart &lt; aEnd;
+}
+
+// server/routes/reservations.js
+// A table can be linked directly (reservations.table_id) or through the
+// join table (merged tables for big groups) — both are checked.
+async function isTableAvailable(tableId, date, startTime, endTime, excludeId) {
+  const result = await pool.query(
+    `SELECT DISTINCT r.id, r.reservation_time, r.duration_minutes
+     FROM reservations r
+     LEFT JOIN reservation_tables rt ON rt.reservation_id = r.id
+     WHERE r.reservation_date = $1
+       AND r.status IN ('confirmed', 'arrived')
+       AND (r.table_id = $2 OR rt.table_id = $2)
+       AND ($3::uuid IS NULL OR r.id != $3)`,
+    [date, tableId, excludeId || null]
+  );
+
+  const requested = Math.max(1, timeToMinutes(endTime) - timeToMinutes(startTime));
+  return !result.rows.some((row) =&gt;
+    windowsOverlap(startTime, requested, row.reservation_time,
+      row.duration_minutes || DEFAULT_DURATION_MINUTES)
+  );
+}
+
+// "Unified lock": auto-picked AND hand-picked tables go through the same
+// check at the moment of confirming — not only when the picker opened.
+// That closes the gap where two near-simultaneous confirms took one table.
+for (const tableId of tableIds) {
+  const free = await isTableAvailable(tableId, target.reservation_date,
+    target.reservation_time, endTime, req.params.id);
+  if (!free) {
+    return res.status(409).json({ error: 'Table already taken for this time.' });
+  }
+}</code></pre>
+          </div>
+          <aside class="cp-why" aria-label="Why it’s built this way">
+            <p class="cp-why__k">Why it’s built this way</p>
+            <h3>No double bookings</h3>
+            <ul><li><b>Half-open time windows</b> — 18:00–20:00 and 20:00–22:00 don’t collide, so a table can be turned twice a night.</li><li><b>One overlap helper for every path:</b> the guest’s availability view, the host’s table picker and the final confirm can never disagree.</li><li><b>Checked again at the moment of confirming</b>, not only when the picker opened — two hosts tapping at once can’t hand out the same table.</li><li>Merged tables for large groups are covered through the join table, not special-cased.</li></ul>
+            <p class="cp-why__stack">Node.js · PostgreSQL</p>
+          </aside>
+        </div>
+        <div class="cp-panel" role="tabpanel" id="p-socket-rooms" aria-labelledby="tab-socket-rooms" hidden>
+          <div class="cp-code">
+            <div class="cp-file">
+              <span class="cp-file__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="cp-file__path"><span class="cp-file__name">server/lib/socket.js</span></span>
+              <span class="cp-file__meta"><span class="cp-lang cp-lang--js">JavaScript</span><span class="cp-file__lines">60 lines</span></span>
+              <button class="cp-copy" type="button" aria-label="Copy code: Socket.io rooms"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15H4.5A1.5 1.5 0 0 1 3 13.5v-9A1.5 1.5 0 0 1 4.5 3h9A1.5 1.5 0 0 1 15 4.5V5"/></svg><span>Copy</span></button>
+            </div>
+<pre class="cp-pre" tabindex="0" aria-label="Socket.io rooms source code"><code data-lang="js">// Postgres UPDATE → LISTEN/NOTIFY → this module → a Socket.io room.
+// Rooms are scoped as narrowly as the data requires:
+//   destination:&lt;id&gt;  every business in one resort (floor plans, queues)
+//   venue:&lt;id&gt;        exactly one house (room-service orders)
+//   user:&lt;id&gt;         exactly one guest (their own reservation updates)
+const { Server } = require('socket.io');
+
+let io = null;
+
+function initSocket(httpServer) {
+  io = new Server(httpServer, { /* CORS options omitted in this excerpt */ });
+
+  io.on('connection', (socket) =&gt; {
+    socket.on('subscribe', (destinationId) =&gt; {
+      if (typeof destinationId === 'string') socket.join(`destination:${destinationId}`);
+    });
+    socket.on('subscribe_user', (userId) =&gt; {
+      if (typeof userId === 'string') socket.join(`user:${userId}`);
+    });
+    // An order names a room number and an amount, so it must only reach the
+    // house it belongs to — never the resort-wide room.
+    socket.on('subscribe_venue', (venueId) =&gt; {
+      if (typeof venueId === 'string') socket.join(`venue:${venueId}`);
+    });
+    socket.on('unsubscribe_venue', (venueId) =&gt; {
+      if (typeof venueId === 'string') socket.leave(`venue:${venueId}`);
+    });
+  });
+
+  return io;
+}
+
+// Events carry identifiers and a status, never the full record: clients
+// treat them as "refetch now" and load details over the authenticated
+// REST route. The database stays the single source of truth.
+function broadcastTableStatusChange(payload, destinationId) {
+  if (!io) return;
+  const target = destinationId ? io.to(`destination:${destinationId}`) : io;
+  target.emit('table_status_changed', payload); // { venueId, tableIds, status }
+}
+
+function broadcastReservationToUser(userId, payload) {
+  if (!io || !userId) return;
+  io.to(`user:${userId}`).emit('reservation_changed', payload);
+}
+
+// No room, no broadcast: better no live update (the app reloads on open)
+// than a room number sent to everyone connected.
+function broadcastRoomServiceOrder(venueId, payload) {
+  if (!io || !venueId) return;
+  io.to(`venue:${venueId}`).emit('room_service_order', payload);
+}
+
+module.exports = {
+  initSocket,
+  broadcastTableStatusChange,
+  broadcastReservationToUser,
+  broadcastRoomServiceOrder,
+};</code></pre>
+          </div>
+          <aside class="cp-why" aria-label="Why it’s built this way">
+            <p class="cp-why__k">Why it’s built this way</p>
+            <h3>Socket.io rooms</h3>
+            <ul><li><b>Rooms are as narrow as the data:</b> resort-wide for floor plans, one venue for room-service orders, one guest for their own bookings.</li><li><b>Events are signals, not data.</b> They carry IDs and a status; clients refetch through authenticated REST, so the database stays the single source of truth.</li><li><b>No room, no broadcast</b> — a missing ID means no live update rather than a room number sent to everyone.</li><li>The result: a booking lands on the restaurant’s tablet in well under a second, without polling.</li></ul>
+            <p class="cp-why__stack">Socket.io · Postgres LISTEN/NOTIFY</p>
+          </aside>
+        </div>
+        <div class="cp-panel" role="tabpanel" id="p-claude-concierge" aria-labelledby="tab-claude-concierge" hidden>
+          <div class="cp-code">
+            <div class="cp-file">
+              <span class="cp-file__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="cp-file__path"><span class="cp-file__name">server/index.js</span><span class="cp-file__extra">POST /api/concierge/chat</span></span>
+              <span class="cp-file__meta"><span class="cp-lang cp-lang--js">JavaScript</span><span class="cp-file__lines">64 lines</span></span>
+              <button class="cp-copy" type="button" aria-label="Copy code: Claude AI concierge"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15H4.5A1.5 1.5 0 0 1 3 13.5v-9A1.5 1.5 0 0 1 4.5 3h9A1.5 1.5 0 0 1 15 4.5V5"/></svg><span>Copy</span></button>
+            </div>
+<pre class="cp-pre" tabindex="0" aria-label="Claude AI concierge source code"><code data-lang="js">// No login (any guest can ask), but every call hits a paid API — so a
+// per-IP rate limiter on the route plus hard caps on what one call may cost.
+const CONCIERGE_MAX_MESSAGES = 40;
+const CONCIERGE_MAX_MESSAGE_LENGTH = 4000;
+
+app.post('/api/concierge/chat', conciergeChatLimiter, async (req, res) =&gt; {
+  const { messages, hotelName, guestName, locale, reservationId } = req.body;
+
+  // Optional, but if sent it must belong to the caller (no writing into others' threads).
+  let userId = null;
+  if (req.body?.userId != null) {
+    userId = await requireGuestId(req, res, req.body.userId);
+    if (!userId) return;
+  }
+
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return res.status(400).json({ error: 'messages array is required' });
+  }
+  if (messages.length &gt; CONCIERGE_MAX_MESSAGES ||
+      messages.some((m) =&gt; typeof m?.content !== 'string' ||
+                           m.content.length &gt; CONCIERGE_MAX_MESSAGE_LENGTH)) {
+    return res.status(400).json({ error: 'Conversation too long.' });
+  }
+
+  const apiKey = process.env.ANTHROPIC_API_KEY; // server-side only, never in the app
+  if (!apiKey) return res.status(503).json({ error: 'Concierge is not configured.' });
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 400,
+        // Live data: verified venues + today's open/closed status (cached 5 min).
+        system: await buildConciergeSystemPrompt({ hotelName, guestName, locale }),
+        messages: messages.map((m) =&gt; ({ role: m.role, content: m.content })),
+      }),
+    });
+
+    if (!response.ok) {
+      // The log gets the real cause (bad key, outage, rate limit); the guest a neutral line.
+      const described = describeAnthropicFailure(response.status, await response.text());
+      console.error(`[concierge] ${response.status} ${described.reason}`);
+      // Pass 429 through so the app can say "try again" instead of "broken".
+      const status = response.status === 429 ? 429 : 502;
+      return res.status(status).json({ error: described.guestMessage });
+    }
+
+    const data = await response.json();
+    const reply = data.content?.find((b) =&gt; b.type === 'text')?.text ?? '';
+    const lastUser = [...messages].reverse().find((m) =&gt; m.role === 'user');
+    await persistConciergeExchange({
+      userId, reservationId, userText: lastUser?.content, assistantText: reply,
+    });
+    res.json({ reply });
+  } catch (err) {
+    res.status(502).json({ error: 'The concierge is unavailable right now.' });
+  }
+});</code></pre>
+          </div>
+          <aside class="cp-why" aria-label="Why it’s built this way">
+            <p class="cp-why__k">Why it’s built this way</p>
+            <h3>Claude AI concierge</h3>
+            <ul><li><b>The API key never leaves the server</b> — the mobile app only talks to this route.</li><li><b>Cost is bounded twice:</b> a per-IP rate limiter on the route, plus caps on message count and length for every call.</li><li><b>Failures are translated, not swallowed.</b> The log gets the real cause (bad key, outage, rate limit); the guest gets a friendly sentence; 429 passes through so the app can say “try again”.</li><li><b>The prompt is built from live data</b> — only verified, bookable venues and today’s open/closed status, cached for five minutes.</li></ul>
+            <p class="cp-why__stack">Express · Claude API</p>
+          </aside>
+        </div>
+        <div class="cp-panel" role="tabpanel" id="p-floor-plan-store" aria-labelledby="tab-floor-plan-store" hidden>
+          <div class="cp-code">
+            <div class="cp-file">
+              <span class="cp-file__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="cp-file__path"><span class="cp-file__name">alpengo-business/src/state/floorPlanStore.ts</span></span>
+              <span class="cp-file__meta"><span class="cp-lang cp-lang--ts">TypeScript</span><span class="cp-file__lines">61 lines</span></span>
+              <button class="cp-copy" type="button" aria-label="Copy code: Floor-plan store"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15H4.5A1.5 1.5 0 0 1 3 13.5v-9A1.5 1.5 0 0 1 4.5 3h9A1.5 1.5 0 0 1 15 4.5V5"/></svg><span>Copy</span></button>
+            </div>
+<pre class="cp-pre" tabindex="0" aria-label="Floor-plan store source code"><code data-lang="ts">// One canvas store for tables, merged groups and zones. Deliberately React
+// Context here: this state is local to the floor-plan dashboard, so it does
+// not justify a global store (businessStore.ts is the Zustand one).
+
+type TableStatusEvent = { venueId: string; tableIds: string[]; status: TableStatus };
+
+// Plan coordinates are fractions 0..1 — the server accepts nothing else.
+const toPlanFraction = (v: number) =&gt; Math.min(0.98, Math.max(0.02, v));
+
+export function FloorPlanStoreProvider({ children }: { children: React.ReactNode }) {
+  const [tables, setTables] = useState&lt;Table[]&gt;([]);
+  const [venueId, setVenueId] = useState&lt;string | null&gt;(null);
+
+  // Real-time sync: every reservation status change with tables attached
+  // emits table_status_changed. The socket room is resort-wide, so the
+  // payload is filtered down to THIS venue before anything re-renders.
+  useEffect(() =&gt; {
+    if (!venueId) return undefined;
+    return onTableStatusChanged((payload: TableStatusEvent) =&gt; {
+      if (payload.venueId !== venueId || !payload.tableIds?.length) return;
+      setTables((prev) =&gt;
+        prev.map((tb) =&gt;
+          payload.tableIds.includes(tb.id) ? { ...tb, status: payload.status } : tb)
+      );
+    });
+  }, [venueId]);
+
+  // Optimistic move: the table jumps immediately, the PATCH runs fire-and-
+  // forget. Called once from the pan gesture's onEnd — never per frame —
+  // so dragging can't flood the API. A failed save is logged, not rolled
+  // back: yanking a table back mid-service is worse than a lost position.
+  const moveTable = useCallback((id: string, globalX: number, globalY: number) =&gt; {
+    const x = toPlanFraction(globalX);
+    const y = toPlanFraction(globalY);
+    setTables((prev) =&gt;
+      prev.map((tb) =&gt; (tb.id === id ? { ...tb, globalX: x, globalY: y } : tb)));
+    updateTablePosition(id, x, y).catch((err) =&gt; {
+      console.warn('[floorPlanStore] position not saved:', (err as Error).message);
+    });
+  }, []);
+
+  // Merged tables move as one: same fractional delta for every member,
+  // so their arrangement relative to each other is preserved exactly.
+  const moveGroupBy = useCallback((groupId: string, dx: number, dy: number) =&gt; {
+    setTables((prev) =&gt; prev.map((tb) =&gt;
+      tb.groupId === groupId
+        ? { ...tb,
+            globalX: toPlanFraction(tb.globalX + dx),
+            globalY: toPlanFraction(tb.globalY + dy) }
+        : tb
+    ));
+  }, []);
+
+  const value = useMemo(
+    () =&gt; ({ tables, venueId, moveTable, moveGroupBy /* …more actions */ }),
+    [tables, venueId, moveTable, moveGroupBy]
+  );
+  return (
+    &lt;FloorPlanStoreContext.Provider value={value}&gt;{children}&lt;/FloorPlanStoreContext.Provider&gt;
+  );
+}</code></pre>
+          </div>
+          <aside class="cp-why" aria-label="Why it’s built this way">
+            <p class="cp-why__k">Why it’s built this way</p>
+            <h3>Floor-plan store</h3>
+            <ul><li><b>Optimistic by design:</b> a dragged table moves instantly; the save runs once when the gesture ends, never per frame.</li><li><b>No rollback mid-service.</b> A failed save is logged; snapping a table back while guests are being seated would be worse.</li><li><b>Coordinates are fractions (0..1)</b>, clamped before they’re stored — the same plan renders correctly on any tablet.</li><li><b>Context, not a global store:</b> this state belongs to one screen. Live updates are filtered to this venue before anything re-renders.</li></ul>
+            <p class="cp-why__stack">React Native · TypeScript · Socket.io</p>
+          </aside>
+        </div>
+        <div class="cp-panel" role="tabpanel" id="p-zustand-store" aria-labelledby="tab-zustand-store" hidden>
+          <div class="cp-code">
+            <div class="cp-file">
+              <span class="cp-file__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="cp-file__path"><span class="cp-file__name">alpengo-business/src/state/businessStore.ts</span></span>
+              <span class="cp-file__meta"><span class="cp-lang cp-lang--ts">TypeScript</span><span class="cp-file__lines">59 lines</span></span>
+              <button class="cp-copy" type="button" aria-label="Copy code: Zustand business store"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15H4.5A1.5 1.5 0 0 1 3 13.5v-9A1.5 1.5 0 0 1 4.5 3h9A1.5 1.5 0 0 1 15 4.5V5"/></svg><span>Copy</span></button>
+            </div>
+<pre class="cp-pre" tabindex="0" aria-label="Zustand business store source code"><code data-lang="ts">// Zustand instead of React Context: the business switcher in the header AND
+// the fetch layer (utils/api.js, outside the component tree) both need the same
+// activeBusinessId — a Context provider could never reach it.
+import { create } from 'zustand';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export type BusinessCategory = 'restaurant' | 'hotel' | 'taxi' | 'activity';
+export type PartnerRole = 'owner' | 'manager' | 'hostess' | 'driver';
+
+export type Business = {
+  id: string;
+  companyName: string;
+  destinationId: string;
+  role?: PartnerRole;             // must match PARTNER_ROLES on the server
+  categories?: BusinessCategory[]; // a hotel with a restaurant has both
+};
+
+const ACTIVE_BUSINESS_KEY = '@alpengo_business/active_business_id';
+
+interface BusinessState {
+  businesses: Business[];
+  activeBusinessId: string | null;
+  hydrated: boolean;
+  setBusinesses: (businesses: Business[], activeId: string | null) =&gt; void;
+  setActiveBusinessId: (id: string | null) =&gt; Promise&lt;void&gt;;
+  hydrate: () =&gt; Promise&lt;void&gt;;
+  clear: () =&gt; void;
+}
+
+export const useBusinessStore = create&lt;BusinessState&gt;((set, get) =&gt; ({
+  businesses: [],
+  activeBusinessId: null,
+  hydrated: false,
+
+  setBusinesses: (businesses, activeId) =&gt; {
+    set({ businesses, activeBusinessId: activeId });
+    if (activeId) AsyncStorage.setItem(ACTIVE_BUSINESS_KEY, activeId);
+  },
+
+  // Persists the choice LOCALLY only (which tab was open last). Real
+  // authorization happens on the server via /switch-business, which
+  // re-scopes the token — this function never touches the token.
+  setActiveBusinessId: async (id) =&gt; {
+    set({ activeBusinessId: id });
+    if (id) await AsyncStorage.setItem(ACTIVE_BUSINESS_KEY, id);
+    else await AsyncStorage.removeItem(ACTIVE_BUSINESS_KEY);
+  },
+
+  hydrate: async () =&gt; {
+    if (get().hydrated) return;
+    const lastActiveId = await AsyncStorage.getItem(ACTIVE_BUSINESS_KEY);
+    set({ activeBusinessId: lastActiveId, hydrated: true });
+  },
+
+  clear: () =&gt; {
+    set({ businesses: [], activeBusinessId: null });
+    AsyncStorage.removeItem(ACTIVE_BUSINESS_KEY);
+  },
+}));</code></pre>
+          </div>
+          <aside class="cp-why" aria-label="Why it’s built this way">
+            <p class="cp-why__k">Why it’s built this way</p>
+            <h3>Zustand business store</h3>
+            <ul><li><b>Zustand where it earns its place:</b> the fetch layer lives outside React and still needs the active business — a Context provider can’t reach it.</li><li><b>The client never decides access.</b> It only remembers which business was open; the server re-scopes the token on every switch.</li><li><b>Types mirror the server:</b> categories match the database constraint, roles match the API’s role guards.</li><li>Small, explicit actions — no reducers or boilerplate, and easy to reset on logout.</li></ul>
+            <p class="cp-why__stack">Zustand · AsyncStorage · TypeScript</p>
+          </aside>
+        </div>
+      </div></div>
+    </section>
+
+    <section class="cp-cta">
+      <div class="wrap"><div class="win cp-cta__win">
+        <p class="label label--center"><span>→</span>Next step</p>
+        <h2>Like how it’s built? <em class="gold">Let’s build yours.</em></h2>
+        <p class="cp-cta__lead">Same care for your app, website or AI assistant — fixed price, source code is yours.</p>
+        <div class="cp-cta__btns">
+          <a class="btn btn--large" href="https://www.fiverr.com/zolotuhindev" target="_blank" rel="noopener" data-contact="fiverr">Start a project on Fiverr <span aria-hidden="true">→</span></a>
+          <a class="btn btn--ghost btn--large" href="index.html#contact">Send a brief</a>
+        </div>
+        <p class="cp-cta__more"><a href="https://github.com/zzolotuhin94-coder" target="_blank" rel="noopener" data-contact="github"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49l-.01-1.9c-2.78.62-3.37-1.21-3.37-1.21-.46-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.35 1.12 2.92.85.09-.66.35-1.12.63-1.37-2.22-.26-4.55-1.14-4.55-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05A9.36 9.36 0 0 1 12 6.84c.85 0 1.71.12 2.51.34 1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.8-4.57 5.05.36.32.68.94.68 1.9l-.01 2.81c0 .27.18.6.69.49A10.26 10.26 0 0 0 22 12.25C22 6.58 17.52 2 12 2z"/></svg>More on GitHub</a><a href="index.html#live">Try the live AlpenGo demo →</a></p>
+      </div></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <span class="footer__copy">© <span id="year">2026</span> zolotuhin.dev · Dmitrijs Zolotuhins · <a href="https://www.fiverr.com/zolotuhindev" target="_blank" rel="noopener" data-contact="fiverr">@zolotuhindev on Fiverr</a></span>
+      <nav class="footer__icons" data-channels="icons" aria-label="Profiles"></nav>
+      <span class="footer__links"><a href="index.html">Portfolio</a><a href="#top">Back to top ↑</a></span>
+    </div>
+  </footer>
+
+  <script src="site/bg.js" defer></script>
+  <script src="site/contact.js" defer></script>
+  <script src="site/code.js" defer></script>
+</body>
+</html>

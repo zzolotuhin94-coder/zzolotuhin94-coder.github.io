@@ -8,10 +8,10 @@
   var TOUR = [
     { file: 'tab-floor-live', kind: 'tablet', app: 'Partner app', title: 'Live floor plan', text: 'Tables turn free, reserved or occupied the moment a booking changes — pushed over Socket.io, with overstay warnings for the host.' },
     { file: 'tab-floor-edit', kind: 'tablet', app: 'Partner app', title: 'Floor-plan editor', text: 'Owners draw their own room: drag, resize and number tables, add the bar, walls and entrance.' },
-    { file: 'guest-concierge-day', app: 'Guest app', title: 'Fabi, the AI concierge', text: 'Guests ask in their own language — “where can we eat fondue tonight?” — and Fabi answers from resort data through the Claude API.' },
+    { file: 'guest-concierge-day', app: 'Guest app', title: 'Fabi, the AI concierge', text: 'Guests ask in their own language — “where can we eat fondue tonight?” — and Fabi answers from the resort’s live partner list through the Claude API.' },
     { file: 'guest-booking-calendar-day', app: 'Guest app', title: 'Booking in three taps', text: 'Pick a day, party size and a free slot. Availability comes from the restaurant’s own tables, so nothing is double-booked.' },
     { file: 'guest-home-night', app: 'Guest app', title: 'Today in the resort', text: 'Weather at altitude, lift status, events and recommendations. The theme follows the sky — sunrise by day, dusk after 18:00.' },
-    { file: 'tab-superadmin', kind: 'tablet', app: 'Admin console', title: 'Command center', text: 'The resort team sees sign-ups, users, tickets and live system alerts across every business on the platform.' }
+    { file: 'tab-superadmin', kind: 'tablet', app: 'Admin console', title: 'Command center', text: 'The resort team sees sign-ups, KPIs per destination, the taxi fleet, plans and live system alerts across every business on the platform.' }
   ];
   var TOUR_MS = 6000;
 

@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="site/live.css">
   <link rel="stylesheet" href="site/rail.css">
   <link rel="stylesheet" href="site/guide.css">
+  <link rel="stylesheet" href="site/contact.css">
 </head>
 <body id="top">
   <a class="skip" href="#main">Skip to content</a>
@@ -42,6 +43,7 @@
         <a href="#jang">Jàng</a>
         <a href="#work">Work</a>
         <a href="#services">Services</a>
+        <a class="nav__gh" href="https://github.com/zzolotuhin94-coder" target="_blank" rel="noopener" data-contact="github" aria-label="GitHub profile" title="GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49l-.01-1.9c-2.78.62-3.37-1.21-3.37-1.21-.46-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.35 1.12 2.92.85.09-.66.35-1.12.63-1.37-2.22-.26-4.55-1.14-4.55-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05A9.36 9.36 0 0 1 12 6.84c.85 0 1.71.12 2.51.34 1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.8-4.57 5.05.36.32.68.94.68 1.9l-.01 2.81c0 .27.18.6.69.49A10.26 10.26 0 0 0 22 12.25C22 6.58 17.52 2 12 2z"/></svg></a>
         <a href="#contact" class="btn btn--small">Start a project</a>
       </nav>
       <button class="nav__toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span></button>
@@ -51,7 +53,9 @@
       <a href="#jang">Jàng</a>
       <a href="#work">Work</a>
       <a href="#services">Services</a>
+      <a href="code.html">Code samples</a>
       <a href="#contact">Hire me</a>
+      <a class="nav__mobile-gh" href="https://github.com/zzolotuhin94-coder" target="_blank" rel="noopener" data-contact="github"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49l-.01-1.9c-2.78.62-3.37-1.21-3.37-1.21-.46-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.35 1.12 2.92.85.09-.66.35-1.12.63-1.37-2.22-.26-4.55-1.14-4.55-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05A9.36 9.36 0 0 1 12 6.84c.85 0 1.71.12 2.51.34 1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.8-4.57 5.05.36.32.68.94.68 1.9l-.01 2.81c0 .27.18.6.69.49A10.26 10.26 0 0 0 22 12.25C22 6.58 17.52 2 12 2z"/></svg>GitHub</a>
     </div>
   </header>
 
@@ -67,9 +71,12 @@
           <p class="hero__lead reveal">Full-stack product developer. From a tourism super-app with real-time bookings and an AI concierge, to scroll-driven 3D landing pages and AI chatbots for small businesses.</p>
           <div class="hero__cta reveal">
             <a class="btn" href="https://www.fiverr.com/zolotuhindev" target="_blank" rel="noopener" data-fiverr>Start a project on Fiverr <span aria-hidden="true">→</span></a>
-            <a class="btn btn--ghost" href="#live">Try the live demo</a>
+            <div class="reach" data-reach>
+              <a class="btn btn--ghost reach__btn" href="#contact">Send a brief</a>
+            </div>
           </div>
-          <p class="hero__proof reveal"><span>4-app platform shipped</span><span>3 languages</span><span>Source code is yours</span></p>
+          <a class="hero__demo reveal" href="#live"><span class="hero__demo-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 7.5v9l7.5-4.5z"/></svg></span><span>Or try the live demo<span class="hero__demo-sub"> — book a table, watch it land on the tablet</span></span></a>
+          <p class="hero__proof reveal"><span>5-app platform shipped</span><span>3 languages</span><span>Source code is yours</span></p>
         </div>
 
         <div class="stage" aria-label="AlpenGo app screens">
@@ -89,9 +96,9 @@
 
       <div class="wrap">
         <dl class="stats reveal">
-          <div><dt><span data-count="43">43</span>k</dt><dd>lines of code in AlpenGo</dd></div>
-          <div><dt><span data-count="4">4</span></dt><dd>apps in one product</dd></div>
-          <div><dt><span data-count="28">28</span></dt><dd>database migrations</dd></div>
+          <div><dt><span data-count="110">110</span>k</dt><dd>lines of code in AlpenGo</dd></div>
+          <div><dt><span data-count="5">5</span></dt><dd>apps in one product</dd></div>
+          <div><dt><span data-count="82">82</span></dt><dd>database migrations</dd></div>
           <div><dt><span data-count="6">6</span></dt><dd>live projects here</dd></div>
         </dl>
       </div>
@@ -106,14 +113,14 @@
           <img class="case__logo" src="site/img/alpengo-logo.webp" alt="AlpenGo logo" width="120" height="98">
           <div>
             <h2 id="alpengo-title">Alpen<em class="gold">Go</em></h2>
-            <p class="case__sub">A tourism super-app platform for an Alpine resort in the Zillertal, Austria. Guests plan their day, book tables and talk to an AI concierge; restaurants and hotels run everything from their own app; the resort manages the whole network from one console.</p>
+            <p class="case__sub">A tourism super-app platform for an Alpine resort in the Zillertal, Austria. Guests plan their day, book tables, rooms and taxis, and talk to an AI concierge. Restaurants, hotels and taxi companies run their business from one partner app, drivers take rides from their own app, and the resort manages the whole network from one console.</p>
           </div>
         </div>
 
         <div class="case__meta">
           <div><span>Role</span>Founder &amp; solo developer — product, design, mobile, backend</div>
-          <div><span>Platform</span>iOS &amp; Android (Expo), web admin, Node.js API</div>
-          <div><span>Scale</span>~43,000 lines · 28 migrations · 17 API modules</div>
+          <div><span>Platform</span>iOS &amp; Android (Expo) · web · Node.js API</div>
+          <div><span>Scale</span>~110,000 lines · 82 migrations · 36 API modules</div>
           <div><span>Languages</span>German, Dutch, English</div>
         </div>
         </div><!-- /win intro -->
@@ -163,71 +170,42 @@
           </div>
           <div>
             <h3>The solution</h3>
-            <p>One platform with four parts that talk to each other in real time. A guest books a table in the app → it appears instantly on the restaurant's floor plan → the host accepts it → the guest gets a push notification. A lift opens in the morning → every guest who asked for it is notified.</p>
+            <p>One platform with five parts that talk to each other in real time. A guest books a table → it appears on the restaurant’s floor plan → the host accepts → the guest gets a push notification. A guest orders a taxi → it lands in the dispatcher’s queue and on a driver’s phone → the guest watches the car arrive on a live map.</p>
           </div>
         </div></div>
 
         <div class="win">
-        <h3 class="case__h">Four parts, <em class="gold">one system</em></h3>
-        <div class="parts reveal">
+        <h3 class="case__h">Five parts, <em class="gold">one system</em></h3>
+        <div class="parts parts--5 reveal">
           <article class="part spot">
-            <div class="part__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10 18h4"/></svg>
-            </div>
+            <div class="part__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10 18h4"/></svg></div>
             <h4>AlpenGo Guest — for visitors</h4>
             <p class="part__tech">React Native · Expo · offline-first</p>
-            <ul>
-              <li>Hotels, restaurants, ski-lift status, weather, events and a map</li>
-              <li>Table booking with live availability and reviews</li>
-              <li><strong>“Fabi”, an AI concierge powered by Claude</strong> that knows the resort</li>
-              <li>German, Dutch and English, switched instantly</li>
-              <li>Offline cache — the app is never empty, even in a gondola</li>
-              <li>Day / night theme that follows the Alpine sunrise and dusk</li>
-            </ul>
+            <ul><li>Restaurants, hotels &amp; apartments, events, news and a map with bus stops</li><li>Book a table, request a room, or <strong>order a taxi and follow it live on the map</strong></li><li>Stripe payments, tips and ride ratings</li><li>Room service to your room, unlocked with a 6-digit stay code</li><li><strong>“Fabi”, an AI concierge powered by Claude</strong> that knows the resort’s real partners</li><li>German, Dutch and English; email-code login and GDPR self-service</li></ul>
           </article>
           <article class="part spot">
-            <div class="part__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="10" r="2"/><circle cx="15.5" cy="10" r="2"/><rect x="7" y="14.5" width="10" height="2.5" rx="1"/></svg>
-            </div>
+            <div class="part__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="10" r="2"/><circle cx="15.5" cy="10" r="2"/><rect x="7" y="14.5" width="10" height="2.5" rx="1"/></svg></div>
             <h4>AlpenGo Business — for venues</h4>
-            <p class="part__tech">React Native · Zustand · Reanimated</p>
-            <ul>
-              <li>Reservations and waitlist with accept / decline in one tap</li>
-              <li><strong>Interactive floor-plan editor</strong> — drag tables, see live occupancy</li>
-              <li>Reservation timeline for the whole evening</li>
-              <li>Menu builder, events, venue photos</li>
-              <li>Analytics and review moderation</li>
-              <li>Hotel module: rooms, housekeeping, occupancy calendar</li>
-              <li>Adapts to the business type — restaurant, hotel, taxi or activity</li>
-            </ul>
+            <p class="part__tech">React Native · TypeScript · Zustand</p>
+            <ul><li>Restaurant, hotel and taxi modules on <strong>one unified dashboard</strong></li><li><strong>Interactive floor-plan editor</strong>, reservation timeline, waitlist</li><li>Hotel: rooms, pricing, iCal sync, housekeeping, room service</li><li>Digital guest registration with signature and tourist-tax count</li><li>Taxi: <strong>live dispatch</strong>, fleet, ride tiers, peak surcharges</li><li>AI-drafted review replies, Stripe subscriptions, five themes</li></ul>
           </article>
           <article class="part spot">
-            <div class="part__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
-            </div>
+            <div class="part__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 17h14M6 17l1.5-6h9L18 17"/><path d="M4 17v2h3v-2M17 17v2h3v-2"/><circle cx="8" cy="14.5" r=".8"/><circle cx="16" cy="14.5" r=".8"/><path d="M9 8h6l1 3H8z"/></svg></div>
+            <h4>AlpenGo Driver — for taxi drivers</h4>
+            <p class="part__tech">React Native · Expo Location · Socket.io</p>
+            <ul><li>Go online and share GPS every 20 seconds</li><li>Ride queue with accept / decline and equipment tags</li><li>One-tap status flow: arriving → on board → completed</li><li>Cash rides: mark payment as collected</li><li>Chat with the guest with DE / EN quick replies</li><li>History, stats and a licence &amp; concession profile</li></ul>
+          </article>
+          <article class="part spot">
+            <div class="part__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div>
             <h4>Super-admin console</h4>
             <p class="part__tech">Resort-wide control</p>
-            <ul>
-              <li>Onboard businesses with invite keys, per-business modules</li>
-              <li>Subscriptions and billing</li>
-              <li>Broadcast messages to every guest</li>
-              <li>QR attribution — which poster brought which guest</li>
-              <li>Audit log, system health, backups</li>
-            </ul>
+            <ul><li>Onboard businesses, switch modules per venue</li><li>Plan catalogue, per-venue fees, commission invoices</li><li>KPIs per destination, fleet overview across taxi companies</li><li>Promotions, broadcasts, bus stops and timetables</li><li>QR attribution, audit log, diagnostics, backups</li></ul>
           </article>
           <article class="part spot">
-            <div class="part__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7" ry="2.5"/><path d="M5 5.5v6c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-6M5 11.5v6c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-6"/></svg>
-            </div>
+            <div class="part__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7" ry="2.5"/><path d="M5 5.5v6c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-6M5 11.5v6c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-6"/></svg></div>
             <h4>Backend API</h4>
-            <p class="part__tech">Node.js · Express · PostgreSQL</p>
-            <ul>
-              <li>JWT auth with rate limiting and Helmet</li>
-              <li>Socket.io rooms for instant updates</li>
-              <li>Reservation state machine with overbooking checks</li>
-              <li>Stripe billing, Sentry monitoring, schedulers</li>
-              <li>Expo push notifications, 28 versioned migrations</li>
-            </ul>
+            <p class="part__tech">Node.js · Express · PostgreSQL · Socket.io</p>
+            <ul><li>Separate identities for guests, partners, drivers and admins</li><li>State machines for reservations, rides and room service</li><li>Stripe checkout with automatic refunds</li><li>Push to guests, drivers and staff; iCal &amp; review schedulers</li><li>82 migrations, 62 automated tests, Docker + Caddy setup</li></ul>
           </article>
         </div>
         </div>
@@ -237,40 +215,43 @@
         <figure class="arch reveal">
           <svg viewBox="0 0 960 400" role="img" aria-labelledby="arch-title arch-desc">
             <title id="arch-title">AlpenGo architecture</title>
-            <desc id="arch-desc">Guest app, partner app and admin console talk to the Node.js API over REST and Socket.io. The API uses PostgreSQL and connects to Claude, Stripe, Expo Push and Sentry.</desc>
+            <desc id="arch-desc">Guest app, partner app, driver app and admin console talk to the Node.js API over REST and Socket.io. The API uses PostgreSQL and connects to Claude, Stripe, Expo Push and Sentry.</desc>
             <defs>
               <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" class="arch__arrowhead"/></marker>
             </defs>
             <g class="arch__client">
-              <rect x="20" y="40" width="220" height="80" rx="14"/>
-              <text x="130" y="75" class="t1">Guest app</text><text x="130" y="98" class="t2">React Native · Expo</text>
-              <rect x="20" y="160" width="220" height="80" rx="14"/>
-              <text x="130" y="195" class="t1">Partner app</text><text x="130" y="218" class="t2">React Native · Zustand</text>
-              <rect x="20" y="280" width="220" height="80" rx="14"/>
-              <text x="130" y="315" class="t1">Admin console</text><text x="130" y="338" class="t2">Super-admin tools</text>
+              <rect x="20" y="20" width="220" height="70" rx="14"/>
+              <text x="130" y="50" class="t1">Guest app</text><text x="130" y="72" class="t2">React Native · Expo</text>
+              <rect x="20" y="110" width="220" height="70" rx="14"/>
+              <text x="130" y="140" class="t1">Partner app</text><text x="130" y="162" class="t2">React Native · TypeScript</text>
+              <rect x="20" y="200" width="220" height="70" rx="14"/>
+              <text x="130" y="230" class="t1">Driver app</text><text x="130" y="252" class="t2">React Native · live GPS</text>
+              <rect x="20" y="290" width="220" height="70" rx="14"/>
+              <text x="130" y="320" class="t1">Admin console</text><text x="130" y="342" class="t2">Super-admin tools</text>
             </g>
             <g class="arch__lines">
-              <path d="M240 80C300 80 300 170 360 185" marker-end="url(#ah)" marker-start="url(#ah)"/>
-              <path d="M240 200H360" marker-end="url(#ah)" marker-start="url(#ah)"/>
-              <path d="M240 320C300 320 300 230 360 215" marker-end="url(#ah)" marker-start="url(#ah)"/>
+              <path d="M240 55C300 55 300 165 360 180" marker-end="url(#ah)" marker-start="url(#ah)"/>
+              <path d="M240 145C290 145 310 190 360 195" marker-end="url(#ah)" marker-start="url(#ah)"/>
+              <path d="M240 235C290 235 310 210 360 205" marker-end="url(#ah)" marker-start="url(#ah)"/>
+              <path d="M240 325C300 325 300 235 360 220" marker-end="url(#ah)" marker-start="url(#ah)"/>
               <path d="M600 200H660" marker-end="url(#ah)" marker-start="url(#ah)"/>
               <path d="M480 140V100" marker-end="url(#ah)"/>
               <path d="M480 260V300" marker-end="url(#ah)"/>
             </g>
-            <text x="300" y="226" class="arch__label">REST + Socket.io</text>
+            <text x="300" y="382" class="arch__label">REST + Socket.io</text>
             <g class="arch__core">
               <rect x="360" y="140" width="240" height="120" rx="18"/>
               <text x="480" y="188" class="t1">Node.js API</text>
               <text x="480" y="212" class="t2">Express · JWT · rate limits</text>
-              <text x="480" y="234" class="t2">reservation state machine</text>
+              <text x="480" y="234" class="t2">reservation &amp; ride state machines</text>
             </g>
             <g class="arch__client">
               <rect x="660" y="160" width="280" height="80" rx="14"/>
-              <text x="800" y="195" class="t1">PostgreSQL</text><text x="800" y="218" class="t2">28 migrations · audit log</text>
+              <text x="800" y="195" class="t1">PostgreSQL</text><text x="800" y="218" class="t2">82 migrations · audit log</text>
             </g>
             <g class="arch__ext">
               <rect x="380" y="40" width="200" height="60" rx="30"/>
-              <text x="480" y="76" class="t1">Claude AI concierge</text>
+              <text x="480" y="76" class="t1">Claude AI</text>
               <rect x="300" y="300" width="130" height="56" rx="28"/>
               <text x="365" y="334" class="t1">Expo Push</text>
               <rect x="440" y="300" width="100" height="56" rx="28"/>
@@ -280,15 +261,22 @@
             </g>
           </svg>
           <ol class="arch__flow" aria-hidden="true">
-            <li class="af af--row"><span>Guest app</span><span>Partner app</span><span>Admin console</span></li>
+            <li class="af af--row"><span>Guest app</span><span>Partner app</span><span>Driver app</span><span>Admin console</span></li>
             <li class="af__link">REST + Socket.io</li>
-            <li class="af af--core"><strong>Node.js API</strong><small>Express · JWT · rate limits · reservation state machine</small></li>
+            <li class="af af--core"><strong>Node.js API</strong><small>Express · JWT · rate limits · reservation &amp; ride state machines</small></li>
             <li class="af__link">&nbsp;</li>
             <li class="af af--row"><span>PostgreSQL</span><span>Claude AI</span></li>
             <li class="af af--row af--ext"><span>Expo Push</span><span>Stripe</span><span>Sentry</span></li>
           </ol>
-          <figcaption>Every client shares one API. Socket.io rooms per user and per venue push changes the moment they happen — no refresh, no polling.</figcaption>
+          <figcaption>Every client shares one API. Socket.io rooms per user, venue, destination and ride push changes the moment they happen — no refresh, no polling.</figcaption>
         </figure>
+        <div class="codecta">
+          <p class="codecta__txt"><span class="codecta__ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16"/></svg></span><span><strong>Read the real code behind this diagram.</strong> The reservation state machine, Socket.io rooms and the Claude concierge — short, commented excerpts.</span></p>
+          <div class="codecta__btns">
+            <a class="btn btn--small codecta__main" href="code.html">Explore code samples <span aria-hidden="true">→</span></a>
+            <a class="btn btn--ghost btn--small codecta__gh" href="https://github.com/zzolotuhin94-coder" target="_blank" rel="noopener" data-contact="github"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49l-.01-1.9c-2.78.62-3.37-1.21-3.37-1.21-.46-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.35 1.12 2.92.85.09-.66.35-1.12.63-1.37-2.22-.26-4.55-1.14-4.55-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05A9.36 9.36 0 0 1 12 6.84c.85 0 1.71.12 2.51.34 1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.8-4.57 5.05.36.32.68.94.68 1.9l-.01 2.81c0 .27.18.6.69.49A10.26 10.26 0 0 0 22 12.25C22 6.58 17.52 2 12 2z"/></svg>GitHub</a>
+          </div>
+        </div>
         </div>
 
         <div class="win">
@@ -316,13 +304,13 @@
           </article>
           <article class="spot">
             <span class="num">05</span>
-            <h4>Offline-first by design</h4>
-            <p>Mountains have dead zones. Data is fetched fresh, cached locally and served from cache when the network drops — with bundled data as a last resort, the app is never blank.</p>
+            <h4>One platform, three verticals</h4>
+            <p>Restaurants, hotels and taxi companies run on the same core. A business can own several venues, each with its own modules and subscription, all on one dashboard — and roles decide who configures and who only operates.</p>
           </article>
           <article class="spot">
             <span class="num">06</span>
-            <h4>Built to be operated</h4>
-            <p>Helmet, JWT and rate limiting on the API, Sentry for errors, audit logging of admin actions, scheduled jobs, backups and a system-health view for the resort team.</p>
+            <h4>Dispatch in real time</h4>
+            <p>A taxi request reaches the dispatcher and every online driver at once. Drivers send GPS every 20 seconds and move the ride through a strict status flow, while the guest watches the car approach on a live map and chats with the driver.</p>
           </article>
         </div>
         </div>
@@ -544,15 +532,64 @@
       </div>
     </section>
 
-    <!-- CONTACT -->
+    <!-- CONTACT (channels come from CONTACT in site/contact.js) -->
     <section class="contact" id="contact" aria-labelledby="contact-title">
       <div class="contact__horizon" aria-hidden="true"></div>
       <div class="wrap"><div class="win win--contact"><div class="contact__inner">
         <p class="label label--center reveal"><span>05</span>Let’s talk</p>
-        <h2 id="contact-title" class="reveal">Let’s build something <em class="gold">people remember.</em></h2>
-        <p class="reveal">Send a two-line brief — I reply within a few hours with a plan and a fixed quote.</p>
-        <a class="btn btn--large btn--magnetic reveal" id="hire-link" href="https://www.fiverr.com/zolotuhindev" target="_blank" rel="noopener">Message me on Fiverr <span aria-hidden="true">→</span></a>
-        <ul class="contact__chips reveal"><li>Fixed price</li><li>Source code is yours</li><li>Tested on real phones</li></ul>
+        <h2 id="contact-title" class="reveal">Have a project in mind? <em class="gold">Let’s build it.</em></h2>
+        <p class="contact__lead reveal">Send a two-line brief — I reply within a few hours with a plan and a fixed quote.</p>
+
+        <div class="contact__grid">
+          <div class="contact__direct">
+            <p class="contact__eyebrow">Fastest way to start</p>
+            <a class="btn btn--large btn--magnetic" id="hire-link" href="https://www.fiverr.com/zolotuhindev" target="_blank" rel="noopener">Message me on Fiverr <span aria-hidden="true">→</span></a>
+            <p class="contact__safe"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5.5c0 4.2 3 7.9 7 8.5 4-.6 7-4.3 7-8.5V6z"/><path d="m9 12 2 2 4-4"/></svg>Fixed price, milestones and payment protection through Fiverr.</p>
+            <ul class="contact__chips"><li>Fixed price</li><li>Source code is yours</li><li>Tested on real phones</li></ul>
+            <p class="contact__or"><span>See how I build first</span></p>
+            <ul class="chans" data-channels="list">
+              <li class="chan"><a class="chan__main" href="code.html"><span class="chan__txt"><b>Code samples</b><small>State machine, Socket.io, Claude API</small></span></a></li>
+            </ul>
+            <figure class="cquote">
+              <blockquote>
+                <span class="cquote__stars" aria-label="5 out of 5 stars">★★★★★</span>
+                <p>“He was super friendly, communicative, reliable, and incredibly fast … the final result was honestly more than I had hoped for.”</p>
+              </blockquote>
+              <figcaption><span><b>alexakarl311</b> · Jàng app client</span><span class="cquote__badge">✓ Verified on Fiverr</span></figcaption>
+            </figure>
+          </div>
+
+          <form class="brief" data-brief novalidate aria-labelledby="brief-title">
+            <div class="brief__head">
+              <h3 id="brief-title">Send a brief</h3>
+              <p>Three quick fields — enough for a plan and a fixed quote.</p>
+            </div>
+            <div class="brief__row">
+              <label class="field"><span class="field__label">Your name</span><input name="name" autocomplete="name" placeholder="Anna Berger" maxlength="80"></label>
+              <label class="field" data-needs="email" hidden><span class="field__label">Your email <small>optional</small></span><input type="email" name="email" autocomplete="email" placeholder="anna@company.com" maxlength="120"></label>
+            </div>
+            <label class="field"><span class="field__label">What do you want to build?</span><textarea name="what" rows="4" required minlength="10" maxlength="2000" placeholder="e.g. A booking app for my restaurant — guests reserve a table, staff confirm it on a tablet."></textarea><em class="field__err">A sentence or two is enough.</em></label>
+            <fieldset class="budget">
+              <legend class="field__label">Budget</legend>
+              <div class="budget__chips">
+                <label><input type="radio" name="budget" value="Under $300"><span>Under $300</span></label>
+                <label><input type="radio" name="budget" value="$300 – $1k"><span>$300 – $1k</span></label>
+                <label><input type="radio" name="budget" value="$1k – $5k"><span>$1k – $5k</span></label>
+                <label><input type="radio" name="budget" value="$5k+"><span>$5k+</span></label>
+                <label><input type="radio" name="budget" value="Not sure yet" checked><span>Not sure yet</span></label>
+              </div>
+            </fieldset>
+            <div class="brief__foot">
+              <ol class="brief__steps" aria-label="What happens next">
+                <li><b>Reply</b>within a few hours</li>
+                <li><b>Plan</b>scope <li><b>Plan</b>scope, timeline &amp; stack</li>amp; timeline</li>
+                <li><b>Quote</b>one fixed price</li>
+              </ol>
+              <button class="btn brief__submit" type="submit"><span>Copy brief &amp; open Fiverr</span> <i aria-hidden="true">→</i></button>
+              <p class="brief__note">Your brief is copied to the clipboard, then Fiverr opens — just paste it into the message.</p>
+            </div>
+          </form>
+        </div>
       </div></div>
       </div>
     </section>
@@ -560,8 +597,9 @@
 
   <footer class="footer">
     <div class="wrap footer__inner">
-      <span>© <span id="year">2026</span> zolotuhin.dev · Dmitrijs Zolotuhins · <a href="https://www.fiverr.com/zolotuhindev" target="_blank" rel="noopener">@zolotuhindev on Fiverr</a></span>
-      <a href="#top">Back to top ↑</a>
+      <span class="footer__copy">© <span id="year">2026</span> zolotuhin.dev · Dmitrijs Zolotuhins · <a href="https://www.fiverr.com/zolotuhindev" target="_blank" rel="noopener" data-fiverr>@zolotuhindev on Fiverr</a></span>
+      <nav class="footer__icons" data-channels="icons" aria-label="Profiles"></nav>
+      <span class="footer__links"><a href="code.html">Code samples</a><a href="#top">Back to top ↑</a></span>
     </div>
   </footer>
 
@@ -575,5 +613,6 @@
   <script src="site/live.js" defer></script>
   <script src="site/rail.js" defer></script>
   <script src="site/guide.js" defer></script>
+  <script src="site/contact.js" defer></script>
 </body>
 </html>
