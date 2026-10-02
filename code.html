@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Code samples · Aurum Forge by Zolotuhin</title>
-  <meta name="description" content="Real, commented excerpts from AlpenGo — a reservation state machine, Socket.io rooms, a Claude-powered concierge and React Native stores. By Dimi Zolotuhin, full-stack product developer.">
+  <meta name="description" content="Real, commented excerpts from AlpenGo — a reservation state machine, Socket.io rooms, a Claude-powered concierge and React Native stores — plus an open-source MCP server for Claude. By Dimi Zolotuhin, full-stack product developer.">
   <meta property="og:title" content="Code samples · Aurum Forge by Zolotuhin">
   <meta property="og:description" content="Real, commented excerpts from AlpenGo: state machine, Socket.io rooms, Claude API, Zustand.">
   <meta property="og:image" content="https://zzolotuhin94-coder.github.io/site/og.png">
@@ -57,8 +57,8 @@
         <a class="cp-back" href="index.html#alpengo"><span aria-hidden="true">←</span> Back to the AlpenGo case study</a>
         <p class="label"><span>&lt;/&gt;</span>Code samples</p>
         <h1 class="cp-title">Real code, <em class="gold">not screenshots.</em></h1>
-        <p class="cp-lead">Six short excerpts from AlpenGo’s API and partner app: how bookings stay consistent, how updates reach exactly the right screen, and how the AI concierge stays safe and affordable.</p>
-        <p class="cp-note"><span class="cp-note__ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg></span><span><strong>Excerpts from AlpenGo — my own product, built from scratch.</strong> The repositories are private; a full code walkthrough is available on request. Comments are translated to English and the code is lightly condensed; no keys, hosts or private data.</span></p>
+        <p class="cp-lead">Six short excerpts from AlpenGo’s API and partner app — how bookings stay consistent, how updates reach exactly the right screen, how the AI concierge stays safe and affordable — plus an open-source MCP server that lets Claude work with business data.</p>
+        <p class="cp-note"><span class="cp-note__ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg></span><span><strong>Excerpts 01–06 are from AlpenGo — my own product, built from scratch.</strong> Those repositories are private; a full code walkthrough is available on request. Comments are translated to English and the code is lightly condensed; no keys, hosts or private data.</span></p>
         <ul class="cp-facts">
           <li><strong>~110k</strong> lines of code</li>
           <li><strong>5</strong> apps, one API</li>
@@ -77,6 +77,7 @@
           <button class="cp-tab" role="tab" id="tab-claude-concierge" aria-controls="p-claude-concierge" aria-selected="false" tabindex="-1" data-tab="claude-concierge"><span class="cp-tab__n">04</span><span class="cp-tab__t">Claude AI concierge</span><span class="cp-tab__l">JS</span></button>
           <button class="cp-tab" role="tab" id="tab-floor-plan-store" aria-controls="p-floor-plan-store" aria-selected="false" tabindex="-1" data-tab="floor-plan-store"><span class="cp-tab__n">05</span><span class="cp-tab__t">Floor-plan store</span><span class="cp-tab__l">TS</span></button>
           <button class="cp-tab" role="tab" id="tab-zustand-store" aria-controls="p-zustand-store" aria-selected="false" tabindex="-1" data-tab="zustand-store"><span class="cp-tab__n">06</span><span class="cp-tab__t">Zustand business store</span><span class="cp-tab__l">TS</span></button>
+          <button class="cp-tab" role="tab" id="tab-mcp-server" aria-controls="p-mcp-server" aria-selected="false" tabindex="-1" data-tab="mcp-server"><span class="cp-tab__n">07</span><span class="cp-tab__t">MCP server for Claude</span><span class="cp-tab__l">TS</span></button>
         </div>
         <div class="cp-panel" role="tabpanel" id="p-state-machine" aria-labelledby="tab-state-machine">
           <div class="cp-code">
@@ -515,6 +516,63 @@ export const useBusinessStore = create&lt;BusinessState&gt;((set, get) =&gt; ({
             <h3>Zustand business store</h3>
             <ul><li><b>Zustand where it earns its place:</b> the fetch layer lives outside React and still needs the active business — a Context provider can’t reach it.</li><li><b>The client never decides access.</b> It only remembers which business was open; the server re-scopes the token on every switch.</li><li><b>Types mirror the server:</b> categories match the database constraint, roles match the API’s role guards.</li><li>Small, explicit actions — no reducers or boilerplate, and easy to reset on logout.</li></ul>
             <p class="cp-why__stack">Zustand · AsyncStorage · TypeScript</p>
+          </aside>
+        </div>
+        <div class="cp-panel" role="tabpanel" id="p-mcp-server" aria-labelledby="tab-mcp-server" hidden>
+          <div class="cp-code">
+            <div class="cp-file">
+              <span class="cp-file__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="cp-file__path"><span class="cp-file__name">mcp-business-server/src/server.ts</span><span class="cp-file__extra">open source</span></span>
+              <span class="cp-file__meta"><span class="cp-lang cp-lang--ts">TypeScript</span><span class="cp-file__lines">40 lines</span></span>
+              <button class="cp-copy" type="button" aria-label="Copy code: MCP server for Claude"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15H4.5A1.5 1.5 0 0 1 3 13.5v-9A1.5 1.5 0 0 1 4.5 3h9A1.5 1.5 0 0 1 15 4.5V5"/></svg><span>Copy</span></button>
+            </div>
+<pre class="cp-pre" tabindex="0" aria-label="MCP server source code"><code data-lang="ts">// An AI assistant should never change business data on its own. So every
+// write tool is two-step: the first call only returns a preview; the change
+// happens only when the assistant calls again with confirm=true — after the
+// human said yes. READ_ONLY=1 removes write tools from the server entirely.
+if (!READ_ONLY) {
+  // Business rules live in code, not in the prompt: the model can ask for
+  // any status, the server only allows the next legal one.
+  const NEXT: Record&lt;string, string[]&gt; = {
+    pending: ["paid", "cancelled"], paid: ["shipped", "cancelled"],
+    shipped: ["delivered", "returned"], delivered: ["returned"],
+    cancelled: [], returned: [],
+  };
+
+  server.registerTool("update_order_status", {
+    title: "Update order status",
+    description: "Move an order to its next status. Call once without confirm "
+      + "to get a preview; repeat with confirm=true only after the user agrees.",
+    inputSchema: {                                   // validated by Zod
+      order_id: z.number().int().positive(),
+      status: z.enum(["paid", "shipped", "delivered", "cancelled", "returned"]),
+      confirm: z.boolean().default(false),
+    },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true },
+  }, async ({ order_id, status, confirm }) =&gt; {
+    const o = one(`SELECT o.id, o.status, c.name AS customer, o.total_cents
+                   FROM orders o JOIN customers c ON c.id = o.customer_id
+                   WHERE o.id = ?`, order_id);           // parameterised, always
+    if (!o) return fail(`No order with id ${order_id}.`);
+    if (!NEXT[o.status].includes(status))            // a clear error the model can act on
+      return fail(`Order ${order_id} is '${o.status}'. Allowed next: ${NEXT[o.status].join(", ") || "none"}.`);
+
+    const change = { order_id, customer: o.customer, from: o.status, to: status };
+    if (!confirm)
+      return json({ preview: change, note: "Nothing changed yet. Ask the user to confirm." });
+
+    db.prepare("UPDATE orders SET status = ? WHERE id = ?").run(status, order_id);
+    audit("update_order_status", `Order #${order_id} (${o.customer}): ${o.status} → ${status}`);
+    return json({ done: true, ...change });
+  });
+}</code></pre>
+          </div>
+          <aside class="cp-why" aria-label="Why it’s built this way">
+            <p class="cp-why__k">Why it’s built this way</p>
+            <h3>MCP server for Claude</h3>
+            <ul><li><b>Lets Claude or ChatGPT answer from real business data</b> — orders, stock, invoices — through the open Model Context Protocol.</li><li><b>Nothing changes without a yes.</b> Every write is preview → confirm, and READ_ONLY=1 removes write tools completely.</li><li><b>Rules in code, not in the prompt.</b> The server enforces legal status moves, whatever the model asks for.</li><li><b>Every change is audited</b>, every input validated, every query parameterised.</li></ul>
+            <p class="cp-why__stack">TypeScript · MCP SDK · Zod · SQLite</p>
+            <p class="cp-why__src"><a href="https://github.com/zzolotuhin94-coder/zzolotuhin94-coder.github.io/tree/main/samples/mcp-business-server" target="_blank" rel="noopener">Full source on GitHub →</a></p>
           </aside>
         </div>
       </div></div>

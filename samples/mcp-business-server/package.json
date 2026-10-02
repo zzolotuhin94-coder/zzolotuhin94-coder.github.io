@@ -1,0 +1,28 @@
+{
+  "name": "mcp-business-server",
+  "version": "1.0.0",
+  "description": "MCP server that connects Claude / ChatGPT to a shop database (demo: Ember & Oak coffee roastery)",
+  "scripts": {
+    "build": "tsc",
+    "start": "node --no-warnings dist/server.js",
+    "demo": "node --no-warnings dist/demo.js",
+    "inspect": "npx @modelcontextprotocol/inspector node --no-warnings dist/server.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.31.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "typescript": "^7.0.2"
+  },
+  "type": "module",
+  "bin": {
+    "ember-oak-mcp": "dist/server.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  }
+}
