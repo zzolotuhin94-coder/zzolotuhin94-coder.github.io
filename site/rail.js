@@ -11,7 +11,7 @@
       id: 'apps', label: 'Apps', short: 'Apps', icon: 'phone', start: '#alpengo',
       items: [
         { href: '#alpengo', name: 'AlpenGo' },
-        { href: '#jang', name: 'Jàng' }
+        { href: '#jang', name: 'Sama Wolof' }
       ]
     },
     {

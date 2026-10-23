@@ -487,7 +487,7 @@
   document.querySelectorAll('.phone__frame, .tablet__frame, .jphone__frame').forEach(function (f) {
     var tablet = f.classList.contains('tablet__frame');
     var jang = f.classList.contains('jphone__frame');
-    modelBody(f, tablet ? 7 : 9, jang ? '<span class="m3d__cams"><i></i><i></i><i></i></span><b class="m3d__word">Jàng</b>' : null, (tablet ? 'm3d__back--tablet' : '') + (jang ? ' m3d__back--jang' : ''));
+    modelBody(f, tablet ? 7 : 9, jang ? '<span class="m3d__cams"><i></i><i></i><i></i></span><b class="m3d__word">Sama Wolof</b>' : null, (tablet ? 'm3d__back--tablet' : '') + (jang ? ' m3d__back--jang' : ''));
     f.classList.add('m3d');
     spinner(f, f);
   });
