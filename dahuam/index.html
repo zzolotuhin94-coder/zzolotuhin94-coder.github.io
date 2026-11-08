@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DAHUAM.202 Кухня</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#24453b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: working tool. Sticky header with tabs, summary first, then dense lists/tables. Pine green + cheese-yellow accent. */
+:root{
+  --bg:#f3f5f2; --surface:#ffffff; --sunk:#e8ece7; --fg:#18231f; --muted:#5d6b65; --line:#d5ddd7;
+  --pine:#24453b; --pine-fg:#f3f5f2; --accent:#e2b33c; --accent-fg:#2a2205;
+  --good:#2f7d4f; --good-bg:#e1f0e6; --warn:#9a6a00; --warn-bg:#f8edcf; --bad:#b23a2e; --bad-bg:#f7e0dc;
+  --f-display:"Unbounded","Golos Text",system-ui,sans-serif;
+  --f-body:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111916; --surface:#18221e; --sunk:#0d1411; --fg:#e4ebe7; --muted:#93a39c; --line:#2b3a34;
+  --pine:#1c362e; --pine-fg:#e4ebe7; --accent:#e9be4f; --accent-fg:#2a2205;
+  --good:#6fcf95; --good-bg:#183326; --warn:#e8c25a; --warn-bg:#352b10; --bad:#f08a7e; --bad-bg:#3a1c18;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111916; --surface:#18221e; --sunk:#0d1411; --fg:#e4ebe7; --muted:#93a39c; --line:#2b3a34;
+  --pine:#1c362e; --pine-fg:#e4ebe7; --accent:#e9be4f; --accent-fg:#2a2205;
+  --good:#6fcf95; --good-bg:#183326; --warn:#e8c25a; --warn-bg:#352b10; --bad:#f08a7e; --bad-bg:#3a1c18;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--f-body);-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--pine)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--pine);color:var(--pine-fg)}
+header.top .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:10px 24px;padding-block:12px}
+.brand{display:flex;flex-direction:column;line-height:1.2}
+.brand b{font:700 17px/1.1 var(--f-display);letter-spacing:.02em}
+.brand b i{font-style:normal;color:var(--accent)}
+.brand span{font-size:12px;opacity:.75}
+nav.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
+nav.tabs button{background:transparent;color:var(--pine-fg);border:1px solid transparent;border-radius:999px;padding:6px 14px;font:500 14px var(--f-body);cursor:pointer;opacity:.85}
+nav.tabs button:hover{opacity:1;border-color:color-mix(in srgb,var(--pine-fg) 30%,transparent)}
+nav.tabs button.on{background:var(--accent);color:var(--accent-fg);opacity:1}
+@media (max-width:560px){nav.tabs{margin-left:0;flex-wrap:nowrap;gap:2px}nav.tabs button{padding:6px 10px;font-size:13.5px}}
+main{padding-block:20px 60px}
+h1{font:700 22px/1.25 var(--f-display);margin:0;text-wrap:balance}
+h2{font:600 13px/1.3 var(--f-body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:26px 0 8px}
+.muted{color:var(--muted)}
+.mono,.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0}
+.bar .sp{flex:1}
+input,select,textarea{font:inherit;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-width:0}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+input[type=number]{font-family:var(--f-mono)}
+.search{flex:1 1 220px;max-width:360px}
+button.btn{font:500 14px var(--f-body);border-radius:8px;padding:7px 14px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+button.btn:hover{border-color:var(--muted)}
+button.primary{background:var(--pine);color:var(--pine-fg);border-color:var(--pine)}
+:root[data-theme="dark"] button.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) button.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}}
+button.danger{color:var(--bad);border-color:var(--bad)}
+button.icon{background:none;border:0;color:var(--muted);cursor:pointer;font-size:18px;padding:2px 8px;border-radius:6px}
+button.icon:hover{color:var(--fg);background:var(--sunk)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:var(--surface);color:var(--muted);padding:7px 12px;font:500 14px var(--f-body);cursor:pointer}
+.seg button.on{background:var(--sunk);color:var(--fg)}
+
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-top:14px}
+.kpi{background:var(--surface);padding:14px 16px}
+.kpi .v{font:600 24px/1.1 var(--f-mono);font-variant-numeric:tabular-nums}
+.kpi .l{font-size:12.5px;color:var(--muted);margin-top:4px}
+@media (max-width:640px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.list{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px 18px;align-items:center;padding:12px 16px;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row.click{cursor:pointer}
+.row.click:hover{background:var(--sunk)}
+.nm{font-weight:600}
+.ds{font-size:13.5px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.alg{font:600 11px/1 var(--f-mono);padding:3px 5px;border-radius:4px;background:var(--sunk);color:var(--muted);border:1px solid var(--line)}
+.tag{font:500 11.5px/1 var(--f-body);padding:3px 7px;border-radius:999px;background:var(--sunk);color:var(--muted)}
+.tag.semi{background:var(--warn-bg);color:var(--warn)}
+.nums{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.nums .p{font-weight:600}
+.nums .s{font-size:12.5px;color:var(--muted)}
+.fc{display:inline-block;min-width:62px;text-align:center;font:600 13px/1 var(--f-mono);padding:6px 8px;border-radius:999px}
+.fc.good{background:var(--good-bg);color:var(--good)}
+.fc.warn{background:var(--warn-bg);color:var(--warn)}
+.fc.bad{background:var(--bad-bg);color:var(--bad)}
+.fc.na{background:var(--sunk);color:var(--muted);font-family:var(--f-body);font-weight:500}
+.acts{display:flex;gap:4px;align-items:center}
+@media (max-width:640px){.row{grid-template-columns:minmax(0,1fr) auto}.row .acts{grid-column:1/-1;justify-content:flex-end}}
+
+.tbl-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+table{border-collapse:collapse;width:100%}
+th,td{padding:8px 10px;border-top:1px solid var(--line);text-align:left;vertical-align:middle}
+thead th{border-top:0;font:600 12px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:var(--sunk);white-space:nowrap}
+td.r,th.r{text-align:right}
+td.num{white-space:nowrap}
+tfoot td{font-weight:600;background:var(--sunk)}
+table.edit{min-width:720px}
+table.edit select{width:100%;min-width:220px}
+table.edit input[type=number]{width:96px;text-align:right}
+table.prods{min-width:820px}
+table.prods input[type=number]{width:92px;text-align:right}
+
+.grid2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted)}
+label.f input,label.f select,label.f textarea{font-size:15px}
+textarea{width:100%;min-height:150px;resize:vertical;line-height:1.5}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.panel + .panel{margin-top:14px}
+.big{font:600 30px/1.1 var(--f-mono);font-variant-numeric:tabular-nums}
+.kv{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:14px;margin-top:10px}
+.kv span:nth-child(even){font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+.hint{font-size:13px;color:var(--muted);margin-top:10px}
+.back{background:none;border:0;color:var(--muted);cursor:pointer;font:500 14px var(--f-body);padding:0;margin-bottom:10px}
+.back:hover{color:var(--fg)}
+.note{font-size:13px;color:var(--muted);border-left:3px solid var(--accent);padding:6px 12px;margin:16px 0;background:var(--surface);border-radius:0 8px 8px 0}
+
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg);padding:0;width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 40px)}
+dialog::backdrop{background:rgba(10,20,16,.45)}
+dialog form{padding:20px;display:flex;flex-direction:column;gap:12px}
+dialog h3{margin:0;font:600 18px var(--f-display)}
+.dlg-actions{display:flex;gap:8px;align-items:center;margin-top:6px}
+.dlg-actions .sp{flex:1}
+.algs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px 10px;font-size:13.5px}
+.algs label{display:flex;gap:6px;align-items:center}
+.empty{padding:28px 16px;text-align:center;color:var(--muted)}
+
+#print{display:none}
+@media print{
+  body > *:not(#print){display:none!important}
+  body::before{display:none}
+  #print{display:block;color:#000;background:#fff;font:12px/1.4 var(--f-body);padding:0}
+  #print h1{font:700 16px var(--f-body);margin:6px 0 2px}
+  #print table{width:100%;border-collapse:collapse;margin-top:10px}
+  #print th,#print td{border:1px solid #000;padding:4px 6px;color:#000;background:#fff}
+  #print .r{text-align:right}
+  #print .meta{display:flex;justify-content:space-between;font-size:11px}
+  #print .sign{display:flex;justify-content:space-between;margin-top:30px}
+  @page{size:A4;margin:14mm}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><b>DAHUAM<i>.</i>202</b><span>Кухня · техкарты, меню, себестоимость</span></div>
+    <nav class="tabs" id="tabs">
+      <button type="button" data-tab="menu">Меню</button>
+      <button type="button" data-tab="cards">Техкарты</button>
+      <button type="button" data-tab="products">Продукты</button>
+      <button type="button" data-tab="setup">Настройки</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap" id="app"></main>
+<dialog id="dlg"><form id="dlgForm" method="dialog"></form></dialog>
+<div id="print"></div>
+
+<script>
+'use strict';
+const KEY = 'dahuam202_kitchen_v1';
+const FRAMED = (()=>{ try { return window.self !== window.top; } catch(e){ return true; } })();
+const ALG = {A:'Глютен',B:'Ракообразные',C:'Яйца',D:'Рыба',E:'Арахис',F:'Соя',G:'Молоко/лактоза',H:'Орехи',L:'Сельдерей',M:'Горчица',N:'Кунжут',O:'Сульфиты',P:'Люпин',R:'Моллюски'};
+
+/* ---------- demo data ---------- */
+function seed(){
+  // [id, name, unit, price € per unit (без НДС), отход хол. %, потери тепл. %, аллергены, вес 1 шт г]
+  const prods = [
+    ['pork','Свиная корейка (Schweinerücken)','кг',9.5,5,15,''],
+    ['veal','Телятина, верхний окорок (Kalbsoberschale)','кг',32,8,15,''],
+    ['beef_goulash','Говядина для гуляша (Wadschinken)','кг',14,8,35,''],
+    ['beef_mince','Говяжий фарш (Rinderfaschiertes)','кг',13,0,25,''],
+    ['speck','Тирольский шпек (Tiroler Speck)','кг',16,3,20,''],
+    ['flour','Мука пшеничная (Mehl glatt)','кг',0.9,0,0,'A'],
+    ['egg','Яйцо куриное М','шт',0.28,12,0,'C',55],
+    ['quail','Яйцо перепелиное','шт',0.35,12,0,'C',10],
+    ['crumbs','Панировочные сухари (Semmelbrösel)','кг',2.5,0,0,'A'],
+    ['schmalz','Топлёное масло (Butterschmalz)','кг',9,0,0,'G'],
+    ['fries','Картофель фри, заморож.','кг',2.2,0,10,''],
+    ['lemon','Лимон','шт',0.35,0,0,'',110],
+    ['cranberry','Брусника протёртая (Preiselbeeren)','кг',7,0,0,''],
+    ['parsley','Петрушка','кг',12,30,0,''],
+    ['milk','Молоко 3,5%','л',1.1,0,0,'G'],
+    ['cream','Сливки 36%','л',4.5,0,0,'G'],
+    ['butter','Масло сливочное','кг',8.5,0,0,'G'],
+    ['cremefr','Крем-фреш','кг',6,0,0,'G'],
+    ['parmesan','Пармезан','кг',22,0,0,'G'],
+    ['bergkase','Циллертальский горный сыр (Bergkäse)','кг',18,3,0,'G'],
+    ['emmental','Эмменталь','кг',12,3,0,'G'],
+    ['cheddar','Чеддер','кг',14,0,0,'G'],
+    ['sugar','Сахар','кг',1.0,0,0,''],
+    ['icing','Сахарная пудра','кг',1.6,0,0,''],
+    ['raisins','Изюм','кг',6,0,0,''],
+    ['applesauce','Яблочное пюре (Apfelmus)','кг',3,0,0,''],
+    ['blueberry','Черника заморож.','кг',9,0,0,''],
+    ['apples','Яблоки','кг',2.2,20,0,''],
+    ['strudel_dough','Тесто для штруделя','кг',6,0,0,'A'],
+    ['cinnamon','Корица молотая','кг',20,0,0,''],
+    ['onion','Лук репчатый','кг',1.2,12,0,''],
+    ['red_onion','Лук красный','кг',1.8,12,0,''],
+    ['spring','Лук зелёный','кг',6,15,0,''],
+    ['garlic','Чеснок','кг',8,15,0,''],
+    ['potato','Картофель','кг',0.9,20,0,''],
+    ['romaine','Салат романо','кг',4.5,20,0,''],
+    ['passata','Томаты протёртые (Passata)','кг',2.2,0,0,''],
+    ['tomato_paste','Томатная паста','кг',4,0,0,''],
+    ['capers','Каперсы','кг',14,0,0,''],
+    ['pickles','Маринованные овощи (Mixed Pickles)','кг',6,0,0,'M O'],
+    ['pesto','Песто базилик','кг',18,0,0,'G H'],
+    ['mustard','Горчица','кг',4,0,0,'M'],
+    ['bbq','Соус BBQ','кг',6,0,0,'M O'],
+    ['chutney','Томатный чатни','кг',7,0,0,'O'],
+    ['bread','Хлеб белый / багет','кг',3.5,0,0,'A'],
+    ['brioche','Булочка бриошь','шт',0.85,0,0,'A C G',80],
+    ['wine','Вино белое сухое','л',6,0,0,'O'],
+    ['kirsch','Кирш (Kirschwasser)','л',25,0,0,''],
+    ['starch','Крахмал кукурузный','кг',3,0,0,''],
+    ['oil','Масло рапсовое','л',2.8,0,0,''],
+    ['paprika','Паприка сладкая молотая','кг',18,0,0,''],
+    ['caraway','Тмин','кг',15,0,0,''],
+    ['salt','Соль','кг',0.5,0,0,''],
+    ['pepper','Перец чёрный молотый','кг',25,0,0,''],
+    ['water','Вода','л',0,0,0,''],
+  ].map(([id,name,unit,price,lossCold,lossHot,alg,pieceG])=>({id,name,unit,price,lossCold,lossHot,alg,pieceG:pieceG||''}));
+
+  const ref = k => (k.startsWith('semi_')?'c:':'p:')+k;
+  // [id, name, type, category, yieldG, items, method]
+  const cards = [
+    ['semi_flammdough','Тесто для фламмкухена','semi','Заготовки',1650,
+      [['flour',1000],['water',600],['oil',80],['salt',20]],
+      'Смешать муку, соль, воду и масло, вымесить 8 мин до гладкости. Отдых под плёнкой 30 мин при +4 °C. Делить по 200 г. Хранение до 48 ч при +2…+4 °C.'],
+    ['semi_goulash','Гуляшсуппе, основа (партия)','semi','Заготовки',8000,
+      [['beef_goulash',2000],['onion',1500],['oil',100],['paprika',60],['tomato_paste',80],['garlic',40],['caraway',10],['potato',1500],['water',4000],['salt',40],['pepper',5]],
+      'Лук пассеровать до золотистого цвета. Снять с огня, добавить паприку и томатную пасту, сразу влить немного воды. Добавить говядину кубиком 1,5 см, тмин и чеснок, тушить 1,5 ч. Добавить картофель кубиком и оставшуюся воду, варить 25 мин. Посолить. Охладить шоковой заморозкой. Срок хранения 72 ч.'],
+    ['semi_caesar','Заправка «Цезарь»','semi','Заготовки',600,
+      [['egg',3],['parmesan',80],['garlic',15],['lemon',1],['mustard',20],['oil',400],['salt',5],['pepper',2]],
+      'Желтки с горчицей, чесноком и соком лимона взбить блендером. Тонкой струйкой ввести масло до эмульсии. Добавить тёртый пармезан, соль и перец. Хранение 48 ч при +2…+4 °C.'],
+    ['semi_strudel','Яблочный штрудель, противень на 12 порций','semi','Заготовки',3600,
+      [['strudel_dough',500],['apples',3000],['sugar',300],['cinnamon',10],['raisins',150],['crumbs',150],['butter',250]],
+      'Яблоки очистить, нарезать тонкими дольками, смешать с сахаром, корицей и изюмом. Тесто смазать растопленным маслом, посыпать обжаренными сухарями, выложить начинку, свернуть. Выпекать 40 мин при 180 °C, смазывая маслом.'],
+    ['semi_blueberry','Черничный компот','semi','Заготовки',900,
+      [['blueberry',800],['sugar',150],['water',100],['starch',15]],
+      'Чернику с сахаром и водой довести до кипения. Загустить крахмалом, разведённым в холодной воде. Охладить.'],
+
+    ['dish_schnitzel_pork','Wiener Schnitzel из свинины с картофелем фри','dish','Фондю и горячее',470,
+      [['pork',180],['flour',20],['egg',1],['crumbs',50],['schmalz',40],['fries',200],['lemon',0.25],['cranberry',30],['parsley',3],['salt',2]],
+      'Отбить мясо до толщины 4 мм, посолить. Обвалять в муке, яйце и сухарях, не прижимая панировку. Жарить в топлёном масле при 170 °C, покачивая сковороду, чтобы панировка «волной» отошла от мяса, 2–3 мин с каждой стороны. Подача: шницель, картофель фри, долька лимона, брусника, петрушка.'],
+    ['dish_schnitzel_veal','Wiener Schnitzel из телятины с картофелем фри','dish','Фондю и горячее',460,
+      [['veal',170],['flour',20],['egg',1],['crumbs',50],['schmalz',40],['fries',200],['lemon',0.25],['cranberry',30],['parsley',3],['salt',2]],
+      'Как свиной шницель. Телятину отбивать аккуратно, через плёнку, до 4 мм.'],
+    ['dish_fondue','Zillertaler Käsefondue (на 1 персону)','dish','Фондю и горячее',700,
+      [['bergkase',120],['emmental',80],['wine',100],['starch',8],['kirsch',10],['garlic',3],['bread',150],['potato',200],['pickles',80]],
+      'Натереть котелок чесноком. Довести вино до кипения, ввести тёртый сыр, помешивая «восьмёркой». Крахмал развести в кирше, ввести и прогреть до однородности. Подать на горелке с хлебом кубиком, отварным картофелем в мундире и маринованными овощами.'],
+    ['dish_kaiser','Kaiserschmarrn с яблочным пюре и черничным компотом','dish','Десерты',480,
+      [['flour',120],['milk',250],['egg',3],['sugar',25],['butter',30],['raisins',20],['icing',10],['applesauce',80],['semi_blueberry',60],['salt',1]],
+      'Желтки смешать с молоком и мукой, белки взбить с сахаром и щепоткой соли, аккуратно соединить. Вылить на сковороду с растопленным маслом, посыпать изюмом, подрумянить снизу. Довести в духовке 6 мин при 180 °C. Разорвать двумя лопатками, карамелизовать с сахарной пудрой. Подать с пюре и компотом.'],
+    ['dish_elsasser','Flammkuchen «Der Elsässer»','dish','Фламмкухен',380,
+      [['semi_flammdough',200],['cremefr',80],['speck',60],['onion',50],['spring',15],['salt',1],['pepper',0.5]],
+      'Раскатать тесто тонко (2 мм), смазать крем-фреш, посолить и поперчить. Разложить лук кольцами и шпек соломкой. Выпекать 6–8 мин при 300 °C. Посыпать зелёным луком.'],
+    ['dish_goulash','Гуляшсуппе с хлебом','dish','Супы',360,
+      [['semi_goulash',300],['bread',60]],
+      'Разогреть порцию основы до 85 °C. Подать в глубокой тарелке, хлеб отдельно.'],
+    ['dish_tomato','Томатный суп с крем-фреш и песто','dish','Супы',330,
+      [['passata',250],['onion',30],['oil',10],['sugar',5],['cream',30],['cremefr',20],['pesto',10],['salt',2]],
+      'Лук спассеровать на масле, добавить пассату и сахар, варить 15 мин. Влить сливки, пробить блендером, посолить. Подать с ложкой крем-фреш и каплями песто.'],
+    ['dish_caesar','Caesar Salat','dish','Салаты и боулы',300,
+      [['romaine',150],['semi_caesar',50],['parmesan',15],['capers',10],['quail',3],['bread',40],['butter',10],['garlic',3]],
+      'Хлеб кубиком обжарить на масле с чесноком. Романо порвать, заправить соусом. Выложить, добавить крутоны, каперсы, половинки перепелиных яиц, стружку пармезана.'],
+    ['dish_strudel','Oma Lisl’s Apfelstrudel','dish','Десерты',305,
+      [['semi_strudel',300],['icing',5]],
+      'Порцию штруделя прогреть 5 мин при 160 °C, присыпать сахарной пудрой.'],
+    ['dish_burger','Wadel-Beißer-Burger','dish','Бургеры и кебаб',380,
+      [['beef_mince',200],['brioche',1],['speck',30],['cheddar',30],['bbq',30],['red_onion',30],['romaine',20],['chutney',30],['salt',2],['pepper',0.5]],
+      'Котлету 200 г обжарить на гриле до прожарки medium, в конце накрыть чеддером. Шпек обжарить до хруста. Булочку поджарить срезом. Сборка: низ, BBQ, романо, котлета с сыром, шпек, маринованный красный лук, чатни, верх.'],
+  ].map(([id,name,type,category,yieldG,items,method],i)=>({id,no:i+1,name,type,category,yieldG,method,items:items.map(([k,q])=>({ref:ref(k),qty:q,net:''}))}));
+
+  // Меню с сайта dahuam202.at (цены с НДС)
+  const M = [
+    ['Фламмкухен','Flammkuchen «Der Elsässer»','Классический, со шпеком, зелёным и репчатым луком',13.90,'dish_elsasser'],
+    ['Фламмкухен','Flammkuchen «Die Gärtnerin»','Вяленые томаты, местная моцарелла, руккола, песто',14.90],
+    ['Фламмкухен','Flammkuchen «Der Weiße»','Козий сыр, тимьян, мёд, грецкий орех',14.90],
+    ['Фламмкухен','Flammkuchen «Schwammerlsuche»','Лисички, тирольский шпек, шпинат, маскарпоне с травами',17.50],
+    ['Супы','Фруктовый томатный суп','Крем-фреш, песто',6.90,'dish_tomato'],
+    ['Супы','Кокосовый суп-карри','С жареной креветкой',8.90],
+    ['Супы','Гуляшсуппе','Домашний, с хлебом',7.90,'dish_goulash'],
+    ['Супы','Говяжий бульон с фриттатой','Полоски фриттаты с травами',6.50],
+    ['Супы','Говяжий бульон с сырным клёцком','Käsespätzle-Nockerl',6.80],
+    ['Закуски','Чесночный хлеб DAHUAM.202','',5.20],
+    ['Закуски','«Vegan Dippin’»','Целый артишок, лимонный винегрет, дип васаби-цезарь',11.90],
+    ['Закуски','Тартар из тирольской говядины 130 г','Острый маринад, тосты, масло',19.50],
+    ['Закуски','Тартар из тирольской говядины 180 г','Острый маринад, тосты, масло',26.40],
+    ['Закуски','«Fabian’s Caprese»','Буррата, томатный чатни, маринованные томаты, песто',16.50],
+    ['Закуски','«Garnelen Pfandl»','Королевские креветки, айоли, азиатский BBQ-дип',21.20],
+    ['Салаты и боулы','Caesar Salat','Романо, пармезановая заправка, каперсы, перепелиное яйцо, крутоны',14.90,'dish_caesar'],
+    ['Салаты и боулы','«Alpen Ceviche»','Форель, маринованная с лаймом, чили и кинзой',18.20],
+    ['Салаты и боулы','Gerlos Bowl','Рис для суши, арахисово-лаймовая заправка, авокадо, кимчи, эдамаме',18.90],
+    ['Салаты и боулы','Летний салат DAHUAM.202','Домашние сырные клёцки, дип с травами, редис',18.20],
+    ['Салаты и боулы','Salatschüsserl с курицей','Курица в корочке из тыквенных семечек, тыквенное масло',18.10],
+    ['Салаты и боулы','Salatschüsserl с козьим сыром','Запечённый козий сыр, абрикосовый чатни, орехи',17.20],
+    ['Салаты и боулы','Kebap Bowl','Рис, айсберг, куриный гирос, йогуртово-чесночный соус, фета',18.90],
+    ['Фондю и горячее','Zillertaler Käsefondue','На 1 персону: хлеб, картофель, домашние маринованные овощи',28.90,'dish_fondue'],
+    ['Фондю и горячее','Телячий гуляш в сливках','Домашние шпецле на масле',20.90],
+    ['Фондю и горячее','Форель «Müllerin»','Циллертальская форель, картофель с петрушкой, миндальное масло',25.20],
+    ['Фондю и горячее','Fish n’ Chips','Треска в пивном кляре, фри, коулслоу, дип',24.20],
+    ['Фондю и горячее','«Veganista Couch Potato»','Батат, шакшука, салат из нута, тахини',18.50],
+    ['Фондю и горячее','Карбонара с лисичками','Паста, лисички, шпек, яйцо, петрушка, пармезан',18.90],
+    ['Фондю и горячее','«Wilde Bolo»','Спагетти болоньезе из герлосской оленины, чили-кранч',18.90],
+    ['Фондю и горячее','Original Wiener Tafelspitz','Только по воскресеньям',26.00],
+    ['Фондю и горячее','Bauernrösti','Шпек, томат, горный сыр, яичница',16.80],
+    ['Фондю и горячее','Dolce Vita Rösti','Средиземноморские овощи, шпинат, вяленые томаты, буррата',18.90],
+    ['Фондю и горячее','Schwammerlrösti','Говядина Ayinger, лисички, перечный соус',24.50],
+    ['Фондю и горячее','Кордон блю','Свиная корейка, горный сыр, ветчина, фри',23.20],
+    ['Фондю и горячее','Wiener Schnitzel (свинина)','С картофелем фри',20.90,'dish_schnitzel_pork'],
+    ['Фондю и горячее','Wiener Schnitzel (телятина)','С картофелем фри',28.90,'dish_schnitzel_veal'],
+    ['Фондю и горячее','«Hans-Wurst»','Три колбаски Kainzenhof, домашние дипы, фри',18.30],
+    ['Фондю и горячее','Ripperl-Tower','Только по вторникам, на 1 персону',21.90],
+    ['Фондю и горячее','«Stück Fleisch»','Филе-стейк 230 г, перечный жюс, масло с травами',41.50],
+    ['Бургеры и кебаб','Alpen Kebap','Куриный гирос в лепёшке, чесночный дип, овощи',16.90],
+    ['Бургеры и кебаб','Wadel-Beißer-Burger','Говядина, бриошь, шпек, чеддер, BBQ, маринованный лук',20.50,'dish_burger'],
+    ['Бургеры и кебаб','DFC Burger','Жареная курица, корейский BBQ, кимчи, острый майонез, арахис',19.90],
+    ['Десерты','«Dippin me softly!»','Шоколадно-ореховое фондю с фруктами, на 1 персону',10.50],
+    ['Десерты','«Endless Summer»','Клубника, крем-чизкейк, масляный крамбл',8.50],
+    ['Десерты','«Fabian’s Schokotraum»','Шоколадный мусс',6.50],
+    ['Десерты','Affogato','Эспрессо с ванильным мороженым',5.90],
+    ['Десерты','Marillenknödel','Абрикосовые кнедли в масляной крошке',9.50],
+    ['Десерты','«Wir sind Kaiser!»','Kaiserschmarrn, яблочное пюре, черничный компот',15.80,'dish_kaiser'],
+    ['Десерты','Oma Lisl’s Apfelstrudel','Домашний, тёплый',5.40,'dish_strudel'],
+    ['Десерты','«French Twist»','Ванильный крем-брюле',9.50],
+    ['Десерты','Cookie Pfandl','Тёплое печенье с шоколадом, ванильное мороженое',12.50],
+    ['Десерты','«Say Cheese»','Подборка сыров от Антонии',10.90],
+    ['Детское меню','Суп с лапшой','',4.90],
+    ['Детское меню','Детский бургер с сыром и фри','',12.50],
+    ['Детское меню','Детский шницель с фри','',12.50],
+    ['Детское меню','Детский стейк с фри','',19.90],
+    ['Детское меню','Сосиска «Würstlkrake» с фри','',8.20],
+    ['Детское меню','Куриные наггетсы с фри','',9.80],
+    ['Детское меню','Шпецле в сливочном соусе','',8.40],
+    ['Детское меню','Паста с томатным соусом или болоньезе','',8.90],
+    ['Детское меню','Детский тост (ветчина, сыр)','',7.90],
+    ['Детское меню','Биттербаллен с фри','',11.60],
+    ['Детское меню','Блинчик','С нутеллой, яблочным пюре или сахарной пудрой',6.50],
+    ['Детское меню','Милкшейк','Банан, шоколад, клубника, ваниль или карамель',5.50],
+  ].map(([section,name,desc,price,card])=>({id:uid('m'),section,name,desc,price,card:card||''}));
+
+  return {settings:{name:'DAHUAM.202 Restobar | Café',vat:10,target:28,nextNo:cards.length+1}, products:prods, cards, menu:M, demo:true};
+}
+
+/* ---------- helpers ---------- */
+function uid(p){ return p+'_'+Math.random().toString(36).slice(2,9); }
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fin = n => (typeof n === 'number' && isFinite(n)) ? n : 0;
+const eur = n => fin(n).toLocaleString('de-AT',{style:'currency',currency:'EUR'});
+const num = (n,d=0) => fin(n).toLocaleString('ru-RU',{maximumFractionDigits:d});
+const pct = n => (n==null || !isFinite(n)) ? '—' : num(n,1)+' %';
+
+let S = load() || seed();
+let view = {tab:'menu', card:null, q:'', ctype:'all', pq:''};
+
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+function load(){ try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; } catch(e){ return null; } }
+
+const P = id => S.products.find(p => p.id === id);
+const C = id => S.cards.find(c => c.id === id);
+function refObj(ref){ if(!ref) return null; const i = ref.indexOf(':'); const t = ref.slice(0,i), id = ref.slice(i+1); const o = t==='p' ? P(id) : C(id); return o ? {t,o} : null; }
+const algList = s => String(s||'').split(/[\s,]+/).filter(Boolean);
+
+/* ---------- calculation ---------- */
+function line(it, depth){
+  const res = {name:'выберите ингредиент', unit:'г', grossG:0, net:0, out:0, cost:0, alg:new Set(), missing:true, netAuto:0};
+  const r = refObj(it.ref); if(!r) return res;
+  res.missing = false;
+  const q = +it.qty || 0;
+  if(r.t === 'p'){
+    const p = r.o; res.name = p.name;
+    if(p.unit === 'шт'){ res.unit = 'шт'; res.cost = q * fin(+p.price); res.grossG = q * fin(+p.pieceG); }
+    else { res.unit = p.unit === 'л' ? 'мл' : 'г'; res.cost = q/1000 * fin(+p.price); res.grossG = q; }
+    res.netAuto = res.grossG * (1 - fin(+p.lossCold)/100);
+    res.net = it.net !== '' && it.net != null ? +it.net : res.netAuto;
+    res.out = res.net * (1 - fin(+p.lossHot)/100);
+    algList(p.alg).forEach(a => res.alg.add(a));
+  } else {
+    const c = r.o; res.name = 'ПФ · ' + c.name; res.grossG = q;
+    const t = totals(c, depth+1);
+    res.cost = c.yieldG ? q * t.cost / c.yieldG : 0;
+    res.netAuto = q; res.net = it.net !== '' && it.net != null ? +it.net : q; res.out = res.net;
+    t.alg.forEach(a => res.alg.add(a));
+  }
+  return res;
+}
+function totals(c, depth=0){
+  const t = {cost:0, gross:0, net:0, out:0, alg:new Set(), lines:[]};
+  if(!c || depth > 6) return t;
+  for(const it of c.items){ const l = line(it, depth); t.lines.push(l); t.cost += l.cost; t.gross += l.grossG; t.net += l.net; t.out += l.out; l.alg.forEach(a => t.alg.add(a)); }
+  return t;
+}
+function menuCalc(m){
+  const c = m.card ? C(m.card) : null;
+  const t = c ? totals(c) : null;
+  const netPrice = (+m.price||0) / (1 + S.settings.vat/100);
+  const cost = t ? t.cost : null;
+  return {c, t, cost, netPrice, fc: cost!=null && netPrice ? cost/netPrice*100 : null, margin: cost!=null ? netPrice - cost : null};
+}
+function fcClass(fc){ if(fc==null) return 'na'; const tg = +S.settings.target; return fc <= tg ? 'good' : fc <= tg+7 ? 'warn' : 'bad'; }
+function fcBadge(fc){ return `<span class="fc ${fcClass(fc)}">${fc==null ? 'нет ТК' : pct(fc)}</span>`; }
+function chips(set){ const a = [...set].sort(); return a.length ? `<div class="chips">${a.map(x=>`<span class="alg" title="${esc(ALG[x]||x)}">${esc(x)}</span>`).join('')}</div>` : ''; }
+function usage(ref){ return S.cards.filter(c => c.items.some(i => i.ref === ref)); }
+
+/* ---------- render ---------- */
+function render(){
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === view.tab));
+  const app = $('#app');
+  if(view.tab === 'menu') app.innerHTML = renderMenu();
+  else if(view.tab === 'cards') app.innerHTML = view.card && C(view.card) ? renderCard(C(view.card)) : renderCards();
+  else if(view.tab === 'products') app.innerHTML = renderProducts();
+  else app.innerHTML = renderSetup();
+}
+function demoNote(){ return S.demo ? `<div class="note">Демо-данные. Меню и цены взяты с сайта dahuam202.at. Рецептуры и закупочные цены примерные: замените их своими во вкладках «Техкарты» и «Продукты».</div>` : ''; }
+
+function renderMenu(){
+  const q = view.q.trim().toLowerCase();
+  const all = S.menu.map(m => ({m, k:menuCalc(m)}));
+  const linked = all.filter(x => x.k.cost != null);
+  const avg = linked.length ? linked.reduce((s,x)=>s+x.k.fc,0)/linked.length : null;
+  const over = linked.filter(x => x.k.fc > S.settings.target).length;
+  const shown = all.filter(({m}) => !q || (m.name+' '+m.desc+' '+m.section).toLowerCase().includes(q));
+  const sections = [...new Set(shown.map(x => x.m.section))];
+  let h = `<h1>Меню</h1>
+  <div class="kpis">
+    <div class="kpi"><div class="v">${S.menu.length}</div><div class="l">позиций в меню</div></div>
+    <div class="kpi"><div class="v">${linked.length}</div><div class="l">с техкартой</div></div>
+    <div class="kpi"><div class="v">${pct(avg)}</div><div class="l">средний фудкост</div></div>
+    <div class="kpi"><div class="v" style="color:${over?'var(--bad)':'var(--good)'}">${over}</div><div class="l">выше цели ${num(S.settings.target)} %</div></div>
+  </div>
+  ${demoNote()}
+  <div class="bar"><input id="mq" class="search" type="search" placeholder="Поиск по меню" value="${esc(view.q)}"><span class="sp"></span><button type="button" class="btn primary" data-act="newMenu">+ Позиция</button></div>`;
+  if(!shown.length) h += `<div class="list"><div class="empty">Ничего не найдено.</div></div>`;
+  for(const s of sections){
+    h += `<h2>${esc(s)}</h2><div class="list">`;
+    for(const {m,k} of shown.filter(x => x.m.section === s)){
+      h += `<div class="row">
+        <div><div class="nm">${esc(m.name)}</div>${m.desc?`<div class="ds">${esc(m.desc)}</div>`:''}${k.t?chips(k.t.alg):''}</div>
+        <div class="nums"><div class="p">${eur(m.price)}</div><div class="s">${k.cost!=null?'себест. '+eur(k.cost):'&nbsp;'}</div></div>
+        <div class="acts">${fcBadge(k.fc)}
+          ${k.c ? `<button type="button" class="btn" data-act="openCard" data-id="${k.c.id}">Техкарта</button>` : `<button type="button" class="btn" data-act="newCardFor" data-id="${m.id}">+ Техкарта</button>`}
+          <button type="button" class="icon" title="Изменить позицию" aria-label="Изменить позицию" data-act="editMenu" data-id="${m.id}">✎</button></div>
+      </div>`;
+    }
+    h += `</div>`;
+  }
+  return h;
+}
+
+function renderCards(){
+  const q = view.q.trim().toLowerCase();
+  const list = S.cards.filter(c => (view.ctype==='all' || c.type===view.ctype) && (!q || (c.name+' '+c.category).toLowerCase().includes(q)))
+    .sort((a,b) => a.type===b.type ? a.name.localeCompare(b.name,'ru') : (a.type==='semi'?1:-1));
+  let h = `<h1>Технологические карты</h1>${demoNote()}
+  <div class="bar"><input id="cq" class="search" type="search" placeholder="Поиск по техкартам" value="${esc(view.q)}">
+    <div class="seg">${[['all','Все'],['dish','Блюда'],['semi','Заготовки']].map(([k,l])=>`<button type="button" class="${view.ctype===k?'on':''}" data-act="ctype" data-id="${k}">${l}</button>`).join('')}</div>
+    <span class="sp"></span>
+    <button type="button" class="btn" data-act="newCard" data-id="semi">+ Заготовка</button>
+    <button type="button" class="btn primary" data-act="newCard" data-id="dish">+ Блюдо</button></div>
+  <div class="list">`;
+  if(!list.length) h += `<div class="empty">Техкарт пока нет. Создайте первую кнопкой «+ Блюдо».</div>`;
+  for(const c of list){
+    const t = totals(c);
+    const per100 = c.yieldG ? t.cost / c.yieldG * 100 : 0;
+    const menus = S.menu.filter(m => m.card === c.id).map(menuCalc);
+    h += `<div class="row click" data-act="openCard" data-id="${c.id}">
+      <div><div class="nm">${esc(c.name)}</div><div class="ds"><span class="tag ${c.type==='semi'?'semi':''}">${c.type==='semi'?'заготовка':'блюдо'}</span> ТТК № ${c.no||'—'} · ${esc(c.category||'без раздела')} · выход ${num(c.yieldG)} г · ${c.items.length} ингр.</div>${chips(t.alg)}</div>
+      <div class="nums"><div class="p">${eur(t.cost)}</div><div class="s">${eur(per100)} / 100 г</div></div>
+      <div class="acts">${c.type==='dish' ? fcBadge(menus.length ? menus[0].fc : null) : ''}</div>
+    </div>`;
+  }
+  return h + `</div>`;
+}
+
+function refOptions(sel, selfId){
+  const ps = [...S.products].sort((a,b)=>a.name.localeCompare(b.name,'ru'));
+  const cs = S.cards.filter(c => c.type==='semi' && c.id!==selfId).sort((a,b)=>a.name.localeCompare(b.name,'ru'));
+  return `<option value="">— выберите —</option><optgroup label="Продукты">${ps.map(p=>`<option value="p:${p.id}" ${sel==='p:'+p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</optgroup>`
+    + (cs.length ? `<optgroup label="Заготовки (ПФ)">${cs.map(c=>`<option value="c:${c.id}" ${sel==='c:'+c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</optgroup>` : '');
+}
+
+function renderCard(c){
+  const t = totals(c);
+  const per100 = c.yieldG ? t.cost / c.yieldG * 100 : 0;
+  const menus = S.menu.filter(m => m.card === c.id);
+  const cats = [...new Set([...S.menu.map(m=>m.section), ...S.cards.map(x=>x.category)].filter(Boolean))];
+  const usedIn = usage('c:'+c.id);
+  const vat = 1 + S.settings.vat/100;
+  const rec = t.cost / (S.settings.target/100) * vat;
+  let rows = c.items.map((it,i) => {
+    const l = t.lines[i];
+    return `<tr>
+      <td><select id="ref-${i}" data-li="${i}" data-lf="ref" aria-label="Ингредиент">${refOptions(it.ref, c.id)}</select></td>
+      <td class="r"><input id="qty-${i}" type="number" step="any" min="0" data-li="${i}" data-lf="qty" value="${esc(it.qty)}" aria-label="Брутто"></td>
+      <td class="muted">${l.unit}</td>
+      <td class="r"><input id="net-${i}" type="number" step="any" min="0" data-li="${i}" data-lf="net" value="${esc(it.net)}" placeholder="${num(l.netAuto,1)}" aria-label="Нетто, г"></td>
+      <td class="r num">${num(l.out,1)}</td>
+      <td class="r num">${eur(l.cost)}</td>
+      <td><button type="button" class="icon" data-act="delLine" data-id="${i}" title="Убрать строку" aria-label="Убрать строку">×</button></td>
+    </tr>`;
+  }).join('');
+  return `<button type="button" class="back" data-act="backCards">← Все техкарты</button>
+  <div class="bar" style="margin-top:0"><h1 style="flex:1 1 300px">${esc(c.name)}</h1>
+    ${FRAMED ? '' : `<button type="button" class="btn" data-act="printCard" data-id="${c.id}">Печать ТТК</button>`}
+    <button type="button" class="btn" data-act="dupCard" data-id="${c.id}">Дублировать</button>
+    <button type="button" class="btn danger" data-act="delCard" data-id="${c.id}">Удалить</button></div>
+  <div class="grid2">
+    <div style="min-width:0">
+      <div class="panel"><div class="fields">
+        <label class="f">Название<input id="cf-name" data-cf="name" value="${esc(c.name)}"></label>
+        <label class="f">Тип<select id="cf-type" data-cf="type"><option value="dish" ${c.type==='dish'?'selected':''}>Блюдо</option><option value="semi" ${c.type==='semi'?'selected':''}>Заготовка (ПФ)</option></select></label>
+        <label class="f">Раздел<input id="cf-category" data-cf="category" list="cats" value="${esc(c.category)}"><datalist id="cats">${cats.map(x=>`<option value="${esc(x)}">`).join('')}</datalist></label>
+        <label class="f">${c.type==='semi'?'Выход партии, г':'Выход порции, г'}<input id="cf-yieldG" data-cf="yieldG" type="number" step="any" min="0" value="${esc(c.yieldG)}" placeholder="${num(t.out)}"></label>
+      </div></div>
+      <h2>Закладка ${c.type==='semi'?'на партию':'на 1 порцию'}</h2>
+      <div class="tbl-wrap"><table class="edit">
+        <thead><tr><th>Ингредиент</th><th class="r">Брутто</th><th></th><th class="r">Нетто, г</th><th class="r">Выход, г</th><th class="r">Сумма</th><th></th></tr></thead>
+        <tbody>${rows || `<tr><td colspan="7" class="muted">Добавьте первый ингредиент.</td></tr>`}</tbody>
+        <tfoot><tr><td>Итого</td><td class="r num">${num(t.gross)}</td><td></td><td class="r num">${num(t.net)}</td><td class="r num">${num(t.out)}</td><td class="r num">${eur(t.cost)}</td><td></td></tr></tfoot>
+      </table></div>
+      <div class="bar"><button type="button" class="btn" data-act="addLine">+ Ингредиент</button><span class="hint" style="margin:0">Нетто считается по проценту отхода продукта. Чтобы задать своё значение, введите его вручную.</span></div>
+      <h2>Технология приготовления</h2>
+      <textarea id="cf-method" data-cf="method" placeholder="Обработка, порядок закладки, температура, время, подача, хранение">${esc(c.method)}</textarea>
+    </div>
+    <div style="min-width:0">
+      <div class="panel">
+        <div class="muted" style="font-size:13px">Себестоимость ${c.type==='semi'?'партии':'порции'}</div>
+        <div class="big">${eur(t.cost)}</div>
+        <div class="kv">
+          <span>за 100 г</span><span>${eur(per100)}</span>
+          ${c.type==='semi' && c.yieldG ? `<span>за 1 кг</span><span>${eur(t.cost/c.yieldG*1000)}</span>` : ''}
+          <span>ТТК №</span><span>${c.no||'—'}</span>
+          <span>Сумма выходов</span><span>${num(t.out)} г</span>
+        </div>
+        ${c.type==='dish' ? `<div class="hint">Цена для фудкоста ${num(S.settings.target)} %: <b class="mono">${eur(rec)}</b> с НДС ${num(S.settings.vat)} %</div>` : ''}
+      </div>
+      <div class="panel"><div class="muted" style="font-size:13px">Аллергены (коды EU 1169/2011)</div>
+        ${t.alg.size ? `<div class="kv">${[...t.alg].sort().map(a=>`<span>${esc(ALG[a]||a)}</span><span>${esc(a)}</span>`).join('')}</div>` : '<div class="hint">Не найдены. Проверьте карточки продуктов.</div>'}
+      </div>
+      ${c.type==='dish' ? `<div class="panel"><div class="muted" style="font-size:13px">В меню</div>
+        ${menus.length ? menus.map(m=>{const k=menuCalc(m);return `<div class="kv"><span>${esc(m.name)}</span><span>${eur(m.price)}</span><span>Фудкост</span><span>${fcBadge(k.fc)}</span><span>Маржа без НДС</span><span>${eur(k.margin)}</span></div>`}).join('<hr style="border:0;border-top:1px solid var(--line)">') : '<div class="hint">Не привязана к позиции меню. Привяжите её на вкладке «Меню» кнопкой ✎.</div>'}
+      </div>` : `<div class="panel"><div class="muted" style="font-size:13px">Используется в техкартах</div>
+        ${usedIn.length ? `<div class="kv">${usedIn.map(u=>`<span>${esc(u.name)}</span><span><button type="button" class="btn" data-act="openCard" data-id="${u.id}">Открыть</button></span>`).join('')}</div>` : '<div class="hint">Пока нигде не используется.</div>'}
+      </div>`}
+    </div>
+  </div>`;
+}
+
+function renderProducts(){
+  const q = view.pq.trim().toLowerCase();
+  const list = S.products.filter(p => !q || p.name.toLowerCase().includes(q)).sort((a,b)=>a.name.localeCompare(b.name,'ru'));
+  return `<h1>Продукты и закупочные цены</h1>${demoNote()}
+  <div class="bar"><input id="pq" class="search" type="search" placeholder="Поиск продукта" value="${esc(view.pq)}"><span class="sp"></span><button type="button" class="btn primary" data-act="newProd">+ Продукт</button></div>
+  <div class="tbl-wrap"><table class="prods">
+    <thead><tr><th>Продукт</th><th>Ед.</th><th class="r">Цена, € без НДС</th><th class="r">Отход хол., %</th><th class="r">Потери тепл., %</th><th>Аллергены</th><th class="r">В ТК</th><th></th></tr></thead>
+    <tbody>${list.map(p=>`<tr>
+      <td>${esc(p.name)}${p.unit==='шт'&&p.pieceG?` <span class="muted">(${num(p.pieceG)} г/шт)</span>`:''}</td>
+      <td>${esc(p.unit)}</td>
+      <td class="r"><input id="pp-${p.id}" type="number" step="0.01" min="0" data-pp="${p.id}" data-pf="price" value="${esc(p.price)}" aria-label="Цена"></td>
+      <td class="r"><input id="plc-${p.id}" type="number" step="any" min="0" max="100" data-pp="${p.id}" data-pf="lossCold" value="${esc(p.lossCold)}" aria-label="Отход холодный"></td>
+      <td class="r"><input id="plh-${p.id}" type="number" step="any" min="0" max="100" data-pp="${p.id}" data-pf="lossHot" value="${esc(p.lossHot)}" aria-label="Потери тепловые"></td>
+      <td>${chips(new Set(algList(p.alg)))}</td>
+      <td class="r num">${usage('p:'+p.id).length}</td>
+      <td><button type="button" class="icon" data-act="editProd" data-id="${p.id}" title="Изменить" aria-label="Изменить продукт">✎</button></td>
+    </tr>`).join('') || `<tr><td colspan="8" class="muted">Ничего не найдено.</td></tr>`}</tbody>
+  </table></div>
+  <div class="hint">Цена за кг, л или шт. Поменяйте цену, и себестоимость всех техкарт и фудкост в меню пересчитаются сразу.</div>`;
+}
+
+function renderSetup(){
+  return `<h1>Настройки</h1>
+  <div class="grid2" style="margin-top:14px"><div class="panel"><div class="fields">
+    <label class="f">Название заведения<input id="s-name" data-sf="name" value="${esc(S.settings.name)}"></label>
+    <label class="f">НДС на еду, %<input id="s-vat" data-sf="vat" type="number" step="any" min="0" value="${esc(S.settings.vat)}"></label>
+    <label class="f">Целевой фудкост, %<input id="s-target" data-sf="target" type="number" step="any" min="1" value="${esc(S.settings.target)}"></label>
+  </div><div class="hint">В Австрии на еду действует сниженный НДС 10 %. Фудкост считается от цены без НДС.</div></div>
+  <div class="panel"><div class="muted" style="font-size:13px">Данные</div>
+    <div class="hint" style="margin-top:4px">Данные хранятся только в этом браузере. Делайте резервную копию и переносите её на другие устройства через импорт.</div>
+    <div class="bar"><button type="button" class="btn" data-act="export">Резервная копия</button>
+      <label class="btn" for="importFile" style="display:inline-block">Загрузить копию</label><input id="importFile" type="file" accept="application/json,.json" hidden>
+      <button type="button" class="btn danger" data-act="reset">Вернуть демо-данные</button></div>
+  </div></div>`;
+}
+
+/* ---------- dialogs ---------- */
+function openDialog(title, body, onOk, opts={}){
+  const f = $('#dlgForm'), d = $('#dlg');
+  f.innerHTML = `<h3>${esc(title)}</h3>${body}<div class="dlg-actions">${opts.del?'<button type="button" class="btn danger" id="dlgDel">Удалить</button>':''}<span class="sp"></span><button type="button" class="btn" id="dlgCancel">${opts.cancel||'Отмена'}</button>${onOk?`<button type="submit" class="btn primary">${opts.ok||'Сохранить'}</button>`:''}</div>`;
+  f.onsubmit = e => { e.preventDefault(); if(onOk){ const r = onOk(new FormData(f)); if(r === false) return; } d.close(); save(); render(); };
+  $('#dlgCancel').onclick = () => d.close();
+  if(opts.del) $('#dlgDel').onclick = () => { d.close(); opts.del(); };
+  d.showModal();
+}
+function ask(text, yes, ok='Удалить'){ openDialog('Подтвердите', `<p style="margin:0">${esc(text)}</p>`, () => { yes(); }, {ok}); }
+function info(title, text){ openDialog(title, `<p style="margin:0">${esc(text)}</p>`, null, {cancel:'Понятно'}); }
+
+function menuDialog(m){
+  const isNew = !m; m = m || {id:uid('m'), section:'', name:'', desc:'', price:'', card:''};
+  const secs = [...new Set(S.menu.map(x=>x.section))];
+  const opts = S.cards.filter(c=>c.type==='dish').sort((a,b)=>a.name.localeCompare(b.name,'ru'));
+  openDialog(isNew ? 'Новая позиция меню' : 'Позиция меню', `
+    <label class="f">Раздел<input name="section" list="secs" required value="${esc(m.section)}"><datalist id="secs">${secs.map(s=>`<option value="${esc(s)}">`).join('')}</datalist></label>
+    <label class="f">Название<input name="name" required value="${esc(m.name)}"></label>
+    <label class="f">Описание<input name="desc" value="${esc(m.desc)}"></label>
+    <label class="f">Цена с НДС, €<input name="price" type="number" step="0.01" min="0" required value="${esc(m.price)}"></label>
+    <label class="f">Техкарта<select name="card"><option value="">— не привязана —</option>${opts.map(c=>`<option value="${c.id}" ${m.card===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label>`,
+    fd => { Object.assign(m, {section:fd.get('section').trim(), name:fd.get('name').trim(), desc:fd.get('desc').trim(), price:+fd.get('price'), card:fd.get('card')}); if(isNew) S.menu.push(m); },
+    {del: isNew ? null : () => ask(`Удалить «${m.name}» из меню? Техкарта останется.`, () => { S.menu = S.menu.filter(x=>x!==m); })});
+}
+
+function prodDialog(p){
+  const isNew = !p; p = p || {id:uid('p'), name:'', unit:'кг', price:'', lossCold:0, lossHot:0, alg:'', pieceG:''};
+  const has = new Set(algList(p.alg));
+  openDialog(isNew ? 'Новый продукт' : 'Продукт', `
+    <label class="f">Название<input name="name" required value="${esc(p.name)}"></label>
+    <div class="fields">
+      <label class="f">Единица<select name="unit">${['кг','л','шт'].map(u=>`<option ${p.unit===u?'selected':''}>${u}</option>`).join('')}</select></label>
+      <label class="f">Цена за ед., € без НДС<input name="price" type="number" step="0.01" min="0" required value="${esc(p.price)}"></label>
+      <label class="f">Вес 1 шт, г (для «шт»)<input name="pieceG" type="number" step="any" min="0" value="${esc(p.pieceG)}"></label>
+      <label class="f">Отход при холодной обработке, %<input name="lossCold" type="number" step="any" min="0" max="100" value="${esc(p.lossCold)}"></label>
+      <label class="f">Потери при тепловой обработке, %<input name="lossHot" type="number" step="any" min="0" max="100" value="${esc(p.lossHot)}"></label>
+    </div>
+    <div class="muted" style="font-size:12.5px">Аллергены</div>
+    <div class="algs">${Object.entries(ALG).map(([k,v])=>`<label><input type="checkbox" name="alg" value="${k}" ${has.has(k)?'checked':''}> <b class="mono">${k}</b> ${esc(v)}</label>`).join('')}</div>`,
+    fd => { Object.assign(p, {name:fd.get('name').trim(), unit:fd.get('unit'), price:+fd.get('price'), pieceG:fd.get('pieceG'), lossCold:+fd.get('lossCold')||0, lossHot:+fd.get('lossHot')||0, alg:fd.getAll('alg').join(' ')}); if(isNew) S.products.push(p); },
+    {del: isNew ? null : () => { const u = usage('p:'+p.id); if(u.length) return info('Продукт используется', `Он есть в техкартах: ${u.map(c=>c.name).join(', ')}. Сначала уберите его оттуда.`); ask(`Удалить продукт «${p.name}»?`, () => { S.products = S.products.filter(x=>x!==p); }); }});
+}
+
+function newCard(type, fromMenu){
+  const c = {id:uid(type==='semi'?'semi':'dish'), no:S.settings.nextNo++, name: fromMenu ? fromMenu.name : (type==='semi'?'Новая заготовка':'Новое блюдо'), type, category: fromMenu ? fromMenu.section : (type==='semi'?'Заготовки':''), yieldG:'', method:'', items:[{ref:'',qty:'',net:''}]};
+  S.cards.push(c); if(fromMenu) fromMenu.card = c.id;
+  view = {...view, tab:'cards', card:c.id}; save(); render(); scrollTo(0,0);
+}
+
+function printCard(id){
+  const c = C(id), t = totals(c);
+  $('#print').innerHTML = `
+    <div class="meta"><span>${esc(S.settings.name)}</span><span>Дата: ${new Date().toLocaleDateString('ru-RU')}</span></div>
+    <h1>Технико-технологическая карта № ${c.no||''}</h1>
+    <div><b>${esc(c.name)}</b> · ${c.type==='semi'?'полуфабрикат':'блюдо'} · ${esc(c.category||'')}</div>
+    <div>Выход: ${num(c.yieldG||t.out)} г ${c.type==='semi'?'(партия)':'(1 порция)'}</div>
+    <table><thead><tr><th>№</th><th>Наименование сырья</th><th class="r">Брутто</th><th>Ед.</th><th class="r">Нетто, г</th><th class="r">Выход, г</th><th class="r">Сумма, €</th></tr></thead>
+    <tbody>${c.items.map((it,i)=>{const l=t.lines[i];return `<tr><td>${i+1}</td><td>${esc(l.name)}</td><td class="r">${num(+it.qty,2)}</td><td>${l.unit}</td><td class="r">${num(l.net,1)}</td><td class="r">${num(l.out,1)}</td><td class="r">${fin(l.cost).toFixed(2)}</td></tr>`}).join('')}</tbody>
+    <tfoot><tr><td></td><td>Итого</td><td class="r">${num(t.gross)}</td><td></td><td class="r">${num(t.net)}</td><td class="r">${num(t.out)}</td><td class="r">${t.cost.toFixed(2)}</td></tr></tfoot></table>
+    <p><b>Технология приготовления:</b><br>${esc(c.method).replace(/\n/g,'<br>')}</p>
+    <p><b>Аллергены:</b> ${[...t.alg].sort().map(a=>`${a} (${ALG[a]||''})`).join(', ') || 'нет'}</p>
+    <div class="sign"><span>Шеф-повар ____________</span><span>Калькулятор ____________</span></div>`;
+  window.print();
+}
+
+function exportData(){
+  const json = JSON.stringify(S, null, 1);
+  openDialog('Резервная копия', `<p class="hint" style="margin:0">Скопируйте текст и сохраните его в файл с расширением .json. Восстановить данные можно в «Настройках» кнопкой «Загрузить копию».</p>
+    <textarea id="expTxt" readonly style="min-height:200px;font:12px var(--f-mono)">${esc(json)}</textarea>
+    <div class="bar" style="margin:0"><button type="button" class="btn" id="copyBtn">Скопировать</button>${FRAMED?'':'<button type="button" class="btn" id="dlBtn">Скачать файл</button>'}<span class="hint" id="copyMsg" style="margin:0"></span></div>`, null, {cancel:'Закрыть'});
+  $('#copyBtn').onclick = () => { const ta = $('#expTxt'); const done = () => $('#copyMsg').textContent = 'Скопировано'; navigator.clipboard?.writeText(json).then(done, () => { ta.select(); $('#copyMsg').textContent = 'Текст выделен, нажмите Ctrl+C'; }) ?? (ta.select()); };
+  if(!FRAMED) $('#dlBtn').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([json],{type:'application/json'})); a.download = 'dahuam202-kuchnya-'+new Date().toISOString().slice(0,10)+'.json'; a.click(); };
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', e => {
+  const tab = e.target.closest('#tabs button');
+  if(tab){ view = {...view, tab:tab.dataset.tab, card:null, q:''}; location.hash = tab.dataset.tab; render(); return; }
+  const el = e.target.closest('[data-act]'); if(!el) return;
+  const id = el.dataset.id, act = el.dataset.act;
+  const c = view.card ? C(view.card) : null;
+  switch(act){
+    case 'newMenu': menuDialog(); break;
+    case 'editMenu': menuDialog(S.menu.find(m=>m.id===id)); break;
+    case 'openCard': view = {...view, tab:'cards', card:id}; location.hash = 'cards'; render(); scrollTo(0,0); break;
+    case 'backCards': view.card = null; render(); break;
+    case 'newCardFor': newCard('dish', S.menu.find(m=>m.id===id)); break;
+    case 'newCard': newCard(id); break;
+    case 'ctype': view.ctype = id; render(); break;
+    case 'addLine': c.items.push({ref:'',qty:'',net:''}); save(); render(); break;
+    case 'delLine': c.items.splice(+id,1); save(); render(); break;
+    case 'dupCard': { const src = C(id); const cp = JSON.parse(JSON.stringify(src)); cp.id = uid(src.type); cp.no = S.settings.nextNo++; cp.name += ' (копия)'; S.cards.push(cp); view.card = cp.id; save(); render(); break; }
+    case 'delCard': { const src = C(id); const u = usage('c:'+id); if(u.length){ info('Заготовка используется', `Она входит в техкарты: ${u.map(x=>x.name).join(', ')}. Сначала уберите её оттуда.`); break; }
+      ask(`Удалить техкарту «${src.name}»? Позиции меню останутся без техкарты.`, () => { S.cards = S.cards.filter(x=>x.id!==id); S.menu.forEach(m=>{ if(m.card===id) m.card=''; }); view.card = null; }); break; }
+    case 'printCard': printCard(id); break;
+    case 'newProd': prodDialog(); break;
+    case 'editProd': prodDialog(P(id)); break;
+    case 'export': exportData(); break;
+    case 'reset': ask('Заменить все данные демо-данными? Ваши изменения пропадут.', () => { S = seed(); }, 'Заменить'); break;
+  }
+});
+
+document.addEventListener('input', e => {
+  const t = e.target;
+  if(t.id === 'mq' || t.id === 'cq'){ view.q = t.value; const pos = t.selectionStart; render(); const n = $('#'+t.id); n.focus(); n.setSelectionRange(pos,pos); }
+  if(t.id === 'pq'){ view.pq = t.value; const pos = t.selectionStart; render(); const n = $('#pq'); n.focus(); n.setSelectionRange(pos,pos); }
+});
+
+document.addEventListener('change', e => {
+  const t = e.target, c = view.card ? C(view.card) : null;
+  if(t.dataset.cf && c){ const f = t.dataset.cf; c[f] = f==='yieldG' ? (t.value===''?'':+t.value) : t.value; S.demo = S.demo; save(); if(f!=='method') render(); return; }
+  if(t.dataset.li != null && c){ const it = c.items[+t.dataset.li]; const f = t.dataset.lf; it[f] = f==='ref' ? t.value : (t.value===''?'':+t.value); if(f==='ref') it.net = ''; save(); render(); const n = document.getElementById(t.id); n && n.focus(); return; }
+  if(t.dataset.pp){ const p = P(t.dataset.pp); p[t.dataset.pf] = +t.value || 0; save(); render(); return; }
+  if(t.dataset.sf){ const f = t.dataset.sf; S.settings[f] = f==='name' ? t.value : (+t.value || 0); save(); return; }
+  if(t.id === 'importFile' && t.files[0]){
+    const r = new FileReader();
+    r.onload = () => { try { const d = JSON.parse(r.result); if(!d.products || !d.cards || !d.menu) throw 0; S = d; save(); view = {tab:'menu',card:null,q:'',ctype:'all',pq:''}; render(); info('Готово', 'Данные загружены.'); } catch(err){ info('Не удалось загрузить', 'Файл не похож на резервную копию этого приложения. Выберите .json, сохранённый кнопкой «Резервная копия».'); } };
+    r.readAsText(t.files[0]); t.value = '';
+  }
+});
+
+function fromHash(){ const h = location.hash.slice(1); if(['menu','cards','products','setup'].includes(h) && h !== view.tab){ view = {...view, tab:h, card:null, q:''}; render(); } }
+window.addEventListener('hashchange', fromHash);
+fromHash(); render();
+</script>
+</body>
+</html>
