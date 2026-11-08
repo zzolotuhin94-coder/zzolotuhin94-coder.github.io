@@ -10,7 +10,7 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
 /* Layout: app shell. Pine sidebar (desktop) / bottom tab bar (phone); content = summary first, then cards and dense tables.
    Accent = Marille (apricot), a nod to the Wachau and to the Marillenknödel on the card. */
@@ -25,6 +25,7 @@
   --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
   --r:16px; --r-s:10px;
+  --ph-s:42%; --ph-l1:88%; --ph-l2:76%; --ph-ink:30%;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0d1311; --surface:#151d1a; --surface-2:#1c2622; --fg:#e8eee9; --muted:#93a29b; --line:#26322d;
@@ -33,6 +34,7 @@
   --good:#5fd39a; --good-bg:#15301f; --warn:#f0c255; --warn-bg:#332810; --bad:#ff8b7a; --bad-bg:#3a1a15;
   --s1:#ff8c42; --s2:#4fb38f; --s3:#e8bb4a; --s4:#7d9be0; --s5:#e07aa4; --s6:#a08fe0; --s7:#33403a;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+  --ph-s:30%; --ph-l1:24%; --ph-l2:17%; --ph-ink:75%;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0d1311; --surface:#151d1a; --surface-2:#1c2622; --fg:#e8eee9; --muted:#93a29b; --line:#26322d;
@@ -41,6 +43,7 @@
   --good:#5fd39a; --good-bg:#15301f; --warn:#f0c255; --warn-bg:#332810; --bad:#ff8b7a; --bad-bg:#3a1a15;
   --s1:#ff8c42; --s2:#4fb38f; --s3:#e8bb4a; --s4:#7d9be0; --s5:#e07aa4; --s6:#a08fe0; --s7:#33403a;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+  --ph-s:30%; --ph-l1:24%; --ph-l2:17%; --ph-ink:75%;
   color-scheme:dark}
 
 *{box-sizing:border-box}
@@ -248,7 +251,7 @@ textarea{width:100%;min-height:160px;resize:vertical;line-height:1.6}
 .hero{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:24px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:var(--shadow);margin-bottom:18px;position:relative;overflow:hidden}
 .hero::before{content:"";position:absolute;right:-80px;top:-120px;width:320px;height:320px;border-radius:50%;background:radial-gradient(closest-side,var(--accent-soft),transparent);pointer-events:none}
 .hero > *{position:relative}
-.title-in{font:800 clamp(24px,3.4vw,36px)/1.1 var(--f-display);letter-spacing:-.03em;border:1px solid transparent;background:transparent;padding:2px 8px;margin:0 -9px;width:calc(100% + 18px)}
+.title-in{display:block;font:800 clamp(24px,3.4vw,36px)/1.1 var(--f-display);letter-spacing:-.03em;border:1px solid transparent;background:transparent;padding:2px 8px;margin:0 -9px;width:calc(100% + 18px);min-height:0;resize:none;overflow:hidden;text-wrap:balance}
 .title-in:hover{border-color:var(--line)}
 .hero-stats{display:flex;flex-wrap:wrap;gap:10px 30px;margin-top:14px}
 .hero-stats div{display:flex;flex-direction:column}
@@ -349,6 +352,189 @@ textarea.code{min-height:200px;font:12px/1.4 var(--f-mono)}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 @media (max-width:900px){#toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}}
 
+/* Fotos */
+.ph{display:block;width:100%;height:100%;object-fit:cover}
+.ph-empty{display:grid;place-items:center;background:linear-gradient(135deg,hsl(var(--h) var(--ph-s) var(--ph-l1)),hsl(calc(var(--h) + 30) var(--ph-s) var(--ph-l2)))}
+.ph-empty b{font:800 44px/1 var(--f-display);color:hsl(var(--h) 35% var(--ph-ink));opacity:.55;letter-spacing:-.04em}
+.ph.xs{width:40px;height:40px;border-radius:10px;flex:none}
+.ph-empty.xs b{font-size:17px}
+.ph-btn{position:absolute;right:10px;bottom:10px;display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:8px;background:rgba(10,18,15,.62);color:#fff;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:background .15s,transform .15s}
+.ph-btn:hover{background:rgba(10,18,15,.85);transform:scale(1.05)}
+.ph-btn .ico{width:18px;height:18px}
+.ph-btn.big{padding:9px 14px;font-weight:600;font-size:13px}
+.ph-btn.del{right:auto;left:10px}
+.vb{display:inline-flex;align-items:center;font:700 10.5px/1 var(--f-mono);padding:4px 6px;border-radius:6px;background:var(--good-bg);color:var(--good)}
+.vb.vg{background:var(--good);color:var(--surface)}
+.vb.top{background:var(--accent);color:var(--accent-fg)}
+.vb.off{background:var(--surface-2);color:var(--muted);font-family:var(--f-body);font-weight:600}
+.vb.warn{background:var(--warn-bg);color:var(--warn);font-family:var(--f-body);font-weight:600;margin-left:6px}
+.dish{display:flex;flex-direction:column;overflow:hidden}
+.dish-ph{position:relative;aspect-ratio:16/9;max-width:100%;background:var(--surface-2);overflow:hidden}
+.dish-ph .ph-btn{top:8px;bottom:auto;right:48px;width:34px;height:34px;padding:0;justify-content:center;opacity:0}
+.dish:hover .dish-ph .ph-btn,.dish-ph .ph-btn:focus-visible{opacity:1}
+@media (hover:none){.dish-ph .ph-btn{opacity:1}}
+.ph-flags{position:absolute;left:10px;top:10px;display:flex;gap:4px}
+.dish .edit{top:auto;bottom:auto}
+.dish-main{flex:1;height:auto}
+.dish .edit{position:absolute;right:8px;top:8px;opacity:1;background:rgba(10,18,15,.5);color:#fff;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.dish .edit:hover{background:rgba(10,18,15,.8);color:#fff}
+.dish-ph:has(.ph-empty){aspect-ratio:5/1}
+.dish-ph .ph-empty b{font-size:26px}
+.dish-top{padding-right:0}
+.rc-ph:has(.ph-empty){aspect-ratio:5/1}
+.rc-ph .ph-empty b{font-size:26px}
+.dish.is-hidden .dish-main{opacity:.55}
+.dish.nocard .dish-ph{opacity:.8}
+.rc{padding:0;overflow:hidden;gap:0}
+.rc-ph{position:relative;aspect-ratio:16/8;max-width:100%;background:var(--surface-2);overflow:hidden}
+.rc-ph .vb{position:absolute;left:10px;top:10px}
+.rc-body{display:flex;flex-direction:column;gap:8px;padding:14px 16px 16px}
+.hero{grid-template-columns:220px minmax(0,1fr) auto auto}
+.hero-ph{position:relative;aspect-ratio:1/1;max-width:100%;border-radius:16px;overflow:hidden;background:var(--surface-2)}
+.hero-ph .ph-empty b{font-size:72px}
+@media (max-width:900px){.hero{grid-template-columns:minmax(0,1fr) auto}.hero-ph{grid-column:1/-1;aspect-ratio:16/9}}
+@media (max-width:700px){.hero-acts{grid-column:1/-1}}
+.dlg-ph{display:flex;align-items:center;gap:14px}
+#dlgThumb{width:120px;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:var(--surface-2);display:grid;place-items:center;text-align:center;padding:4px;flex:none}
+#dlgThumb img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+
+/* Schritte */
+.steps{list-style:none;margin:0 0 14px;padding:0;display:flex;flex-direction:column;gap:12px}
+.step{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:12px;align-items:start}
+.step-no{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--fg);color:var(--bg);font:700 14px var(--f-mono)}
+.step-body{display:flex;flex-direction:column;gap:8px;align-items:flex-start;min-width:0}
+.step-body textarea{min-height:0;resize:vertical}
+.step-ph{position:relative;width:min(320px,100%);aspect-ratio:4/3;border-radius:12px;overflow:hidden}
+.step-ph img{width:100%;height:100%;object-fit:cover}
+.step-acts{display:flex;flex-direction:column}
+@media (max-width:560px){.step{grid-template-columns:28px minmax(0,1fr)}.step-no{width:28px;height:28px;font-size:12px}.step-acts{grid-column:2;flex-direction:row}}
+.btn.ghost{background:transparent;border-style:dashed}
+
+/* Schalter */
+.togs{display:flex;flex-wrap:wrap;gap:8px 18px}
+.tog{display:inline-flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;user-select:none}
+.tog input{position:absolute;opacity:0;pointer-events:none}
+.tog span{position:relative;width:38px;height:22px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);transition:background .15s;flex:none}
+.tog span::after{content:"";position:absolute;left:2px;top:2px;width:16px;height:16px;border-radius:50%;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .18s}
+.tog input:checked + span{background:var(--accent);border-color:var(--accent)}
+.tog input:checked + span::after{transform:translateX(16px)}
+.tog input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+.sm-ta{min-height:70px}
+
+/* Gästekarte: Werkzeuge + Vorschau */
+.guest-wrap{display:grid;grid-template-columns:300px minmax(0,1fr);gap:18px;align-items:start}
+.guest-tools{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);display:flex;flex-direction:column;gap:14px}
+.guest-tools .seg{align-self:flex-start}
+.guest-prev{min-width:0}
+@media (max-width:1000px){.guest-wrap{grid-template-columns:minmax(0,1fr)}.guest-tools{position:static}}
+
+/* Die Karte selbst: eigenes Druckobjekt mit festen Farben je Stil */
+.g-paper{--gp:#f6efe2;--gi:#20352c;--ga:#c8742f;--gm:#6b6457;max-width:860px;margin:0 auto;background:var(--gp);color:var(--gi);border-radius:6px;box-shadow:0 30px 60px -30px rgba(0,0,0,.45);padding:clamp(28px,6vw,64px) clamp(20px,6vw,68px);font-family:"Cormorant Garamond",Georgia,serif}
+.g-head{text-align:center;margin-bottom:clamp(26px,5vw,44px)}
+.g-mark-logo{font:600 13px/1 var(--f-body);letter-spacing:.32em;text-transform:uppercase}
+.g-mark-logo span{color:var(--ga)}
+.g-title{font:500 clamp(44px,8vw,76px)/1 "Cormorant Garamond",Georgia,serif;font-style:italic;margin:14px 0 8px;letter-spacing:-.01em}
+.g-sub{font:500 13px var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--gm)}
+.g-sec{margin-top:clamp(26px,5vw,40px);break-inside:avoid-page}
+.g-h{display:flex;align-items:center;gap:16px;font:600 13px/1 var(--f-body);letter-spacing:.28em;text-transform:uppercase;color:var(--ga);margin:0 0 18px}
+.g-h::before,.g-h::after{content:"";flex:1;height:1px;background:currentColor;opacity:.35}
+.g-list{display:flex;flex-direction:column;gap:16px}
+.g-item{display:flex;gap:16px;align-items:flex-start;break-inside:avoid}
+.g-ph{width:76px;height:76px;border-radius:50%;object-fit:cover;flex:none;border:2px solid var(--ga)}
+.g-txt{flex:1;min-width:0}
+.g-row{display:flex;align-items:baseline;gap:10px}
+.g-n{font:600 22px/1.2 "Cormorant Garamond",Georgia,serif}
+.g-row .lead{flex:1;min-width:20px;border-bottom:1.5px dotted currentColor;opacity:.35;transform:translateY(-5px)}
+.g-p{font:600 16px var(--f-body);font-variant-numeric:tabular-nums;white-space:nowrap}
+.g-d{font:400 17px/1.35 "Cormorant Garamond",Georgia,serif;font-style:italic;color:var(--gm);margin-top:2px}
+.g-a{font:500 11px var(--f-mono);letter-spacing:.08em;color:var(--gm);margin-top:4px}
+.g-top{font:600 11px var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--ga);margin-top:2px}
+.g-mark{font:700 10px/1 var(--f-body);font-style:normal;letter-spacing:.04em;border:1px solid currentColor;border-radius:4px;padding:2px 4px;vertical-align:3px;color:var(--ga)}
+.g-foot{margin-top:clamp(30px,6vw,52px);padding-top:20px;border-top:1px solid color-mix(in srgb,var(--gi) 25%,transparent);font:400 13px/1.5 var(--f-body);color:var(--gm);text-align:center}
+.g-keys{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 20px;margin-bottom:10px}
+.g-leg{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;font-size:12px;margin-bottom:10px}
+.g-leg b{font-family:var(--f-mono)}
+.g-foot p{margin:0}
+.g-empty{text-align:center;color:var(--gm)}
+.g-alpin{--gp:#183128;--gi:#f3ead8;--ga:#f0a463;--gm:#b9c3b4;background-image:radial-gradient(ellipse at top,rgba(240,164,99,.12),transparent 60%)}
+.g-klassisch{--gp:#fbf9f4;--gi:#1e1c19;--ga:#8a6a3b;--gm:#6f6a61}
+.g-klassisch .g-item{text-align:center;flex-direction:column;align-items:center;gap:8px}
+.g-klassisch .g-row{justify-content:center}
+.g-klassisch .g-row .lead{display:none}
+.g-klassisch .g-ph{width:120px;height:80px;border-radius:4px;border:0}
+.g-klassisch .g-p::before{content:"€ ";opacity:.6}
+.g-modern{--gp:#ffffff;--gi:#16201c;--ga:#e2702a;--gm:#626c67;font-family:var(--f-body)}
+.g-modern .g-title{font:800 clamp(40px,7vw,64px)/1 var(--f-display);font-style:normal;letter-spacing:-.04em}
+.g-modern .g-h{justify-content:flex-start;letter-spacing:.18em}
+.g-modern .g-h::before{display:none}
+.g-modern .g-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.g-modern .g-item{flex-direction:column;gap:0;border:1px solid #e6e9e5;border-radius:14px;overflow:hidden}
+.g-modern .g-ph{width:100%;height:auto;aspect-ratio:16/10;border-radius:0;border:0}
+.g-modern .g-txt{padding:12px 14px 14px}
+.g-modern .g-n{font:700 17px/1.25 var(--f-display);letter-spacing:-.01em}
+.g-modern .g-d{font:400 13.5px/1.4 var(--f-body);font-style:normal}
+.g-modern .g-row .lead{opacity:0}
+.g-modern .g-item.is-top{border-color:var(--ga)}
+
+/* Aufbau */
+.layout-intro{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:16px}
+.layout-intro .hint{max-width:70ch}
+.lay{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;align-items:start}
+@media (max-width:420px){.lay{grid-template-columns:minmax(0,1fr)}}
+.lay-sec{padding:14px}
+.lay-h{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.lay-no{display:grid;place-items:center;width:26px;height:26px;border-radius:8px;background:var(--surface-2);font-size:12px;font-weight:700;flex:none}
+.lay-name{flex:1;min-width:0;font:700 16px var(--f-display);border-color:transparent;background:transparent;padding:4px 6px}
+.lay-name:hover{border-color:var(--line)}
+.lay-acts{display:flex}
+.lay-acts .icon-btn{width:30px;height:30px}
+.icon-btn:disabled{opacity:.25;cursor:default;background:transparent}
+.lay-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.lay-list li{display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid var(--line)}
+.lay-list li.off{opacity:.45}
+.lay-list .icon-btn{width:30px;height:30px}
+.lay-n{flex:1;min-width:0;font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Lager */
+table.stock{min-width:860px}
+table.stock tr.is-low td{background:color-mix(in srgb,var(--warn-bg) 40%,transparent)}
+.nowrap{white-space:nowrap}
+.lvl{position:relative;display:block;width:110px;height:8px;border-radius:99px;background:var(--surface-2)}
+.lvl i{position:absolute;inset:0 auto 0 0;border-radius:99px}
+.lvl i.good{background:var(--good)} .lvl i.warn{background:var(--warn)} .lvl i.bad{background:var(--bad)}
+.lvl em{position:absolute;top:-3px;bottom:-3px;border-left:2px solid var(--fg);opacity:.35}
+.moves{list-style:none;margin:0;padding:0}
+.moves li{display:grid;grid-template-columns:92px 110px minmax(0,1fr) auto 90px 34px;gap:12px;align-items:center;padding:10px 12px 10px 18px;border-top:1px solid var(--line)}
+.moves li:first-child{border-top:0}
+.mv-n{display:flex;flex-direction:column;min-width:0}
+.mv-n b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mv-d{font-size:13px;color:var(--muted)}
+.mv-q,.mv-v{text-align:right;white-space:nowrap}
+.mvt{justify-self:start;font:600 11.5px/1 var(--f-body);padding:5px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted)}
+.mvt.in{background:var(--good-bg);color:var(--good)} .mvt.waste{background:var(--bad-bg);color:var(--bad)} .mvt.sale{background:var(--accent-soft);color:var(--accent)} .mvt.inv{background:var(--warn-bg);color:var(--warn)}
+@media (max-width:700px){.moves li{grid-template-columns:minmax(0,1fr) auto 34px;gap:4px 10px}.mv-d{grid-column:1}.mvt{grid-column:2;grid-row:1;justify-self:end}.mv-n{grid-column:1/3}.mv-q{grid-column:1;text-align:left}.mv-v{grid-column:2}.moves .icon-btn{grid-column:3;grid-row:1/4}}
+.inv-bar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;position:sticky;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:5}
+.inv-bar > div:first-child{flex:1 1 260px;min-width:0}
+.inv-h{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.inv-h span{display:flex;flex-direction:column}
+.inv-h .r{align-items:flex-end}
+table.inv{min-width:560px}
+table.inv input{width:90px;text-align:right;padding:7px 8px}
+table.inv tr.counted td:first-child{box-shadow:inset 3px 0 0 var(--good)}
+.ord-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;align-items:start}
+@media (max-width:420px){.ord-grid{grid-template-columns:minmax(0,1fr)}}
+.ord-grid h2{display:flex;align-items:center;gap:8px}
+.ord{list-style:none;margin:0;padding:0}
+.ord li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;border-top:1px dashed var(--line)}
+.ord li span:first-child{display:flex;flex-direction:column;min-width:0}
+.ord input{width:84px;text-align:right;padding:6px 8px}
+.sales{list-style:none;margin:0;padding:0;max-height:44vh;overflow:auto;border:1px solid var(--line);border-radius:12px}
+.sales li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 12px;border-top:1px solid var(--line)}
+.sales li:first-child{border-top:0}
+.sales li > span:first-child{display:flex;flex-direction:column;min-width:0;font-weight:600}
+.stepper{display:inline-flex;align-items:center;gap:2px}
+.stepper input{width:56px;text-align:center;padding:6px 4px}
+
 #print{display:none}
 @media print{
   body > *:not(#print){display:none!important}
@@ -360,6 +546,10 @@ textarea.code{min-height:200px;font:12px/1.4 var(--f-mono)}
   #print .r{text-align:right}
   #print .meta{display:flex;justify-content:space-between;font-size:11px}
   #print .sign{display:flex;justify-content:space-between;margin-top:30px}
+  #print .pr-ph{max-width:60mm;margin:8px 0}
+  #print .pr-steps img{max-width:50mm;margin:4px 0}
+  body.print-menu #print{font:inherit}
+  body.print-menu #print .g-paper{box-shadow:none;border-radius:0;max-width:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   @page{size:A4;margin:14mm}
 }
 @media (prefers-reduced-motion: reduce){*,*::before{transition:none!important;animation:none!important}}
@@ -390,6 +580,7 @@ textarea.code{min-height:200px;font:12px/1.4 var(--f-mono)}
 <div id="toast" role="status" aria-live="polite"></div>
 <dialog id="dlg"><form id="dlgForm" method="dialog"></form></dialog>
 <div id="print"></div>
+<input id="imgFile" type="file" accept="image/*" hidden>
 <script>
 'use strict';
 const KEY = 'dahuam202_kueche_de_v1';
@@ -397,7 +588,7 @@ const FRAMED = (()=>{ try { return window.self !== window.top; } catch(e){ retur
 const ALG = {A:'Gluten',B:'Krebstiere',C:'Ei',D:'Fisch',E:'Erdnuss',F:'Soja',G:'Milch/Laktose',H:'Schalenfrüchte',L:'Sellerie',M:'Senf',N:'Sesam',O:'Sulfite',P:'Lupinen',R:'Weichtiere'};
 
 /* ---------- Demodaten ---------- */
-function seed(){
+function seedBase(){
   // [id, Name, Einheit, Preis € je Einheit exkl. MwSt., Putzverlust %, Garverlust %, Allergene, Gewicht 1 Stk g]
   const prods = [
     ['pork','Schweinerücken','kg',9.5,5,15,''],
@@ -589,7 +780,7 @@ const num = (n,d=0) => fin(n).toLocaleString('de-AT',{maximumFractionDigits:d});
 const pct = n => (n==null || !isFinite(n)) ? '—' : num(n,1)+' %';
 const byName = (a,b) => a.name.localeCompare(b.name,'de');
 
-let S = load() || seed();
+let S;
 let view = {tab:'menu', card:null, q:'', ctype:'all', pq:''};
 
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
@@ -641,29 +832,148 @@ function fcBadge(fc){ return `<span class="fc ${fcClass(fc)}">${fc==null ? 'kein
 function chips(set){ const a = [...set].sort(); return a.length ? `<div class="chips">${a.map(x=>`<span class="alg" title="${esc(ALG[x]||x)}">${esc(x)}</span>`).join('')}</div>` : ''; }
 function usage(ref){ return S.cards.filter(c => c.items.some(i => i.ref === ref)); }
 
+/* =====================================================================
+   Erweiterung: Lager, Inventur, Fotos, Zubereitungsschritte, Gästekarte
+   ===================================================================== */
+const LOCS = {K:'Kühlhaus', T:'Tiefkühler', L:'Trockenlager', G:'Gemüselager', W:'Bar & Weinkeller'};
+const MOVE = {in:'Wareneingang', out:'Entnahme', waste:'Schwund', sale:'Verkauf', inv:'Inventur'};
+const WASTE = ['Verdorben / abgelaufen','Überproduktion','Zubereitungsfehler','Personalessen','Bruch','Sonstiges'];
+const SECTION_ORDER = ['Vorspeisen','Suppen','Salate & Bowls','Flammkuchen','Fondue & Hauptspeisen','Burger & Kebap','Desserts','Kindermenü'];
+const GSTYLES = [['alpin','Alpin'],['klassisch','Klassisch'],['modern','Modern']];
+
+// Demo-Lagerdaten: Bestand, Mindestbestand, Lagerort, Lieferant
+const DEMO_STOCK = {
+  pork:[12,8,'K','Metzgerei'], veal:[3.5,5,'K','Metzgerei'], beef_goulash:[9,6,'K','Metzgerei'], beef_mince:[6,5,'K','Metzgerei'], speck:[4,3,'K','Metzgerei'],
+  flour:[25,15,'L','Großhandel'], egg:[180,120,'K','Bauernhof'], quail:[36,24,'K','Bauernhof'], crumbs:[6,4,'L','Bäckerei'], schmalz:[5,4,'L','Großhandel'],
+  fries:[16,20,'T','Großhandel'], lemon:[30,20,'G','Gemüsehändler'], cranberry:[3,2,'L','Großhandel'], parsley:[0.3,0.5,'K','Gemüsehändler'],
+  milk:[20,15,'K','Molkerei'], cream:[8,6,'K','Molkerei'], butter:[6,5,'K','Molkerei'], cremefr:[4,3,'K','Molkerei'], parmesan:[2.5,1.5,'K','Großhandel'],
+  bergkase:[7,6,'K','Sennerei'], emmental:[5,4,'K','Sennerei'], cheddar:[2,1.5,'K','Großhandel'], sugar:[20,10,'L','Großhandel'], icing:[5,3,'L','Großhandel'],
+  raisins:[2,1,'L','Großhandel'], applesauce:[6,4,'L','Großhandel'], blueberry:[2.5,4,'T','Großhandel'], apples:[15,10,'G','Bauernhof'], strudel_dough:[3,2,'K','Großhandel'],
+  cinnamon:[0.5,0.2,'L','Großhandel'], onion:[20,10,'G','Gemüsehändler'], red_onion:[5,3,'G','Gemüsehändler'], spring:[1,1,'K','Gemüsehändler'], garlic:[2,1,'G','Gemüsehändler'],
+  potato:[40,25,'G','Bauernhof'], romaine:[2.5,4,'K','Gemüsehändler'], passata:[12,8,'L','Großhandel'], tomato_paste:[3,2,'L','Großhandel'], capers:[1,0.5,'L','Großhandel'],
+  pickles:[5,4,'L','Großhandel'], pesto:[1.5,1,'K','Großhandel'], mustard:[2,1,'L','Großhandel'], bbq:[3,2,'L','Großhandel'], chutney:[2,1.5,'K','Großhandel'],
+  bread:[6,4,'L','Bäckerei'], brioche:[40,30,'T','Bäckerei'], wine:[24,12,'W','Weinhandel'], kirsch:[3,2,'W','Weinhandel'], starch:[3,1,'L','Großhandel'],
+  oil:[20,10,'L','Großhandel'], paprika:[1,0.5,'L','Großhandel'], caraway:[0.5,0.2,'L','Großhandel'], salt:[10,5,'L','Großhandel'], pepper:[1,0.5,'L','Großhandel'],
+};
+const DEMO_VEG = {'„Die Gärtnerin“':'v','„Der Weiße“':'v','Fruchtige Tomatensuppe':'v','„Vegan Dippin’“':'vg','„Fabian’s Caprese“':'v','„Veganista Couch Potato“':'vg','Dolce Vita Rösti':'v','„Wir sind Kaiser!“':'v','Oma Lisl’s Apfelstrudel':'v','„Marillenzeit = Knödelzeit“':'v','Zillertaler Käsefondue':'v'};
+const DEMO_TOP = ['Zillertaler Käsefondue','„Wir sind Kaiser!“','Wiener Schnitzel vom Kalb','„Schwammerlsuche“'];
+
+function daysAgo(n){ const d = new Date(); d.setDate(d.getDate()-n); return d.toISOString(); }
+function splitSteps(t){ const parts = String(t||'').split(/\.\s+(?=[A-ZÄÖÜ„])/).map(s=>s.trim()).filter(Boolean); return parts.map((s,i)=>({t: i<parts.length-1 || !/[.!?]$/.test(s) ? s.replace(/\.?$/,'.') : s, img:''})); }
+
+function seed(){
+  const d = seedBase();
+  d.products.forEach(p => { const s = DEMO_STOCK[p.id]; if(s){ [p.stock,p.minStock,p.loc,p.supplier] = s; } else { p.stock = 0; p.minStock = 0; p.loc = 'L'; p.supplier = ''; p.noStock = p.id==='water'; } });
+  d.cards.forEach(c => { c.steps = splitSteps(c.method); delete c.method; c.img = ''; });
+  const order = {};
+  d.menu.forEach(m => { order[m.section] = (order[m.section]||0); m.order = order[m.section]++; m.img = ''; m.veg = DEMO_VEG[m.name]||''; m.top = DEMO_TOP.includes(m.name); m.hidden = false; });
+  d.settings.sections = [...SECTION_ORDER];
+  d.settings.guest = {style:'alpin', photos:true, allergens:true, desc:true, title:'Speisekarte', subtitle:'Restobar | Café · Gerlos im Zillertal', footer:'Alle Preise in Euro inkl. MwSt. Bitte informieren Sie uns über Allergien und Unverträglichkeiten.'};
+  const mv = (n,type,pid,qty,note) => { const p = d.products.find(x=>x.id===pid); return {id:uid('mv'), date:daysAgo(n), type, pid, qty, price:p.price, note}; };
+  d.moves = [
+    mv(6,'in','pork',10,'Lieferschein 2231'), mv(6,'in','veal',5,'Lieferschein 2231'), mv(5,'in','milk',20,'Molkerei Frühlieferung'),
+    mv(4,'in','potato',25,''), mv(3,'waste','parsley',-0.1,'Verdorben / abgelaufen'), mv(2,'in','bergkase',4,''), mv(1,'out','wine',-2,'Für Fondue-Vorbereitung'),
+  ];
+  d.inventories = [{id:uid('inv'), date:daysAgo(31), counted:54, value:2386.40, diff:-42.30, demo:true}];
+  d.invDraft = null;
+  return d;
+}
+
+function migrate(d){
+  if(!d) return null;
+  d.products.forEach(p => { if(p.stock==null){ const s = d.demo && DEMO_STOCK[p.id]; [p.stock,p.minStock,p.loc,p.supplier] = s || [0,0,'L','']; } if(p.id==='water') p.noStock = true; });
+  d.cards.forEach(c => { if(!c.steps){ c.steps = splitSteps(c.method); delete c.method; } if(c.img==null) c.img=''; });
+  const order = {};
+  d.menu.forEach(m => { if(m.order==null){ order[m.section] = (order[m.section]||0); m.order = order[m.section]++; } if(m.img==null) m.img=''; if(m.veg==null) m.veg=''; });
+  if(!d.settings.sections) d.settings.sections = [...SECTION_ORDER];
+  if(!d.settings.guest) d.settings.guest = {style:'alpin', photos:true, allergens:true, desc:true, title:'Speisekarte', subtitle:'', footer:'Alle Preise in Euro inkl. MwSt.'};
+  d.moves = d.moves || []; d.inventories = d.inventories || []; if(d.invDraft===undefined) d.invDraft = null;
+  return d;
+}
+
+/* ---------- Fotos (IndexedDB) ---------- */
+const IMG = {}; let idb = null;
+function idbOpen(){ return new Promise(res => { try { const r = indexedDB.open('dahuam202_fotos', 1); r.onupgradeneeded = () => r.result.createObjectStore('img'); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch(e){ res(null); } }); }
+async function imgLoadAll(){ idb = await idbOpen(); if(!idb) return; await new Promise(res => { try { const rq = idb.transaction('img').objectStore('img').openCursor(); rq.onsuccess = () => { const c = rq.result; if(c){ IMG[c.key] = c.value; c.continue(); } else res(); }; rq.onerror = () => res(); } catch(e){ res(); } }); }
+function imgPut(id, data){ IMG[id] = data; try { idb && idb.transaction('img','readwrite').objectStore('img').put(data, id); } catch(e){} }
+function imgDel(id){ if(!id) return; delete IMG[id]; try { idb && idb.transaction('img','readwrite').objectStore('img').delete(id); } catch(e){} }
+function resizeImage(file, max=1400){
+  return new Promise((res, rej) => { const fr = new FileReader(); fr.onerror = rej; fr.onload = () => { const im = new Image(); im.onerror = rej; im.onload = () => {
+    const k = Math.min(1, max/Math.max(im.width, im.height)); const cv = document.createElement('canvas'); cv.width = Math.round(im.width*k); cv.height = Math.round(im.height*k);
+    cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height); res(cv.toDataURL('image/jpeg', 0.82)); }; im.src = fr.result; }; fr.readAsDataURL(file); });
+}
+let pickCb = null;
+function pickImage(cb){ pickCb = cb; const i = $('#imgFile'); const d = $('#dlg'); (d.open ? d : document.body).appendChild(i); i.value = ''; i.click(); }
+function setPhoto(obj, field='img'){ pickImage(data => { if(obj[field]) imgDel(obj[field]); const id = uid('img'); imgPut(id, data); obj[field] = id; save(); render(); toast('Foto gespeichert'); }); }
+function initials(n){ const w = String(n||'').replace(/[„“"'«»]/g,'').trim().split(/\s+/); return ((w[0]||'')[0]||'·').toUpperCase(); }
+function menuImg(m){ const c = m.card && C(m.card); return (m.img && IMG[m.img]) ? m.img : (c && c.img && IMG[c.img]) ? c.img : ''; }
+function photo(imgId, name, hue, cls=''){
+  const src = imgId && IMG[imgId];
+  return src ? `<img class="ph ${cls}" src="${src}" alt="${esc(name)}" loading="lazy">` : `<span class="ph ph-empty ${cls}" style="--h:${secHue(hue)}" aria-hidden="true"><b>${esc(initials(name))}</b></span>`;
+}
+
+/* ---------- Lager-Logik ---------- */
+function unitOf(p){ return p ? p.unit : ''; }
+function qtyFmt(q, p){ const d = p && p.unit==='Stk' ? 0 : (Math.abs(q) < 10 ? 2 : 1); return num(q, d)+' '+unitOf(p); }
+function stockProducts(){ return S.products.filter(p => !p.noStock); }
+function stockValue(){ return stockProducts().reduce((s,p)=>s + Math.max(0,+p.stock||0)*(+p.price||0), 0); }
+function lowStock(){ return stockProducts().filter(p => (+p.minStock||0) > 0 && (+p.stock||0) < +p.minStock); }
+function addMove(type, pid, delta, note='', price=null, date=null){
+  const p = P(pid); if(!p || !delta) return;
+  p.stock = Math.round(((+p.stock||0) + delta)*1000)/1000;
+  S.moves.unshift({id:uid('mv'), date: date || new Date().toISOString(), type, pid, qty:delta, price: price ?? p.price, note});
+}
+function explode(c, f, acc=new Map(), d=0){
+  if(!c || d > 6) return acc;
+  for(const it of c.items){ const r = refObj(it.ref); if(!r) continue; const q = (+it.qty||0)*f;
+    if(r.t==='p'){ if(r.o.noStock) continue; acc.set(r.o.id, (acc.get(r.o.id)||0) + (r.o.unit==='Stk' ? q : q/1000)); }
+    else if(r.o.yieldG) explode(r.o, q/r.o.yieldG, acc, d+1); }
+  return acc;
+}
+function orderSuggest(p){ const min = +p.minStock||0, s = +p.stock||0; let q = Math.max(0, min*2 - s); if(p.unit==='Stk') return Math.ceil(q); return Math.ceil(q*2)/2; }
+
+/* ---------- Karten-Reihenfolge ---------- */
+function secList(){ const s = S.settings.sections; for(const m of S.menu) if(m.section && !s.includes(m.section)) s.push(m.section); return s; }
+function menuSorted(){ const s = secList(); return [...S.menu].sort((a,b) => s.indexOf(a.section) - s.indexOf(b.section) || (a.order??0) - (b.order??0)); }
+function nextOrder(sec){ return S.menu.filter(m=>m.section===sec).reduce((mx,m)=>Math.max(mx, m.order??0), -1) + 1; }
+function moveItem(id, dir){
+  const m = S.menu.find(x=>x.id===id); const list = menuSorted().filter(x=>x.section===m.section); list.forEach((x,i)=>x.order=i);
+  const i = list.indexOf(m), j = i+dir; if(j<0 || j>=list.length) return; [list[i].order, list[j].order] = [list[j].order, list[i].order];
+}
+
 /* ---------- Icons ---------- */
 const ICO = {
   dash:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
   menu:'<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M9 9h6M9 13h6"/>',
   cards:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/>',
+  stock:'<path d="M3 21V8l9-5 9 5v13"/><path d="M7 21v-8h10v8M7 17h10"/>',
   products:'<path d="M3 7l9-4 9 4-9 4z"/><path d="M3 7v10l9 4 9-4V7M12 11v10"/>',
   setup:'<path d="M4 6h9M19 6h1M4 12h3M13 12h7M4 18h11M21 18h-1"/><circle cx="16" cy="6" r="2.2"/><circle cx="10" cy="12" r="2.2"/><circle cx="18" cy="18" r="2.2"/>',
   search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
   sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.4 1.4M17.6 17.6L19 19M5 19l1.4-1.4M17.6 6.4L19 5"/>',
   moon:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
-  plus:'<path d="M12 5v14M5 12h14"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>', minus:'<path d="M5 12h14"/>',
   edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
   x:'<path d="M6 6l12 12M18 6L6 18"/>',
   arrow:'<path d="M15 5l-7 7 7 7"/>',
+  up:'<path d="M6 15l6-6 6 6"/>', down:'<path d="M6 9l6 6 6-6"/>',
   print:'<path d="M7 9V3h10v6M7 17H4v-7h16v7h-3"/><rect x="7" y="14" width="10" height="7"/>',
   copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
   trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
   spark:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6"/>',
+  camera:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  eyeoff:'<path d="M3 3l18 18M10.6 6.1A10 10 0 0 1 12 6c6 0 10 6 10 6a17 17 0 0 1-3.2 3.8M6.6 6.6C3.8 8.4 2 12 2 12s4 7 10 7c1.6 0 3-.4 4.3-1"/>',
+  truck:'<path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
+  clip:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 11l2 2 4-4M9 17h6"/>',
+  star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+  leaf:'<path d="M5 19c0-8 5-14 15-14 0 10-6 15-14 15"/><path d="M5 19l7-7"/>',
+  cart:'<path d="M3 4h2l2.5 11h10L20 7H6"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/>',
 };
 const ico = (n, cls='') => `<svg class="ico ${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICO[n]}</svg>`;
 
-const TABS = [['dash','Übersicht'],['menu','Speisekarte'],['cards','Rezepturen'],['products','Produkte'],['setup','Einstellungen']];
-view = {tab:'dash', card:null, q:'', sec:'all', ctype:'all', pq:'', sim:null, portions:20};
+const TABS = [['dash','Übersicht','Start'],['menu','Speisekarte','Karte'],['cards','Rezepturen','Rezepte'],['stock','Lager','Lager'],['products','Produkte','Produkte'],['setup','Einstellungen','Mehr']];
+view = {tab:'dash', card:null, q:'', sec:'all', ctype:'all', pq:'', sim:null, portions:20, mtab:'calc', stab:'bestand', loc:'all', mtype:'all', order:{}};
 
 /* ---------- Bausteine ---------- */
 function ring(fc, size=46, stroke=5){
@@ -672,22 +982,25 @@ function ring(fc, size=46, stroke=5){
     <circle class="trk" cx="${size/2}" cy="${size/2}" r="${r}" stroke-width="${stroke}" fill="none"/>
     <circle class="val" cx="${size/2}" cy="${size/2}" r="${r}" stroke-width="${stroke}" fill="none" stroke-linecap="round" stroke-dasharray="${(c*v).toFixed(2)} ${c.toFixed(2)}" transform="rotate(-90 ${size/2} ${size/2})"/></svg>`;
 }
-function secHue(name){ const secs = [...new Set(S.menu.map(m=>m.section).concat(S.cards.map(c=>c.category)))]; const i = Math.max(0, secs.indexOf(name)); return (i*47 + 20) % 360; }
+function secHue(name){ const secs = [...new Set(secList().concat(S.cards.map(c=>c.category)))]; const i = Math.max(0, secs.indexOf(name)); return (i*47 + 20) % 360; }
 function catDot(name){ return `<span class="dot" style="--h:${secHue(name)}"></span>`; }
-function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove('show'), 1800); }
-function demoNote(){ return S.demo ? `<div class="note">${ico('spark')}<span>Demodaten: Speisekarte und Preise von dahuam202.at. Rezepturen und Einkaufspreise sind Richtwerte, bitte durch eigene ersetzen.</span></div>` : ''; }
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove('show'), 2200); }
+function demoNote(){ return S.demo ? `<div class="note">${ico('spark')}<span>Demodaten: Speisekarte und Preise von dahuam202.at. Rezepturen, Einkaufspreise und Lagerbestände sind Richtwerte, bitte durch eigene ersetzen.</span></div>` : ''; }
+function seg(name, cur, opts){ return `<div class="seg" role="tablist">${opts.map(([k,l,n])=>`<button type="button" role="tab" class="${cur===k?'on':''}" data-act="${name}" data-id="${k}">${l}${n!=null?`<small>${n}</small>`:''}</button>`).join('')}</div>`; }
+function vegBadge(v){ return v==='vg' ? '<span class="vb vg" title="Vegan">VG</span>' : v==='v' ? '<span class="vb" title="Vegetarisch">V</span>' : ''; }
+function fmtDate(iso){ return new Date(iso).toLocaleDateString('de-AT',{day:'2-digit',month:'2-digit',year:'numeric'}); }
 
 /* ---------- Rahmen ---------- */
 function render(){
   document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === view.tab));
   const app = $('#app');
-  const fn = {dash:renderDash, menu:renderMenu, products:renderProducts, setup:renderSetup}[view.tab];
+  const fn = {dash:renderDash, menu:renderMenu, stock:renderStock, products:renderProducts, setup:renderSetup}[view.tab];
   app.innerHTML = fn ? fn() : (view.card && C(view.card) ? renderCard(C(view.card)) : renderCards());
   app.classList.remove('enter'); void app.offsetWidth; app.classList.add('enter');
+  autosize();
 }
-function navHtml(){
-  return TABS.map(([k,l])=>`<button type="button" class="nav-i" data-tab="${k}">${ico(k)}<span>${l}</span></button>`).join('');
-}
+function autosize(el){ (el ? [el] : document.querySelectorAll('#app .title-in, #app [data-step]')).forEach(t => { if(t.tagName!=='TEXTAREA') return; t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }); }
+function navHtml(short){ return TABS.map(([k,l,s])=>`<button type="button" class="nav-i" data-tab="${k}">${ico(k)}<span>${short?s:l}</span></button>`).join(''); }
 
 /* ---------- Übersicht ---------- */
 function renderDash(){
@@ -695,28 +1008,26 @@ function renderDash(){
   const linked = all.filter(x => x.k.cost != null).sort((a,b)=>b.k.fc-a.k.fc);
   const avg = linked.length ? linked.reduce((s,x)=>s+x.k.fc,0)/linked.length : null;
   const over = linked.filter(x => x.k.fc > S.settings.target);
-  const avgMargin = linked.length ? linked.reduce((s,x)=>s+x.k.margin,0)/linked.length : null;
   const cover = S.menu.length ? linked.length/S.menu.length*100 : 0;
   const tg = +S.settings.target;
   const scale = Math.max(40, Math.ceil(((linked[0]?.k.fc)||0)/10)*10 + 5);
-
-  // Kostentreiber: Produkte nach Anteil am Wareneinsatz aller kalkulierten Gerichte (je 1 Portion)
+  const low = lowStock();
   const drv = new Map();
-  const walk = (c, f, d=0) => { if(d>6) return; const t = totals(c, d); c.items.forEach((it,i)=>{ const r = refObj(it.ref); if(!r) return; if(r.t==='p') drv.set(r.o.id,(drv.get(r.o.id)||0)+t.lines[i].cost*f); else if(r.o.yieldG) walk(r.o, f*(+it.qty||0)/r.o.yieldG, d+1); }); };
-  linked.forEach(x => walk(x.k.c, 1));
+  linked.forEach(x => explode(x.k.c, 1).forEach((q,pid) => { const p = P(pid); drv.set(pid, (drv.get(pid)||0) + q*(+p.price||0)); }));
   const drvList = [...drv.entries()].sort((a,b)=>b[1]-a[1]);
   const drvSum = drvList.reduce((s,x)=>s+x[1],0) || 1;
   const top = drvList.slice(0,6);
-
   const hour = new Date().getHours();
   const hi = hour < 11 ? 'Guten Morgen' : hour < 17 ? 'Servus' : 'Guten Abend';
-  return `<div class="page-h"><div><div class="eyebrow">${new Date().toLocaleDateString('de-AT',{weekday:'long', day:'numeric', month:'long'})}</div><h1>${hi}, Küche!</h1></div></div>
+  const lastInv = S.inventories[0];
+  return `<div class="page-h"><div><div class="eyebrow">${new Date().toLocaleDateString('de-AT',{weekday:'long', day:'numeric', month:'long'})}</div><h1>${hi}, Küche!</h1></div>
+    <div class="row-btns"><button type="button" class="btn" data-act="sales">${ico('cart')}Verkäufe buchen</button><button type="button" class="btn primary" data-act="moveDlg" data-id="in">${ico('truck')}Wareneingang</button></div></div>
   ${demoNote()}
   <div class="tiles">
     <div class="tile"><div class="tile-ring">${ring(avg,58,6)}<b>${avg==null?'—':num(avg,0)+'%'}</b></div><div><div class="t-l">Ø Wareneinsatz</div><div class="t-s">Ziel ${num(tg)} %</div></div></div>
     <div class="tile"><div><div class="t-v">${linked.length}<small>/${S.menu.length}</small></div><div class="t-l">Gerichte kalkuliert</div><div class="meter"><i style="width:${cover.toFixed(1)}%"></i></div></div></div>
-    <button type="button" class="tile click" data-act="goMenu" data-id="over"><div><div class="t-v ${over.length?'bad-t':'good-t'}">${over.length}</div><div class="t-l">über dem Ziel</div><div class="t-s">${over.length?'Ansehen →':'Alles im grünen Bereich'}</div></div></button>
-    <div class="tile"><div><div class="t-v">${avgMargin==null?'—':eur(avgMargin)}</div><div class="t-l">Ø Rohertrag pro Gericht</div><div class="t-s">exkl. ${num(S.settings.vat)} % MwSt.</div></div></div>
+    <button type="button" class="tile click" data-act="goStock" data-id="bestand"><div><div class="t-v">${eur(stockValue())}</div><div class="t-l">Lagerwert</div><div class="t-s">${lastInv?'Inventur '+fmtDate(lastInv.date):'Noch keine Inventur'}</div></div></button>
+    <button type="button" class="tile click" data-act="goStock" data-id="bestellung"><div><div class="t-v ${low.length?'bad-t':'good-t'}">${low.length}</div><div class="t-l">unter Mindestbestand</div><div class="t-s">${low.length?'Bestellvorschlag ansehen →':'Lager ist gut gefüllt'}</div></div></button>
   </div>
   <div class="dash-grid">
     <section class="panel">
@@ -731,19 +1042,20 @@ function renderDash(){
     </section>
     <div class="stack">
       <section class="panel">
+        <div class="panel-h"><h2>Zu erledigen</h2></div>
+        <ul class="todo">
+          <li><button type="button" data-act="goStock" data-id="bestellung"><b class="${low.length?'bad-t':''}">${low.length}</b><span>Artikel nachbestellen</span>${ico('arrow','flip')}</button></li>
+          <li><button type="button" data-act="goMenu" data-id="none"><b>${S.menu.length-linked.length}</b><span>Gerichte ohne Rezeptur</span>${ico('arrow','flip')}</button></li>
+          <li><button type="button" data-act="goMenu" data-id="over"><b class="${over.length?'bad-t':''}">${over.length}</b><span>Gerichte über ${num(tg)} % Wareneinsatz</span>${ico('arrow','flip')}</button></li>
+          <li><button type="button" data-act="goStock" data-id="inventur"><b>${S.invDraft?'…':ico('clip')}</b><span>${S.invDraft?'Laufende Inventur fortsetzen':'Inventur durchführen'}</span>${ico('arrow','flip')}</button></li>
+        </ul>
+      </section>
+      <section class="panel">
         <div class="panel-h"><h2>Größte Kostentreiber</h2></div>
         <div class="stackbar">${top.map(([id,v],i)=>`<i style="width:${(v/drvSum*100).toFixed(2)}%;background:var(--s${i+1})"></i>`).join('')}<i style="flex:1;background:var(--s7)"></i></div>
         <ul class="leg">${top.map(([id,v],i)=>`<li><span class="sw" style="background:var(--s${i+1})"></span><span class="ln">${esc(P(id)?.name)}</span><span class="mono">${num(v/drvSum*100,1)} %</span></li>`).join('')}
           <li><span class="sw" style="background:var(--s7)"></span><span class="ln muted">Übrige Produkte</span><span class="mono">${num((1-top.reduce((s,x)=>s+x[1],0)/drvSum)*100,1)} %</span></li></ul>
-        <p class="hint">Anteil am Wareneinsatz aller kalkulierten Gerichte, je eine Portion. Preise dieser Produkte zuerst verhandeln.</p>
-      </section>
-      <section class="panel">
-        <div class="panel-h"><h2>Zu erledigen</h2></div>
-        <ul class="todo">
-          <li><button type="button" data-act="goMenu" data-id="none"><b>${S.menu.length-linked.length}</b><span>Gerichte ohne Rezeptur</span>${ico('arrow','flip')}</button></li>
-          <li><button type="button" data-act="goMenu" data-id="over"><b class="${over.length?'bad-t':''}">${over.length}</b><span>Gerichte über ${num(tg)} % Wareneinsatz</span>${ico('arrow','flip')}</button></li>
-          <li><button type="button" data-act="goTab" data-id="products"><b>${S.products.length}</b><span>Einkaufspreise prüfen</span>${ico('arrow','flip')}</button></li>
-        </ul>
+        <p class="hint">Anteil am Wareneinsatz aller kalkulierten Gerichte, je eine Portion.</p>
       </section>
     </div>
   </div>`;
@@ -751,23 +1063,31 @@ function renderDash(){
 
 /* ---------- Speisekarte ---------- */
 function renderMenu(){
+  const hidden = S.menu.filter(m=>m.hidden).length;
+  const head = `<div class="page-h"><div><div class="eyebrow">${S.menu.length} Gerichte · ${secList().length} Kategorien${hidden?` · ${hidden} ausgeblendet`:''}</div><h1>Speisekarte</h1></div>
+    <div class="row-btns">${view.mtab==='guest' && !FRAMED ? `<button type="button" class="btn" data-act="printMenu">${ico('print')}Drucken</button>` : ''}<button type="button" class="btn primary" data-act="newMenu">${ico('plus')}Gericht</button></div></div>
+  <div class="toolbar">${seg('mtab', view.mtab, [['calc','Kalkulation'],['guest','Gästekarte'],['layout','Aufbau & Reihenfolge']])}</div>`;
+  return head + (view.mtab==='guest' ? renderGuest() : view.mtab==='layout' ? renderLayout() : renderMenuCalc());
+}
+
+function renderMenuCalc(){
   const q = view.q.trim().toLowerCase();
-  const all = S.menu.map(m => ({m, k:menuCalc(m)}));
-  const secs = [...new Set(S.menu.map(m=>m.section))];
+  const all = menuSorted().map(m => ({m, k:menuCalc(m)}));
   const f = view.sec;
   const shown = all.filter(({m,k}) => (!q || (m.name+' '+m.desc+' '+m.section).toLowerCase().includes(q))
-    && (f==='all' || (f==='none' ? k.cost==null : f==='over' ? (k.fc!=null && k.fc > S.settings.target) : m.section===f)));
+    && (f==='all' || (f==='none' ? k.cost==null : f==='over' ? (k.fc!=null && k.fc > S.settings.target) : f==='nophoto' ? !menuImg(m) : m.section===f)));
   const cnt = x => all.filter(x).length;
   const chip = (k,l,n,dot) => `<button type="button" class="chip ${f===k?'on':''}" data-act="sec" data-id="${esc(k)}">${dot||''}${esc(l)}<small>${n}</small></button>`;
-  let h = `<div class="page-h"><div><div class="eyebrow">${S.menu.length} Gerichte · ${secs.length} Kategorien</div><h1>Speisekarte</h1></div>
-    <button type="button" class="btn primary" data-act="newMenu">${ico('plus')}Gericht</button></div>
-  <div class="toolbar"><label class="search">${ico('search')}<input id="mq" type="search" placeholder="Gericht, Zutat oder Kategorie" value="${esc(view.q)}" autocomplete="off"></label></div>
-  <div class="chips-row">${chip('all','Alle',all.length)}${chip('over','Über Ziel',cnt(x=>x.k.fc!=null&&x.k.fc>S.settings.target))}${chip('none','Ohne Rezeptur',cnt(x=>x.k.cost==null))}<span class="sep"></span>${secs.map(s=>chip(s,s,cnt(x=>x.m.section===s),catDot(s))).join('')}</div>`;
+  let h = `<div class="toolbar"><label class="search">${ico('search')}<input id="mq" type="search" placeholder="Gericht, Zutat oder Kategorie" value="${esc(view.q)}" autocomplete="off"></label></div>
+  <div class="chips-row">${chip('all','Alle',all.length)}${chip('over','Über Ziel',cnt(x=>x.k.fc!=null&&x.k.fc>S.settings.target))}${chip('none','Ohne Rezeptur',cnt(x=>x.k.cost==null))}${chip('nophoto','Ohne Foto',cnt(x=>!menuImg(x.m)))}<span class="sep"></span>${secList().filter(s=>all.some(x=>x.m.section===s)).map(s=>chip(s,s,cnt(x=>x.m.section===s),catDot(s))).join('')}</div>`;
   if(!shown.length) return h + `<div class="panel empty">Keine Gerichte für diesen Filter.</div>`;
-  for(const s of [...new Set(shown.map(x=>x.m.section))]){
+  for(const s of secList().filter(s=>shown.some(x=>x.m.section===s))){
     h += `<h2 class="sec-h">${catDot(s)}${esc(s)}</h2><div class="dish-grid">`;
     for(const {m,k} of shown.filter(x=>x.m.section===s)){
-      h += `<article class="dish ${k.c?'':'nocard'}">
+      h += `<article class="dish ${k.c?'':'nocard'} ${m.hidden?'is-hidden':''}">
+        <div class="dish-ph">${photo(menuImg(m), m.name, m.section)}
+          <button type="button" class="ph-btn" data-act="photoMenu" data-id="${m.id}" title="Foto ${menuImg(m)?'ändern':'hinzufügen'}" aria-label="Foto ${menuImg(m)?'ändern':'hinzufügen'}">${ico('camera')}</button>
+          <span class="ph-flags">${m.top?'<span class="vb top" title="Empfehlung">★</span>':''}${vegBadge(m.veg)}${m.hidden?'<span class="vb off">ausgeblendet</span>':''}</span></div>
         <button type="button" class="dish-main" data-act="${k.c?'openCard':'newCardFor'}" data-id="${k.c?k.c.id:m.id}">
           <span class="dish-top"><span class="dish-n">${esc(m.name)}</span><span class="price">${eur(m.price)}</span></span>
           ${m.desc?`<span class="dish-d">${esc(m.desc)}</span>`:''}
@@ -782,6 +1102,67 @@ function renderMenu(){
   return h;
 }
 
+function guestHtml(){
+  const g = S.settings.guest;
+  const items = menuSorted().filter(m => !m.hidden);
+  const used = new Set();
+  let body = '';
+  for(const s of secList()){
+    const list = items.filter(m=>m.section===s); if(!list.length) continue;
+    body += `<section class="g-sec"><h3 class="g-h"><span>${esc(s)}</span></h3><div class="g-list">`;
+    for(const m of list){
+      const k = menuCalc(m); const alg = k.t ? [...k.t.alg].sort() : []; alg.forEach(a=>used.add(a));
+      const img = g.photos ? menuImg(m) : '';
+      body += `<article class="g-item ${img?'has-ph':''} ${m.top?'is-top':''}">
+        ${img ? `<img class="g-ph" src="${IMG[img]}" alt="${esc(m.name)}" loading="lazy">` : ''}
+        <div class="g-txt"><div class="g-row"><span class="g-n">${esc(m.name)}${m.veg==='vg'?' <i class="g-mark" title="Vegan">VG</i>':m.veg==='v'?' <i class="g-mark" title="Vegetarisch">V</i>':''}</span><span class="lead"></span><span class="g-p">${fin(+m.price).toLocaleString('de-AT',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+        ${m.top?`<div class="g-top">★ Empfehlung des Hauses</div>`:''}
+        ${g.desc && m.desc ? `<div class="g-d">${esc(m.desc)}</div>` : ''}
+        ${g.allergens && alg.length ? `<div class="g-a">${alg.join(' · ')}</div>` : ''}</div>
+      </article>`;
+    }
+    body += `</div></section>`;
+  }
+  const legend = g.allergens && used.size ? `<div class="g-leg">${[...used].sort().map(a=>`<span><b>${a}</b> ${esc(ALG[a])}</span>`).join('')}</div>` : '';
+  return `<div class="g-paper g-${g.style}">
+    <header class="g-head"><div class="g-mark-logo">DAHUAM<span>.</span>202</div><h2 class="g-title">${esc(g.title)}</h2>${g.subtitle?`<div class="g-sub">${esc(g.subtitle)}</div>`:''}</header>
+    ${body || '<p class="g-empty">Noch keine sichtbaren Gerichte.</p>'}
+    <footer class="g-foot"><div class="g-keys"><span><i class="g-mark">V</i> vegetarisch</span><span><i class="g-mark">VG</i> vegan</span><span>★ Empfehlung des Hauses</span></div>${legend}<p>${esc(g.footer)}</p></footer>
+  </div>`;
+}
+function renderGuest(){
+  const g = S.settings.guest;
+  const tog = (k,l) => `<label class="tog"><input type="checkbox" data-gf="${k}" ${g[k]?'checked':''}><span></span>${l}</label>`;
+  return `<div class="guest-wrap">
+    <aside class="panel guest-tools">
+      <div class="panel-h"><h2>Gestaltung</h2></div>
+      <div class="f">Stil</div>${seg('gstyle', g.style, GSTYLES)}
+      <div class="togs">${tog('photos','Fotos zeigen')}${tog('desc','Beschreibungen')}${tog('allergens','Allergene')}</div>
+      <label class="f">Titel<input id="g-title" data-gs="title" value="${esc(g.title)}"></label>
+      <label class="f">Untertitel<input id="g-sub" data-gs="subtitle" value="${esc(g.subtitle)}"></label>
+      <label class="f">Fußzeile<textarea id="g-foot" data-gs="footer" class="sm-ta">${esc(g.footer)}</textarea></label>
+      <p class="hint">Gerichte erscheinen automatisch in ihrer Kategorie. Reihenfolge und Sichtbarkeit legen Sie unter „Aufbau & Reihenfolge“ fest.</p>
+      <button type="button" class="btn" data-act="mtab" data-id="layout">${ico('up')}Reihenfolge ändern</button>
+    </aside>
+    <div class="guest-prev">${guestHtml()}</div>
+  </div>`;
+}
+
+function renderLayout(){
+  const secs = secList();
+  return `<div class="layout-intro"><p class="hint" style="margin:0">So ist Ihre Karte aufgebaut. Neue Gerichte landen automatisch in der passenden Kategorie, am Ende der Liste. Mit den Pfeilen ändern Sie die Reihenfolge, mit dem Auge blenden Sie ein Gericht auf der Gästekarte aus.</p>
+    <button type="button" class="btn" data-act="addSec">${ico('plus')}Kategorie</button></div>
+  <div class="lay">${secs.map((s,si)=>{ const items = menuSorted().filter(m=>m.section===s); return `<section class="panel lay-sec">
+    <div class="lay-h"><span class="lay-no mono">${si+1}</span>${catDot(s)}<input class="lay-name" data-secname="${si}" value="${esc(s)}" aria-label="Kategoriename"><span class="muted sm">${items.length}</span>
+      <span class="lay-acts"><button type="button" class="icon-btn" data-act="secMove" data-id="${si}:-1" ${si===0?'disabled':''} aria-label="Kategorie nach oben">${ico('up')}</button><button type="button" class="icon-btn" data-act="secMove" data-id="${si}:1" ${si===secs.length-1?'disabled':''} aria-label="Kategorie nach unten">${ico('down')}</button>
+      <button type="button" class="icon-btn" data-act="secSort" data-id="${si}" title="Nach Preis sortieren" aria-label="Nach Preis sortieren"><span class="mono" style="font-size:12px">€↑</span></button>
+      ${items.length?'':`<button type="button" class="icon-btn danger" data-act="secDel" data-id="${si}" aria-label="Kategorie löschen">${ico('trash')}</button>`}</span></div>
+    ${items.length ? `<ol class="lay-list">${items.map((m,i)=>`<li class="${m.hidden?'off':''}">${photo(menuImg(m), m.name, s, 'xs')}<span class="lay-n">${esc(m.name)}</span><span class="mono sm">${eur(m.price)}</span>
+      <button type="button" class="icon-btn" data-act="itemMove" data-id="${m.id}:-1" ${i===0?'disabled':''} aria-label="Nach oben">${ico('up')}</button><button type="button" class="icon-btn" data-act="itemMove" data-id="${m.id}:1" ${i===items.length-1?'disabled':''} aria-label="Nach unten">${ico('down')}</button>
+      <button type="button" class="icon-btn" data-act="itemHide" data-id="${m.id}" title="${m.hidden?'Auf der Gästekarte zeigen':'Auf der Gästekarte ausblenden'}" aria-label="Sichtbarkeit">${ico(m.hidden?'eyeoff':'eye')}</button></li>`).join('')}</ol>` : '<p class="hint">Leer. Ein Gericht mit dieser Kategorie erscheint hier automatisch.</p>'}
+  </section>`; }).join('')}</div>`;
+}
+
 /* ---------- Rezepturen ---------- */
 function renderCards(){
   const q = view.q.trim().toLowerCase();
@@ -791,7 +1172,7 @@ function renderCards(){
   let h = `<div class="page-h"><div><div class="eyebrow">${n('dish')} Gerichte · ${n('semi')} Basisrezepte</div><h1>Rezepturen</h1></div>
     <div class="row-btns"><button type="button" class="btn" data-act="newCard" data-id="semi">${ico('plus')}Basisrezept</button><button type="button" class="btn primary" data-act="newCard" data-id="dish">${ico('plus')}Gericht</button></div></div>
   <div class="toolbar"><label class="search">${ico('search')}<input id="cq" type="search" placeholder="Rezeptur suchen" value="${esc(view.q)}" autocomplete="off"></label>
-    <div class="seg">${[['all','Alle'],['dish','Gerichte'],['semi','Basisrezepte']].map(([k,l])=>`<button type="button" class="${view.ctype===k?'on':''}" data-act="ctype" data-id="${k}">${l}<small>${n(k)}</small></button>`).join('')}</div></div>`;
+    ${seg('ctype', view.ctype, [['all','Alle',n('all')],['dish','Gerichte',n('dish')],['semi','Basisrezepte',n('semi')]])}</div>`;
   if(!list.length) return h + `<div class="panel empty">Keine Rezepturen gefunden. Legen Sie eine mit „Gericht“ an.</div>`;
   h += `<div class="rc-grid">`;
   for(const c of list){
@@ -799,11 +1180,13 @@ function renderCards(){
     const per100 = c.yieldG ? t.cost / c.yieldG * 100 : 0;
     const mk = S.menu.filter(m => m.card === c.id).map(menuCalc)[0];
     h += `<button type="button" class="rc" data-act="openCard" data-id="${c.id}">
+      <span class="rc-ph">${photo(c.img, c.name, c.category)}${c.type==='dish' && !mk ? '<span class="vb off">nicht auf der Karte</span>' : ''}</span>
+      <span class="rc-body">
       <span class="rc-top"><span class="tag ${c.type}">${c.type==='semi'?'Basisrezept':'Gericht'} · Nr. ${c.no||'—'}</span>${c.type==='dish'?`<span class="fcw sm">${ring(mk?mk.fc:null,28,4)}<b class="mono">${mk?pct(mk.fc):'—'}</b></span>`:''}</span>
       <span class="rc-n">${esc(c.name)}</span>
-      <span class="rc-m">${catDot(c.category)}${esc(c.category||'ohne Kategorie')} · ${c.items.length} Zutaten · ${num(c.yieldG)} g</span>
+      <span class="rc-m">${catDot(c.category)}${esc(c.category||'ohne Kategorie')} · ${c.items.length} Zutaten · ${(c.steps||[]).length} Schritte</span>
       <span class="rc-b"><span><b class="mono">${eur(t.cost)}</b><small>${c.type==='semi'?'pro Charge':'pro Portion'}</small></span><span><b class="mono">${eur(per100)}</b><small>pro 100 g</small></span></span>
-      ${chips(t.alg)}
+      </span>
     </button>`;
   }
   return h + `</div>`;
@@ -815,7 +1198,6 @@ function refOptions(sel, selfId){
   return `<option value="">— Zutat wählen —</option><optgroup label="Produkte">${ps.map(p=>`<option value="p:${p.id}" ${sel==='p:'+p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</optgroup>`
     + (cs.length ? `<optgroup label="Basisrezepte">${cs.map(c=>`<option value="c:${c.id}" ${sel==='c:'+c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</optgroup>` : '');
 }
-
 function simHtml(cost, price){
   const np = price/(1+S.settings.vat/100), fc = np ? cost/np*100 : null;
   return `<div class="sim-out"><div class="fcw">${ring(fc,52,6)}<span><b class="mono big2">${pct(fc)}</b><small>Wareneinsatz</small></span></div>
@@ -832,41 +1214,46 @@ function renderCard(c){
   const per100 = c.yieldG ? t.cost / c.yieldG * 100 : 0;
   const menus = S.menu.filter(m => m.card === c.id);
   const m0 = menus[0], k0 = m0 ? menuCalc(m0) : null;
-  const cats = [...new Set([...S.menu.map(m=>m.section), ...S.cards.map(x=>x.category)].filter(Boolean))];
+  const cats = [...new Set([...secList(), ...S.cards.map(x=>x.category)].filter(Boolean))];
   const usedIn = usage('c:'+c.id);
   const vat = 1 + S.settings.vat/100;
   const rec = t.cost / (S.settings.target/100) * vat;
-  // Kostenstruktur
-  const parts = t.lines.map((l,i)=>({n:l.name, v:l.cost})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
+  const parts = t.lines.map(l=>({n:l.name, v:l.cost})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
   const top = parts.slice(0,5), rest = parts.slice(5).reduce((s,x)=>s+x.v,0), sum = t.cost || 1;
-  // Simulator
   const base = m0 ? +m0.price : Math.round(rec*10)/10;
   if(!view.sim || view.sim.id !== c.id) view.sim = {id:c.id, price:base};
   const smin = Math.max(1, Math.floor(t.cost*vat*1.2)), smax = Math.max(smin+5, Math.ceil(Math.max(base, rec)*1.6));
+  const steps = c.steps || [];
 
-  const rows = c.items.map((it,i) => {
-    const l = t.lines[i];
-    return `<tr>
+  const rows = c.items.map((it,i) => { const l = t.lines[i]; return `<tr>
       <td class="c-ing"><select id="ref-${i}" data-li="${i}" data-lf="ref" aria-label="Zutat">${refOptions(it.ref, c.id)}</select></td>
       <td class="r"><span class="qty"><input id="qty-${i}" type="number" step="any" min="0" inputmode="decimal" data-li="${i}" data-lf="qty" value="${esc(it.qty)}" aria-label="Brutto"><em>${l.unit}</em></span></td>
       <td class="r"><input id="net-${i}" type="number" step="any" min="0" inputmode="decimal" data-li="${i}" data-lf="net" value="${esc(it.net)}" placeholder="${num(l.netAuto,1)}" aria-label="Netto in g"></td>
       <td class="r mono">${num(l.out,1)}</td>
       <td class="r mono">${eur(l.cost)}<span class="share" style="width:${(l.cost/sum*100).toFixed(1)}%"></span></td>
-      <td><button type="button" class="icon-btn" data-act="delLine" data-id="${i}" title="Zeile entfernen" aria-label="Zeile entfernen">${ico('x')}</button></td>
-    </tr>`;
-  }).join('');
+      <td><button type="button" class="icon-btn" data-act="delLine" data-id="${i}" title="Zeile entfernen" aria-label="Zeile entfernen">${ico('x')}</button></td></tr>`; }).join('');
+
+  const stepsHtml = steps.map((s,i)=>`<li class="step">
+      <span class="step-no">${i+1}</span>
+      <div class="step-body"><textarea id="st-${i}" data-step="${i}" rows="2" placeholder="Was passiert in diesem Schritt?">${esc(s.t)}</textarea>
+        ${s.img && IMG[s.img] ? `<div class="step-ph"><img src="${IMG[s.img]}" alt="Schritt ${i+1}"><button type="button" class="ph-btn" data-act="stepPhoto" data-id="${i}" aria-label="Foto ändern">${ico('camera')}</button><button type="button" class="ph-btn del" data-act="stepPhotoDel" data-id="${i}" aria-label="Foto entfernen">${ico('x')}</button></div>`
+          : `<button type="button" class="btn sm ghost" data-act="stepPhoto" data-id="${i}">${ico('camera')}Foto</button>`}</div>
+      <div class="step-acts"><button type="button" class="icon-btn" data-act="stepMove" data-id="${i}:-1" ${i===0?'disabled':''} aria-label="Nach oben">${ico('up')}</button><button type="button" class="icon-btn" data-act="stepMove" data-id="${i}:1" ${i===steps.length-1?'disabled':''} aria-label="Nach unten">${ico('down')}</button><button type="button" class="icon-btn" data-act="stepDel" data-id="${i}" aria-label="Schritt löschen">${ico('trash')}</button></div>
+    </li>`).join('');
 
   return `<button type="button" class="back" data-act="backCards">${ico('arrow')}Alle Rezepturen</button>
   <div class="hero">
+    <div class="hero-ph">${photo(c.img, c.name, c.category)}<button type="button" class="ph-btn big" data-act="photoCard" data-id="${c.id}">${ico('camera')}<span>${c.img&&IMG[c.img]?'Foto ändern':'Foto hinzufügen'}</span></button>${c.img&&IMG[c.img]?`<button type="button" class="ph-btn del" data-act="photoCardDel" data-id="${c.id}" aria-label="Foto entfernen">${ico('x')}</button>`:''}</div>
     <div class="hero-main">
       <div class="eyebrow">${c.type==='semi'?'Basisrezept':'Gericht'} · Rezeptur Nr. ${c.no||'—'} · ${esc(c.category||'ohne Kategorie')}</div>
-      <input id="cf-name" class="title-in" data-cf="name" value="${esc(c.name)}" aria-label="Bezeichnung">
+      <textarea id="cf-name" class="title-in" data-cf="name" rows="1" aria-label="Bezeichnung">${esc(c.name)}</textarea>
       <div class="hero-stats">
         <div><b class="mono">${eur(t.cost)}</b><small>Wareneinsatz ${c.type==='semi'?'pro Charge':'pro Portion'}</small></div>
         <div><b class="mono">${eur(per100)}</b><small>pro 100 g</small></div>
         ${c.type==='semi' && c.yieldG ? `<div><b class="mono">${eur(t.cost/c.yieldG*1000)}</b><small>pro kg</small></div>` : ''}
         ${k0 ? `<div><b class="mono">${eur(m0.price)}</b><small>Verkaufspreis</small></div>` : ''}
       </div>
+      ${c.type==='dish' && !m0 ? `<button type="button" class="btn primary sm" data-act="toMenu" data-id="${c.id}" style="margin-top:14px">${ico('plus')}Auf die Karte setzen</button>` : ''}
     </div>
     ${c.type==='dish' ? `<div class="hero-ring">${ring(k0?k0.fc:null,112,10)}<span><b class="mono">${k0?num(k0.fc,1)+'%':'—'}</b><small>${k0?'Wareneinsatz':'nicht auf der Karte'}</small></span></div>` : ''}
     <div class="hero-acts">
@@ -877,13 +1264,11 @@ function renderCard(c){
   </div>
   <div class="grid2">
     <div class="col">
-      <section class="panel">
-        <div class="fields">
-          <label class="f">Typ<select id="cf-type" data-cf="type"><option value="dish" ${c.type==='dish'?'selected':''}>Gericht</option><option value="semi" ${c.type==='semi'?'selected':''}>Basisrezept</option></select></label>
-          <label class="f">Kategorie<input id="cf-category" data-cf="category" list="cats" value="${esc(c.category)}"><datalist id="cats">${cats.map(x=>`<option value="${esc(x)}">`).join('')}</datalist></label>
-          <label class="f">${c.type==='semi'?'Ausbeute Charge, g':'Portionsgewicht, g'}<input id="cf-yieldG" data-cf="yieldG" type="number" step="any" min="0" value="${esc(c.yieldG)}" placeholder="${num(t.out)}"></label>
-        </div>
-      </section>
+      <section class="panel"><div class="fields">
+        <label class="f">Typ<select id="cf-type" data-cf="type"><option value="dish" ${c.type==='dish'?'selected':''}>Gericht</option><option value="semi" ${c.type==='semi'?'selected':''}>Basisrezept</option></select></label>
+        <label class="f">Kategorie<input id="cf-category" data-cf="category" list="cats" value="${esc(c.category)}"><datalist id="cats">${cats.map(x=>`<option value="${esc(x)}">`).join('')}</datalist></label>
+        <label class="f">${c.type==='semi'?'Ausbeute Charge, g':'Portionsgewicht, g'}<input id="cf-yieldG" data-cf="yieldG" type="number" step="any" min="0" value="${esc(c.yieldG)}" placeholder="${num(t.out)}"></label>
+      </div></section>
       <section class="panel flush">
         <div class="panel-h pad"><h2>Zutaten ${c.type==='semi'?'pro Charge':'pro Portion'}</h2><span class="muted sm">${c.items.length} Positionen</span></div>
         <div class="tbl-wrap"><table class="edit">
@@ -894,14 +1279,15 @@ function renderCard(c){
         <div class="panel-f"><button type="button" class="btn" data-act="addLine">${ico('plus')}Zutat</button><span class="hint">Netto ergibt sich aus dem Putzverlust. Eigenen Wert einfach überschreiben.</span></div>
       </section>
       <section class="panel">
-        <div class="panel-h"><h2>Zubereitung</h2></div>
-        <textarea id="cf-method" data-cf="method" placeholder="Vorbereitung, Reihenfolge, Temperatur, Zeit, Anrichten, Lagerung">${esc(c.method)}</textarea>
+        <div class="panel-h"><h2>Zubereitung</h2><span class="muted sm">${steps.length} Schritte</span></div>
+        <ol class="steps">${stepsHtml || '<li class="hint">Noch keine Schritte.</li>'}</ol>
+        <button type="button" class="btn" data-act="stepAdd">${ico('plus')}Schritt</button>
       </section>
     </div>
     <div class="col">
       ${c.type==='dish' ? `<section class="panel accent">
         <div class="panel-h"><h2>Preis-Simulator</h2><span class="muted sm">inkl. ${num(S.settings.vat)} % MwSt.</span></div>
-        <div class="sim-price"><b class="mono" id="simVal">${eur(view.sim.price)}</b>${m0?`<button type="button" class="btn sm" data-act="applySim" data-id="${m0.id}" id="simApply" ${+view.sim.price===+m0.price?'hidden':''}>Übernehmen</button>`:''}</div>
+        <div class="sim-price"><b class="mono" id="simVal">${eur(view.sim.price)}</b>${m0?`<button type="button" class="btn sm" data-act="applySim" data-id="${m0.id}" id="simApply" ${Math.abs(view.sim.price-m0.price)<0.05?'hidden':''}>Übernehmen</button>`:''}</div>
         <input id="sim" type="range" min="${smin}" max="${smax}" step="0.1" value="${view.sim.price}" aria-label="Verkaufspreis">
         <div class="range-l"><span>${eur(smin)}</span><span>${eur(smax)}</span></div>
         <div id="simOut">${simHtml(t.cost, +view.sim.price)}</div>
@@ -920,13 +1306,117 @@ function renderCard(c){
         <div class="panel-h"><h2>Allergene</h2><span class="muted sm">EU-VO 1169/2011</span></div>
         ${t.alg.size ? `<div class="alg-big">${[...t.alg].sort().map(a=>`<span><b>${esc(a)}</b>${esc(ALG[a]||a)}</span>`).join('')}</div>` : '<p class="hint">Keine gefunden. Bitte die Produktdaten prüfen.</p>'}
       </section>
-      ${c.type==='dish' ? (menus.length>1 ? `<section class="panel"><div class="panel-h"><h2>Auf der Speisekarte</h2></div>${menus.map(m=>{const k=menuCalc(m);return `<div class="kv"><span>${esc(m.name)}</span><span>${eur(m.price)} · ${pct(k.fc)}</span></div>`}).join('')}</section>`
-        : !menus.length ? `<section class="panel"><p class="hint">Mit keinem Gericht der Speisekarte verknüpft. Verknüpfen unter „Speisekarte“ mit dem Stift-Symbol.</p></section>` : '')
-      : `<section class="panel"><div class="panel-h"><h2>Verwendet in</h2></div>
+      ${c.type==='semi' ? `<section class="panel"><div class="panel-h"><h2>Verwendet in</h2></div>
         ${usedIn.length ? `<ul class="todo">${usedIn.map(u=>`<li><button type="button" data-act="openCard" data-id="${u.id}"><span>${esc(u.name)}</span>${ico('arrow','flip')}</button></li>`).join('')}</ul>` : '<p class="hint">Noch in keiner Rezeptur verwendet.</p>'}
-      </section>`}
+      </section>` : ''}
     </div>
   </div>`;
+}
+
+/* ---------- Lager ---------- */
+function renderStock(){
+  const low = lowStock(), last = S.inventories[0];
+  const week = S.moves.filter(m => m.type==='in' && (Date.now()-new Date(m.date))/864e5 <= 7).reduce((s,m)=>s+m.qty*m.price, 0);
+  const head = `<div class="page-h"><div><div class="eyebrow">${stockProducts().length} Artikel · ${Object.keys(LOCS).length} Lagerorte</div><h1>Lager</h1></div>
+    <div class="row-btns"><button type="button" class="btn" data-act="sales">${ico('cart')}Verkäufe buchen</button><button type="button" class="btn" data-act="moveDlg" data-id="waste">${ico('trash')}Schwund</button><button type="button" class="btn primary" data-act="moveDlg" data-id="in">${ico('truck')}Wareneingang</button></div></div>
+  ${demoNote()}
+  <div class="tiles">
+    <div class="tile"><div><div class="t-v">${eur(stockValue())}</div><div class="t-l">Lagerwert</div><div class="t-s">zu Einkaufspreisen</div></div></div>
+    <button type="button" class="tile click" data-act="stab" data-id="bestellung"><div><div class="t-v ${low.length?'bad-t':'good-t'}">${low.length}</div><div class="t-l">unter Mindestbestand</div><div class="t-s">${low.length?'Bestellvorschlag →':'Alles vorrätig'}</div></div></button>
+    <div class="tile"><div><div class="t-v">${eur(week)}</div><div class="t-l">Wareneingang 7 Tage</div><div class="t-s">${S.moves.filter(m=>m.type==='in').length} Lieferungen gesamt</div></div></div>
+    <button type="button" class="tile click" data-act="stab" data-id="inventur"><div><div class="t-v ${last&&last.diff<0?'bad-t':''}">${last?eur(last.diff):'—'}</div><div class="t-l">Differenz letzte Inventur</div><div class="t-s">${S.invDraft?'Inventur läuft →':last?fmtDate(last.date):'Noch keine Inventur'}</div></div></button>
+  </div>
+  <div class="toolbar">${seg('stab', view.stab, [['bestand','Bestand'],['buchungen','Buchungen',S.moves.length],['inventur','Inventur'],['bestellung','Bestellung',low.length]])}</div>`;
+  return head + ({bestand:stockList, buchungen:moveList, inventur:invView, bestellung:orderView}[view.stab] || stockList)();
+}
+function levelBar(p){ const s = +p.stock||0, mn = +p.minStock||0; const w = mn ? Math.min(100, s/(mn*2)*100) : 100; const cls = mn && s < mn*0.5 ? 'bad' : mn && s < mn ? 'warn' : 'good'; return `<span class="lvl"><i class="${cls}" style="width:${w.toFixed(1)}%"></i>${mn?`<em style="left:50%"></em>`:''}</span>`; }
+function stockList(){
+  const q = view.pq.trim().toLowerCase();
+  const all = stockProducts();
+  const list = all.filter(p => (view.loc==='all' || p.loc===view.loc) && (!q || (p.name+' '+p.supplier).toLowerCase().includes(q))).sort((a,b)=> (a.loc||'').localeCompare(b.loc||'') || byName(a,b));
+  const chip = (k,l,n) => `<button type="button" class="chip ${view.loc===k?'on':''}" data-act="loc" data-id="${k}">${l}<small>${n}</small></button>`;
+  return `<div class="toolbar"><label class="search">${ico('search')}<input id="pq" type="search" placeholder="Artikel oder Lieferant" value="${esc(view.pq)}" autocomplete="off"></label></div>
+  <div class="chips-row">${chip('all','Alle Lagerorte',all.length)}${Object.entries(LOCS).map(([k,l])=>chip(k,l,all.filter(p=>p.loc===k).length)).join('')}</div>
+  <section class="panel flush"><div class="tbl-wrap"><table class="stock">
+    <thead><tr><th>Artikel</th><th>Lagerort</th><th>Füllstand</th><th class="r">Bestand</th><th class="r">Mindest</th><th class="r">Wert</th><th></th></tr></thead>
+    <tbody>${list.map(p=>{ const low = (+p.minStock||0) && (+p.stock||0) < +p.minStock; return `<tr class="${low?'is-low':''}">
+      <td><b class="pn">${esc(p.name)}</b><small class="muted">${esc(p.supplier||'kein Lieferant')}</small></td>
+      <td><span class="tag">${esc(LOCS[p.loc]||'—')}</span></td>
+      <td>${levelBar(p)}</td>
+      <td class="r mono ${(+p.stock||0)<0?'bad-t':''}">${qtyFmt(+p.stock||0,p)}${low?' <span class="vb warn">nachbestellen</span>':''}</td>
+      <td class="r mono muted">${qtyFmt(+p.minStock||0,p)}</td>
+      <td class="r mono">${eur(Math.max(0,+p.stock||0)*(+p.price||0))}</td>
+      <td class="nowrap"><button type="button" class="icon-btn" data-act="moveDlg" data-id="in:${p.id}" title="Wareneingang" aria-label="Wareneingang">${ico('plus')}</button><button type="button" class="icon-btn" data-act="moveDlg" data-id="out:${p.id}" title="Entnahme" aria-label="Entnahme">${ico('minus')}</button><button type="button" class="icon-btn" data-act="editProd" data-id="${p.id}" title="Artikel bearbeiten" aria-label="Artikel bearbeiten">${ico('edit')}</button></td>
+    </tr>`; }).join('') || '<tr><td colspan="7" class="muted">Nichts gefunden.</td></tr>'}</tbody>
+    <tfoot><tr><td colspan="5">Summe ${view.loc==='all'?'':esc(LOCS[view.loc])}</td><td class="r mono">${eur(list.reduce((s,p)=>s+Math.max(0,+p.stock||0)*(+p.price||0),0))}</td><td></td></tr></tfoot>
+  </table></div></section>`;
+}
+function moveList(){
+  const t = view.mtype;
+  const list = S.moves.filter(m => t==='all' || m.type===t).slice(0,300);
+  const chip = (k,l) => `<button type="button" class="chip ${t===k?'on':''}" data-act="mtype" data-id="${k}">${l}<small>${k==='all'?S.moves.length:S.moves.filter(m=>m.type===k).length}</small></button>`;
+  return `<div class="chips-row">${chip('all','Alle')}${Object.entries(MOVE).map(([k,l])=>chip(k,l)).join('')}</div>
+  <section class="panel flush">${list.length ? `<ul class="moves">${list.map(m=>{ const p = P(m.pid); return `<li>
+    <span class="mv-d mono">${fmtDate(m.date)}</span><span class="mvt ${m.type}">${MOVE[m.type]}</span>
+    <span class="mv-n"><b>${esc(p?p.name:'gelöschter Artikel')}</b>${m.note?`<small class="muted">${esc(m.note)}</small>`:''}</span>
+    <span class="mv-q mono ${m.qty<0?'bad-t':'good-t'}">${m.qty>0?'+':''}${qtyFmt(m.qty,p)}</span>
+    <span class="mv-v mono">${eur(m.qty*m.price)}</span>
+    <button type="button" class="icon-btn" data-act="moveUndo" data-id="${m.id}" title="Stornieren" aria-label="Buchung stornieren">${ico('x')}</button></li>`; }).join('')}</ul>` : '<div class="empty">Noch keine Buchungen.</div>'}</section>`;
+}
+function invView(){
+  const d = S.invDraft;
+  if(!d){
+    return `<div class="grid2"><section class="panel accent"><div class="panel-h"><h2>Neue Inventur</h2></div>
+      <p class="dlg-p">Die Zählliste ist nach Lagerorten sortiert, so gehen Sie einmal durch Kühlhaus, Tiefkühler und Lager. Tragen Sie die gezählte Menge ein; Differenzen in Menge und Euro erscheinen sofort. Nicht gezählte Artikel bleiben unverändert.</p>
+      <div class="row-btns" style="margin-top:14px"><button type="button" class="btn primary" data-act="invStart">${ico('clip')}Inventur starten</button></div></section>
+      <section class="panel"><div class="panel-h"><h2>Bisherige Inventuren</h2></div>
+      ${S.inventories.length ? `<ul class="todo">${S.inventories.map(i=>`<li><div class="inv-h"><span><b class="mono">${fmtDate(i.date)}</b><small class="muted">${i.counted} Artikel gezählt${i.demo?' · Demo':''}</small></span><span class="r"><b class="mono">${eur(i.value)}</b><small class="mono ${i.diff<0?'bad-t':'good-t'}">${i.diff>0?'+':''}${eur(i.diff)}</small></span></div></li>`).join('')}</ul>` : '<p class="hint">Noch keine abgeschlossene Inventur.</p>'}
+      </section></div>`;
+  }
+  const items = stockProducts().sort((a,b)=>(a.loc||'').localeCompare(b.loc||'') || byName(a,b));
+  const done = items.filter(p => d.counts[p.id] !== undefined && d.counts[p.id] !== '').length;
+  const diffSum = items.reduce((s,p)=>{ const c = d.counts[p.id]; return c===undefined||c==='' ? s : s + (c-(+p.stock||0))*(+p.price||0); }, 0);
+  let h = `<section class="panel inv-bar"><div><div class="eyebrow">Inventur seit ${fmtDate(d.date)}</div><b class="mono" id="invProg">${done} / ${items.length}</b> gezählt · Differenz <b class="mono ${diffSum<0?'bad-t':''}" id="invDiff">${eur(diffSum)}</b>
+    <div class="meter"><i id="invMeter" style="width:${(done/items.length*100).toFixed(1)}%"></i></div></div>
+    <div class="row-btns"><button type="button" class="btn" data-act="invCancel">Verwerfen</button><button type="button" class="btn primary" data-act="invFinish">Inventur abschließen</button></div></section>`;
+  for(const [k,l] of Object.entries(LOCS)){
+    const list = items.filter(p=>p.loc===k); if(!list.length) continue;
+    h += `<h2 class="sec-h">${esc(l)}<small class="muted sm">${list.length} Artikel</small></h2><section class="panel flush"><div class="tbl-wrap"><table class="inv">
+      <thead><tr><th>Artikel</th><th class="r">Soll</th><th class="r">Ist gezählt</th><th class="r">Differenz</th><th class="r">Wert</th></tr></thead><tbody>
+      ${list.map(p=>{ const c = d.counts[p.id]; const has = c!==undefined && c!==''; const df = has ? c-(+p.stock||0) : 0; return `<tr id="ir-${p.id}" class="${has?'counted':''}">
+        <td><b class="pn">${esc(p.name)}</b></td><td class="r mono muted">${qtyFmt(+p.stock||0,p)}</td>
+        <td class="r"><span class="qty"><input id="inv-${p.id}" type="number" step="any" min="0" inputmode="decimal" data-inv="${p.id}" value="${has?esc(c):''}" placeholder="—" aria-label="Gezählt"><em>${esc(p.unit)}</em></span></td>
+        <td class="r mono idf ${df<0?'bad-t':df>0?'good-t':''}">${has?(df>0?'+':'')+qtyFmt(df,p):''}</td><td class="r mono idv ${df<0?'bad-t':df>0?'good-t':''}">${has?eur(df*(+p.price||0)):''}</td></tr>`; }).join('')}
+      </tbody></table></div></section>`;
+  }
+  return h;
+}
+function invUpdate(pid){
+  const d = S.invDraft, p = P(pid), row = $('#ir-'+pid); const c = d.counts[pid]; const has = c!==undefined && c!=='';
+  const df = has ? c-(+p.stock||0) : 0; const cls = df<0?'bad-t':df>0?'good-t':'';
+  row.classList.toggle('counted', has);
+  const a = row.querySelector('.idf'), b = row.querySelector('.idv'); a.className = 'r mono idf '+cls; b.className = 'r mono idv '+cls;
+  a.textContent = has ? (df>0?'+':'')+qtyFmt(df,p) : ''; b.textContent = has ? eur(df*(+p.price||0)) : '';
+  const items = stockProducts(); const done = items.filter(x => d.counts[x.id] !== undefined && d.counts[x.id] !== '').length;
+  const sum = items.reduce((s,x)=>{ const v = d.counts[x.id]; return v===undefined||v==='' ? s : s + (v-(+x.stock||0))*(+x.price||0); }, 0);
+  $('#invProg').textContent = `${done} / ${items.length}`; $('#invDiff').textContent = eur(sum); $('#invDiff').className = 'mono '+(sum<0?'bad-t':''); $('#invMeter').style.width = (done/items.length*100).toFixed(1)+'%';
+}
+function orderView(){
+  const low = lowStock();
+  if(!low.length) return `<section class="panel empty">Alle Artikel sind über dem Mindestbestand. Mindestbestände stellen Sie im Artikel ein.</section>`;
+  const groups = {}; low.forEach(p => { const s = p.supplier || 'Ohne Lieferant'; (groups[s] = groups[s] || []).push(p); });
+  return `<p class="hint" style="margin:0 0 14px">Vorschlag: auffüllen auf den doppelten Mindestbestand. Mengen anpassen, Text kopieren und per Mail oder WhatsApp senden. Kommt die Lieferung, buchen Sie sie mit einem Klick ein.</p>
+  <div class="ord-grid">${Object.entries(groups).map(([s,list])=>`<section class="panel">
+    <div class="panel-h"><h2>${ico('truck')} ${esc(s)}</h2><span class="muted sm">${list.length} Artikel</span></div>
+    <ul class="ord">${list.map(p=>{ const q = view.order[p.id] ?? orderSuggest(p); return `<li><span><b>${esc(p.name)}</b><small class="muted">Bestand ${qtyFmt(+p.stock||0,p)} · Mindest ${qtyFmt(+p.minStock||0,p)}</small></span>
+      <span class="qty"><input id="ord-${p.id}" type="number" step="any" min="0" data-ord="${p.id}" value="${q}" aria-label="Bestellmenge"><em>${esc(p.unit)}</em></span></li>`; }).join('')}</ul>
+    <div class="kv"><span>Geschätzter Einkauf</span><span>${eur(list.reduce((t,p)=>t+(view.order[p.id] ?? orderSuggest(p))*(+p.price||0),0))}</span></div>
+    <div class="row-btns" style="margin-top:12px"><button type="button" class="btn" data-act="ordCopy" data-id="${esc(s)}">${ico('copy')}Bestelltext</button><button type="button" class="btn primary" data-act="ordBook" data-id="${esc(s)}">${ico('truck')}Lieferung einbuchen</button></div>
+  </section>`).join('')}</div>`;
+}
+function orderText(s){
+  const list = lowStock().filter(p => (p.supplier||'Ohne Lieferant')===s);
+  return `Bestellung ${S.settings.name}\nLieferant: ${s}\nGewünschte Lieferung: ________\n\n${list.map(p=>`• ${p.name}: ${num(view.order[p.id] ?? orderSuggest(p),2)} ${p.unit}`).join('\n')}\n\nDanke und liebe Grüße\nKüche ${S.settings.name}`;
 }
 
 /* ---------- Produkte ---------- */
@@ -940,7 +1430,7 @@ function renderProducts(){
   <section class="panel flush"><div class="tbl-wrap"><table class="prods">
     <thead><tr><th>Produkt</th><th class="r">Preis €</th><th class="r">Putzverlust</th><th class="r">Garverlust</th><th>Allergene</th><th class="r">Rezepturen</th><th></th></tr></thead>
     <tbody>${list.map(p=>{ const u = usage('p:'+p.id).length; return `<tr>
-      <td><b class="pn">${esc(p.name)}</b><small class="muted">${p.unit==='Stk'&&p.pieceG?`je Stk · ${num(p.pieceG)} g`:`je ${esc(p.unit)}`}</small></td>
+      <td><b class="pn">${esc(p.name)}</b><small class="muted">${p.unit==='Stk'&&p.pieceG?`je Stk · ${num(p.pieceG)} g`:`je ${esc(p.unit)}`}${p.supplier?' · '+esc(p.supplier):''}</small></td>
       <td class="r"><span class="qty"><input id="pp-${p.id}" type="number" step="0.01" min="0" inputmode="decimal" data-pp="${p.id}" data-pf="price" value="${esc(p.price)}" aria-label="Preis"><em>€</em></span></td>
       <td class="r"><span class="qty"><input id="plc-${p.id}" type="number" step="any" min="0" max="100" data-pp="${p.id}" data-pf="lossCold" value="${esc(p.lossCold)}" aria-label="Putzverlust"><em>%</em></span></td>
       <td class="r"><span class="qty"><input id="plh-${p.id}" type="number" step="any" min="0" max="100" data-pp="${p.id}" data-pf="lossHot" value="${esc(p.lossHot)}" aria-label="Garverlust"><em>%</em></span></td>
@@ -954,6 +1444,7 @@ function renderProducts(){
 
 /* ---------- Einstellungen ---------- */
 function renderSetup(){
+  const n = Object.keys(IMG).length;
   return `<div class="page-h"><div><div class="eyebrow">Betrieb & Daten</div><h1>Einstellungen</h1></div></div>
   <div class="grid2">
     <section class="panel"><div class="panel-h"><h2>Kalkulation</h2></div><div class="fields">
@@ -961,9 +1452,9 @@ function renderSetup(){
       <label class="f">MwSt. Speisen, %<input id="s-vat" data-sf="vat" type="number" step="any" min="0" value="${esc(S.settings.vat)}"></label>
       <label class="f">Ziel-Wareneinsatz, %<input id="s-target" data-sf="target" type="number" step="any" min="1" value="${esc(S.settings.target)}"></label>
     </div><p class="hint">In Österreich gilt für Speisen der ermäßigte Steuersatz von 10 %. Der Wareneinsatz wird vom Preis exkl. MwSt. berechnet.</p></section>
-    <section class="panel"><div class="panel-h"><h2>Daten</h2></div>
-      <p class="hint">Die Daten werden nur in diesem Browser gespeichert. Erstellen Sie regelmäßig eine Sicherung und übertragen Sie sie per Import auf andere Geräte.</p>
-      <div class="row-btns wrap"><button type="button" class="btn" data-act="export">Sicherung erstellen</button>
+    <section class="panel"><div class="panel-h"><h2>Daten</h2><span class="muted sm">${n} Fotos gespeichert</span></div>
+      <p class="hint">Daten und Fotos werden nur in diesem Browser gespeichert. Erstellen Sie regelmäßig eine Sicherung und übertragen Sie sie per Import auf andere Geräte.</p>
+      <div class="row-btns wrap" style="margin-top:12px"><button type="button" class="btn" data-act="export">Sicherung erstellen</button>
         <label class="btn" for="importFile">Sicherung laden</label><input id="importFile" type="file" accept="application/json,.json" hidden>
         <button type="button" class="btn danger" data-act="reset">Demodaten wiederherstellen</button></div>
     </section>
@@ -973,34 +1464,51 @@ function renderSetup(){
 /* ---------- Dialoge ---------- */
 function openDialog(title, body, onOk, opts={}){
   const f = $('#dlgForm'), d = $('#dlg');
+  f.oninput = null;
   f.innerHTML = `<div class="dlg-h"><h3>${esc(title)}</h3><button type="button" class="icon-btn" id="dlgX" aria-label="Schließen">${ico('x')}</button></div>${body}<div class="dlg-actions">${opts.del?'<button type="button" class="btn danger" id="dlgDel">Löschen</button>':''}<span class="sp"></span><button type="button" class="btn" id="dlgCancel">${opts.cancel||'Abbrechen'}</button>${onOk?`<button type="submit" class="btn primary">${opts.ok||'Speichern'}</button>`:''}</div>`;
-  f.onsubmit = e => { e.preventDefault(); if(onOk){ const r = onOk(new FormData(f)); if(r === false) return; } d.close(); save(); render(); if(opts.toast!==false) toast(opts.done||'Gespeichert'); };
+  f.onsubmit = e => { e.preventDefault(); if(onOk){ const r = onOk(new FormData(f)); if(r === false) return; } d.close(); save(); render(); if(opts.toast!==false) toast(typeof opts.done==='function' ? opts.done() : (opts.done||'Gespeichert')); };
   $('#dlgCancel').onclick = $('#dlgX').onclick = () => d.close();
   if(opts.del) $('#dlgDel').onclick = () => { d.close(); opts.del(); };
   d.showModal();
+  opts.after && opts.after(f);
 }
 function ask(text, yes, ok='Löschen'){ openDialog('Bitte bestätigen', `<p class="dlg-p">${esc(text)}</p>`, () => { yes(); }, {ok, done: ok==='Löschen'?'Gelöscht':'Erledigt'}); }
 function info(title, text){ openDialog(title, `<p class="dlg-p">${esc(text)}</p>`, null, {cancel:'OK'}); }
 
-function menuDialog(m){
-  const isNew = !m; m = m || {id:uid('m'), section:view.sec!=='all'&&view.sec!=='none'&&view.sec!=='over'?view.sec:'', name:'', desc:'', price:'', card:''};
-  const secs = [...new Set(S.menu.map(x=>x.section))];
+function menuDialog(m, prefill){
+  const isNew = !m; m = m || {id:uid('m'), section:'', name:'', desc:'', price:'', card:'', img:'', veg:'', top:false, hidden:false, ...(prefill||{})};
+  if(isNew && !m.section && !['all','none','over','nophoto'].includes(view.sec)) m.section = view.sec;
+  let img = m.img;
   const opts = S.cards.filter(c=>c.type==='dish').sort(byName);
+  const thumb = () => img && IMG[img] ? `<img src="${IMG[img]}" alt="">` : `<span class="muted sm">${m.card && C(m.card)?.img ? 'Foto der Rezeptur wird verwendet' : 'Kein Foto'}</span>`;
   openDialog(isNew ? 'Neues Gericht' : 'Gericht bearbeiten', `
+    <div class="dlg-ph"><div id="dlgThumb">${thumb()}</div><div class="row-btns"><button type="button" class="btn sm" id="dlgPhoto">${ico('camera')}Foto wählen</button>${img?'<button type="button" class="btn sm" id="dlgPhotoDel">Entfernen</button>':''}</div></div>
     <label class="f">Bezeichnung<input name="name" required value="${esc(m.name)}"></label>
     <label class="f">Beschreibung<input name="desc" value="${esc(m.desc)}"></label>
     <div class="fields">
-      <label class="f">Kategorie<input name="section" list="secs" required value="${esc(m.section)}"><datalist id="secs">${secs.map(s=>`<option value="${esc(s)}">`).join('')}</datalist></label>
+      <label class="f">Kategorie<select name="section" required>${secList().map(s=>`<option ${m.section===s?'selected':''}>${esc(s)}</option>`).join('')}</select></label>
       <label class="f">Preis inkl. MwSt., €<input name="price" type="number" step="0.01" min="0" required value="${esc(m.price)}"></label>
     </div>
-    <label class="f">Rezeptur<select name="card"><option value="">— nicht verknüpft —</option>${opts.map(c=>`<option value="${c.id}" ${m.card===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label>`,
-    fd => { Object.assign(m, {section:fd.get('section').trim(), name:fd.get('name').trim(), desc:fd.get('desc').trim(), price:+fd.get('price'), card:fd.get('card')}); if(isNew) S.menu.push(m); },
-    {del: isNew ? null : () => ask(`„${m.name}“ von der Speisekarte löschen? Die Rezeptur bleibt erhalten.`, () => { S.menu = S.menu.filter(x=>x!==m); })});
+    <label class="f">Rezeptur<select name="card"><option value="">— nicht verknüpft —</option>${opts.map(c=>`<option value="${c.id}" ${m.card===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label>
+    <div class="togs">
+      <label class="tog"><input type="radio" name="veg" value="" ${!m.veg?'checked':''}><span></span>Fleisch / Fisch</label>
+      <label class="tog"><input type="radio" name="veg" value="v" ${m.veg==='v'?'checked':''}><span></span>Vegetarisch</label>
+      <label class="tog"><input type="radio" name="veg" value="vg" ${m.veg==='vg'?'checked':''}><span></span>Vegan</label>
+    </div>
+    <div class="togs"><label class="tog"><input type="checkbox" name="top" ${m.top?'checked':''}><span></span>Empfehlung des Hauses</label>
+      <label class="tog"><input type="checkbox" name="show" ${m.hidden?'':'checked'}><span></span>Auf der Gästekarte zeigen</label></div>`,
+    fd => { const sec = fd.get('section'); if(isNew || sec !== m.section) m.order = nextOrder(sec);
+      if(m.img && m.img !== img) imgDel(m.img);
+      Object.assign(m, {section:sec, name:fd.get('name').trim(), desc:fd.get('desc').trim(), price:+fd.get('price'), card:fd.get('card'), img, veg:fd.get('veg')||'', top:!!fd.get('top'), hidden:!fd.get('show')}); if(isNew) S.menu.push(m); },
+    {done: isNew ? ()=>`„${m.name}“ steht jetzt unter ${m.section}` : 'Gespeichert',
+     del: isNew ? null : () => ask(`„${m.name}“ von der Speisekarte löschen? Die Rezeptur bleibt erhalten.`, () => { imgDel(m.img); S.menu = S.menu.filter(x=>x!==m); }),
+     after: f => { const bind = () => { $('#dlgPhoto').onclick = () => pickImage(data => { const id = uid('img'); imgPut(id, data); img = id; $('#dlgThumb').innerHTML = thumb(); }); const del = $('#dlgPhotoDel'); if(del) del.onclick = () => { img = ''; $('#dlgThumb').innerHTML = thumb(); }; }; bind(); }});
 }
 
 function prodDialog(p){
-  const isNew = !p; p = p || {id:uid('p'), name:'', unit:'kg', price:'', lossCold:0, lossHot:0, alg:'', pieceG:''};
+  const isNew = !p; p = p || {id:uid('p'), name:'', unit:'kg', price:'', lossCold:0, lossHot:0, alg:'', pieceG:'', stock:0, minStock:0, loc:'L', supplier:''};
   const has = new Set(algList(p.alg));
+  const sups = [...new Set(S.products.map(x=>x.supplier).filter(Boolean))];
   openDialog(isNew ? 'Neues Produkt' : 'Produkt bearbeiten', `
     <label class="f">Bezeichnung<input name="name" required value="${esc(p.name)}"></label>
     <div class="fields">
@@ -1010,14 +1518,61 @@ function prodDialog(p){
       <label class="f">Putzverlust, %<input name="lossCold" type="number" step="any" min="0" max="100" value="${esc(p.lossCold)}"></label>
       <label class="f">Garverlust, %<input name="lossHot" type="number" step="any" min="0" max="100" value="${esc(p.lossHot)}"></label>
     </div>
+    <div class="fields">
+      <label class="f">Lagerort<select name="loc">${Object.entries(LOCS).map(([k,l])=>`<option value="${k}" ${p.loc===k?'selected':''}>${l}</option>`).join('')}</select></label>
+      <label class="f">Lieferant<input name="supplier" list="sups" value="${esc(p.supplier)}"><datalist id="sups">${sups.map(s=>`<option value="${esc(s)}">`).join('')}</datalist></label>
+      <label class="f">Mindestbestand<input name="minStock" type="number" step="any" min="0" value="${esc(p.minStock)}"></label>
+      ${isNew?`<label class="f">Anfangsbestand<input name="stock" type="number" step="any" min="0" value="0"></label>`:''}
+    </div>
     <div class="f">Allergene</div>
     <div class="algs">${Object.entries(ALG).map(([k,v])=>`<label class="algc"><input type="checkbox" name="alg" value="${k}" ${has.has(k)?'checked':''}><span><b>${k}</b>${esc(v)}</span></label>`).join('')}</div>`,
-    fd => { Object.assign(p, {name:fd.get('name').trim(), unit:fd.get('unit'), price:+fd.get('price'), pieceG:fd.get('pieceG'), lossCold:+fd.get('lossCold')||0, lossHot:+fd.get('lossHot')||0, alg:fd.getAll('alg').join(' ')}); if(isNew) S.products.push(p); },
+    fd => { Object.assign(p, {name:fd.get('name').trim(), unit:fd.get('unit'), price:+fd.get('price'), pieceG:fd.get('pieceG'), lossCold:+fd.get('lossCold')||0, lossHot:+fd.get('lossHot')||0, alg:fd.getAll('alg').join(' '), loc:fd.get('loc'), supplier:fd.get('supplier').trim(), minStock:+fd.get('minStock')||0});
+      if(isNew){ p.stock = 0; S.products.push(p); const s = +fd.get('stock')||0; if(s) addMove('in', p.id, s, 'Anfangsbestand'); } },
     {del: isNew ? null : () => { const u = usage('p:'+p.id); if(u.length) return info('Produkt wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(c=>c.name).join(', ')}. Entfernen Sie es dort zuerst.`); ask(`Produkt „${p.name}“ löschen?`, () => { S.products = S.products.filter(x=>x!==p); }); }});
 }
 
+function moveDlg(arg){
+  const [type, pid] = String(arg).split(':');
+  const prods = stockProducts().sort(byName);
+  const title = {in:'Wareneingang buchen', out:'Entnahme buchen', waste:'Schwund buchen'}[type];
+  const p0 = pid ? P(pid) : null;
+  openDialog(title, `
+    <label class="f">Artikel<select name="pid" id="mvPid" required>${p0?'':'<option value="">— wählen —</option>'}${prods.map(p=>`<option value="${p.id}" ${p0&&p0.id===p.id?'selected':''}>${esc(p.name)} · ${qtyFmt(+p.stock||0,p)}</option>`).join('')}</select></label>
+    <div class="fields">
+      <label class="f">Menge in <span id="mvUnit">${p0?esc(p0.unit):'Einheit'}</span><input name="qty" type="number" step="any" min="0" required inputmode="decimal" autofocus></label>
+      ${type==='in'?`<label class="f">Preis je Einheit, €<input name="price" id="mvPrice" type="number" step="0.01" min="0" value="${p0?esc(p0.price):''}"></label>`:''}
+      <label class="f">Datum<input name="date" type="date" value="${new Date().toISOString().slice(0,10)}"></label>
+    </div>
+    ${type==='waste'?`<label class="f">Grund<select name="note">${WASTE.map(w=>`<option>${w}</option>`).join('')}</select></label>`:`<label class="f">${type==='in'?'Lieferschein / Notiz':'Notiz'}<input name="note" placeholder="${type==='in'?'z. B. Lieferschein 2240':'z. B. für Mise en place'}"></label>`}
+    ${type==='in'?`<div class="togs"><label class="tog"><input type="checkbox" name="upd" checked><span></span>Neuen Preis in die Kalkulation übernehmen</label></div>`:''}`,
+    fd => { const p = P(fd.get('pid')); const q = +fd.get('qty'); if(!p || !q) return false;
+      const date = fd.get('date') ? new Date(fd.get('date')+'T12:00:00').toISOString() : null;
+      if(type==='in'){ const pr = fd.get('price')==='' ? p.price : +fd.get('price'); if(fd.get('upd') && pr !== p.price) p.price = pr; addMove('in', p.id, q, fd.get('note'), pr, date); }
+      else addMove(type, p.id, -q, fd.get('note'), null, date);
+      moveDlg.last = `${MOVE[type]}: ${p.name} ${type==='in'?'+':'−'}${qtyFmt(q,p)}`; },
+    {ok:'Buchen', done:()=>moveDlg.last, after: f => { const s = f.querySelector('#mvPid'); s.onchange = () => { const p = P(s.value); f.querySelector('#mvUnit').textContent = p ? p.unit : 'Einheit'; const pr = f.querySelector('#mvPrice'); if(pr && p) pr.value = p.price; }; }});
+}
+
+function salesDlg(){
+  const items = menuSorted().filter(m => m.card && C(m.card));
+  openDialog('Verkäufe buchen', `<p class="dlg-p">Tragen Sie die verkauften Portionen ein, zum Beispiel aus dem Kassenbericht. Die Zutaten werden laut Rezeptur vom Lager abgebucht, auch aus Basisrezepten.</p>
+    <label class="f">Datum<input name="date" type="date" value="${new Date().toISOString().slice(0,10)}"></label>
+    <ul class="sales">${items.map(m=>`<li><span>${esc(m.name)}<small class="muted">${esc(m.section)}</small></span><span class="stepper"><button type="button" class="icon-btn" data-step="-1" aria-label="weniger">${ico('minus')}</button><input name="s_${m.id}" type="number" min="0" step="1" value="0" inputmode="numeric" aria-label="Portionen"><button type="button" class="icon-btn" data-step="1" aria-label="mehr">${ico('plus')}</button></span></li>`).join('')}</ul>
+    <div class="kv"><span>Portionen gesamt</span><span id="salesN">0</span><span>Wareneinsatz</span><span id="salesC">${eur(0)}</span></div>`,
+    fd => { const acc = new Map(); let n = 0; const date = fd.get('date') ? new Date(fd.get('date')+'T20:00:00').toISOString() : null;
+      items.forEach(m => { const q = +fd.get('s_'+m.id)||0; if(q>0){ n += q; explode(C(m.card), q, acc); } });
+      if(!n) return false;
+      acc.forEach((q,pid) => addMove('sale', pid, -Math.round(q*1000)/1000, `Verkauf ${fmtDate(date||new Date().toISOString())}`, null, date));
+      salesDlg.last = `${n} Portionen gebucht, ${acc.size} Artikel abgebucht`; },
+    {ok:'Abbuchen', done:()=>salesDlg.last, after: f => {
+      const upd = () => { let n = 0, c = 0; items.forEach(m => { const q = +f.elements['s_'+m.id].value||0; n += q; c += q*menuCalc(m).cost; }); $('#salesN').textContent = n; $('#salesC').textContent = eur(c); };
+      f.oninput = upd;
+      f.querySelectorAll('[data-step]').forEach(b => b.onclick = () => { const i = b.parentNode.querySelector('input'); i.value = Math.max(0, (+i.value||0) + +b.dataset.step); upd(); });
+    }});
+}
+
 function newCard(type, fromMenu){
-  const c = {id:uid(type==='semi'?'semi':'dish'), no:S.settings.nextNo++, name: fromMenu ? fromMenu.name : (type==='semi'?'Neues Basisrezept':'Neues Gericht'), type, category: fromMenu ? fromMenu.section : (type==='semi'?'Basisrezepte':''), yieldG:'', method:'', items:[{ref:'',qty:'',net:''}]};
+  const c = {id:uid(type==='semi'?'semi':'dish'), no:S.settings.nextNo++, name: fromMenu ? fromMenu.name : (type==='semi'?'Neues Basisrezept':'Neues Gericht'), type, category: fromMenu ? fromMenu.section : (type==='semi'?'Basisrezepte':''), yieldG:'', img:'', steps:[{t:'',img:''}], items:[{ref:'',qty:'',net:''}]};
   S.cards.push(c); if(fromMenu) fromMenu.card = c.id;
   go('cards', c.id); save(); toast('Rezeptur angelegt');
 }
@@ -1029,38 +1584,49 @@ function printCard(id){
     <h1>Rezeptur Nr. ${c.no||''}</h1>
     <div><b>${esc(c.name)}</b> · ${c.type==='semi'?'Basisrezept':'Gericht'} · ${esc(c.category||'')}</div>
     <div>Ausbeute: ${num(c.yieldG||t.out)} g ${c.type==='semi'?'(Charge)':'(1 Portion)'}</div>
+    ${c.img&&IMG[c.img]?`<img class="pr-ph" src="${IMG[c.img]}" alt="">`:''}
     <table><thead><tr><th>Nr.</th><th>Zutat</th><th class="r">Brutto</th><th>Einh.</th><th class="r">Netto, g</th><th class="r">Fertig, g</th><th class="r">Betrag, €</th></tr></thead>
     <tbody>${c.items.map((it,i)=>{const l=t.lines[i];return `<tr><td>${i+1}</td><td>${esc(l.name)}</td><td class="r">${num(+it.qty,2)}</td><td>${l.unit}</td><td class="r">${num(l.net,1)}</td><td class="r">${num(l.out,1)}</td><td class="r">${num(l.cost,2)}</td></tr>`}).join('')}</tbody>
     <tfoot><tr><td></td><td>Summe</td><td class="r">${num(t.gross)}</td><td></td><td class="r">${num(t.net)}</td><td class="r">${num(t.out)}</td><td class="r">${num(t.cost,2)}</td></tr></tfoot></table>
-    <p><b>Zubereitung:</b><br>${esc(c.method).replace(/\n/g,'<br>')}</p>
+    <h2>Zubereitung</h2><ol class="pr-steps">${(c.steps||[]).map(s=>`<li>${esc(s.t)}${s.img&&IMG[s.img]?`<br><img src="${IMG[s.img]}" alt="">`:''}</li>`).join('')}</ol>
     <p><b>Allergene:</b> ${[...t.alg].sort().map(a=>`${a} (${ALG[a]||''})`).join(', ') || 'keine'}</p>
     <div class="sign"><span>Küchenchef ____________</span><span>Kalkulation ____________</span></div>`;
-  window.print();
+  document.body.classList.remove('print-menu'); window.print();
 }
+function printMenu(){ $('#print').innerHTML = guestHtml(); document.body.classList.add('print-menu'); window.print(); }
 
 function exportData(){
-  const json = JSON.stringify(S, null, 1);
   openDialog('Sicherung', `<p class="dlg-p">Kopieren Sie den Text und speichern Sie ihn als .json-Datei. Wiederherstellen unter „Einstellungen“ mit „Sicherung laden“.</p>
-    <textarea id="expTxt" readonly class="code">${esc(json)}</textarea>
+    <div class="togs"><label class="tog"><input type="checkbox" id="expImg" ${Object.keys(IMG).length?'checked':''}><span></span>Fotos einschließen (${Object.keys(IMG).length})</label></div>
+    <textarea id="expTxt" readonly class="code"></textarea>
     <div class="row-btns"><button type="button" class="btn" id="copyBtn">${ico('copy')}Kopieren</button>${FRAMED?'':'<button type="button" class="btn" id="dlBtn">Datei herunterladen</button>'}</div>`, null, {cancel:'Schließen'});
-  $('#copyBtn').onclick = () => { const ta = $('#expTxt'); const p = navigator.clipboard?.writeText(json); if(p) p.then(()=>toast('Kopiert'), () => { ta.select(); toast('Text markiert, mit Strg+C kopieren'); }); else { ta.select(); toast('Text markiert, mit Strg+C kopieren'); } };
-  if(!FRAMED) $('#dlBtn').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([json],{type:'application/json'})); a.download = 'dahuam202-kueche-'+new Date().toISOString().slice(0,10)+'.json'; a.click(); };
+  const json = () => JSON.stringify($('#expImg').checked ? {...S, images:IMG} : S);
+  const fill = () => { const j = json(); $('#expTxt').value = j.length > 400000 ? j.slice(0,400000)+'\n… (gekürzt angezeigt, „Kopieren“ übernimmt alles)' : j; };
+  fill(); $('#expImg').onchange = fill;
+  $('#copyBtn').onclick = () => { const ta = $('#expTxt'); const pr = navigator.clipboard?.writeText(json()); if(pr) pr.then(()=>toast('Kopiert'), () => { ta.select(); toast('Text markiert, mit Strg+C kopieren'); }); else { ta.select(); toast('Text markiert, mit Strg+C kopieren'); } };
+  if(!FRAMED) $('#dlBtn').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([json()],{type:'application/json'})); a.download = 'dahuam202-kueche-'+new Date().toISOString().slice(0,10)+'.json'; a.click(); };
 }
 
-/* ---------- Schnellsuche (Strg+K) ---------- */
+/* ---------- Schnellsuche ---------- */
 let palSel = 0, palItems = [];
 function palData(){
   return [
     ...TABS.map(([k,l])=>({g:'Bereich', n:l, s:'', run:()=>go(k)})),
-    ...S.menu.map(m=>({g:'Speisekarte', n:m.name, s:eur(m.price)+' · '+m.section, run:()=> m.card ? go('cards', m.card) : menuDialog(m)})),
-    ...S.cards.map(c=>({g:'Rezeptur', n:c.name, s:(c.type==='semi'?'Basisrezept':'Gericht')+' · Nr. '+c.no, run:()=>go('cards', c.id)})),
-    ...S.products.map(p=>({g:'Produkt', n:p.name, s:eur(p.price)+' / '+p.unit, run:()=>prodDialog(p)})),
+    {g:'Bereich', n:'Gästekarte ansehen', s:'Speisekarte', run:()=>{ view.mtab='guest'; go('menu'); }},
+    {g:'Bereich', n:'Inventur', s:'Lager', run:()=>{ view.stab='inventur'; go('stock'); }},
+    {g:'Bereich', n:'Bestellvorschlag', s:'Lager', run:()=>{ view.stab='bestellung'; go('stock'); }},
+    {g:'Aktion', n:'Wareneingang buchen', s:'', run:()=>moveDlg('in')},
+    {g:'Aktion', n:'Verkäufe buchen', s:'', run:()=>salesDlg()},
+    {g:'Aktion', n:'Schwund buchen', s:'', run:()=>moveDlg('waste')},
     {g:'Aktion', n:'Neues Gericht auf die Speisekarte', s:'', run:()=>menuDialog()},
     {g:'Aktion', n:'Neue Rezeptur anlegen', s:'', run:()=>newCard('dish')},
     {g:'Aktion', n:'Neues Produkt anlegen', s:'', run:()=>prodDialog()},
+    ...S.menu.map(m=>({g:'Speisekarte', n:m.name, s:eur(m.price)+' · '+m.section, run:()=> m.card ? go('cards', m.card) : menuDialog(m)})),
+    ...S.cards.map(c=>({g:'Rezeptur', n:c.name, s:(c.type==='semi'?'Basisrezept':'Gericht')+' · Nr. '+c.no, run:()=>go('cards', c.id)})),
+    ...S.products.map(p=>({g:'Produkt', n:p.name, s:p.noStock?eur(p.price):qtyFmt(+p.stock||0,p)+' auf Lager', run:()=>prodDialog(p)})),
   ];
 }
-function palOpen(){ const p = $('#pal'); p.hidden = false; const i = $('#palIn'); i.value = ''; palFilter(''); i.focus(); }
+function palOpen(){ $('#pal').hidden = false; const i = $('#palIn'); i.value = ''; palFilter(''); i.focus(); }
 function palClose(){ $('#pal').hidden = true; }
 function palFilter(q){
   q = q.trim().toLowerCase();
@@ -1080,7 +1646,6 @@ function go(tab, card=null){
   try { if(location.hash.slice(1) !== tab) history.replaceState(null, '', '#'+tab); } catch(e){}
   render(); window.scrollTo({top:0});
 }
-
 function setTheme(t){ document.documentElement.dataset.theme = t; try { localStorage.setItem(KEY+'_theme', t); } catch(e){} themeIcon(); }
 function themeIcon(){ const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme==='dark' : matchMedia('(prefers-color-scheme: dark)').matches; document.querySelectorAll('[data-act=theme]').forEach(b => { b.innerHTML = ico(dark?'sun':'moon'); b.title = dark ? 'Helles Design' : 'Dunkles Design'; }); return dark; }
 
@@ -1091,34 +1656,73 @@ document.addEventListener('click', e => {
   const pi = e.target.closest('[data-pal]');
   if(pi){ const x = palItems[+pi.dataset.pal]; palClose(); x && x.run(); return; }
   if(e.target.id === 'pal'){ palClose(); return; }
-  const el = e.target.closest('[data-act]'); if(!el) return;
+  const el = e.target.closest('[data-act]'); if(!el || el.closest('#dlg') && !el.closest('#dlgForm')) return;
   const id = el.dataset.id, act = el.dataset.act;
   const c = view.card ? C(view.card) : null;
   switch(act){
     case 'theme': setTheme(themeIcon() ? 'light' : 'dark'); break;
     case 'palette': palOpen(); break;
     case 'goTab': go(id); break;
-    case 'goMenu': view.sec = id; go('menu'); break;
+    case 'goMenu': view.sec = id; view.mtab = 'calc'; go('menu'); break;
+    case 'goStock': view.stab = id; go('stock'); break;
     case 'sec': view.sec = id; render(); break;
+    case 'mtab': view.mtab = id; render(); break;
+    case 'stab': view.stab = id; render(); break;
+    case 'loc': view.loc = id; render(); break;
+    case 'mtype': view.mtype = id; render(); break;
+    case 'gstyle': S.settings.guest.style = id; save(); render(); break;
     case 'newMenu': menuDialog(); break;
     case 'editMenu': menuDialog(S.menu.find(m=>m.id===id)); break;
+    case 'photoMenu': setPhoto(S.menu.find(m=>m.id===id)); break;
+    case 'toMenu': { const cc = C(id); const t = totals(cc); const rec = t.cost/(S.settings.target/100)*(1+S.settings.vat/100); const sec = secList().includes(cc.category) ? cc.category : secList()[0];
+      menuDialog(null, {name:cc.name, section:sec, card:cc.id, price: Math.max(0.9, Math.ceil(rec) - 0.1).toFixed(2)}); break; }
     case 'openCard': go('cards', id); break;
     case 'backCards': go('cards'); break;
     case 'newCardFor': newCard('dish', S.menu.find(m=>m.id===id)); break;
     case 'newCard': newCard(id); break;
     case 'ctype': view.ctype = id; render(); break;
+    case 'photoCard': setPhoto(C(id)); break;
+    case 'photoCardDel': { const cc = C(id); imgDel(cc.img); cc.img = ''; save(); render(); toast('Foto entfernt'); break; }
     case 'addLine': c.items.push({ref:'',qty:'',net:''}); save(); render(); setTimeout(()=>document.getElementById('ref-'+(c.items.length-1))?.focus(),0); break;
     case 'delLine': c.items.splice(+id,1); save(); render(); toast('Zeile entfernt'); break;
+    case 'stepAdd': c.steps.push({t:'',img:''}); save(); render(); setTimeout(()=>document.getElementById('st-'+(c.steps.length-1))?.focus(),0); break;
+    case 'stepDel': imgDel(c.steps[+id].img); c.steps.splice(+id,1); save(); render(); break;
+    case 'stepMove': { const [i,d] = id.split(':').map(Number); const j = i+d; [c.steps[i], c.steps[j]] = [c.steps[j], c.steps[i]]; save(); render(); break; }
+    case 'stepPhoto': setPhoto(c.steps[+id]); break;
+    case 'stepPhotoDel': imgDel(c.steps[+id].img); c.steps[+id].img = ''; save(); render(); break;
     case 'simTo': { const r = $('#sim'); view.sim.price = Math.min(+r.max, Math.max(+r.min, +id)); r.value = view.sim.price; r.dispatchEvent(new Event('input',{bubbles:true})); break; }
     case 'applySim': { const m = S.menu.find(x=>x.id===id); m.price = Math.round(view.sim.price*10)/10; save(); render(); toast('Verkaufspreis auf '+eur(m.price)+' gesetzt'); break; }
-    case 'dupCard': { const src = C(id); const cp = JSON.parse(JSON.stringify(src)); cp.id = uid(src.type); cp.no = S.settings.nextNo++; cp.name += ' (Kopie)'; S.cards.push(cp); save(); go('cards', cp.id); toast('Kopie angelegt'); break; }
+    case 'dupCard': { const src = C(id); const cp = JSON.parse(JSON.stringify(src)); cp.id = uid(src.type); cp.no = S.settings.nextNo++; cp.name += ' (Kopie)'; cp.img = ''; cp.steps.forEach(s=>s.img=''); S.cards.push(cp); save(); go('cards', cp.id); toast('Kopie angelegt (ohne Fotos)'); break; }
     case 'delCard': { const src = C(id); const u = usage('c:'+id); if(u.length){ info('Basisrezept wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(x=>x.name).join(', ')}. Entfernen Sie es dort zuerst.`); break; }
-      ask(`Rezeptur „${src.name}“ löschen? Die Gerichte bleiben auf der Speisekarte, aber ohne Rezeptur.`, () => { S.cards = S.cards.filter(x=>x.id!==id); S.menu.forEach(m=>{ if(m.card===id) m.card=''; }); view.card = null; }); break; }
+      ask(`Rezeptur „${src.name}“ löschen? Die Gerichte bleiben auf der Speisekarte, aber ohne Rezeptur.`, () => { imgDel(src.img); (src.steps||[]).forEach(s=>imgDel(s.img)); S.cards = S.cards.filter(x=>x.id!==id); S.menu.forEach(m=>{ if(m.card===id) m.card=''; }); view.card = null; }); break; }
     case 'printCard': printCard(id); break;
+    case 'printMenu': printMenu(); break;
+    case 'addSec': { let n = 'Neue Kategorie', i = 2; while(secList().includes(n)) n = 'Neue Kategorie '+i++; S.settings.sections.push(n); save(); render(); setTimeout(()=>{ const inp = document.querySelector(`[data-secname="${S.settings.sections.length-1}"]`); inp?.focus(); inp?.select(); },0); break; }
+    case 'secMove': { const [i,d] = id.split(':').map(Number); const s = S.settings.sections; [s[i], s[i+d]] = [s[i+d], s[i]]; save(); render(); break; }
+    case 'secDel': S.settings.sections.splice(+id,1); save(); render(); toast('Kategorie gelöscht'); break;
+    case 'secSort': { const s = secList()[+id]; S.menu.filter(m=>m.section===s).sort((a,b)=>a.price-b.price).forEach((m,i)=>m.order=i); save(); render(); toast(`${s}: nach Preis sortiert`); break; }
+    case 'itemMove': { const [mid,d] = id.split(':'); moveItem(mid, +d); save(); render(); break; }
+    case 'itemHide': { const m = S.menu.find(x=>x.id===id); m.hidden = !m.hidden; save(); render(); toast(m.hidden ? `„${m.name}“ ausgeblendet` : `„${m.name}“ wird angezeigt`); break; }
+    case 'moveDlg': moveDlg(id); break;
+    case 'sales': salesDlg(); break;
+    case 'moveUndo': { const m = S.moves.find(x=>x.id===id); const p = P(m.pid);
+      ask(`Buchung stornieren? ${MOVE[m.type]} ${p?p.name:''} ${qtyFmt(m.qty,p)} wird rückgängig gemacht.`, () => { if(p) p.stock = Math.round(((+p.stock||0) - m.qty)*1000)/1000; S.moves = S.moves.filter(x=>x!==m); }, 'Stornieren'); break; }
+    case 'invStart': S.invDraft = {date:new Date().toISOString(), counts:{}}; save(); render(); toast('Inventur gestartet'); break;
+    case 'invCancel': ask('Laufende Inventur verwerfen? Die gezählten Mengen gehen verloren.', () => { S.invDraft = null; }, 'Verwerfen'); break;
+    case 'invFinish': { const d = S.invDraft; const items = stockProducts().filter(p => d.counts[p.id]!==undefined && d.counts[p.id]!=='');
+      if(!items.length){ info('Noch nichts gezählt', 'Tragen Sie mindestens eine gezählte Menge ein.'); break; }
+      const diff = items.reduce((s,p)=>s+(d.counts[p.id]-(+p.stock||0))*(+p.price||0),0);
+      ask(`Inventur mit ${items.length} gezählten Artikeln abschließen? Differenz: ${eur(diff)}. Die Bestände werden auf die gezählten Mengen gesetzt.`, () => {
+        items.forEach(p => { const df = d.counts[p.id]-(+p.stock||0); if(Math.abs(df) > 1e-9) addMove('inv', p.id, Math.round(df*1000)/1000, 'Inventurdifferenz'); });
+        S.inventories.unshift({id:uid('inv'), date:new Date().toISOString(), counted:items.length, value:stockValue(), diff}); S.invDraft = null; }, 'Abschließen'); break; }
+    case 'ordCopy': { const txt = orderText(id); const pr = navigator.clipboard?.writeText(txt); const fb = () => openDialog('Bestelltext', `<textarea class="code" readonly id="ordTxt">${esc(txt)}</textarea>`, null, {cancel:'Schließen', after:()=>$('#ordTxt').select()});
+      if(pr) pr.then(()=>toast('Bestelltext kopiert'), fb); else fb(); break; }
+    case 'ordBook': { const list = lowStock().filter(p => (p.supplier||'Ohne Lieferant')===id);
+      ask(`Lieferung von ${id} mit ${list.length} Artikeln einbuchen?`, () => { list.forEach(p => { const q = +(view.order[p.id] ?? orderSuggest(p)); if(q>0) addMove('in', p.id, q, 'Lieferung laut Bestellung'); delete view.order[p.id]; }); }, 'Einbuchen'); break; }
     case 'newProd': prodDialog(); break;
     case 'editProd': prodDialog(P(id)); break;
     case 'export': exportData(); break;
-    case 'reset': ask('Alle Daten durch die Demodaten ersetzen? Ihre Änderungen gehen verloren.', () => { S = seed(); }, 'Ersetzen'); break;
+    case 'reset': ask('Alle Daten durch die Demodaten ersetzen? Ihre Änderungen und Lagerbuchungen gehen verloren. Fotos bleiben gespeichert.', () => { S = seed(); }, 'Ersetzen'); break;
   }
 });
 
@@ -1135,6 +1739,10 @@ document.addEventListener('input', e => {
   }
   if(t.id === 'portions'){ view.portions = Math.max(1, +t.value||1); $('#prodOut').innerHTML = prodHtml(C(view.card), view.portions); }
   if(t.id === 'palIn') palFilter(t.value);
+  if(t.dataset.inv){ S.invDraft.counts[t.dataset.inv] = t.value==='' ? '' : +t.value; save(); invUpdate(t.dataset.inv); }
+  if(t.dataset.step != null && t.closest('#app')){ const c = C(view.card); c.steps[+t.dataset.step].t = t.value; save(); autosize(t); }
+  if(t.classList.contains('title-in')) autosize(t);
+  if(t.dataset.gs){ S.settings.guest[t.dataset.gs] = t.value; save(); $('.guest-prev').innerHTML = guestHtml(); }
 });
 
 document.addEventListener('keydown', e => {
@@ -1146,31 +1754,41 @@ document.addEventListener('keydown', e => {
     else if(e.key === 'Enter'){ e.preventDefault(); const x = palItems[palSel]; palClose(); x && x.run(); }
     return;
   }
-  if(e.key === 'Enter' && e.target.matches('input[data-li],input[data-pp],input[data-cf]')){ e.preventDefault(); e.target.blur(); }
+  if(e.key === 'Enter' && e.target.matches('input[data-inv]')){ e.preventDefault(); const all = [...document.querySelectorAll('input[data-inv]')]; const n = all[all.indexOf(e.target)+1]; n ? (n.focus(), n.select()) : e.target.blur(); return; }
+  if(e.key === 'Enter' && e.target.matches('input[data-li],input[data-pp],input[data-cf],textarea.title-in,input[data-secname],input[data-ord]')){ e.preventDefault(); e.target.blur(); }
   if(e.key === '/' && !e.target.closest('input,textarea,select')){ e.preventDefault(); palOpen(); }
 });
 
 document.addEventListener('change', e => {
   const t = e.target, c = view.card ? C(view.card) : null;
-  if(t.dataset.cf && c){ const f = t.dataset.cf; c[f] = f==='yieldG' ? (t.value===''?'':+t.value) : t.value; save(); if(f!=='method') render(); toast('Gespeichert'); return; }
+  if(t.id === 'imgFile'){ const f = t.files[0]; if(!f) return; resizeImage(f).then(d => { pickCb && pickCb(d); pickCb = null; }, () => info('Foto nicht lesbar', 'Bitte ein JPG- oder PNG-Bild wählen.')); return; }
+  if(t.dataset.cf && c){ const f = t.dataset.cf; c[f] = f==='yieldG' ? (t.value===''?'':+t.value) : t.value; save(); render(); toast('Gespeichert'); return; }
   if(t.dataset.li != null && c){ const it = c.items[+t.dataset.li]; const f = t.dataset.lf; it[f] = f==='ref' ? t.value : (t.value===''?'':+t.value); if(f==='ref') it.net = ''; save(); render(); return; }
+  if(t.dataset.step != null && t.closest('#app')){ toast('Gespeichert'); return; }
   if(t.dataset.pp){ const p = P(t.dataset.pp); const old = +p[t.dataset.pf]; p[t.dataset.pf] = +t.value || 0; save(); render(); if(t.dataset.pf==='price' && old !== p.price) toast(`${p.name}: ${eur(old)} → ${eur(p.price)} · ${usage('p:'+p.id).length} Rezepturen neu berechnet`); return; }
   if(t.dataset.sf){ const f = t.dataset.sf; S.settings[f] = f==='name' ? t.value : (+t.value || 0); save(); toast('Gespeichert'); return; }
+  if(t.dataset.gf){ S.settings.guest[t.dataset.gf] = t.checked; save(); $('.guest-prev').innerHTML = guestHtml(); return; }
+  if(t.dataset.secname != null){ const i = +t.dataset.secname, old = S.settings.sections[i], nv = t.value.trim(); if(!nv || nv===old){ t.value = old; return; }
+    if(S.settings.sections.includes(nv)){ t.value = old; toast('Diese Kategorie gibt es schon'); return; }
+    S.settings.sections[i] = nv; S.menu.forEach(m=>{ if(m.section===old) m.section = nv; }); S.cards.forEach(x=>{ if(x.category===old) x.category = nv; }); if(view.sec===old) view.sec = nv; save(); render(); toast('Kategorie umbenannt'); return; }
+  if(t.dataset.ord){ view.order[t.dataset.ord] = Math.max(0, +t.value||0); render(); return; }
   if(t.id === 'importFile' && t.files[0]){
     const r = new FileReader();
-    r.onload = () => { try { const d = JSON.parse(r.result); if(!d.products || !d.cards || !d.menu) throw 0; S = d; save(); go('dash'); toast('Sicherung geladen'); } catch(err){ info('Laden fehlgeschlagen', 'Die Datei ist keine Sicherung dieser App. Wählen Sie eine .json-Datei, die mit „Sicherung erstellen“ gespeichert wurde.'); } };
+    r.onload = () => { try { const d = JSON.parse(r.result); if(!d.products || !d.cards || !d.menu) throw 0; if(d.images){ Object.entries(d.images).forEach(([k,v])=>imgPut(k,v)); delete d.images; } S = migrate(d); save(); go('dash'); toast('Sicherung geladen'); } catch(err){ info('Laden fehlgeschlagen', 'Die Datei ist keine Sicherung dieser App. Wählen Sie eine .json-Datei, die mit „Sicherung erstellen“ gespeichert wurde.'); } };
     r.readAsText(t.files[0]); t.value = '';
   }
 });
 
 /* ---------- Start ---------- */
-document.querySelectorAll('.nav-slot').forEach(n => n.innerHTML = navHtml());
+S = migrate(load()) || seed();
+document.querySelectorAll('.nav-slot').forEach(n => n.innerHTML = navHtml(n.closest('.bottom')));
 try { const th = localStorage.getItem(KEY+'_theme'); if(th) document.documentElement.dataset.theme = th; } catch(e){}
 themeIcon();
 matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', themeIcon);
 function fromHash(){ const h = location.hash.slice(1); if(TABS.some(t=>t[0]===h) && h !== view.tab){ view = {...view, tab:h, card:null, q:''}; render(); } }
 window.addEventListener('hashchange', fromHash);
 fromHash(); render();
+imgLoadAll().then(() => { if(Object.keys(IMG).length) render(); });
 
 </script>
 </body>
