@@ -10,7 +10,7 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Fraunces:ital,wght@0,500;0,600;1,500&family=Karla:wght@400;500;700&family=Young+Serif&family=Work+Sans:wght@400;500&family=Alegreya+SC:wght@700&family=Alegreya+Sans:wght@400;500&family=Alegreya:ital,wght@0,500;1,400&family=Big+Shoulders+Display:wght@800&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
 /* Layout: app shell. Pine sidebar (desktop) / bottom tab bar (phone); content = summary first, then cards and dense tables.
    Accent = Marille (apricot), a nod to the Wachau and to the Marillenknödel on the card. */
@@ -535,6 +535,184 @@ table.inv tr.counted td:first-child{box-shadow:inset 3px 0 0 var(--good)}
 .stepper{display:inline-flex;align-items:center;gap:2px}
 .stepper input{width:56px;text-align:center;padding:6px 4px}
 
+/* ===== Saisonkarten: Typo und Farben laufen über Variablen je Saison ===== */
+.g-paper{font-family:var(--gfb,"Figtree",sans-serif);position:relative;overflow:hidden}
+.g-paper .g-title,.g-paper .g-n{font-family:var(--gfd)}
+.g-paper .g-d{font-family:var(--gfd)}
+.g-paper .g-sub,.g-paper .g-h,.g-paper .g-p,.g-paper .g-top,.g-paper .g-mark-logo,.g-paper .g-foot{font-family:var(--gfb)}
+.g-paper .g-row .lead{border-bottom-color:var(--gr,currentColor);opacity:1}
+.g-paper .g-ph{border-color:var(--gr)}
+.g-paper .g-h::before,.g-paper .g-h::after{background:var(--gr);opacity:1}
+.g-paper .g-foot{border-top-color:var(--gr)}
+.g-paper .g-p .cur{opacity:0;font-size:0}
+.g-orn{width:28px;height:28px;fill:none;stroke:var(--ga);stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;display:block;margin:0 auto 12px}
+.g-orn.top{width:34px;height:34px;margin-bottom:16px}
+.g-foot .g-orn{margin:0 auto 12px;opacity:.8}
+.g-h-orn{display:none;width:20px;height:20px;fill:none;stroke:var(--ga);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.g-cover{display:block;width:calc(100% + 2*clamp(20px,6vw,68px));max-width:none;margin:calc(-1*clamp(28px,6vw,64px)) calc(-1*clamp(20px,6vw,68px)) clamp(24px,4vw,36px);aspect-ratio:16/6;object-fit:cover}
+.g-days{font-weight:inherit;font-style:normal;color:var(--ga)}
+.g-stand{font-size:11px;opacity:.7;margin-top:6px!important}
+.g-paper.g-modern .g-d{font-family:var(--gfb)}
+.g-paper.g-modern .g-title{font-family:var(--gfd)}
+
+/* Pulverschnee (Winter) */
+.g-th-winter .g-title{font-weight:600}
+.g-th-winter .g-title{font-style:italic;font-weight:500}
+.g-th-winter .g-h{font:700 12px var(--gfb);letter-spacing:.3em;color:var(--ga)}
+.g-th-winter .g-n{font-weight:600;font-size:21px}
+.g-th-winter .g-p{font-weight:700;font-variant-numeric:tabular-nums;color:var(--gi)}
+.g-th-winter .g-d{font-style:italic;font-weight:400;font-size:16px}
+/* Bärlauch (Frühling) */
+.g-th-fruehling .g-title{font-style:normal;font-weight:400}
+.g-th-fruehling .g-h{flex-wrap:wrap;justify-content:flex-start;gap:10px;font:400 26px/1.1 var(--gfd);letter-spacing:0;text-transform:none;color:var(--ga)}
+.g-th-fruehling .g-h::before{display:none}
+.g-th-fruehling .g-h::after{flex:0 0 100%;max-width:40px;height:1px;background:var(--ga);margin-top:2px}
+.g-th-fruehling .g-h-orn{display:block}
+.g-th-fruehling .g-row .lead{border-bottom-style:solid;border-bottom-width:1px;transform:translateY(-6px)}
+.g-th-fruehling .g-p{color:var(--ga);font-weight:600}
+.g-th-fruehling .g-n{font-weight:400;font-size:20px}
+.g-th-fruehling .g-d{font-family:var(--gfb);font-style:normal;font-size:14px}
+/* Almrausch (Sommer) */
+.g-th-sommer .g-title{font-weight:800}
+.g-th-sommer .g-h{justify-content:flex-start;font:800 15px var(--gfd);letter-spacing:.12em;color:var(--gi)}
+.g-th-sommer .g-h::before,.g-th-sommer .g-h::after{display:none}
+.g-th-sommer .g-h span{box-shadow:inset 0 -6px 0 var(--ga);padding:0 2px}
+.g-th-sommer .g-p{font-weight:500;color:var(--gi)}
+.g-th-sommer.g-modern .g-item{border-color:var(--gr)}
+.g-th-sommer.g-modern .g-item.is-top{border-color:var(--ga);box-shadow:inset 0 3px 0 var(--ga)}
+/* Lärchengold (Herbst) */
+.g-th-herbst .g-title{font-style:normal;font-weight:700;letter-spacing:.02em}
+.g-th-herbst .g-h{position:relative;justify-content:flex-start;gap:10px;font:700 18px var(--gfd);letter-spacing:.08em;text-transform:none;color:var(--gi);border-top:1px solid var(--gr);padding-top:9px}
+.g-th-herbst .g-h::before{content:"";position:absolute;left:0;right:0;top:2px;height:3px;flex:none;background:var(--gr)}
+.g-th-herbst .g-h::after{display:none}
+.g-th-herbst .g-h-orn{display:block}
+.g-th-herbst .g-n{font-family:"Alegreya",Georgia,serif;font-weight:500;font-size:20px;font-variant:small-caps;font-feature-settings:normal}
+.g-th-herbst .g-d{font-family:"Alegreya",Georgia,serif;font-style:italic}
+.g-th-herbst .g-p{color:var(--ga);font-weight:500;font-variant-numeric:oldstyle-nums}
+.g-th-herbst .g-p .cur{opacity:.6;font-size:inherit}
+
+/* ===== Aktionen: Einleger (Tagesblatt) ===== */
+.g-special{--sy:#f2c14e;margin:0 0 clamp(26px,5vw,38px);padding:22px 24px;border-radius:4px;background:var(--gi);color:var(--gp);break-inside:avoid}
+.g-sp-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px;margin-bottom:14px}
+.g-sp-title{margin:0;font:800 26px/1 "Big Shoulders Display",var(--gfb);text-transform:uppercase;letter-spacing:.06em;color:var(--sy)}
+.g-sp-date{font:600 12px var(--gfb);text-transform:uppercase;letter-spacing:.08em;opacity:.85}
+.g-sp-note{flex-basis:100%;margin:0;font:italic 400 15px var(--gfd);opacity:.8}
+.g-sp-list{display:flex;flex-direction:column;gap:12px}
+.g-special .g-item{flex-direction:row;border:0;border-radius:0;text-align:left;align-items:flex-start}
+.g-special .g-txt{padding:0}
+.g-special .g-row{justify-content:flex-start}
+.g-special .g-row .lead{display:block;border-bottom:1px dotted currentColor;opacity:.35;transform:translateY(-5px)}
+.g-special .g-n{color:inherit}
+.g-special .g-p{color:var(--sy);border:1px solid var(--sy);border-radius:999px;padding:2px 9px;font-weight:600}
+.g-special .g-p .cur{opacity:0;font-size:0}
+.g-special .g-d,.g-special .g-a{color:inherit;opacity:.75}
+.g-special .g-mark,.g-special .g-days{color:var(--sy)}
+.g-sp-saison{background:transparent;color:var(--gi);border:1.5px solid var(--ga);--sy:var(--ga)}
+.g-sp-festlich{--sy:#d8b45a;background:#1d1a16;color:#f3ead8;outline:1px solid #d8b45a;outline-offset:-6px}
+.g-sp-festlich .g-sp-title{font:italic 500 32px/1 "Cormorant Garamond",Georgia,serif;text-transform:none;letter-spacing:0}
+.g-special.is-page{background:transparent;color:inherit;outline:0;border:0;padding:0}
+.g-tk .g-sp-title{font-size:clamp(34px,6vw,52px);text-align:center;flex-basis:100%}
+.g-tk-festlich .g-sp-title{font-size:clamp(40px,7vw,60px)}
+.g-tk .g-sp-date{flex-basis:100%;text-align:center}
+.g-tk .g-sp-note{text-align:center}
+.g-tk .g-sp-list{gap:18px;margin-top:10px}
+.g-tk .g-n{font-size:21px}
+.g-tk{max-width:620px}
+.tk-label{max-width:860px;margin:28px auto 10px;font:600 12px var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.g-closed{display:flex;gap:10px;align-items:center;max-width:860px;margin:0 auto 12px;padding:10px 14px;border-radius:12px;background:var(--warn-bg);color:var(--warn);font-weight:600;font-size:14px}
+
+/* ===== Werkzeuge Gästekarte ===== */
+@media (min-width:1001px){.guest-wrap{grid-template-columns:330px minmax(0,1fr)}}
+.guest-tools{gap:14px;max-height:calc(100vh - 32px);overflow:auto;padding-bottom:4px}
+.guest-tools .panel{display:flex;flex-direction:column;gap:12px}
+.guest-tools .panel-h{margin-bottom:0}
+.sm-link{font-size:13px;font-family:var(--f-body)}
+.chips-row.tight{padding-bottom:2px;margin-bottom:0}
+.chip.sm,.chips-row.tight .chip{padding:4px 10px;font-size:12.5px}
+.fields.two{grid-template-columns:1fr 1fr}
+.presets{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sw-preset{display:flex;align-items:center;gap:4px;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:6px 8px;cursor:pointer;font-size:12.5px;font-weight:600;text-align:left}
+.sw-preset i{width:14px;height:14px;border-radius:50%;border:1px solid rgba(0,0,0,.12);flex:none}
+.sw-preset span{margin-left:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sw-preset.on{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 25%,transparent)}
+.colors{display:flex;gap:10px;flex-wrap:wrap}
+.clr{display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}
+.clr input{width:34px;height:34px;padding:2px;border-radius:10px;cursor:pointer}
+.orns{display:flex;flex-wrap:wrap;gap:6px}
+.orn-b{width:40px;height:40px;border:1px solid var(--line);background:var(--surface);border-radius:10px;display:grid;place-items:center;cursor:pointer;color:var(--fg)}
+.orn-b.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.warn-box,.ok-box{display:flex;gap:10px;align-items:flex-start;border-radius:12px;padding:10px 12px;font-size:13px}
+.warn-box{background:var(--bad-bg);color:var(--bad)}
+.warn-box span{flex:1;color:var(--fg)}
+.warn-box .ico{color:var(--bad)}
+.ok-box{background:var(--good-bg);color:var(--good);font-weight:600}
+.seg small{font-family:var(--f-body)!important}
+
+/* ===== Saison & Aktionen ===== */
+.tl-wrap{overflow-x:auto}
+.tline{position:relative;min-width:720px;padding-bottom:6px}
+.tl-months{display:grid;grid-template-columns:repeat(12,1fr);font:600 11.5px var(--f-body);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.tl-months span{border-left:1px solid var(--line);padding:0 0 6px 6px}
+.tl-track{position:relative;height:46px;background:var(--surface-2);border-radius:12px;margin-top:2px}
+.tl-bar{position:absolute;top:6px;bottom:6px;border:0;border-radius:8px;background:var(--p);color:var(--c);box-shadow:inset 0 0 0 2px var(--c);cursor:pointer;font:700 12.5px var(--f-body);overflow:hidden;white-space:nowrap;padding:0 8px;text-align:left;transition:transform .15s}
+.tl-bar:hover{transform:translateY(-2px)}
+.tl-today{position:absolute;top:-6px;bottom:-6px;width:2px;background:var(--fg);border-radius:2px}
+.tl-today::after{content:"Heute";position:absolute;top:-16px;left:50%;transform:translateX(-50%);font:700 10px var(--f-body);text-transform:uppercase;letter-spacing:.06em}
+.tl-pins{position:relative;height:64px}
+.tl-pin{position:absolute;top:6px;transform:translateX(-6px);border:0;background:none;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:4px;max-width:120px}
+.tl-pin i{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--surface)}
+.tl-pin.past i{background:var(--muted)}
+.tl-pin.live i{background:var(--good);box-shadow:0 0 0 3px var(--surface),0 0 0 6px color-mix(in srgb,var(--good) 30%,transparent)}
+.tl-pin span{font-size:11.5px;font-weight:600;line-height:1.2;text-align:left;color:var(--fg)}
+.tl-pin:nth-child(even){top:34px}
+.plan-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:18px;align-items:start;margin-top:4px}
+@media (max-width:1100px){.plan-grid{grid-template-columns:minmax(0,1fr)}}
+.sp-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.sp-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;min-width:0}
+.sp-card.live{border-color:var(--good)}
+.sp-card.past{opacity:.65}
+.sp-card h3{margin:0;font:700 17px/1.2 var(--f-display)}
+.sp-card p{margin:0}
+.sp-top{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.sp-st{font:700 11px var(--f-body);text-transform:uppercase;letter-spacing:.06em;padding:4px 8px;border-radius:999px}
+.sp-st.live{background:var(--good);color:var(--surface)} .sp-st.soon{background:var(--accent-soft);color:var(--accent)} .sp-st.past{background:var(--surface-2);color:var(--muted)}
+.sp-items{list-style:none;margin:0;padding:0;font-size:13.5px}
+.sp-items li{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-top:1px dashed var(--line)}
+.sp-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:auto}
+.sp-foot .icon-btn{width:30px;height:30px}
+.pad-x{padding-left:18px;padding-right:18px} .pad-b{padding-bottom:16px}
+table.matrix{min-width:560px}
+table.matrix .c{text-align:center;width:84px}
+.sdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.chk{display:inline-grid;place-items:center;cursor:pointer}
+.chk input{position:absolute;opacity:0;pointer-events:none}
+.chk span{width:22px;height:22px;border-radius:7px;border:1.5px solid var(--line);background:var(--surface);display:grid;place-items:center;transition:background .12s,border-color .12s}
+.chk input:checked + span{background:var(--accent);border-color:var(--accent)}
+.chk input:checked + span::after{content:"";width:10px;height:6px;border:2px solid var(--accent-fg);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.chk input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+/* Aktion-Dialog */
+#spRows{display:flex;flex-direction:column;gap:10px}
+.sp-row{display:grid;grid-template-columns:minmax(0,1fr) 90px 34px;gap:6px;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+.sp-row .wide{grid-column:1/-1}
+.sp-row select{grid-column:span 1}
+.sp-row select:last-of-type{grid-column:2/-1}
+.sm-sel{padding:6px 10px;font-size:13px;max-width:240px}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.days .algc span{justify-content:center;padding:7px 4px}
+.algs.seasons{grid-template-columns:repeat(4,1fr)}
+.algs.seasons .algc span{justify-content:center}
+details.alg-det summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted);padding:4px 0}
+details.alg-det[open] summary{margin-bottom:8px}
+.seg{max-width:100%;overflow-x:auto;scrollbar-width:none}.seg button{flex:none;white-space:nowrap}.seg::-webkit-scrollbar{display:none}
+.chk,.tog{position:relative}
+.f input,.f select,.f textarea{width:100%;min-width:0}
+.plan-grid .tbl-wrap{max-height:min(640px,70vh);overflow:auto}
+table.matrix thead th{position:sticky;top:0;z-index:1}
+.warn-box{flex-wrap:wrap}
+.warn-box span{flex:1 1 180px}
+
+.dish-main:focus-visible,.rc:focus-visible{outline-offset:-3px}
+.title-in{hyphens:auto;-webkit-hyphens:auto}
 #print{display:none}
 @media print{
   body > *:not(#print){display:none!important}
@@ -592,16 +770,16 @@ function seedBase(){
   // [id, Name, Einheit, Preis € je Einheit exkl. MwSt., Putzverlust %, Garverlust %, Allergene, Gewicht 1 Stk g]
   const prods = [
     ['pork','Schweinerücken','kg',9.5,5,15,''],
-    ['veal','Kalbsoberschale','kg',32,8,15,''],
-    ['beef_goulash','Rindswadschinken (Gulasch)','kg',14,8,35,''],
-    ['beef_mince','Rinderfaschiertes','kg',13,0,25,''],
-    ['speck','Tiroler Speck','kg',16,3,20,''],
+    ['veal','Kalbsoberschale','kg',32,11,15,''],
+    ['beef_goulash','Rindswadschinken (Gulasch)','kg',14,11,35,''],
+    ['beef_mince','Rindsfaschiertes','kg',13,0,20,''],
+    ['speck','Tiroler Speck g.g.A.','kg',19.5,5,20,''],
     ['flour','Mehl glatt','kg',0.9,0,0,'A'],
-    ['egg','Ei M','Stk',0.28,12,0,'C',55],
+    ['egg','Ei M','Stk',0.28,12,0,'C',60],
     ['quail','Wachtelei','Stk',0.35,12,0,'C',10],
     ['crumbs','Semmelbrösel','kg',2.5,0,0,'A'],
-    ['schmalz','Butterschmalz','kg',9,0,0,'G'],
-    ['fries','Pommes frites TK','kg',2.2,0,10,''],
+    ['schmalz','Butterschmalz','kg',11,0,0,'G'],
+    ['fries','Pommes frites TK','kg',2.2,0,20,''],
     ['lemon','Zitrone','Stk',0.35,0,0,'',110],
     ['cranberry','Preiselbeeren','kg',7,0,0,''],
     ['parsley','Petersilie','kg',12,30,0,''],
@@ -610,15 +788,15 @@ function seedBase(){
     ['butter','Butter','kg',8.5,0,0,'G'],
     ['cremefr','Crème fraîche','kg',6,0,0,'G'],
     ['parmesan','Parmesan','kg',22,0,0,'G'],
-    ['bergkase','Zillertaler Bergkäse','kg',18,3,0,'G'],
+    ['bergkase','Zillertaler Bergkäse','kg',18,8,0,'G'],
     ['emmental','Emmentaler','kg',12,3,0,'G'],
     ['cheddar','Cheddar','kg',14,0,0,'G'],
     ['sugar','Kristallzucker','kg',1.0,0,0,''],
     ['icing','Staubzucker','kg',1.6,0,0,''],
-    ['raisins','Rosinen','kg',6,0,0,''],
+    ['raisins','Rosinen (geschwefelt)','kg',6,0,0,'O'],
     ['applesauce','Apfelmus','kg',3,0,0,''],
     ['blueberry','Heidelbeeren TK','kg',9,0,0,''],
-    ['apples','Äpfel','kg',2.2,20,0,''],
+    ['apples','Äpfel','kg',1.8,28,0,''],
     ['strudel_dough','Strudelteig','kg',6,0,0,'A'],
     ['cinnamon','Zimt gemahlen','kg',20,0,0,''],
     ['onion','Zwiebel','kg',1.2,12,0,''],
@@ -637,10 +815,10 @@ function seedBase(){
     ['chutney','Tomatenchutney','kg',7,0,0,'O'],
     ['bread','Weißbrot / Baguette','kg',3.5,0,0,'A'],
     ['brioche','Brioche-Bun','Stk',0.85,0,0,'A C G',80],
-    ['wine','Weißwein trocken','l',6,0,0,'O'],
+    ['wine','Kochwein weiß, trocken','l',4,0,0,'O'],
     ['kirsch','Kirschwasser','l',25,0,0,''],
     ['starch','Maisstärke','kg',3,0,0,''],
-    ['oil','Rapsöl','l',2.8,0,0,''],
+    ['oil','Rapsöl','l',2.2,0,0,''],
     ['paprika','Paprikapulver edelsüß','kg',18,0,0,''],
     ['caraway','Kümmel','kg',15,0,0,''],
     ['salt','Salz','kg',0.5,0,0,''],
@@ -655,12 +833,12 @@ function seedBase(){
       [['flour',1000],['water',600],['oil',80],['salt',20]],
       'Mehl, Salz, Wasser und Öl 8 Min. glatt kneten. 30 Min. abgedeckt bei +4 °C rasten lassen. In Portionen zu 200 g teilen. Haltbarkeit 48 h bei +2 bis +4 °C.'],
     ['semi_goulash','Gulaschsuppe, Basis (Charge)','semi','Basisrezepte',8000,
-      [['beef_goulash',2000],['onion',1500],['oil',100],['paprika',60],['tomato_paste',80],['garlic',40],['caraway',10],['potato',1500],['water',4000],['salt',40],['pepper',5]],
+      [['beef_goulash',2000],['onion',1500],['oil',100],['paprika',80],['tomato_paste',80],['garlic',40],['caraway',10],['potato',1500],['water',4000],['salt',40],['pepper',5]],
       'Zwiebeln goldbraun rösten. Vom Herd nehmen, Paprikapulver und Tomatenmark einrühren, sofort mit etwas Wasser ablöschen. Rindfleisch in 1,5-cm-Würfeln, Kümmel und Knoblauch zugeben, 1,5 h schmoren. Kartoffelwürfel und restliches Wasser zugeben, 25 Min. köcheln. Salzen. Schockkühlen. Haltbarkeit 72 h.'],
     ['semi_caesar','Caesar-Dressing','semi','Basisrezepte',600,
       [['egg',3],['parmesan',80],['garlic',15],['lemon',1],['mustard',20],['oil',400],['salt',5],['pepper',2]],
-      'Eigelb mit Senf, Knoblauch und Zitronensaft mixen. Öl in dünnem Strahl zur Emulsion einarbeiten. Geriebenen Parmesan, Salz und Pfeffer zugeben. Haltbarkeit 48 h bei +2 bis +4 °C.'],
-    ['semi_strudel','Apfelstrudel, Blech für 12 Portionen','semi','Basisrezepte',3600,
+      'Pasteurisiertes Eigelb mit Senf, Knoblauch und Zitronensaft mixen. Öl in dünnem Strahl zur Emulsion einarbeiten. Geriebenen Parmesan, Salz und Pfeffer zugeben. Haltbarkeit 24 h bei +2 bis +4 °C.'],
+    ['semi_strudel','Apfelstrudel, Blech für 16 Portionen','semi','Basisrezepte',3000,
       [['strudel_dough',500],['apples',3000],['sugar',300],['cinnamon',10],['raisins',150],['crumbs',150],['butter',250]],
       'Äpfel schälen, blättrig schneiden, mit Zucker, Zimt und Rosinen mischen. Teig mit flüssiger Butter bestreichen, mit gerösteten Bröseln bestreuen, Fülle auflegen und einrollen. 40 Min. bei 180 °C backen, dabei mit Butter bestreichen.'],
     ['semi_blueberry','Heidelbeerkompott','semi','Basisrezepte',900,
@@ -668,31 +846,31 @@ function seedBase(){
       'Heidelbeeren mit Zucker und Wasser aufkochen. Mit in kaltem Wasser angerührter Stärke binden. Auskühlen lassen.'],
 
     ['dish_schnitzel_pork','Wiener Schnitzel vom Schwein mit Pommes','dish','Fondue & Hauptspeisen',470,
-      [['pork',180],['flour',20],['egg',1],['crumbs',50],['schmalz',40],['fries',200],['lemon',0.25],['cranberry',30],['parsley',3],['salt',2]],
+      [['pork',180],['flour',12],['egg',0.35],['crumbs',35],['schmalz',40],['fries',200],['lemon',0.25],['cranberry',30],['parsley',3],['salt',2]],
       'Fleisch auf 4 mm klopfen, salzen. In Mehl, Ei und Bröseln panieren, Panier nicht andrücken. In Butterschmalz bei 170 °C schwimmend herausbacken, Pfanne schwenken, damit die Panier souffliert, je Seite 2–3 Min. Anrichten mit Pommes, Zitronenspalte, Preiselbeeren und Petersilie.'],
     ['dish_schnitzel_veal','Wiener Schnitzel vom Kalb mit Pommes','dish','Fondue & Hauptspeisen',460,
-      [['veal',170],['flour',20],['egg',1],['crumbs',50],['schmalz',40],['fries',200],['lemon',0.25],['cranberry',30],['parsley',3],['salt',2]],
+      [['veal',170],['flour',12],['egg',0.35],['crumbs',35],['schmalz',40],['fries',200],['lemon',0.25],['cranberry',30],['parsley',3],['salt',2]],
       'Wie Schweinsschnitzel. Kalbfleisch vorsichtig zwischen Folie auf 4 mm klopfen.'],
     ['dish_fondue','Zillertaler Käsefondue (pro Person)','dish','Fondue & Hauptspeisen',700,
-      [['bergkase',120],['emmental',80],['wine',100],['starch',8],['kirsch',10],['garlic',3],['bread',150],['potato',200],['pickles',80]],
+      [['bergkase',120],['emmental',80],['wine',100],['starch',8],['kirsch',20],['garlic',3],['bread',150],['potato',200],['pickles',80]],
       'Caquelon mit Knoblauch ausreiben. Wein aufkochen, geriebenen Käse unter Rühren in Achterform schmelzen. Stärke im Kirschwasser anrühren, einrühren und glatt erhitzen. Auf dem Rechaud servieren mit Brotwürfeln, Kartoffeln in der Schale und Mixed Pickles.'],
     ['dish_kaiser','Kaiserschmarrn mit Apfelmus und Heidelbeerkompott','dish','Desserts',480,
       [['flour',120],['milk',250],['egg',3],['sugar',25],['butter',30],['raisins',20],['icing',10],['applesauce',80],['semi_blueberry',60],['salt',1]],
       'Dotter mit Milch und Mehl glatt rühren, Eiklar mit Zucker und einer Prise Salz steif schlagen, unterheben. In die Pfanne mit geschmolzener Butter gießen, Rosinen darüberstreuen, unten anbacken. 6 Min. bei 180 °C im Rohr fertig backen. Mit zwei Spateln zerreißen, mit Staubzucker karamellisieren. Mit Apfelmus und Kompott servieren.'],
     ['dish_elsasser','Flammkuchen „Der Elsässer“','dish','Flammkuchen',380,
-      [['semi_flammdough',200],['cremefr',80],['speck',60],['onion',50],['spring',15],['salt',1],['pepper',0.5]],
+      [['semi_flammdough',150],['cremefr',80],['speck',60],['onion',50],['spring',15],['salt',1],['pepper',0.5]],
       'Teig dünn (2 mm) ausrollen, mit Crème fraîche bestreichen, salzen, pfeffern. Zwiebelringe und Speckstreifen verteilen. 6–8 Min. bei 300 °C backen. Mit Frühlingszwiebel bestreuen.'],
     ['dish_goulash','Gulaschsuppe mit Brot','dish','Suppen',360,
       [['semi_goulash',300],['bread',60]],
-      'Portion Basis auf 85 °C erhitzen. Im tiefen Teller anrichten, Brot extra.'],
+      'Portion Basis auf Kerntemperatur mindestens 75 °C regenerieren. Im tiefen Teller anrichten, Brot extra.'],
     ['dish_tomato','Fruchtige Tomatensuppe mit Crème fraîche und Pesto','dish','Suppen',330,
       [['passata',250],['onion',30],['oil',10],['sugar',5],['cream',30],['cremefr',20],['pesto',10],['salt',2]],
       'Zwiebel in Öl anschwitzen, Passata und Zucker zugeben, 15 Min. köcheln. Obers zugeben, pürieren, salzen. Mit einem Löffel Crème fraîche und Pestotupfen servieren.'],
     ['dish_caesar','Caesar Salat','dish','Salate & Bowls',300,
       [['romaine',150],['semi_caesar',50],['parmesan',15],['capers',10],['quail',3],['bread',40],['butter',10],['garlic',3]],
       'Brotwürfel in Butter mit Knoblauch rösten. Römersalat zupfen, mit Dressing marinieren. Anrichten, Croûtons, Kapern, halbierte Wachteleier und Parmesanspäne darauf.'],
-    ['dish_strudel','Oma Lisl’s Apfelstrudel','dish','Desserts',305,
-      [['semi_strudel',300],['icing',5]],
+    ['dish_strudel','Oma Lisl’s Apfelstrudel','dish','Desserts',185,
+      [['semi_strudel',180],['icing',5]],
       'Portion 5 Min. bei 160 °C erwärmen, mit Staubzucker bestreuen.'],
     ['dish_burger','Wadel-Beißer-Burger','dish','Burger & Kebap',380,
       [['beef_mince',200],['brioche',1],['speck',30],['cheddar',30],['bbq',30],['red_onion',30],['romaine',20],['chutney',30],['salt',2],['pepper',0.5]],
@@ -808,7 +986,7 @@ function line(it, depth){
   } else {
     const c = r.o; res.name = 'BR · ' + c.name; res.grossG = q;
     const t = totals(c, depth+1);
-    res.cost = c.yieldG ? q * t.cost / c.yieldG : 0;
+    { const y = +c.yieldG || t.out; res.cost = y ? q * t.cost / y : 0; }
     res.netAuto = q; res.net = it.net !== '' && it.net != null ? +it.net : q; res.out = res.net;
     t.alg.forEach(a => res.alg.add(a));
   }
@@ -876,11 +1054,18 @@ function seed(){
   ];
   d.inventories = [{id:uid('inv'), date:daysAgo(31), counted:54, value:2386.40, diff:-42.30, demo:true}];
   d.invDraft = null;
+  seasonSeed(d);
   return d;
 }
 
 function migrate(d){
-  if(!d) return null;
+  if(!d || typeof d !== 'object') return null;
+  if(!Array.isArray(d.products) || !Array.isArray(d.cards) || !Array.isArray(d.menu)) return null;
+  d.settings = Object.assign({name:'Mein Betrieb', vat:10, target:28, nextNo:d.cards.length+1}, d.settings||{});
+  if(!(+d.settings.target >= 1)) d.settings.target = 28; if(!(+d.settings.vat >= 0)) d.settings.vat = 10;
+  d.products = d.products.filter(p=>p && p.id); d.products.forEach(p=>{ p.name = p.name||p.id; p.unit = ['kg','l','Stk'].includes(p.unit)?p.unit:'kg'; p.price = +p.price||0; p.alg = p.alg||''; });
+  d.cards = d.cards.filter(c=>c && c.id); d.cards.forEach(c=>{ c.name = c.name||'Rezeptur'; c.type = c.type==='semi'?'semi':'dish'; if(!Array.isArray(c.items)) c.items = []; c.items = c.items.filter(i=>i && typeof i==='object'); if(c.steps && !Array.isArray(c.steps)) c.steps = []; });
+  d.menu = d.menu.filter(m=>m && m.id); d.menu.forEach(m=>{ m.name = m.name||'Gericht'; m.section = m.section||'Ohne Kategorie'; m.price = +m.price||0; m.desc = m.desc||''; });
   d.products.forEach(p => { if(p.stock==null){ const s = d.demo && DEMO_STOCK[p.id]; [p.stock,p.minStock,p.loc,p.supplier] = s || [0,0,'L','']; } if(p.id==='water') p.noStock = true; });
   d.cards.forEach(c => { if(!c.steps){ c.steps = splitSteps(c.method); delete c.method; } if(c.img==null) c.img=''; });
   const order = {};
@@ -888,6 +1073,7 @@ function migrate(d){
   if(!d.settings.sections) d.settings.sections = [...SECTION_ORDER];
   if(!d.settings.guest) d.settings.guest = {style:'alpin', photos:true, allergens:true, desc:true, title:'Speisekarte', subtitle:'', footer:'Alle Preise in Euro inkl. MwSt.'};
   d.moves = d.moves || []; d.inventories = d.inventories || []; if(d.invDraft===undefined) d.invDraft = null;
+  seasonMigrate(d);
   return d;
 }
 
@@ -927,7 +1113,7 @@ function explode(c, f, acc=new Map(), d=0){
   if(!c || d > 6) return acc;
   for(const it of c.items){ const r = refObj(it.ref); if(!r) continue; const q = (+it.qty||0)*f;
     if(r.t==='p'){ if(r.o.noStock) continue; acc.set(r.o.id, (acc.get(r.o.id)||0) + (r.o.unit==='Stk' ? q : q/1000)); }
-    else if(r.o.yieldG) explode(r.o, q/r.o.yieldG, acc, d+1); }
+    else { const y = +r.o.yieldG || totals(r.o).out; if(y) explode(r.o, q/y, acc, d+1); } }
   return acc;
 }
 function orderSuggest(p){ const min = +p.minStock||0, s = +p.stock||0; let q = Math.max(0, min*2 - s); if(p.unit==='Stk') return Math.ceil(q); return Math.ceil(q*2)/2; }
@@ -998,7 +1184,14 @@ function render(){
   app.innerHTML = fn ? fn() : (view.card && C(view.card) ? renderCard(C(view.card)) : renderCards());
   app.classList.remove('enter'); void app.offsetWidth; app.classList.add('enter');
   autosize();
+  pendingRender = false;
+  if(kbdSel){ const el = document.querySelector(kbdSel); kbdSel = null; if(el) el.focus({preventScroll:true}); }
 }
+let kbdSel = null, ptrDown = false, pendingRender = false;
+function softRender(){ if(ptrDown){ pendingRender = true; return; } setTimeout(() => { const id = document.activeElement && document.activeElement.id; render(); if(id){ const n = document.getElementById(id); if(n) n.focus({preventScroll:true}); } }, 0); }
+document.addEventListener('pointerdown', () => { ptrDown = true; }, true);
+document.addEventListener('pointerup', () => { ptrDown = false; if(pendingRender) setTimeout(() => { if(pendingRender){ pendingRender = false; render(); } }, 0); }, true);
+document.addEventListener('click', e => { const b = e.target.closest('[data-act][data-id],[data-act]'); if(b && e.detail === 0 && b.closest('#app')) kbdSel = `[data-act="${b.dataset.act}"]` + (b.dataset.id!=null ? `[data-id="${CSS.escape(b.dataset.id)}"]` : ''); }, true);
 function autosize(el){ (el ? [el] : document.querySelectorAll('#app .title-in, #app [data-step]')).forEach(t => { if(t.tagName!=='TEXTAREA') return; t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }); }
 function navHtml(short){ return TABS.map(([k,l,s])=>`<button type="button" class="nav-i" data-tab="${k}">${ico(k)}<span>${short?s:l}</span></button>`).join(''); }
 
@@ -1045,6 +1238,8 @@ function renderDash(){
         <div class="panel-h"><h2>Zu erledigen</h2></div>
         <ul class="todo">
           <li><button type="button" data-act="goStock" data-id="bestellung"><b class="${low.length?'bad-t':''}">${low.length}</b><span>Artikel nachbestellen</span>${ico('arrow','flip')}</button></li>
+          ${(() => { const nx = S.specials.filter(sp=>spStatus(sp)[0]!=='past').sort((a,b)=>a.from.localeCompare(b.from))[0]; return nx ? `<li><button type="button" data-act="previewSpecial" data-id="${nx.id}"><b>${ico('star')}</b><span>${esc(nx.name)} · ${spStatus(nx)[1]}</span>${ico('arrow','flip')}</button></li>` : ''; })()}
+          <li><button type="button" data-act="goMenu" data-id="noalg"><b class="${S.menu.some(m=>!hasAlg(m))?'bad-t':''}">${S.menu.filter(m=>!hasAlg(m)).length}</b><span>Gerichte ohne Allergenangabe</span>${ico('arrow','flip')}</button></li>
           <li><button type="button" data-act="goMenu" data-id="none"><b>${S.menu.length-linked.length}</b><span>Gerichte ohne Rezeptur</span>${ico('arrow','flip')}</button></li>
           <li><button type="button" data-act="goMenu" data-id="over"><b class="${over.length?'bad-t':''}">${over.length}</b><span>Gerichte über ${num(tg)} % Wareneinsatz</span>${ico('arrow','flip')}</button></li>
           <li><button type="button" data-act="goStock" data-id="inventur"><b>${S.invDraft?'…':ico('clip')}</b><span>${S.invDraft?'Laufende Inventur fortsetzen':'Inventur durchführen'}</span>${ico('arrow','flip')}</button></li>
@@ -1074,12 +1269,12 @@ function renderMenuCalc(){
   const q = view.q.trim().toLowerCase();
   const all = menuSorted().map(m => ({m, k:menuCalc(m)}));
   const f = view.sec;
-  const shown = all.filter(({m,k}) => (!q || (m.name+' '+m.desc+' '+m.section).toLowerCase().includes(q))
-    && (f==='all' || (f==='none' ? k.cost==null : f==='over' ? (k.fc!=null && k.fc > S.settings.target) : f==='nophoto' ? !menuImg(m) : m.section===f)));
+  const shown = all.filter(({m,k}) => (!q || (m.name+' '+m.desc+' '+m.section+' '+(k.t?k.t.lines.map(l=>l.name).join(' '):'')).toLowerCase().includes(q))
+    && (f==='all' || (f==='none' ? k.cost==null : f==='over' ? (k.fc!=null && k.fc > S.settings.target) : f==='nophoto' ? !menuImg(m) : f==='noalg' ? !hasAlg(m) : SEASONS.some(x=>x[0]===f) ? m.seasons.includes(f) : m.section===f)));
   const cnt = x => all.filter(x).length;
   const chip = (k,l,n,dot) => `<button type="button" class="chip ${f===k?'on':''}" data-act="sec" data-id="${esc(k)}">${dot||''}${esc(l)}<small>${n}</small></button>`;
   let h = `<div class="toolbar"><label class="search">${ico('search')}<input id="mq" type="search" placeholder="Gericht, Zutat oder Kategorie" value="${esc(view.q)}" autocomplete="off"></label></div>
-  <div class="chips-row">${chip('all','Alle',all.length)}${chip('over','Über Ziel',cnt(x=>x.k.fc!=null&&x.k.fc>S.settings.target))}${chip('none','Ohne Rezeptur',cnt(x=>x.k.cost==null))}${chip('nophoto','Ohne Foto',cnt(x=>!menuImg(x.m)))}<span class="sep"></span>${secList().filter(s=>all.some(x=>x.m.section===s)).map(s=>chip(s,s,cnt(x=>x.m.section===s),catDot(s))).join('')}</div>`;
+  <div class="chips-row">${chip('all','Alle',all.length)}${chip('over','Über Ziel',cnt(x=>x.k.fc!=null&&x.k.fc>S.settings.target))}${chip('none','Ohne Rezeptur',cnt(x=>x.k.cost==null))}${chip('nophoto','Ohne Foto',cnt(x=>!menuImg(x.m)))}${chip('noalg','Ohne Allergene',cnt(x=>!hasAlg(x.m)))}<span class="sep"></span>${SEASONS.map(([k,l])=>chip(k,'Nur '+l,cnt(x=>x.m.seasons.includes(k)))).join('')}<span class="sep"></span>${secList().filter(s=>all.some(x=>x.m.section===s)).map(s=>chip(s,s,cnt(x=>x.m.section===s),catDot(s))).join('')}</div>`;
   if(!shown.length) return h + `<div class="panel empty">Keine Gerichte für diesen Filter.</div>`;
   for(const s of secList().filter(s=>shown.some(x=>x.m.section===s))){
     h += `<h2 class="sec-h">${catDot(s)}${esc(s)}</h2><div class="dish-grid">`;
@@ -1087,12 +1282,12 @@ function renderMenuCalc(){
       h += `<article class="dish ${k.c?'':'nocard'} ${m.hidden?'is-hidden':''}">
         <div class="dish-ph">${photo(menuImg(m), m.name, m.section)}
           <button type="button" class="ph-btn" data-act="photoMenu" data-id="${m.id}" title="Foto ${menuImg(m)?'ändern':'hinzufügen'}" aria-label="Foto ${menuImg(m)?'ändern':'hinzufügen'}">${ico('camera')}</button>
-          <span class="ph-flags">${m.top?'<span class="vb top" title="Empfehlung">★</span>':''}${vegBadge(m.veg)}${m.hidden?'<span class="vb off">ausgeblendet</span>':''}</span></div>
+          <span class="ph-flags">${m.top?'<span class="vb top" title="Empfehlung">★</span>':''}${vegBadge(m.veg)}${m.hidden?'<span class="vb off">ausgeblendet</span>':''}${m.seasons.length?`<span class="vb off">${m.seasons.map(seasonName).join(' · ')}</span>`:''}${m.days.length?`<span class="vb off">${esc(daysLabel(m))}</span>`:''}</span></div>
         <button type="button" class="dish-main" data-act="${k.c?'openCard':'newCardFor'}" data-id="${k.c?k.c.id:m.id}">
           <span class="dish-top"><span class="dish-n">${esc(m.name)}</span><span class="price">${eur(m.price)}</span></span>
           ${m.desc?`<span class="dish-d">${esc(m.desc)}</span>`:''}
           <span class="dish-b">${k.c ? `<span class="fcw">${ring(k.fc,34,4)}<span><b class="mono">${pct(k.fc)}</b><small>WE ${eur(k.cost)}</small></span></span>${chips(k.t.alg)}`
-            : `<span class="add">${ico('plus')}Rezeptur anlegen</span>`}</span>
+            : `<span class="add">${ico('plus')}Rezeptur anlegen</span>${hasAlg(m) ? chips(new Set(algList(m.alg))) : '<span class="vb warn">Allergene fehlen</span>'}`}</span>
         </button>
         <button type="button" class="icon-btn edit" title="Gericht bearbeiten" aria-label="Gericht bearbeiten" data-act="editMenu" data-id="${m.id}">${ico('edit')}</button>
       </article>`;
@@ -1157,7 +1352,7 @@ function renderLayout(){
       <span class="lay-acts"><button type="button" class="icon-btn" data-act="secMove" data-id="${si}:-1" ${si===0?'disabled':''} aria-label="Kategorie nach oben">${ico('up')}</button><button type="button" class="icon-btn" data-act="secMove" data-id="${si}:1" ${si===secs.length-1?'disabled':''} aria-label="Kategorie nach unten">${ico('down')}</button>
       <button type="button" class="icon-btn" data-act="secSort" data-id="${si}" title="Nach Preis sortieren" aria-label="Nach Preis sortieren"><span class="mono" style="font-size:12px">€↑</span></button>
       ${items.length?'':`<button type="button" class="icon-btn danger" data-act="secDel" data-id="${si}" aria-label="Kategorie löschen">${ico('trash')}</button>`}</span></div>
-    ${items.length ? `<ol class="lay-list">${items.map((m,i)=>`<li class="${m.hidden?'off':''}">${photo(menuImg(m), m.name, s, 'xs')}<span class="lay-n">${esc(m.name)}</span><span class="mono sm">${eur(m.price)}</span>
+    ${items.length ? `<ol class="lay-list">${items.map((m,i)=>`<li class="${m.hidden?'off':''}">${photo(menuImg(m), m.name, s, 'xs')}<span class="lay-n" title="${esc(m.name)}">${esc(m.name)}</span><span class="mono sm">${eur(m.price)}</span>
       <button type="button" class="icon-btn" data-act="itemMove" data-id="${m.id}:-1" ${i===0?'disabled':''} aria-label="Nach oben">${ico('up')}</button><button type="button" class="icon-btn" data-act="itemMove" data-id="${m.id}:1" ${i===items.length-1?'disabled':''} aria-label="Nach unten">${ico('down')}</button>
       <button type="button" class="icon-btn" data-act="itemHide" data-id="${m.id}" title="${m.hidden?'Auf der Gästekarte zeigen':'Auf der Gästekarte ausblenden'}" aria-label="Sichtbarkeit">${ico(m.hidden?'eyeoff':'eye')}</button></li>`).join('')}</ol>` : '<p class="hint">Leer. Ein Gericht mit dieser Kategorie erscheint hier automatisch.</p>'}
   </section>`; }).join('')}</div>`;
@@ -1291,7 +1486,7 @@ function renderCard(c){
         <input id="sim" type="range" min="${smin}" max="${smax}" step="0.1" value="${view.sim.price}" aria-label="Verkaufspreis">
         <div class="range-l"><span>${eur(smin)}</span><span>${eur(smax)}</span></div>
         <div id="simOut">${simHtml(t.cost, +view.sim.price)}</div>
-        <p class="hint">Für ${num(S.settings.target)} % Wareneinsatz: <button type="button" class="link" data-act="simTo" data-id="${rec.toFixed(1)}">${eur(rec)}</button></p>
+        <p class="hint">Für ${num(S.settings.target)} % Wareneinsatz: <button type="button" class="link" data-act="simTo" data-id="${(Math.round(rec*10)/10).toFixed(1)}">${eur(Math.round(rec*10)/10)}</button></p>
       </section>` : ''}
       <section class="panel">
         <div class="panel-h"><h2>Kostenstruktur</h2></div>
@@ -1455,7 +1650,7 @@ function renderSetup(){
     <section class="panel"><div class="panel-h"><h2>Daten</h2><span class="muted sm">${n} Fotos gespeichert</span></div>
       <p class="hint">Daten und Fotos werden nur in diesem Browser gespeichert. Erstellen Sie regelmäßig eine Sicherung und übertragen Sie sie per Import auf andere Geräte.</p>
       <div class="row-btns wrap" style="margin-top:12px"><button type="button" class="btn" data-act="export">Sicherung erstellen</button>
-        <label class="btn" for="importFile">Sicherung laden</label><input id="importFile" type="file" accept="application/json,.json" hidden>
+        <button type="button" class="btn" data-act="importPick">Sicherung laden</button><input id="importFile" type="file" accept="application/json,.json" hidden>
         <button type="button" class="btn danger" data-act="reset">Demodaten wiederherstellen</button></div>
     </section>
   </div>`;
@@ -1476,8 +1671,8 @@ function ask(text, yes, ok='Löschen'){ openDialog('Bitte bestätigen', `<p clas
 function info(title, text){ openDialog(title, `<p class="dlg-p">${esc(text)}</p>`, null, {cancel:'OK'}); }
 
 function menuDialog(m, prefill){
-  const isNew = !m; m = m || {id:uid('m'), section:'', name:'', desc:'', price:'', card:'', img:'', veg:'', top:false, hidden:false, ...(prefill||{})};
-  if(isNew && !m.section && !['all','none','over','nophoto'].includes(view.sec)) m.section = view.sec;
+  const isNew = !m; m = m || {id:uid('m'), section:'', name:'', desc:'', price:'', card:'', img:'', veg:'', top:false, hidden:false, seasons:[], days:[], alg:'', ...(prefill||{})};
+  if(isNew && !m.section && secList().includes(view.sec)) m.section = view.sec;
   let img = m.img;
   const opts = S.cards.filter(c=>c.type==='dish').sort(byName);
   const thumb = () => img && IMG[img] ? `<img src="${IMG[img]}" alt="">` : `<span class="muted sm">${m.card && C(m.card)?.img ? 'Foto der Rezeptur wird verwendet' : 'Kein Foto'}</span>`;
@@ -1495,11 +1690,14 @@ function menuDialog(m, prefill){
       <label class="tog"><input type="radio" name="veg" value="v" ${m.veg==='v'?'checked':''}><span></span>Vegetarisch</label>
       <label class="tog"><input type="radio" name="veg" value="vg" ${m.veg==='vg'?'checked':''}><span></span>Vegan</label>
     </div>
+    <div class="f">Saison</div><div class="algs seasons">${SEASONS.map(([k,l])=>`<label class="algc"><input type="checkbox" name="sea" value="${k}" ${!m.seasons.length||m.seasons.includes(k)?'checked':''}><span>${l}</span></label>`).join('')}</div>
+    <div class="f">Wochentage</div><div class="days">${DAYS.map(([i,l])=>`<label class="algc"><input type="checkbox" name="day" value="${i}" ${!m.days.length||m.days.includes(i)?'checked':''}><span>${l}</span></label>`).join('')}</div>
+    <details class="alg-det" ${!m.card && !algList(m.alg).length ? 'open' : ''}><summary>Allergene von Hand (wenn keine Rezeptur verknüpft ist)</summary><div class="algs">${Object.entries(ALG).map(([k,v])=>`<label class="algc"><input type="checkbox" name="alg" value="${k}" ${algList(m.alg).includes(k)?'checked':''}><span><b>${k}</b>${esc(v)}</span></label>`).join('')}</div></details>
     <div class="togs"><label class="tog"><input type="checkbox" name="top" ${m.top?'checked':''}><span></span>Empfehlung des Hauses</label>
       <label class="tog"><input type="checkbox" name="show" ${m.hidden?'':'checked'}><span></span>Auf der Gästekarte zeigen</label></div>`,
     fd => { const sec = fd.get('section'); if(isNew || sec !== m.section) m.order = nextOrder(sec);
       if(m.img && m.img !== img) imgDel(m.img);
-      Object.assign(m, {section:sec, name:fd.get('name').trim(), desc:fd.get('desc').trim(), price:+fd.get('price'), card:fd.get('card'), img, veg:fd.get('veg')||'', top:!!fd.get('top'), hidden:!fd.get('show')}); if(isNew) S.menu.push(m); },
+      Object.assign(m, {section:sec, name:fd.get('name').trim(), desc:fd.get('desc').trim(), price:+fd.get('price'), card:fd.get('card'), img, veg:fd.get('veg')||'', top:!!fd.get('top'), hidden:!fd.get('show'), seasons: fd.getAll('sea').length===4 ? [] : fd.getAll('sea'), days: fd.getAll('day').length===7 ? [] : fd.getAll('day').map(Number), alg: fd.getAll('alg').join(' ')}); if(isNew) S.menu.push(m); },
     {done: isNew ? ()=>`„${m.name}“ steht jetzt unter ${m.section}` : 'Gespeichert',
      del: isNew ? null : () => ask(`„${m.name}“ von der Speisekarte löschen? Die Rezeptur bleibt erhalten.`, () => { imgDel(m.img); S.menu = S.menu.filter(x=>x!==m); }),
      after: f => { const bind = () => { $('#dlgPhoto').onclick = () => pickImage(data => { const id = uid('img'); imgPut(id, data); img = id; $('#dlgThumb').innerHTML = thumb(); }); const del = $('#dlgPhotoDel'); if(del) del.onclick = () => { img = ''; $('#dlgThumb').innerHTML = thumb(); }; }; bind(); }});
@@ -1541,29 +1739,29 @@ function moveDlg(arg){
     <div class="fields">
       <label class="f">Menge in <span id="mvUnit">${p0?esc(p0.unit):'Einheit'}</span><input name="qty" type="number" step="any" min="0" required inputmode="decimal" autofocus></label>
       ${type==='in'?`<label class="f">Preis je Einheit, €<input name="price" id="mvPrice" type="number" step="0.01" min="0" value="${p0?esc(p0.price):''}"></label>`:''}
-      <label class="f">Datum<input name="date" type="date" value="${new Date().toISOString().slice(0,10)}"></label>
+      <label class="f">Datum<input name="date" type="date" value="${todayStr()}"></label>
     </div>
     ${type==='waste'?`<label class="f">Grund<select name="note">${WASTE.map(w=>`<option>${w}</option>`).join('')}</select></label>`:`<label class="f">${type==='in'?'Lieferschein / Notiz':'Notiz'}<input name="note" placeholder="${type==='in'?'z. B. Lieferschein 2240':'z. B. für Mise en place'}"></label>`}
-    ${type==='in'?`<div class="togs"><label class="tog"><input type="checkbox" name="upd" checked><span></span>Neuen Preis in die Kalkulation übernehmen</label></div>`:''}`,
+    ${type==='in'?`<div class="togs"><label class="tog"><input type="checkbox" name="upd" checked><span></span>Preis in die Kalkulation übernehmen (gleitender Durchschnitt)</label></div>`:''}`,
     fd => { const p = P(fd.get('pid')); const q = +fd.get('qty'); if(!p || !q) return false;
       const date = fd.get('date') ? new Date(fd.get('date')+'T12:00:00').toISOString() : null;
-      if(type==='in'){ const pr = fd.get('price')==='' ? p.price : +fd.get('price'); if(fd.get('upd') && pr !== p.price) p.price = pr; addMove('in', p.id, q, fd.get('note'), pr, date); }
-      else addMove(type, p.id, -q, fd.get('note'), null, date);
-      moveDlg.last = `${MOVE[type]}: ${p.name} ${type==='in'?'+':'−'}${qtyFmt(q,p)}`; },
+      if(type==='in'){ const old = p.price; const pr = fd.get('price')==='' ? p.price : +fd.get('price'); if(fd.get('upd') && pr !== p.price){ const s0 = Math.max(0, +p.stock||0); p.price = Math.round((s0*p.price + q*pr)/(s0+q)*100)/100; } addMove('in', p.id, q, fd.get('note'), pr, date); if(old !== p.price) S.moves[0].prevPrice = old; }
+      else { if(q > (+p.stock||0)) moveDlg.warn = ` · Achtung: mehr als der Bestand (${qtyFmt(+p.stock||0,p)})`; addMove(type, p.id, -q, fd.get('note'), null, date); }
+      moveDlg.last = `${MOVE[type]}: ${p.name} ${type==='in'?'+':'−'}${qtyFmt(q,p)}` + (type==='in' ? ` · Ø-Preis ${eur(p.price)}` : '') + (moveDlg.warn||''); moveDlg.warn = ''; },
     {ok:'Buchen', done:()=>moveDlg.last, after: f => { const s = f.querySelector('#mvPid'); s.onchange = () => { const p = P(s.value); f.querySelector('#mvUnit').textContent = p ? p.unit : 'Einheit'; const pr = f.querySelector('#mvPrice'); if(pr && p) pr.value = p.price; }; }});
 }
 
 function salesDlg(){
-  const items = menuSorted().filter(m => m.card && C(m.card));
+  const items = [...specialsFor(todayStr()).flatMap(sp => sp.items.map((it,i)=>({...it, id:'sp_'+sp.id+'_'+i, section:'Aktion · '+sp.name})).filter(it => it.card && C(it.card))), ...menuSorted().filter(m => m.card && C(m.card))];
   openDialog('Verkäufe buchen', `<p class="dlg-p">Tragen Sie die verkauften Portionen ein, zum Beispiel aus dem Kassenbericht. Die Zutaten werden laut Rezeptur vom Lager abgebucht, auch aus Basisrezepten.</p>
-    <label class="f">Datum<input name="date" type="date" value="${new Date().toISOString().slice(0,10)}"></label>
+    <label class="f">Datum<input name="date" type="date" value="${todayStr()}"></label>
     <ul class="sales">${items.map(m=>`<li><span>${esc(m.name)}<small class="muted">${esc(m.section)}</small></span><span class="stepper"><button type="button" class="icon-btn" data-step="-1" aria-label="weniger">${ico('minus')}</button><input name="s_${m.id}" type="number" min="0" step="1" value="0" inputmode="numeric" aria-label="Portionen"><button type="button" class="icon-btn" data-step="1" aria-label="mehr">${ico('plus')}</button></span></li>`).join('')}</ul>
     <div class="kv"><span>Portionen gesamt</span><span id="salesN">0</span><span>Wareneinsatz</span><span id="salesC">${eur(0)}</span></div>`,
     fd => { const acc = new Map(); let n = 0; const date = fd.get('date') ? new Date(fd.get('date')+'T20:00:00').toISOString() : null;
       items.forEach(m => { const q = +fd.get('s_'+m.id)||0; if(q>0){ n += q; explode(C(m.card), q, acc); } });
       if(!n) return false;
       acc.forEach((q,pid) => addMove('sale', pid, -Math.round(q*1000)/1000, `Verkauf ${fmtDate(date||new Date().toISOString())}`, null, date));
-      salesDlg.last = `${n} Portionen gebucht, ${acc.size} Artikel abgebucht`; },
+      const neg = stockProducts().filter(p=>(+p.stock||0)<0).length; salesDlg.last = `${n} Portionen gebucht, ${acc.size} Artikel abgebucht` + (neg ? ` · ${neg} Artikel im Minus, Wareneingang prüfen` : ''); },
     {ok:'Abbuchen', done:()=>salesDlg.last, after: f => {
       const upd = () => { let n = 0, c = 0; items.forEach(m => { const q = +f.elements['s_'+m.id].value||0; n += q; c += q*menuCalc(m).cost; }); $('#salesN').textContent = n; $('#salesC').textContent = eur(c); };
       f.oninput = upd;
@@ -1604,7 +1802,7 @@ function exportData(){
   const fill = () => { const j = json(); $('#expTxt').value = j.length > 400000 ? j.slice(0,400000)+'\n… (gekürzt angezeigt, „Kopieren“ übernimmt alles)' : j; };
   fill(); $('#expImg').onchange = fill;
   $('#copyBtn').onclick = () => { const ta = $('#expTxt'); const pr = navigator.clipboard?.writeText(json()); if(pr) pr.then(()=>toast('Kopiert'), () => { ta.select(); toast('Text markiert, mit Strg+C kopieren'); }); else { ta.select(); toast('Text markiert, mit Strg+C kopieren'); } };
-  if(!FRAMED) $('#dlBtn').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([json()],{type:'application/json'})); a.download = 'dahuam202-kueche-'+new Date().toISOString().slice(0,10)+'.json'; a.click(); };
+  if(!FRAMED) $('#dlBtn').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([json()],{type:'application/json'})); a.download = 'dahuam202-kueche-'+todayStr()+'.json'; a.click(); };
 }
 
 /* ---------- Schnellsuche ---------- */
@@ -1613,6 +1811,8 @@ function palData(){
   return [
     ...TABS.map(([k,l])=>({g:'Bereich', n:l, s:'', run:()=>go(k)})),
     {g:'Bereich', n:'Gästekarte ansehen', s:'Speisekarte', run:()=>{ view.mtab='guest'; go('menu'); }},
+    {g:'Bereich', n:'Saison & Aktionen', s:'Speisekarte', run:()=>{ view.mtab='plan'; go('menu'); }},
+    {g:'Aktion', n:'Neue Aktion / Spezialität', s:'', run:()=>specialDialog()},
     {g:'Bereich', n:'Inventur', s:'Lager', run:()=>{ view.stab='inventur'; go('stock'); }},
     {g:'Bereich', n:'Bestellvorschlag', s:'Lager', run:()=>{ view.stab='bestellung'; go('stock'); }},
     {g:'Aktion', n:'Wareneingang buchen', s:'', run:()=>moveDlg('in')},
@@ -1641,7 +1841,7 @@ function palDraw(){
 
 /* ---------- Navigation ---------- */
 function go(tab, card=null){
-  view = {...view, tab, card, q: tab===view.tab ? view.q : ''};
+  view = {...view, tab, card, q: tab===view.tab ? view.q : '', pq: tab===view.tab ? view.pq : ''};
   if(card) view.sim = null;
   try { if(location.hash.slice(1) !== tab) history.replaceState(null, '', '#'+tab); } catch(e){}
   render(); window.scrollTo({top:0});
@@ -1706,7 +1906,7 @@ document.addEventListener('click', e => {
     case 'moveDlg': moveDlg(id); break;
     case 'sales': salesDlg(); break;
     case 'moveUndo': { const m = S.moves.find(x=>x.id===id); const p = P(m.pid);
-      ask(`Buchung stornieren? ${MOVE[m.type]} ${p?p.name:''} ${qtyFmt(m.qty,p)} wird rückgängig gemacht.`, () => { if(p) p.stock = Math.round(((+p.stock||0) - m.qty)*1000)/1000; S.moves = S.moves.filter(x=>x!==m); }, 'Stornieren'); break; }
+      ask(`Buchung stornieren? ${MOVE[m.type]} ${p?p.name:''} ${qtyFmt(m.qty,p)} wird rückgängig gemacht.`, () => { if(p) p.stock = Math.round(((+p.stock||0) - m.qty)*1000)/1000; if(p && m.prevPrice != null) p.price = m.prevPrice; S.moves = S.moves.filter(x=>x!==m); }, 'Stornieren'); break; }
     case 'invStart': S.invDraft = {date:new Date().toISOString(), counts:{}}; save(); render(); toast('Inventur gestartet'); break;
     case 'invCancel': ask('Laufende Inventur verwerfen? Die gezählten Mengen gehen verloren.', () => { S.invDraft = null; }, 'Verwerfen'); break;
     case 'invFinish': { const d = S.invDraft; const items = stockProducts().filter(p => d.counts[p.id]!==undefined && d.counts[p.id]!=='');
@@ -1746,6 +1946,7 @@ document.addEventListener('input', e => {
 });
 
 document.addEventListener('keydown', e => {
+  if($('#dlg').open && $('#pal').hidden) { if(e.key === 'Enter' && e.target.matches('input[data-li],input[data-pp],input[data-cf],textarea.title-in,input[data-secname],input[data-ord]')) {} if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='k') e.preventDefault(); return; }
   if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k'){ e.preventDefault(); $('#pal').hidden ? palOpen() : palClose(); return; }
   if(!$('#pal').hidden){
     if(e.key === 'Escape'){ palClose(); }
@@ -1762,21 +1963,447 @@ document.addEventListener('keydown', e => {
 document.addEventListener('change', e => {
   const t = e.target, c = view.card ? C(view.card) : null;
   if(t.id === 'imgFile'){ const f = t.files[0]; if(!f) return; resizeImage(f).then(d => { pickCb && pickCb(d); pickCb = null; }, () => info('Foto nicht lesbar', 'Bitte ein JPG- oder PNG-Bild wählen.')); return; }
-  if(t.dataset.cf && c){ const f = t.dataset.cf; c[f] = f==='yieldG' ? (t.value===''?'':+t.value) : t.value; save(); render(); toast('Gespeichert'); return; }
-  if(t.dataset.li != null && c){ const it = c.items[+t.dataset.li]; const f = t.dataset.lf; it[f] = f==='ref' ? t.value : (t.value===''?'':+t.value); if(f==='ref') it.net = ''; save(); render(); return; }
+  if(t.dataset.cf && c){ const f = t.dataset.cf; c[f] = f==='yieldG' ? (t.value===''?'':+t.value) : t.value; save(); softRender(); toast('Gespeichert'); return; }
+  if(t.dataset.li != null && c){ const it = c.items[+t.dataset.li]; const f = t.dataset.lf; it[f] = f==='ref' ? t.value : (t.value===''?'':+t.value); if(f==='ref') it.net = ''; save(); softRender(); return; }
   if(t.dataset.step != null && t.closest('#app')){ toast('Gespeichert'); return; }
-  if(t.dataset.pp){ const p = P(t.dataset.pp); const old = +p[t.dataset.pf]; p[t.dataset.pf] = +t.value || 0; save(); render(); if(t.dataset.pf==='price' && old !== p.price) toast(`${p.name}: ${eur(old)} → ${eur(p.price)} · ${usage('p:'+p.id).length} Rezepturen neu berechnet`); return; }
-  if(t.dataset.sf){ const f = t.dataset.sf; S.settings[f] = f==='name' ? t.value : (+t.value || 0); save(); toast('Gespeichert'); return; }
+  if(t.dataset.pp){ const p = P(t.dataset.pp); const old = +p[t.dataset.pf]; p[t.dataset.pf] = Math.max(0, +t.value || 0); save(); softRender(); if(t.dataset.pf==='price' && old !== p.price) toast(`${p.name}: ${eur(old)} → ${eur(p.price)} · ${usage('p:'+p.id).length} Rezepturen neu berechnet`); return; }
+  if(t.dataset.sf){ const f = t.dataset.sf; S.settings[f] = f==='name' ? t.value : f==='target' ? Math.min(100, Math.max(1, +t.value || 28)) : Math.min(100, Math.max(0, +t.value || 0)); if(f!=='name') t.value = S.settings[f]; save(); toast('Gespeichert'); return; }
   if(t.dataset.gf){ S.settings.guest[t.dataset.gf] = t.checked; save(); $('.guest-prev').innerHTML = guestHtml(); return; }
   if(t.dataset.secname != null){ const i = +t.dataset.secname, old = S.settings.sections[i], nv = t.value.trim(); if(!nv || nv===old){ t.value = old; return; }
     if(S.settings.sections.includes(nv)){ t.value = old; toast('Diese Kategorie gibt es schon'); return; }
     S.settings.sections[i] = nv; S.menu.forEach(m=>{ if(m.section===old) m.section = nv; }); S.cards.forEach(x=>{ if(x.category===old) x.category = nv; }); if(view.sec===old) view.sec = nv; save(); render(); toast('Kategorie umbenannt'); return; }
-  if(t.dataset.ord){ view.order[t.dataset.ord] = Math.max(0, +t.value||0); render(); return; }
+  if(t.dataset.ord){ view.order[t.dataset.ord] = Math.max(0, +t.value||0); softRender(); return; }
   if(t.id === 'importFile' && t.files[0]){
     const r = new FileReader();
-    r.onload = () => { try { const d = JSON.parse(r.result); if(!d.products || !d.cards || !d.menu) throw 0; if(d.images){ Object.entries(d.images).forEach(([k,v])=>imgPut(k,v)); delete d.images; } S = migrate(d); save(); go('dash'); toast('Sicherung geladen'); } catch(err){ info('Laden fehlgeschlagen', 'Die Datei ist keine Sicherung dieser App. Wählen Sie eine .json-Datei, die mit „Sicherung erstellen“ gespeichert wurde.'); } };
+    r.onload = () => { try { const d = JSON.parse(r.result); if(!d.products || !d.cards || !d.menu) throw 0; const imgs = d.images; delete d.images; const nd = migrate(d); if(!nd) throw 0; const old = S; S = nd; try { render(); } catch(e2){ S = old; render(); throw e2; } if(imgs) Object.entries(imgs).forEach(([k,v])=>imgPut(k,v)); save(); go('dash'); toast('Sicherung geladen'); } catch(err){ info('Laden fehlgeschlagen', 'Die Datei ist keine Sicherung dieser App. Wählen Sie eine .json-Datei, die mit „Sicherung erstellen“ gespeichert wurde.'); } };
     r.readAsText(t.files[0]); t.value = '';
   }
+});
+
+
+/* =====================================================================
+   Saisonkarten & Aktionen (Spezialitäten für 1–2 Tage)
+   ===================================================================== */
+const SEASONS = [['winter','Winter'],['fruehling','Frühling'],['sommer','Sommer'],['herbst','Herbst']];
+const SEASON_RANGE = {winter:['12-01','04-15'], fruehling:['04-16','06-14'], sommer:['06-15','09-15'], herbst:['09-16','11-30']};
+const ORN = {
+  schnee:'<path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7M12 2l-2.2 2.2M12 2l2.2 2.2M12 22l-2.2-2.2M12 22l2.2-2.2M3.3 7l3 .8M3.3 7l.8 3M20.7 17l-3-.8M20.7 17l-.8-3M3.3 17l.8-3M3.3 17l3-.8M20.7 7l-.8 3M20.7 7l-3 .8"/>',
+  bluete:'<circle cx="12" cy="6.5" r="3.2"/><circle cx="17.2" cy="10.3" r="3.2"/><circle cx="15.2" cy="16.4" r="3.2"/><circle cx="8.8" cy="16.4" r="3.2"/><circle cx="6.8" cy="10.3" r="3.2"/><circle cx="12" cy="12" r="1.6"/>',
+  sonne:'<circle cx="12" cy="12" r="4.2"/><path d="M12 1.5v3.5M12 19v3.5M1.5 12H5M19 12h3.5M4.6 4.6l2.4 2.4M17 17l2.4 2.4M4.6 19.4L7 17M17 7l2.4-2.4"/>',
+  blatt:'<path d="M12 22V9"/><path d="M12 9c0-4 3-7 8-7 0 5-3 8-8 8M12 13c0-3.5-3-6-8-6 0 4.5 3 7 8 7"/>',
+  berg:'<path d="M1.5 20l7-12 4 6 3-4 7 10z"/><path d="M6.8 11l1.7-3 2 3"/>',
+  keins:'',
+};
+const ORN_LABEL = {schnee:'Schneeflocke', bluete:'Blüte', sonne:'Sonne', blatt:'Blatt', berg:'Berge', keins:'Ohne'};
+// Saison-Themen (Paletten, Schriften, Ornament) – vom Design-Team
+const THEMES = {
+  winter:   {theme:'Pulverschnee', layout:'alpin',     pal:{paper:'#13233a', ink:'#eef3f7', accent:'#9fc7e8', muted:'#93a6b8', rule:'#2e4562'}, fd:'Cormorant Garamond', fb:'Figtree', orn:'schnee', title:'Winterkarte', subtitle:'Nach dem Skitag · direkt an der Piste'},
+  fruehling:{theme:'Almrausch',    layout:'klassisch', pal:{paper:'#f7f5ee', ink:'#23302a', accent:'#c2557a', muted:'#6f7a70', rule:'#d9dccf'}, fd:'Cormorant Garamond', fb:'Figtree', orn:'bluete', title:'Frühlingskarte', subtitle:'Erste Kräuter, frischer Bärlauch'},
+  sommer:   {theme:'Bergsommer',   layout:'modern',    pal:{paper:'#fffdf6', ink:'#1c2b2a', accent:'#e0892b', muted:'#677370', rule:'#eadfc8'}, fd:'Bricolage Grotesque', fb:'Figtree', orn:'sonne', title:'Sommerkarte', subtitle:'Terrasse, Bergluft, Marillenzeit'},
+  herbst:   {theme:'Almabtrieb',   layout:'alpin',     pal:{paper:'#2a1d16', ink:'#f3e6d6', accent:'#d98b3a', muted:'#b59f88', rule:'#4a3527'}, fd:'Cormorant Garamond', fb:'Figtree', orn:'blatt', title:'Herbstkarte', subtitle:'Wild, Schwammerl, Kastanien'},
+};
+const FONTPAIRS = [['Cormorant Garamond','Figtree','Elegant'],['Bricolage Grotesque','Figtree','Modern'],['Playfair Display','Source Sans 3','Klassisch'],['Fraunces','Figtree','Weich'],['DM Serif Display','DM Sans','Kontrast']];
+const SPECIAL_STYLES = [['tafel','Kreidetafel'],['saison','Wie Saisonkarte'],['festlich','Festlich']];
+
+function seasonDefaults(k){ const t = THEMES[k]; return {from:SEASON_RANGE[k][0], to:SEASON_RANGE[k][1], layout:t.layout, pal:{...t.pal}, fd:t.fd, fb:t.fb, orn:t.orn, title:t.title, subtitle:t.subtitle, footer:'Alle Preise in Euro inkl. MwSt. Bitte informieren Sie uns über Allergien und Unverträglichkeiten.', photos:true, desc:true, allergens:true, cover:''}; }
+const todayStr = () => { const d = new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10); };
+function addDays(s, n){ const d = new Date(s+'T12:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+function inRangeMD(md, from, to){ return from <= to ? (md >= from && md <= to) : (md >= from || md <= to); }
+function seasonFor(dateStr){ const md = dateStr.slice(5); const ss = S.settings.seasons; return SEASONS.map(x=>x[0]).find(k => inRangeMD(md, ss[k].from, ss[k].to)) || null; }
+function specialsFor(dateStr){ return S.specials.filter(sp => sp.from <= dateStr && dateStr <= (sp.to||sp.from)); }
+function inSeason(m, k){ return !m.seasons || !m.seasons.length || !k || m.seasons.includes(k); }
+function seasonName(k){ return (SEASONS.find(x=>x[0]===k)||[,'Ganzjährig'])[1]; }
+function spDays(sp){ return Math.round((new Date((sp.to||sp.from)+'T12:00:00') - new Date(sp.from+'T12:00:00'))/864e5) + 1; }
+function spStatus(sp){ const t = todayStr(); if((sp.to||sp.from) < t) return ['past','vorbei']; if(sp.from <= t) return ['live','läuft heute']; const n = Math.round((new Date(sp.from+'T12:00:00') - new Date(t+'T12:00:00'))/864e5); return ['soon', n===1 ? 'morgen' : `in ${n} Tagen`]; }
+function fmtShort(s){ const [y,m,d] = s.split('-'); return `${d}.${m}.`; }
+function fmtRange(sp){ return sp.to && sp.to !== sp.from ? `${fmtShort(sp.from)}–${fmtShort(sp.to)}${sp.to.slice(0,4)}` : `${fmtShort(sp.from)}${sp.from.slice(0,4)}`; }
+function mdLabel(md){ const [m,d] = md.split('-'); return `${d}.${m}.`; }
+function ornSvg(k, cls='g-orn'){ return ORN[k] ? `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${ORN[k]}</svg>` : ''; }
+function fontStack(f, serif){ return `"${f}",${serif?'Georgia,serif':'system-ui,sans-serif'}`; }
+
+function seasonSeed(d){
+  d.settings.seasons = {}; SEASONS.forEach(([k]) => d.settings.seasons[k] = seasonDefaults(k));
+  const tag = {'Zillertaler Käsefondue':['winter','herbst'], '„Dippin me softly!“':['winter'], '„Marillenzeit = Knödelzeit“':['sommer'], '„Endless Summer“':['fruehling','sommer'], 'DAHUAM.202 Sommersalat':['sommer'],
+    '„Schwammerlsuche“':['sommer','herbst'], 'Eierschwammerl Carbonara':['sommer','herbst'], 'Schwammerlrösti':['sommer','herbst'], '„Wilde Bolo“':['herbst','winter'], '„Alpen Ceviche“':['fruehling','sommer'], 'Kokos-Curry-Suppe':['winter','herbst']};
+  d.menu.forEach(m => m.seasons = tag[m.name] || []);
+  const add = (section, name, desc, price, seasons, veg='') => d.menu.push({id:uid('m'), section, name, desc, price, card:'', img:'', veg, top:false, hidden:false, seasons, order: d.menu.filter(x=>x.section===section).length});
+  SEASON_DEMO.forEach(x => add(...x));
+  const y = new Date().getFullYear(); const t = todayStr();
+  const mk = (name, from, to, mode, style, note, items) => ({id:uid('sp'), name, from, to, mode, style, note, items:items.map(([n,ds,p,veg])=>({name:n, desc:ds, price:p, veg:veg||'', card:''}))});
+  d.specials = SPECIAL_DEMO(y, t).map(a => mk(...a));
+}
+function seasonMigrate(d){
+  if(!d.settings.seasons){ d.settings.seasons = {}; SEASONS.forEach(([k]) => d.settings.seasons[k] = seasonDefaults(k)); const g = d.settings.guest; if(g){ SEASONS.forEach(([k]) => Object.assign(d.settings.seasons[k], {photos:g.photos, desc:g.desc, allergens:g.allergens, footer:g.footer||d.settings.seasons[k].footer})); } }
+  d.menu.forEach(m => { if(!m.seasons) m.seasons = []; });
+  if(!d.specials) d.specials = [];
+  return d;
+}
+
+/* ---------- Gästekarte für Saison + Datum ---------- */
+function paperStyle(s){ const p = s.pal; return `--gp:${p.paper};--gi:${p.ink};--ga:${p.accent};--gm:${p.muted};--gr:${p.rule};--gfd:${fontStack(s.fd, !/Grotesque|Sans/.test(s.fd))};--gfb:${fontStack(s.fb)}`; }
+function itemHtml(m, s, used){
+  const k = m.card ? menuCalc(m) : null; const alg = k && k.t ? [...k.t.alg].sort() : []; alg.forEach(a=>used.add(a));
+  const img = s.photos && m.id ? menuImg(m) : '';
+  return `<article class="g-item ${img?'has-ph':''} ${m.top?'is-top':''}">
+    ${img ? `<img class="g-ph" src="${IMG[img]}" alt="${esc(m.name)}" loading="lazy">` : ''}
+    <div class="g-txt"><div class="g-row"><span class="g-n">${esc(m.name)}${m.veg==='vg'?' <i class="g-mark" title="Vegan">VG</i>':m.veg==='v'?' <i class="g-mark" title="Vegetarisch">V</i>':''}</span><span class="lead"></span><span class="g-p">${fin(+m.price).toLocaleString('de-AT',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+    ${m.top?`<div class="g-top">★ Empfehlung des Hauses</div>`:''}
+    ${s.desc && m.desc ? `<div class="g-d">${esc(m.desc)}</div>` : ''}
+    ${s.allergens && alg.length ? `<div class="g-a">${alg.join(' · ')}</div>` : ''}</div>
+  </article>`;
+}
+function specialBlock(sp, s, used, standalone){
+  const items = sp.items.map(it => ({...it, id:'', top:false, card: it.card || ''}));
+  const st = sp.style === 'saison' ? '' : ` g-sp-${sp.style}`;
+  return `<section class="g-special${st} ${standalone?'is-page':''}">
+    <div class="g-sp-head"><span class="g-sp-date">${sp.to && sp.to!==sp.from ? `${fmtShort(sp.from)} – ${fmtShort(sp.to)}` : new Date(sp.from+'T12:00:00').toLocaleDateString('de-AT',{weekday:'long', day:'numeric', month:'long'})}</span>
+      <h3 class="g-sp-title">${esc(sp.name)}</h3>${sp.note?`<p class="g-sp-note">${esc(sp.note)}</p>`:''}</div>
+    <div class="g-list">${items.map(it => itemHtml(it, {...s, photos:false}, used)).join('')}</div>
+  </section>`;
+}
+function guestHtml(seasonKey, dateStr){
+  dateStr = dateStr || todayStr();
+  const k = seasonKey || seasonFor(dateStr) || 'winter';
+  const s = S.settings.seasons[k];
+  const items = menuSorted().filter(m => !m.hidden && inSeason(m, k));
+  const used = new Set();
+  const inserts = specialsFor(dateStr).filter(sp => sp.mode !== 'tageskarte');
+  let body = inserts.map(sp => specialBlock(sp, s, used)).join('');
+  for(const sec of secList()){
+    const list = items.filter(m=>m.section===sec); if(!list.length) continue;
+    body += `<section class="g-sec"><h3 class="g-h"><span>${esc(sec)}</span></h3><div class="g-list">${list.map(m => itemHtml(m, s, used)).join('')}</div></section>`;
+  }
+  const legend = s.allergens && used.size ? `<div class="g-leg">${[...used].sort().map(a=>`<span><b>${a}</b> ${esc(ALG[a])}</span>`).join('')}</div>` : '';
+  const cover = s.cover && IMG[s.cover] ? `<img class="g-cover" src="${IMG[s.cover]}" alt="">` : '';
+  return `<div class="g-paper g-${s.layout} g-season-${k}" style="${paperStyle(s)}">
+    ${cover}
+    <header class="g-head">${ornSvg(s.orn,'g-orn top')}<div class="g-mark-logo">DAHUAM<span>.</span>202</div><h2 class="g-title">${esc(s.title)}</h2>${s.subtitle?`<div class="g-sub">${esc(s.subtitle)}</div>`:''}</header>
+    ${body || '<p class="g-empty">Noch keine sichtbaren Gerichte in dieser Saison.</p>'}
+    <footer class="g-foot">${ornSvg(s.orn,'g-orn')}<div class="g-keys"><span><i class="g-mark">V</i> vegetarisch</span><span><i class="g-mark">VG</i> vegan</span><span>★ Empfehlung des Hauses</span></div>${legend}<p>${esc(s.footer)}</p></footer>
+  </div>`;
+}
+function tageskarteHtml(sp, k){
+  const s = S.settings.seasons[k || seasonFor(sp.from) || 'winter']; const used = new Set();
+  const inner = specialBlock(sp, s, used, true);
+  const legend = used.size ? `<div class="g-leg">${[...used].sort().map(a=>`<span><b>${a}</b> ${esc(ALG[a])}</span>`).join('')}</div>` : '';
+  return `<div class="g-paper g-tk g-${s.layout} ${sp.style!=='saison'?'g-tk-'+sp.style:''}" style="${paperStyle(s)}">
+    <header class="g-head"><div class="g-mark-logo">DAHUAM<span>.</span>202</div><div class="g-sub">Tageskarte</div></header>${inner}
+    <footer class="g-foot">${legend}<p>Solange der Vorrat reicht. Preise in Euro inkl. MwSt.</p></footer></div>`;
+}
+
+/* ---------- Gästekarte: Werkzeuge ---------- */
+function renderGuest(){
+  const date = view.gdate || (view.gdate = todayStr());
+  const auto = seasonFor(date);
+  const k = view.gseason || auto || 'winter';
+  const s = S.settings.seasons[k];
+  const sps = specialsFor(date);
+  const tks = sps.filter(sp => sp.mode === 'tageskarte');
+  const tog = (f,l) => `<label class="tog"><input type="checkbox" data-sv="${f}" ${s[f]?'checked':''}><span></span>${l}</label>`;
+  const presets = SEASONS.map(([pk,pl]) => { const p = THEMES[pk].pal; return `<button type="button" class="sw-preset ${JSON.stringify(s.pal)===JSON.stringify(p)?'on':''}" data-act="palPreset" data-id="${pk}" title="${esc(THEMES[pk].theme)}"><i style="background:${p.paper}"></i><i style="background:${p.accent}"></i><i style="background:${p.ink}"></i><span>${esc(THEMES[pk].theme)}</span></button>`; }).join('');
+  return `<div class="guest-wrap">
+    <aside class="guest-tools">
+      <section class="panel">
+        <div class="panel-h"><h2>Was sehen die Gäste?</h2></div>
+        <label class="f">Datum<input id="gdate" type="date" value="${date}"></label>
+        <div class="chips-row tight"><button type="button" class="chip ${date===todayStr()?'on':''}" data-act="gdate" data-id="${todayStr()}">Heute</button><button type="button" class="chip" data-act="gdate" data-id="${addDays(todayStr(),1)}">Morgen</button>${S.specials.filter(sp=>spStatus(sp)[0]!=='past').slice(0,3).map(sp=>`<button type="button" class="chip" data-act="gdate" data-id="${sp.from}">${esc(sp.name)}</button>`).join('')}</div>
+        <p class="hint">${auto ? `Am ${fmtDate(date+'T12:00:00')} gilt die <b>${esc(S.settings.seasons[auto].title)}</b>` : 'An diesem Datum gilt keine Saisonkarte'}${sps.length ? ` und ${sps.length===1?'die Aktion':'die Aktionen'} <b>${sps.map(x=>esc(x.name)).join(', ')}</b>.` : '.'}</p>
+        ${(() => { const miss = guestItems(k, date).filter(m=>!hasAlg(m)).length + sps.reduce((n,sp)=>n+sp.items.filter(it=>!hasAlg(it)).length,0); return miss ? `<div class="warn-box">${ico('spark')}<span><b>${miss} Gerichte ohne Allergenangabe.</b> In Österreich Pflicht: Rezeptur verknüpfen oder Allergene im Gericht eintragen.</span><button type="button" class="btn sm" data-act="goMenu" data-id="noalg">Anzeigen</button></div>` : '<div class="ok-box">Alle Gerichte haben Allergenangaben.</div>'; })()}
+      </section>
+      <section class="panel">
+        <div class="panel-h"><h2>Saisonkarte gestalten</h2>${view.gseason?`<button type="button" class="link sm-link" data-act="gseason" data-id="">nach Datum</button>`:''}</div>
+        ${seg('gseason', k, SEASONS.map(([sk,sl])=>[sk,sl]))}
+        <div class="fields two">
+          <label class="f">Gültig ab<input type="text" inputmode="numeric" placeholder="TT.MM." data-smd="from" value="${mdLabel(s.from)}"></label>
+          <label class="f">bis<input type="text" inputmode="numeric" placeholder="TT.MM." data-smd="to" value="${mdLabel(s.to)}"></label>
+        </div>
+        <div class="f">Layout</div>${seg('glayout', s.layout, GSTYLES)}
+        <div class="f">Farben</div><div class="presets">${presets}</div>
+        <div class="colors">${[['paper','Papier'],['ink','Schrift'],['accent','Akzent']].map(([c,l])=>`<label class="clr"><input type="color" data-pal="${c}" value="${s.pal[c]}" aria-label="${l}"><span>${l}</span></label>`).join('')}</div>
+        <label class="f">Schrift<select data-sv="fontpair">${FONTPAIRS.map(([a,b,l])=>`<option value="${esc(a+'|'+b)}" ${s.fd===a&&s.fb===b?'selected':''}>${l} · ${esc(a)}</option>`).join('')}</select></label>
+        <div class="f">Ornament</div><div class="orns">${ORN_ORDER.map(o=>`<button type="button" class="orn-b ${s.orn===o?'on':''}" data-act="gorn" data-id="${o}" title="${ORN_LABEL[o]}" aria-label="${ORN_LABEL[o]}">${o==='keins'?'<span>—</span>':ornSvg(o,'ico')}</button>`).join('')}</div>
+        <div class="togs">${tog('photos','Fotos')}${tog('desc','Beschreibungen')}${tog('allergens','Allergene')}</div>
+        <label class="f">Titel<input data-st="title" value="${esc(s.title)}"></label>
+        <label class="f">Untertitel<input data-st="subtitle" value="${esc(s.subtitle)}"></label>
+        <label class="f">Fußzeile<textarea data-st="footer" class="sm-ta">${esc(s.footer)}</textarea></label>
+        <div class="row-btns"><button type="button" class="btn sm" data-act="gcover">${ico('camera')}${s.cover?'Titelbild ändern':'Titelbild'}</button>${s.cover?'<button type="button" class="btn sm" data-act="gcoverDel">Entfernen</button>':''}<button type="button" class="btn sm" data-act="gReset" data-id="${k}">Design zurücksetzen</button></div>
+        <p class="hint">${S.menu.filter(m=>!m.hidden && inSeason(m,k)).length} Gerichte auf der ${esc(s.title)}. Welche Gerichte in welcher Saison laufen, legen Sie unter „Saison & Aktionen“ fest.</p>
+      </section>
+    </aside>
+    <div class="guest-prev">${guestPrevHtml()}</div>
+  </div>`;
+}
+
+/* ---------- Saison & Aktionen ---------- */
+function dayOfYear(md){ const [m,d] = md.split('-').map(Number); return Math.round((Date.UTC(2025,m-1,d) - Date.UTC(2025,0,1))/864e5); }
+function renderPlan(){
+  const ss = S.settings.seasons, y = new Date().getFullYear(), t = todayStr();
+  const months = ['Jän','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  const bars = SEASONS.map(([k,l]) => { const s = ss[k], a = dayOfYear(s.from), b = dayOfYear(s.to); const segs = a <= b ? [[a,b]] : [[a,364],[0,b]];
+    return segs.map(([x,z]) => `<button type="button" class="tl-bar" style="left:${(x/365*100).toFixed(2)}%;width:${((z-x+1)/365*100).toFixed(2)}%;--c:${s.pal.accent};--p:${s.pal.paper}" data-act="editSeason" data-id="${k}" title="${esc(s.title)} ${mdLabel(s.from)}–${mdLabel(s.to)}"><span>${l}</span></button>`).join(''); }).join('');
+  const pins = S.specials.filter(sp => sp.from.slice(0,4) == y || (sp.to||'').slice(0,4) == y).map(sp => `<button type="button" class="tl-pin ${spStatus(sp)[0]}" style="left:${(dayOfYear(sp.from.slice(5))/365*100).toFixed(2)}%" data-act="editSpecial" data-id="${sp.id}" title="${esc(sp.name)} · ${fmtRange(sp)}"><i></i><span>${esc(sp.name)}</span></button>`).join('');
+  const groups = [['live','Läuft gerade'],['soon','Geplant'],['past','Vergangen']];
+  const sorted = [...S.specials].sort((a,b)=>a.from.localeCompare(b.from));
+  const q = view.pq.trim().toLowerCase();
+  const dishes = menuSorted().filter(m => !q || m.name.toLowerCase().includes(q));
+  return `<section class="panel">
+    <div class="panel-h"><h2>Jahresplan ${y}</h2><div class="row-btns"><button type="button" class="btn sm primary" data-act="newSpecial">${ico('plus')}Aktion / Spezialität</button></div></div>
+    <div class="tl-wrap"><div class="tline">
+      <div class="tl-months">${months.map(m=>`<span>${m}</span>`).join('')}</div>
+      <div class="tl-track">${bars}<span class="tl-today" style="left:${(dayOfYear(t.slice(5))/365*100).toFixed(2)}%" title="Heute"></span></div>
+      <div class="tl-pins">${pins}</div>
+    </div></div>
+    <p class="hint">Saisonzeiten verschieben: Saison anklicken. Die Gästekarte wechselt automatisch am ersten Tag einer Saison. Aktionen erscheinen nur an ihren Tagen.</p>
+  </section>
+  <div class="plan-grid">
+    <section class="col">
+      ${groups.map(([g,l]) => { const list = sorted.filter(sp => spStatus(sp)[0]===g); if(!list.length) return ''; return `<h2 class="sec-h">${l}<small class="muted sm">${list.length}</small></h2><div class="sp-list">${(g==='past'?list.reverse():list).map(sp => { const [st,stl] = spStatus(sp); return `<article class="sp-card ${st}">
+        <div class="sp-top"><span class="sp-st ${st}">${stl}</span><span class="muted sm mono">${fmtRange(sp)} · ${spDays(sp)} ${spDays(sp)===1?'Tag':'Tage'}</span></div>
+        <h3>${esc(sp.name)}</h3>${sp.note?`<p class="muted sm">${esc(sp.note)}</p>`:''}
+        <ul class="sp-items">${sp.items.map(it=>`<li><span>${esc(it.name)}</span><span class="mono">${eur(it.price)}</span></li>`).join('')}</ul>
+        <div class="sp-foot"><span class="tag">${sp.mode==='tageskarte'?'Eigene Tageskarte':'Einleger auf der Karte'} · ${esc((SPECIAL_STYLES.find(x=>x[0]===sp.style)||[,''])[1])}</span>
+          <span class="row-btns"><button type="button" class="icon-btn" data-act="previewSpecial" data-id="${sp.id}" title="Vorschau" aria-label="Vorschau">${ico('eye')}</button><button type="button" class="icon-btn" data-act="dupSpecial" data-id="${sp.id}" title="Für nächstes Jahr kopieren" aria-label="Kopieren">${ico('copy')}</button>${!FRAMED && sp.mode==='tageskarte'?`<button type="button" class="icon-btn" data-act="printSpecial" data-id="${sp.id}" title="Tageskarte drucken" aria-label="Drucken">${ico('print')}</button>`:''}<button type="button" class="icon-btn" data-act="editSpecial" data-id="${sp.id}" title="Bearbeiten" aria-label="Bearbeiten">${ico('edit')}</button></span></div>
+      </article>`; }).join('')}</div>`; }).join('') || '<div class="panel empty">Noch keine Aktionen geplant.</div>'}
+    </section>
+    <section class="panel flush">
+      <div class="panel-h pad"><h2>Welche Gerichte in welcher Saison?</h2></div>
+      <div class="toolbar pad-x"><label class="search">${ico('search')}<input id="pq" type="search" placeholder="Gericht suchen" value="${esc(view.pq)}" autocomplete="off"></label></div>
+      <div class="tbl-wrap"><table class="matrix"><thead><tr><th>Gericht</th>${SEASONS.map(([k,l])=>`<th class="c"><span class="sdot" style="background:${ss[k].pal.accent}"></span>${l}</th>`).join('')}</tr></thead>
+      <tbody>${dishes.map(m=>{ const all = !m.seasons.length; return `<tr><td><b class="pn">${esc(m.name)}</b><small class="muted">${esc(m.section)}${all?' · ganzjährig':''}</small></td>${SEASONS.map(([k])=>`<td class="c"><label class="chk"><input type="checkbox" data-ms="${m.id}:${k}" ${all||m.seasons.includes(k)?'checked':''} aria-label="${esc(m.name)} ${seasonName(k)}"><span></span></label></td>`).join('')}</tr>`; }).join('')}</tbody></table></div>
+      <p class="hint pad-x pad-b">Alle vier Haken bedeutet ganzjährig. Ein Gericht ohne passende Saison erscheint auf keiner Gästekarte, bleibt aber in der Kalkulation.</p>
+    </section>
+  </div>`;
+}
+
+function specialDialog(sp){
+  const isNew = !sp;
+  const t = todayStr();
+  sp = sp ? JSON.parse(JSON.stringify(sp)) : {id:uid('sp'), name:'', from:addDays(t,1), to:addDays(t,2), mode:'insert', style:'tafel', note:'', items:[{name:'',desc:'',price:'',veg:'',card:''}]};
+  const dishes = S.cards.filter(c=>c.type==='dish').sort(byName);
+  const menuOpts = menuSorted();
+  const row = (it,i) => `<div class="sp-row" data-row>
+    <input placeholder="Gericht" data-f="name" value="${esc(it.name)}" required>
+    <input type="number" step="0.1" min="0" placeholder="€" data-f="price" value="${esc(it.price)}" required class="pr">
+    <button type="button" class="icon-btn" data-rm aria-label="Zeile entfernen">${ico('x')}</button>
+    <input placeholder="Beschreibung" data-f="desc" value="${esc(it.desc)}" class="wide">
+    <select data-f="veg" aria-label="Art"><option value="">Fleisch/Fisch</option><option value="v" ${it.veg==='v'?'selected':''}>Vegetarisch</option><option value="vg" ${it.veg==='vg'?'selected':''}>Vegan</option></select>
+    <select data-f="card" aria-label="Rezeptur"><option value="">ohne Rezeptur</option>${dishes.map(c=>`<option value="${c.id}" ${it.card===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>
+    <input placeholder="Allergene ohne Rezeptur, z. B. A C G" data-f="alg" value="${esc(it.alg||'')}" class="wide" aria-label="Allergene">
+  </div>`;
+  openDialog(isNew ? 'Neue Aktion / Spezialität' : 'Aktion bearbeiten', `
+    <label class="f">Name<input name="name" required placeholder="z. B. Wildwochenende" value="${esc(sp.name)}"></label>
+    <div class="fields two"><label class="f">Von<input name="from" type="date" required value="${sp.from}"></label><label class="f">Bis<input name="to" type="date" value="${sp.to||sp.from}"></label></div>
+    <div class="chips-row tight"><button type="button" class="chip" data-dur="1">1 Tag</button><button type="button" class="chip" data-dur="2">2 Tage</button><button type="button" class="chip" data-dur="3">Wochenende (3)</button><button type="button" class="chip" data-dur="7">1 Woche</button></div>
+    <label class="f">Kurzer Text für die Gäste<input name="note" placeholder="z. B. Frisch aus der Gerlosser Jagd" value="${esc(sp.note)}"></label>
+    <div class="fields two">
+      <label class="f">Darstellung<select name="mode"><option value="insert" ${sp.mode==='insert'?'selected':''}>Einleger oben auf der Karte</option><option value="tageskarte" ${sp.mode==='tageskarte'?'selected':''}>Eigene Tageskarte</option></select></label>
+      <label class="f">Stil<select name="style">${SPECIAL_STYLES.map(([k,l])=>`<option value="${k}" ${sp.style===k?'selected':''}>${l}</option>`).join('')}</select></label>
+    </div>
+    <div class="f">Gerichte</div>
+    <div id="spRows">${sp.items.map(row).join('')}</div>
+    <div class="row-btns"><button type="button" class="btn sm" id="spAdd">${ico('plus')}Gericht</button>
+      <select id="spFromMenu" class="sm-sel"><option value="">Von der Karte übernehmen …</option>${menuOpts.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('')}</select></div>`,
+    fd => { const rows = [...$('#spRows').querySelectorAll('[data-row]')].map(r => { const g = f => r.querySelector(`[data-f="${f}"]`).value; return {name:g('name').trim(), desc:g('desc').trim(), price:+g('price')||0, veg:g('veg'), card:g('card'), alg:g('alg').toUpperCase().replace(/[^A-PR\s,]/g,'').split(/[\s,]+/).filter(a=>ALG[a]).join(' ')}; }).filter(x=>x.name);
+      if(!rows.length){ toast('Mindestens ein Gericht eintragen'); return false; }
+      let from = fd.get('from'), to = fd.get('to') || from; if(to < from) [from,to] = [to,from];
+      Object.assign(sp, {name:fd.get('name').trim(), from, to, note:fd.get('note').trim(), mode:fd.get('mode'), style:fd.get('style'), items:rows});
+      const i = S.specials.findIndex(x=>x.id===sp.id); if(i>=0) S.specials[i] = sp; else S.specials.push(sp);
+      view.gdate = sp.from; },
+    {done:()=>`„${sp.name}“ gespeichert · ${fmtRange(sp)}`, del: isNew ? null : () => ask(`Aktion „${sp.name}“ löschen?`, () => { S.specials = S.specials.filter(x=>x.id!==sp.id); }),
+     after: f => {
+      const rows = $('#spRows');
+      $('#spAdd').onclick = () => { rows.insertAdjacentHTML('beforeend', row({name:'',desc:'',price:'',veg:'',card:''})); rows.lastElementChild.querySelector('input').focus(); };
+      rows.onclick = e => { const b = e.target.closest('[data-rm]'); if(b && rows.children.length > 1) b.closest('[data-row]').remove(); };
+      rows.onchange = e => { if(e.target.dataset.f === 'card' && e.target.value){ const r = e.target.closest('[data-row]'); const c = C(e.target.value); const nm = r.querySelector('[data-f=name]'); if(!nm.value) nm.value = c.name; const pr = r.querySelector('[data-f=price]'); if(!pr.value){ const tt = totals(c); pr.value = (Math.ceil(tt.cost/(S.settings.target/100)*(1+S.settings.vat/100)) - 0.1).toFixed(1); } } };
+      $('#spFromMenu').onchange = e => { const m = S.menu.find(x=>x.id===e.target.value); if(!m) return; rows.insertAdjacentHTML('beforeend', row({name:m.name, desc:m.desc, price:m.price, veg:m.veg, card:m.card})); const first = rows.firstElementChild; if(first && !first.querySelector('[data-f=name]').value) first.remove(); e.target.value = ''; };
+      f.querySelectorAll('[data-dur]').forEach(b => b.onclick = () => { const fr = f.elements.from.value || todayStr(); f.elements.to.value = addDays(fr, +b.dataset.dur - 1); });
+     }});
+}
+
+/* ---------- Design-Team: Themen, Ornamente, Schriften ---------- */
+Object.assign(ORN, {
+  schnee:'<path d="M12 2v20M3.3 7l17.4 10M3.3 17l17.4-10M10 4l2 2 2-2M10 20l2-2 2 2M4.5 10.5l2.6-.7-.7-2.6M19.5 13.5l-2.6.7.7 2.6"/>',
+  baerlauch:'<path d="M4 20C7 11 13 5 20 4c-1 7-6 13-16 16z"/><path d="M4 20L15 9"/>',
+  bergsee:'<path d="M2 15l5-7 4 5 3-3 8 5"/><path d="M2 19q2.5-2 5 0t5 0 5 0 5 0"/>',
+  laerche:'<path d="M4 20L19 5M8 16l-3-1M8 16l1 3M12 12l-3-1M12 12l1 3M16 8l-3-1M16 8l1 3"/><ellipse cx="19.5" cy="4.5" rx="1.6" ry="2.2" transform="rotate(45 19.5 4.5)"/>',
+  stempel:'<circle cx="12" cy="12" r="10.5" stroke-dasharray="1.6 1.6"/><circle cx="12" cy="12" r="7.5"/><path d="M12 8.2l1.1 2.4 2.6.3-1.9 1.8.5 2.6-2.3-1.3-2.3 1.3.5-2.6-1.9-1.8 2.6-.3z" fill="currentColor" stroke="none"/>',
+});
+delete ORN.blatt; delete ORN.berg;
+Object.assign(ORN_LABEL, {baerlauch:'Bärlauch', bergsee:'Bergsee', laerche:'Lärche', stempel:'Stempel'});
+const ORN_ORDER = ['schnee','baerlauch','bluete','sonne','bergsee','laerche','stempel','keins'];
+Object.assign(THEMES, {
+  winter:   {theme:'Pulverschnee', layout:'alpin',  pal:{paper:'#eef2f4', ink:'#1b2a3a', accent:'#a3243b', muted:'#5e6e7a', rule:'#b9c6ce'}, fd:'Fraunces', fb:'Karla', orn:'schnee', title:'Winterkarte', subtitle:'Gegenüber der Piste · Fondue, Flammkuchen & Kaiserschmarrn'},
+  fruehling:{theme:'Bärlauch',     layout:'alpin',  pal:{paper:'#f3f5ec', ink:'#23331f', accent:'#5f8b2e', muted:'#6e7766', rule:'#c9d4b8'}, fd:'Young Serif', fb:'Figtree', orn:'baerlauch', title:'Frühlingskarte', subtitle:'Bärlauch, Spargel & die ersten Almkräuter'},
+  sommer:   {theme:'Almrausch',    layout:'modern', pal:{paper:'#fbfcfa', ink:'#0f3b4a', accent:'#c8325f', muted:'#557079', rule:'#bfd6dc'}, fd:'Bricolage Grotesque', fb:'Work Sans', orn:'bergsee', title:'Sommerkarte', subtitle:'Terrasse, Flammkuchen & kühle Getränke unterm Gerlospass'},
+  herbst:   {theme:'Lärchengold',  layout:'alpin',  pal:{paper:'#e6e4d8', ink:'#2e2a1f', accent:'#9e7410', muted:'#6b6655', rule:'#c3bfa8'}, fd:'Alegreya SC', fb:'Alegreya Sans', orn:'laerche', title:'Herbstkarte', subtitle:'Wild, Kürbis & Kastanien aus dem Zillertal'},
+});
+const TAGESBLATT = {paper:'#23282b', ink:'#f4f2ec', accent:'#f2c14e', muted:'#a9b0b4', rule:'#4a5257'};
+FONTPAIRS.length = 0;
+FONTPAIRS.push(['Fraunces','Karla','Pulverschnee'],['Young Serif','Figtree','Bärlauch'],['Bricolage Grotesque','Work Sans','Almrausch'],['Alegreya SC','Alegreya Sans','Lärchengold'],['Cormorant Garamond','Figtree','Elegant']);
+const SERIF_FONTS = ['Fraunces','Young Serif','Alegreya SC','Cormorant Garamond'];
+fontStack = (f, serif) => `"${f}",${SERIF_FONTS.includes(f)?'Georgia,serif':'system-ui,sans-serif'}`;
+const DAYS = [[1,'Mo'],[2,'Di'],[3,'Mi'],[4,'Do'],[5,'Fr'],[6,'Sa'],[0,'So']];
+const DAYNAME = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+
+/* ---------- Demodaten: Saisongerichte (Küchenchef) & Aktionen (Gastronomie) ---------- */
+const SEASON_DEMO = [
+  ['Fondue & Hauptspeisen','Hirschragout','Mit Serviettenknödel, Rotkraut und Preiselbeerbirne',26.90,['winter','herbst'],'','A C G L O'],
+  ['Fondue & Hauptspeisen','Zillertaler Krapfen','Roggenteig mit Graukäse-Erdäpfelfülle, Sauerkraut',15.90,['winter'],'v','A C G'],
+  ['Vorspeisen','Bärlauch-Kaspressknödel','Auf Blattsalat mit Kernöl',15.50,['fruehling'],'v','A C G'],
+  ['Fondue & Hauptspeisen','Gebratener Zillertaler Saibling','Mit grünem Spargel und Heurigen',27.50,['fruehling'],'','D G'],
+  ['Fondue & Hauptspeisen','Eierschwammerlgulasch','Mit Serviettenknödel und Petersilie',19.90,['sommer'],'v','A C G'],
+  ['Suppen','Kalte Gurken-Buttermilchsuppe','Mit Dille und Forellenkaviar',8.90,['sommer'],'','D G'],
+  ['Suppen','Kürbiscremesuppe','Mit Kernöl und gerösteten Kernen',7.50,['herbst'],'v','G'],
+  ['Fondue & Hauptspeisen','Tiroler Kiachl','Mit Sauerkraut oder Preiselbeeren',12.90,['herbst'],'v','A C G'],
+];
+function easter(Y){ const a=Y%19,b=Math.floor(Y/100),c=Y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1; return `${Y}-${String(mo).padStart(2,'0')}-${String(da).padStart(2,'0')}`; }
+function nthSunday(Y,M,n){ const d = new Date(Y,M-1,1); const first = (7-d.getDay())%7+1; return `${Y}-${String(M).padStart(2,'0')}-${String(first+7*(n-1)).padStart(2,'0')}`; }
+function nextFriday(t){ const d = new Date(t+'T12:00:00'); return addDays(t, ((5-d.getDay()+7)%7) || 7); }
+function upcoming(fn, y, t){ const a = fn(y); return a >= t ? a : fn(y+1); }
+const SPECIAL_DEMO = (y, t) => {
+  const wild = nextFriday(t), ost = upcoming(easter, y, t), mut = upcoming(Y=>nthSunday(Y,5,2), y, t), alm = upcoming(Y=>`${Y}-09-26`, y, t), sch = upcoming(Y=>`${Y}-07-13`, y, t);
+  return [
+    ['Gerlosser Wildwochenende', wild, addDays(wild,2), 'insert', 'tafel', 'Frisch aus der heimischen Jagd', [['Rehragout','Mit Serviettenknödel, Rotkraut und Preiselbeeren',26.90,'','A C G L O'],['Hirschgulasch','Mit Butterspätzle',24.90,'','A C G L']]],
+    ['Silvester-Fondue Chinoise', `${y}-12-31`, `${y}-12-31`, 'tageskarte', 'festlich', 'Reservierung um 18:15 oder ab 20:30 Uhr', [['Fondue Chinoise','Rind, Kalb und Huhn, Brühe, fünf hausgemachte Saucen, pro Person',42.00,'','C L M O'],['Mitternachts-Gulaschsuppe','Mit Gebäck',7.90,'','A']]],
+    ['Ostern bei uns', ost, addDays(ost,1), 'insert', 'saison', 'Ostersonntag und Ostermontag', [['Osterbrunch-Teller','Osterschinken, Kren, gefärbte Eier, Bauernbrot, Butter',17.50,'','A C G']]],
+    ['Muttertags-Menü', mut, mut, 'tageskarte', 'festlich', 'Drei Gänge für Mama', [['Bärlauchsuppe','',0,'v','G'],['Kalbsrücken mit Spargel','Hauptgang',0,'','G'],['Erdbeer-Topfencreme','Dessert',0,'v','G'],['Menü komplett','Drei Gänge',39.50,'','A C G']]],
+    ['Almabtrieb-Wochenende', alm, addDays(alm,1), 'insert', 'tafel', 'Wenn die Kühe von der Alm kommen', [['Almabtrieb-Kasspatzln','Zillertaler Bergkäse, Röstzwiebel, grüner Salat',16.90,'v','A C G']]],
+    ['Eierschwammerl-Tage', sch, addDays(sch,13), 'insert', 'saison', 'Je nach Ernte', [['Eierschwammerl à la crème','Mit Semmelknödel und Petersilie',21.50,'v','A C G']]],
+  ];
+};
+// seasonSeed neu: mit Allergenen, Wochentagen, Ruhetag
+seasonSeed = function(d){
+  d.settings.seasons = {}; SEASONS.forEach(([k]) => d.settings.seasons[k] = seasonDefaults(k));
+  d.settings.closed = [3];
+  const tag = {'Zillertaler Käsefondue':['winter','herbst'], '„Dippin me softly!“':['winter'], '„Marillenzeit = Knödelzeit“':['sommer'], '„Endless Summer“':['fruehling','sommer'], 'DAHUAM.202 Sommersalat':['sommer'],
+    '„Schwammerlsuche“':['sommer','herbst'], 'Eierschwammerl Carbonara':['sommer','herbst'], 'Schwammerlrösti':['sommer','herbst'], '„Wilde Bolo“':['herbst','winter'], '„Alpen Ceviche“':['fruehling','sommer'], 'Kokos-Curry-Suppe':['winter','herbst']};
+  const days = {'Original Wiener Tafelspitz':[0], 'Ripperl-Tower':[2]};
+  d.menu.forEach(m => { m.seasons = tag[m.name] || []; m.days = days[m.name] || []; m.alg = ''; });
+  SEASON_DEMO.forEach(([section,name,desc,price,seasons,veg,alg]) => d.menu.push({id:uid('m'), section, name, desc, price, card:'', img:'', veg, top:false, hidden:false, seasons, days:[], alg, order: d.menu.filter(x=>x.section===section).length}));
+  const y = new Date().getFullYear(), t = todayStr();
+  d.specials = SPECIAL_DEMO(y, t).map(([name, from, to, mode, style, note, items]) => ({id:uid('sp'), name, from, to, mode, style, note, items:items.map(([n,ds,p,veg,alg])=>({name:n, desc:ds, price:p, veg:veg||'', card:'', alg:alg||''}))}));
+};
+const _seasonMigrate = seasonMigrate;
+seasonMigrate = function(d){ _seasonMigrate(d); d.menu.forEach(m => { if(!m.days) m.days = []; if(m.alg==null) m.alg = ''; }); if(!d.settings.closed) d.settings.closed = [3]; return d; };
+
+/* ---------- Allergene & Verfügbarkeit ---------- */
+function itemAlg(m){ const c = m.card && C(m.card); return c ? [...totals(c).alg].sort() : algList(m.alg).sort(); }
+function hasAlg(m){ return !!(m.card && C(m.card)) || algList(m.alg).length > 0; }
+function dayOk(m, date){ return !m.days || !m.days.length || m.days.includes(new Date(date+'T12:00:00').getDay()); }
+function daysLabel(m){ return m.days && m.days.length ? 'nur ' + DAYS.filter(([i])=>m.days.includes(i)).map(([,l])=>l).join(', ') : ''; }
+function seasonYear(k, date){ const y = +date.slice(0,4), s = S.settings.seasons[k]; if(s.from > s.to){ return date.slice(5) >= s.from ? `${y}/${String(y+1).slice(2)}` : `${y-1}/${String(y).slice(2)}`; } return String(y); }
+
+itemHtml = function(m, s, used, date){
+  const alg = itemAlg(m); alg.forEach(a=>used.add(a));
+  const img = s.photos && m.id ? menuImg(m) : '';
+  const dl = daysLabel(m);
+  return `<article class="g-item ${img?'has-ph':''} ${m.top?'is-top':''}">
+    ${img ? `<img class="g-ph" src="${IMG[img]}" alt="${esc(m.name)}" loading="lazy">` : ''}
+    <div class="g-txt"><div class="g-row"><span class="g-n">${esc(m.name)}${m.veg==='vg'?' <i class="g-mark" title="Vegan">VG</i>':m.veg==='v'?' <i class="g-mark" title="Vegetarisch">V</i>':''}</span><span class="lead"></span>${+m.price ? `<span class="g-p"><span class="cur">€ </span>${fin(+m.price).toLocaleString('de-AT',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>` : ''}</div>
+    ${m.top?`<div class="g-top">★ Empfehlung des Hauses</div>`:''}
+    ${s.desc && (m.desc || dl) ? `<div class="g-d">${esc(m.desc)}${m.desc&&dl?' · ':''}${dl?`<b class="g-days">${esc(dl)}</b>`:''}</div>` : ''}
+    ${s.allergens && alg.length ? `<div class="g-a">${alg.join(' · ')}</div>` : ''}</div>
+  </article>`;
+};
+specialBlock = function(sp, s, used, standalone){
+  const sty = sp.style || 'tafel';
+  const d1 = new Date(sp.from+'T12:00:00'), d2 = new Date((sp.to||sp.from)+'T12:00:00');
+  const f = d => d.toLocaleDateString('de-AT',{weekday:'short', day:'numeric', month:'short'}).replace(/\./g,'');
+  const date = sp.to && sp.to !== sp.from ? `${f(d1)} – ${f(d2)}` : d1.toLocaleDateString('de-AT',{weekday:'long', day:'numeric', month:'long'});
+  return `<section class="g-special g-sp-${sty} ${standalone?'is-page':''}">
+    <div class="g-sp-head"><h3 class="g-sp-title">${esc(sp.name)}</h3><span class="g-sp-date">${esc(date)}</span>${sp.note?`<p class="g-sp-note">${esc(sp.note)}</p>`:''}</div>
+    <div class="g-sp-list">${sp.items.map(it => itemHtml({...it, id:'', top:false}, {...s, photos:false}, used)).join('')}</div>
+  </section>`;
+};
+function guestItems(k, date){ const sp = new Set(specialsFor(date).flatMap(x=>x.items.map(i=>i.name))); return menuSorted().filter(m => !m.hidden && inSeason(m, k) && dayOk(m, date) && !sp.has(m.name)); }
+guestHtml = function(seasonKey, dateStr){
+  dateStr = dateStr || todayStr();
+  const k = seasonKey || seasonFor(dateStr) || 'winter';
+  const s = S.settings.seasons[k];
+  const items = guestItems(k, dateStr);
+  const used = new Set();
+  const inserts = specialsFor(dateStr).filter(sp => sp.mode !== 'tageskarte');
+  let body = inserts.map(sp => specialBlock(sp, s, used)).join('');
+  for(const sec of secList()){
+    const list = items.filter(m=>m.section===sec); if(!list.length) continue;
+    body += `<section class="g-sec"><h3 class="g-h">${ornSvg(s.orn,'g-h-orn')}<span>${esc(sec)}</span></h3><div class="g-list">${list.map(m => itemHtml(m, s, used, dateStr)).join('')}</div></section>`;
+  }
+  const legend = s.allergens && used.size ? `<div class="g-leg">${[...used].sort().map(a=>`<span><b>${a}</b> ${esc(ALG[a])}</span>`).join('')}</div>` : '';
+  const cover = s.cover && IMG[s.cover] ? `<img class="g-cover" src="${IMG[s.cover]}" alt="">` : '';
+  return `<div class="g-paper g-${s.layout} g-th-${k}" style="${paperStyle(s)}">
+    ${cover}
+    <header class="g-head">${ornSvg(s.orn,'g-orn top')}<div class="g-mark-logo">DAHUAM<span>.</span>202</div><h2 class="g-title">${esc(s.title)}</h2>${s.subtitle?`<div class="g-sub">${esc(s.subtitle)}</div>`:''}</header>
+    ${body || '<p class="g-empty">Noch keine sichtbaren Gerichte in dieser Saison.</p>'}
+    <footer class="g-foot">${ornSvg(s.orn,'g-orn')}<div class="g-keys"><span><i class="g-mark">V</i> vegetarisch</span><span><i class="g-mark">VG</i> vegan</span><span>★ Empfehlung des Hauses</span></div>${legend}<p>${esc(s.footer)}</p><p class="g-stand">${esc(s.title)} ${seasonYear(k, dateStr)} · Stand ${fmtDate(new Date().toISOString())}</p></footer>
+  </div>`;
+};
+tageskarteHtml = function(sp, k){
+  k = k || seasonFor(sp.from) || 'winter';
+  const base = S.settings.seasons[k]; const used = new Set();
+  const pal = sp.style === 'saison' ? base.pal : sp.style === 'festlich' ? {paper:'#1d1a16', ink:'#f3ead8', accent:'#d8b45a', muted:'#b5a990', rule:'#4a4234'} : TAGESBLATT;
+  const s = {...base, pal, layout:'alpin', fd: sp.style==='festlich' ? 'Cormorant Garamond' : base.fd, fb: sp.style==='saison' ? base.fb : 'Figtree'};
+  const legend = used.size; const inner = specialBlock(sp, s, used, true);
+  return `<div class="g-paper g-tk g-alpin g-tk-${sp.style}" style="${paperStyle(s)}">
+    <header class="g-head">${ornSvg(sp.style==='saison'?base.orn:'stempel','g-orn top')}<div class="g-mark-logo">DAHUAM<span>.</span>202</div><div class="g-sub">Tageskarte</div></header>${inner}
+    <footer class="g-foot">${used.size ? `<div class="g-leg">${[...used].sort().map(a=>`<span><b>${a}</b> ${esc(ALG[a])}</span>`).join('')}</div>` : ''}<p>Nur für kurze Zeit, solange der Vorrat reicht. Preise in Euro inkl. MwSt.</p></footer></div>`;
+};
+function guestPrevHtml(){
+  const date = view.gdate || todayStr(); const k = curSeasonKey();
+  const wd = new Date(date+'T12:00:00').getDay();
+  const closed = (S.settings.closed||[]).includes(wd) ? `<div class="g-closed">${ico('spark')}${DAYNAME[wd]} ist Ruhetag. So sähe die Karte trotzdem aus.</div>` : '';
+  return closed + guestHtml(k, date) + specialsFor(date).filter(sp => sp.mode === 'tageskarte').map(sp=>`<div class="tk-label">Eigene Tageskarte · ${esc(sp.name)}</div>${tageskarteHtml(sp, k)}`).join('');
+}
+function curSeasonKey(){ return view.gseason || seasonFor(view.gdate || todayStr()) || 'winter'; }
+
+/* ---------- Speisekarte: Reiter inkl. Saison & Aktionen ---------- */
+renderMenu = function(){
+  const hidden = S.menu.filter(m=>m.hidden).length;
+  const live = S.specials.filter(sp => spStatus(sp)[0]==='live').length;
+  const head = `<div class="page-h"><div><div class="eyebrow">${S.menu.length} Gerichte · ${secList().length} Kategorien${hidden?` · ${hidden} ausgeblendet`:''}</div><h1>Speisekarte</h1></div>
+    <div class="row-btns">${view.mtab==='guest' && !FRAMED ? `<button type="button" class="btn" data-act="printMenu">${ico('print')}Drucken</button>` : ''}${view.mtab==='plan' ? `<button type="button" class="btn primary" data-act="newSpecial">${ico('plus')}Aktion</button>` : `<button type="button" class="btn primary" data-act="newMenu">${ico('plus')}Gericht</button>`}</div></div>
+  <div class="toolbar">${seg('mtab', view.mtab, [['calc','Kalkulation'],['guest','Gästekarte'],['plan','Saison & Aktionen', live?'live':null],['layout','Aufbau & Reihenfolge']])}</div>`;
+  return head + (view.mtab==='guest' ? renderGuest() : view.mtab==='layout' ? renderLayout() : view.mtab==='plan' ? renderPlan() : renderMenuCalc());
+};
+printMenu = function(){ $('#print').innerHTML = guestPrevHtml().replace(/<div class="g-closed">.*?<\/div>/,''); document.body.classList.add('print-menu'); window.print(); };
+
+function parseMD(v){ const m = String(v).trim().match(/^(\d{1,2})\.(\d{1,2})\.?$/); if(!m) return null; const d = +m[1], mo = +m[2]; if(mo<1||mo>12||d<1||d>31) return null; return `${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+function refreshGuest(){ const p = $('.guest-prev'); if(p) p.innerHTML = guestPrevHtml(); }
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if(!el) return;
+  const id = el.dataset.id, s = S.settings.seasons[curSeasonKey()];
+  switch(el.dataset.act){
+    case 'importPick': $('#importFile').click(); break;
+    case 'gdate': view.gdate = id; view.gseason = null; render(); break;
+    case 'gseason': view.gseason = id || null; render(); break;
+    case 'glayout': s.layout = id; save(); render(); break;
+    case 'gorn': s.orn = id; save(); render(); break;
+    case 'palPreset': s.pal = {...THEMES[id].pal}; save(); render(); toast(`Farben „${THEMES[id].theme}“ übernommen`); break;
+    case 'gcover': pickImage(data => { if(s.cover) imgDel(s.cover); const iid = uid('img'); imgPut(iid, data); s.cover = iid; save(); render(); toast('Titelbild gespeichert'); }); break;
+    case 'gcoverDel': imgDel(s.cover); s.cover = ''; save(); render(); break;
+    case 'gReset': ask(`Design der ${s.title} auf „${THEMES[id].theme}“ zurücksetzen? Zeitraum und Texte bleiben.`, () => { const d = seasonDefaults(id); Object.assign(s, {layout:d.layout, pal:d.pal, fd:d.fd, fb:d.fb, orn:d.orn}); }, 'Zurücksetzen'); break;
+    case 'editSeason': view.mtab = 'guest'; view.gseason = id; go('menu'); break;
+    case 'newSpecial': specialDialog(); break;
+    case 'editSpecial': specialDialog(S.specials.find(x=>x.id===id)); break;
+    case 'previewSpecial': { const sp = S.specials.find(x=>x.id===id); view.gdate = sp.from; view.gseason = null; view.mtab = 'guest'; go('menu'); break; }
+    case 'dupSpecial': { const sp = S.specials.find(x=>x.id===id); const n = JSON.parse(JSON.stringify(sp)); n.id = uid('sp'); const sh = d => `${+d.slice(0,4)+1}${d.slice(4)}`; n.from = sh(sp.from); n.to = sh(sp.to||sp.from); S.specials.push(n); save(); render(); toast(`„${n.name}“ für ${n.from.slice(0,4)} angelegt. Datum bitte prüfen.`); break; }
+    case 'printSpecial': { const sp = S.specials.find(x=>x.id===id); $('#print').innerHTML = tageskarteHtml(sp); document.body.classList.add('print-menu'); window.print(); break; }
+  }
+});
+document.addEventListener('input', e => {
+  const t = e.target; if(!t.closest('#app')) return;
+  const s = S.settings.seasons[curSeasonKey()];
+  if(t.dataset.st){ s[t.dataset.st] = t.value; save(); refreshGuest(); }
+  if(t.dataset.pal){ s.pal[t.dataset.pal] = t.value; save(); refreshGuest(); }
+});
+document.addEventListener('change', e => {
+  const t = e.target; if(!t.closest('#app')) return;
+  const s = S.settings.seasons[curSeasonKey()];
+  if(t.id === 'gdate' && t.value){ view.gdate = t.value; view.gseason = null; render(); return; }
+  if(t.dataset.pal){ document.querySelectorAll('.sw-preset').forEach(b=>b.classList.remove('on')); return; }
+  if(t.dataset.sv){ if(t.dataset.sv === 'fontpair'){ const [a,b] = t.value.split('|'); s.fd = a; s.fb = b; } else s[t.dataset.sv] = t.checked; save(); refreshGuest(); return; }
+  if(t.dataset.smd){ const v = parseMD(t.value); if(!v){ t.value = mdLabel(s[t.dataset.smd]); toast('Datum als TT.MM. eingeben, z. B. 01.12.'); return; } s[t.dataset.smd] = v; save(); render(); toast(`${s.title}: ${mdLabel(s.from)} bis ${mdLabel(s.to)}`); return; }
+  if(t.dataset.ms){ const [mid,k] = t.dataset.ms.split(':'); const m = S.menu.find(x=>x.id===mid); let set = new Set(m.seasons.length ? m.seasons : SEASONS.map(x=>x[0])); t.checked ? set.add(k) : set.delete(k); m.seasons = set.size === 4 ? [] : SEASONS.map(x=>x[0]).filter(x=>set.has(x)); save(); const st = t.closest('tr').querySelector('small'); if(st) st.textContent = m.section + (m.seasons.length ? '' : ' · ganzjährig'); if(!set.size) toast(`„${m.name}“ steht jetzt auf keiner Saisonkarte`); return; }
 });
 
 /* ---------- Start ---------- */
@@ -1787,7 +2414,7 @@ themeIcon();
 matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', themeIcon);
 function fromHash(){ const h = location.hash.slice(1); if(TABS.some(t=>t[0]===h) && h !== view.tab){ view = {...view, tab:h, card:null, q:''}; render(); } }
 window.addEventListener('hashchange', fromHash);
-fromHash(); render();
+try { fromHash(); render(); } catch(err){ console.error(err); $('#app').innerHTML = `<section class="panel" style="max-width:560px"><h2>Gespeicherte Daten konnten nicht geladen werden</h2><p class="hint">Laden Sie eine Sicherung oder starten Sie mit den Demodaten neu.</p><div class="row-btns" style="margin-top:12px"><button type="button" class="btn primary" data-act="importPick">Sicherung laden</button><button type="button" class="btn danger" data-act="reset">Demodaten laden</button></div><input id="importFile" type="file" accept="application/json,.json" hidden></section>`; }
 imgLoadAll().then(() => { if(Object.keys(IMG).length) render(); });
 
 </script>
