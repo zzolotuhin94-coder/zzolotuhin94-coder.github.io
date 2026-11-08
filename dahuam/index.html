@@ -5,144 +5,355 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>DAHUAM.202 Küche</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="theme-color" content="#24453b">
+<meta name="theme-color" content="#173229">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
-/* Layout: working tool. Sticky header with tabs, summary first, then dense lists/tables. Pine green + cheese-yellow accent. */
+/* Layout: app shell. Pine sidebar (desktop) / bottom tab bar (phone); content = summary first, then cards and dense tables.
+   Accent = Marille (apricot), a nod to the Wachau and to the Marillenknödel on the card. */
 :root{
-  --bg:#f3f5f2; --surface:#ffffff; --sunk:#e8ece7; --fg:#18231f; --muted:#5d6b65; --line:#d5ddd7;
-  --pine:#24453b; --pine-fg:#f3f5f2; --accent:#e2b33c; --accent-fg:#2a2205;
-  --good:#2f7d4f; --good-bg:#e1f0e6; --warn:#9a6a00; --warn-bg:#f8edcf; --bad:#b23a2e; --bad-bg:#f7e0dc;
-  --f-display:"Unbounded","Golos Text",system-ui,sans-serif;
-  --f-body:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --bg:#f2f4f0; --surface:#ffffff; --surface-2:#eceee9; --fg:#14201b; --muted:#5c6963; --line:#dde2db;
+  --side:#173229; --side-2:#21443a; --side-fg:#eef4f0; --side-muted:#9fb8ad;
+  --accent:#ec7a2f; --accent-2:#ffd9bd; --accent-soft:#fdeee2; --accent-fg:#ffffff;
+  --good:#23845a; --good-bg:#dff1e7; --warn:#a46a00; --warn-bg:#faedcc; --bad:#c2402f; --bad-bg:#fbe3de;
+  --s1:#ec7a2f; --s2:#2f7d63; --s3:#d9a632; --s4:#5677b8; --s5:#b4557c; --s6:#7d6bb0; --s7:#cfd5cd;
+  --shadow:0 1px 2px rgba(20,32,27,.06),0 8px 24px -12px rgba(20,32,27,.18);
+  --f-display:"Bricolage Grotesque","Figtree",system-ui,sans-serif;
+  --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
-  --r:10px;
+  --r:16px; --r-s:10px;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#111916; --surface:#18221e; --sunk:#0d1411; --fg:#e4ebe7; --muted:#93a39c; --line:#2b3a34;
-  --pine:#1c362e; --pine-fg:#e4ebe7; --accent:#e9be4f; --accent-fg:#2a2205;
-  --good:#6fcf95; --good-bg:#183326; --warn:#e8c25a; --warn-bg:#352b10; --bad:#f08a7e; --bad-bg:#3a1c18;
+  --bg:#0d1311; --surface:#151d1a; --surface-2:#1c2622; --fg:#e8eee9; --muted:#93a29b; --line:#26322d;
+  --side:#0a100e; --side-2:#16211d; --side-fg:#e8eee9; --side-muted:#7f948b;
+  --accent:#ff8c42; --accent-2:#5a3218; --accent-soft:#2a1c12; --accent-fg:#1a0d04;
+  --good:#5fd39a; --good-bg:#15301f; --warn:#f0c255; --warn-bg:#332810; --bad:#ff8b7a; --bad-bg:#3a1a15;
+  --s1:#ff8c42; --s2:#4fb38f; --s3:#e8bb4a; --s4:#7d9be0; --s5:#e07aa4; --s6:#a08fe0; --s7:#33403a;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
   color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#111916; --surface:#18221e; --sunk:#0d1411; --fg:#e4ebe7; --muted:#93a39c; --line:#2b3a34;
-  --pine:#1c362e; --pine-fg:#e4ebe7; --accent:#e9be4f; --accent-fg:#2a2205;
-  --good:#6fcf95; --good-bg:#183326; --warn:#e8c25a; --warn-bg:#352b10; --bad:#f08a7e; --bad-bg:#3a1c18;
+  --bg:#0d1311; --surface:#151d1a; --surface-2:#1c2622; --fg:#e8eee9; --muted:#93a29b; --line:#26322d;
+  --side:#0a100e; --side-2:#16211d; --side-fg:#e8eee9; --side-muted:#7f948b;
+  --accent:#ff8c42; --accent-2:#5a3218; --accent-soft:#2a1c12; --accent-fg:#1a0d04;
+  --good:#5fd39a; --good-bg:#15301f; --warn:#f0c255; --warn-bg:#332810; --bad:#ff8b7a; --bad-bg:#3a1a15;
+  --s1:#ff8c42; --s2:#4fb38f; --s3:#e8bb4a; --s4:#7d9be0; --s5:#e07aa4; --s6:#a08fe0; --s7:#33403a;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
   color-scheme:dark}
+
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{margin:0}
-body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--f-body);-webkit-text-size-adjust:100%}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--pine)}
-.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--pine);color:var(--pine-fg)}
-header.top .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:10px 24px;padding-block:12px}
-.brand{display:flex;flex-direction:column;line-height:1.2}
-.brand b{font:700 17px/1.1 var(--f-display);letter-spacing:.02em}
-.brand b i{font-style:normal;color:var(--accent)}
-.brand span{font-size:12px;opacity:.75}
-nav.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
-nav.tabs button{background:transparent;color:var(--pine-fg);border:1px solid transparent;border-radius:999px;padding:6px 14px;font:500 14px var(--f-body);cursor:pointer;opacity:.85}
-nav.tabs button:hover{opacity:1;border-color:color-mix(in srgb,var(--pine-fg) 30%,transparent)}
-nav.tabs button.on{background:var(--accent);color:var(--accent-fg);opacity:1}
-@media (max-width:560px){nav.tabs{margin-left:0;flex-wrap:nowrap;gap:2px;width:100%;overflow-x:auto;scrollbar-width:none}nav.tabs button{padding:6px 10px;font-size:13.5px}}
-main{padding-block:20px 60px}
-h1{font:700 22px/1.25 var(--f-display);margin:0;text-wrap:balance}
-h2{font:600 13px/1.3 var(--f-body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:26px 0 8px}
-.muted{color:var(--muted)}
-.mono,.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
-.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0}
-.bar .sp{flex:1}
-input,select,textarea{font:inherit;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-width:0}
-input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-input[type=number]{font-family:var(--f-mono)}
-.search{flex:1 1 220px;max-width:360px}
-button.btn{font:500 14px var(--f-body);border-radius:8px;padding:7px 14px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
-button.btn:hover{border-color:var(--muted)}
-button.primary{background:var(--pine);color:var(--pine-fg);border-color:var(--pine)}
-:root[data-theme="dark"] button.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) button.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}}
-button.danger{color:var(--bad);border-color:var(--bad)}
-button.icon{background:none;border:0;color:var(--muted);cursor:pointer;font-size:18px;padding:2px 8px;border-radius:6px}
-button.icon:hover{color:var(--fg);background:var(--sunk)}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.seg button{border:0;background:var(--surface);color:var(--muted);padding:7px 12px;font:500 14px var(--f-body);cursor:pointer}
-.seg button.on{background:var(--sunk);color:var(--fg)}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--f-body);-webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--side)}
+button{font:inherit;color:inherit}
+.ico{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ico.flip{transform:rotate(180deg)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.muted{color:var(--muted)} .sm{font-size:13px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-top:14px}
-.kpi{background:var(--surface);padding:14px 16px}
-.kpi .v{font:600 24px/1.1 var(--f-mono);font-variant-numeric:tabular-nums}
-.kpi .l{font-size:12.5px;color:var(--muted);margin-top:4px}
-@media (max-width:640px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* Shell */
+.shell{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:env(safe-area-inset-top,0px);height:calc(100vh - env(safe-area-inset-top,0px));background:var(--side);color:var(--side-fg);display:flex;flex-direction:column;gap:22px;padding:22px 14px 18px max(14px,env(safe-area-inset-left,0px))}
+.brand{display:flex;align-items:center;gap:12px;padding:0 8px}
+.logo{width:40px;height:40px;border-radius:12px;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;font:800 15px/1 var(--f-display);letter-spacing:-.03em}
+.brand b{display:block;font:800 18px/1 var(--f-display);letter-spacing:-.02em}
+.brand small{display:block;font-size:12px;color:var(--side-muted);margin-top:4px}
+.side .nav-slot{display:flex;flex-direction:column;gap:2px}
+.nav-i{display:flex;align-items:center;gap:12px;width:100%;border:0;background:transparent;color:var(--side-muted);padding:10px 12px;border-radius:12px;cursor:pointer;font-weight:500;text-align:left;transition:background .15s,color .15s}
+.nav-i:hover{background:var(--side-2);color:var(--side-fg)}
+.nav-i.on{background:var(--side-2);color:var(--side-fg)}
+.nav-i.on .ico{color:var(--accent)}
+.kbd-btn{display:flex;align-items:center;gap:10px;border:1px solid var(--side-2);background:transparent;color:var(--side-muted);border-radius:12px;padding:9px 12px;cursor:pointer;width:100%}
+.kbd-btn:hover{color:var(--side-fg);border-color:var(--side-muted)}
+.kbd-btn kbd{margin-left:auto;font:500 11px var(--f-mono);border:1px solid var(--side-2);border-radius:6px;padding:2px 6px}
+.side-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding:0 8px;font-size:12px;color:var(--side-muted)}
+.theme-btn{border:0;background:var(--side-2);color:var(--side-fg);width:36px;height:36px;border-radius:10px;display:grid;place-items:center;cursor:pointer}
+.topbar,.bottom{display:none}
 
-.list{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
-.row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px 18px;align-items:center;padding:12px 16px;border-top:1px solid var(--line)}
-.row:first-child{border-top:0}
-.row.click{cursor:pointer}
-.row.click:hover{background:var(--sunk)}
-.nm{font-weight:600}
-.ds{font-size:13.5px;color:var(--muted)}
-.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
-.alg{font:600 11px/1 var(--f-mono);padding:3px 5px;border-radius:4px;background:var(--sunk);color:var(--muted);border:1px solid var(--line)}
-.tag{font:500 11.5px/1 var(--f-body);padding:3px 7px;border-radius:999px;background:var(--sunk);color:var(--muted)}
+main{padding-block:28px 80px;padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px));max-width:1320px;width:100%}
+main.enter{animation:rise .28s ease-out}
+@keyframes rise{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+@media (max-width:900px){
+  .shell{display:block}
+  .side{display:none}
+  .topbar{display:flex;position:sticky;top:env(safe-area-inset-top,0px);z-index:20;align-items:center;gap:10px;background:var(--side);color:var(--side-fg);padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .topbar .brand{padding:0;flex:1}
+  .topbar .logo{width:34px;height:34px;border-radius:10px;font-size:13px}
+  .topbar .brand b{font-size:16px}
+  .bottom{display:flex;position:fixed;inset:auto 0 0 0;z-index:20;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px max(6px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px))}
+  .bottom .nav-slot{display:flex;width:100%}
+  .bottom .nav-i{flex:1;flex-direction:column;gap:3px;padding:6px 2px;font-size:10.5px;color:var(--muted);text-align:center;align-items:center;min-width:0}
+  .bottom .nav-i span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .bottom .nav-i:hover{background:transparent;color:var(--fg)}
+  .bottom .nav-i.on{background:transparent;color:var(--fg)}
+  main{padding-block:18px 100px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+}
+
+/* Typo */
+h1{font:800 clamp(28px,4vw,40px)/1.05 var(--f-display);letter-spacing:-.03em;margin:0;text-wrap:balance}
+h2{font:700 15px/1.3 var(--f-body);margin:0;letter-spacing:-.005em}
+.eyebrow{font:600 12px/1.2 var(--f-body);text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:8px}
+.page-h{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
+.sec-h{display:flex;align-items:center;gap:10px;font:700 20px/1.2 var(--f-display);letter-spacing:-.02em;margin:30px 0 12px}
+.hint{font-size:13px;color:var(--muted);margin:10px 0 0}
+.note{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--fg);background:var(--accent-soft);border:1px solid var(--accent-2);border-radius:12px;padding:10px 14px;margin:0 0 20px}
+.note .ico{color:var(--accent);margin-top:1px}
+
+/* Controls */
+input,select,textarea{font:inherit;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-s);padding:9px 12px;min-width:0;transition:border-color .15s,box-shadow .15s}
+input:hover,select:hover,textarea:hover{border-color:color-mix(in srgb,var(--muted) 50%,var(--line))}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+input[type=number]{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+textarea{width:100%;min-height:160px;resize:vertical;line-height:1.6}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:14px;border-radius:12px;padding:9px 16px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--fg);transition:transform .1s,border-color .15s,background .15s}
+.btn .ico{width:18px;height:18px}
+.btn:hover{border-color:var(--muted)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg);box-shadow:0 6px 18px -8px var(--accent)}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn.danger{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 45%,var(--line))}
+.btn.sm{padding:5px 12px;font-size:13px;border-radius:10px}
+.icon-btn{border:0;background:transparent;color:var(--muted);width:34px;height:34px;border-radius:10px;display:inline-grid;place-items:center;cursor:pointer;transition:background .15s,color .15s}
+.icon-btn:hover{background:var(--surface-2);color:var(--fg)}
+.icon-btn.lg{width:42px;height:42px;border:1px solid var(--line);background:var(--surface)}
+.icon-btn.danger:hover{color:var(--bad)}
+.link{border:0;background:none;padding:0;color:var(--accent);font-weight:600;font-family:var(--f-mono);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.row-btns{display:flex;gap:8px;flex-wrap:wrap}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.search{flex:1 1 260px;max-width:440px;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 12px;color:var(--muted)}
+.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.search input{border:0;background:transparent;padding:10px 0;flex:1;box-shadow:none!important}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:12px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;color:var(--muted);padding:7px 12px;border-radius:9px;font-weight:600;font-size:13.5px;cursor:pointer;display:flex;gap:6px;align-items:center}
+.seg button small{font:500 11px var(--f-mono);opacity:.7}
+.seg button.on{background:var(--surface);color:var(--fg);box-shadow:var(--shadow)}
+.chips-row{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 8px;margin:0 -2px 4px;scrollbar-width:thin}
+.chips-row .sep{flex:none;width:1px;background:var(--line);margin:4px 4px}
+.chip{flex:none;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s}
+.chip small{font:500 11px var(--f-mono);color:var(--muted)}
+.chip:hover{border-color:var(--muted)}
+.chip.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.chip.on small{color:inherit;opacity:.7}
+.dot{width:9px;height:9px;border-radius:50%;background:hsl(var(--h) 60% 52%);flex:none}
+
+/* Panels & tiles */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);min-width:0}
+.panel.flush{padding:0;overflow:hidden}
+.panel.accent{border-color:var(--accent-2);background:linear-gradient(180deg,var(--accent-soft),var(--surface) 70%)}
+.panel-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.panel-h.pad{padding:16px 18px 0;margin-bottom:12px}
+.panel-f{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:12px 18px;border-top:1px solid var(--line)}
+.panel-f .hint{margin:0}
+.empty{padding:36px 16px;text-align:center;color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.tile{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);text-align:left;min-width:0}
+.tile > div{min-width:0;flex:1}
+.tile.click{cursor:pointer;transition:transform .15s,border-color .15s}
+.tile.click:hover{transform:translateY(-2px);border-color:var(--accent)}
+.t-v{font:700 30px/1 var(--f-mono);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.t-v small{font-size:16px;color:var(--muted);font-weight:500}
+.t-l{font-weight:600;margin-top:6px}
+.t-s{font-size:12.5px;color:var(--muted);margin-top:2px}
+.good-t{color:var(--good)} .bad-t{color:var(--bad)}
+.meter{height:6px;border-radius:99px;background:var(--surface-2);margin-top:10px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--accent);border-radius:inherit}
+.tile-ring{position:relative;display:grid;place-items:center;flex:none}
+.tile-ring b{position:absolute;font:700 14px var(--f-mono)}
+@media (max-width:1100px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:420px){.tiles{gap:10px}.tile{padding:14px;gap:12px}.t-v{font-size:24px}}
+
+.ring .trk{stroke:var(--surface-2)}
+.ring .val{transition:stroke-dasharray .5s cubic-bezier(.2,.8,.2,1)}
+.ring.good .val{stroke:var(--good)} .ring.warn .val{stroke:var(--warn)} .ring.bad .val{stroke:var(--bad)} .ring.na .val{stroke:transparent}
+
+.dash-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px;align-items:start}
+.stack{display:flex;flex-direction:column;gap:18px;min-width:0}
+@media (max-width:1100px){.dash-grid{grid-template-columns:minmax(0,1fr)}}
+.legend{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)}
+.legend .tl{width:14px;height:0;border-top:2px dashed var(--fg);opacity:.6}
+.bars{position:relative;display:flex;flex-direction:column;gap:4px}
+.bar-r{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 56px;align-items:center;gap:12px;border:0;background:transparent;padding:6px 8px;margin:0 -8px;border-radius:10px;cursor:pointer;text-align:left}
+.bar-r:hover{background:var(--surface-2)}
+.bar-n{font-size:13.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-t{position:relative;height:12px;background:var(--surface-2);border-radius:99px}
+.bar-t i{position:absolute;inset:0 auto 0 0;border-radius:99px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.bar-t i.good{background:var(--good)} .bar-t i.warn{background:var(--warn)} .bar-t i.bad{background:var(--bad)}
+.bar-t::after{content:"";position:absolute;left:var(--tg);top:-4px;bottom:-4px;border-left:2px dashed var(--fg);opacity:.5}
+.bar-v{font:600 13px var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
+.bar-axis{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 56px;gap:12px;font:500 11px var(--f-mono);color:var(--muted);padding-top:4px}
+.bar-axis{margin:0 -8px;padding-inline:8px}
+.bar-axis .ax{display:flex;justify-content:space-between}
+.bar-axis i{font-style:normal}
+@media (max-width:560px){.bar-r,.bar-axis{grid-template-columns:minmax(0,110px) minmax(0,1fr) 48px;gap:8px}}
+.stackbar{display:flex;height:14px;border-radius:99px;overflow:hidden;gap:2px;background:var(--surface-2)}
+.stackbar i{display:block;height:100%;min-width:3px}
+.leg{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.leg li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:10px;align-items:center;font-size:13.5px}
+.leg .sw{width:12px;height:12px;border-radius:4px}
+.leg .ln{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.todo{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.todo button{display:flex;align-items:center;gap:12px;width:100%;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px;cursor:pointer;text-align:left;transition:border-color .15s,transform .15s}
+.todo button:hover{border-color:var(--accent);transform:translateX(2px)}
+.todo b{font:700 16px var(--f-mono);min-width:28px}
+.todo span{flex:1;min-width:0}
+.todo .ico{color:var(--muted);width:16px;height:16px}
+
+/* Dish cards */
+.dish-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.dish{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);transition:transform .18s,border-color .18s,box-shadow .18s;min-width:0}
+.dish:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.dish.nocard{background:transparent;border-style:dashed;box-shadow:none}
+.dish-main{display:flex;flex-direction:column;gap:6px;width:100%;height:100%;border:0;background:transparent;text-align:left;padding:16px 16px 14px;cursor:pointer;border-radius:inherit}
+.dish-top{display:flex;justify-content:space-between;gap:12px;align-items:baseline;padding-right:28px}
+.dish-n{font:700 16.5px/1.25 var(--f-display);letter-spacing:-.01em}
+.price{font:700 15px var(--f-mono);white-space:nowrap;font-variant-numeric:tabular-nums}
+.dish-d{font-size:13px;color:var(--muted);line-height:1.4}
+.dish-b{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:10px;flex-wrap:wrap}
+.dish .edit{position:absolute;top:10px;right:8px;opacity:.55}
+.dish:hover .edit{opacity:1}
+.fcw{display:flex;align-items:center;gap:10px}
+.fcw span{display:flex;flex-direction:column;line-height:1.15}
+.fcw b{font-size:14px}
+.fcw small{font-size:12px;color:var(--muted)}
+.fcw.sm b{font-size:12.5px}
+.add{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600;color:var(--accent)}
+.add .ico{width:16px;height:16px}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.alg{font:700 10.5px/1 var(--f-mono);padding:4px 5px;border-radius:6px;background:var(--surface-2);color:var(--muted)}
+
+/* Recipe cards */
+.rc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.rc{display:flex;flex-direction:column;gap:8px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;cursor:pointer;box-shadow:var(--shadow);transition:transform .18s,border-color .18s;min-width:0}
+.rc:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.rc-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tag{font:600 11.5px/1 var(--f-body);padding:5px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted)}
 .tag.semi{background:var(--warn-bg);color:var(--warn)}
-.nums{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
-.nums .p{font-weight:600}
-.nums .s{font-size:12.5px;color:var(--muted)}
-.fc{display:inline-block;min-width:62px;text-align:center;font:600 13px/1 var(--f-mono);padding:6px 8px;border-radius:999px}
-.fc.good{background:var(--good-bg);color:var(--good)}
-.fc.warn{background:var(--warn-bg);color:var(--warn)}
-.fc.bad{background:var(--bad-bg);color:var(--bad)}
-.fc.na{background:var(--sunk);color:var(--muted);font-family:var(--f-body);font-weight:500}
-.acts{display:flex;gap:4px;align-items:center}
-@media (max-width:640px){.row{grid-template-columns:minmax(0,1fr) auto}.row .acts{grid-column:1/-1;justify-content:flex-end}}
+.tag.dish{background:var(--good-bg);color:var(--good)}
+.rc-n{font:700 17px/1.25 var(--f-display);letter-spacing:-.01em}
+.rc-m{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)}
+.rc-b{display:flex;gap:22px;padding-top:6px;border-top:1px solid var(--line);margin-top:2px}
+.rc-b span{display:flex;flex-direction:column;padding-top:8px}
+.rc-b b{font-size:16px}
+.rc-b small{font-size:12px;color:var(--muted)}
 
-.tbl-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
-table{border-collapse:collapse;width:100%}
-th,td{padding:8px 10px;border-top:1px solid var(--line);text-align:left;vertical-align:middle}
-thead th{border-top:0;font:600 12px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:var(--sunk);white-space:nowrap}
-td.r,th.r{text-align:right}
-td.num{white-space:nowrap}
-tfoot td{font-weight:600;background:var(--sunk)}
-table.edit{min-width:720px}
-table.edit select{width:100%;min-width:220px}
-table.edit input[type=number]{width:96px;text-align:right}
-table.prods{min-width:820px}
-table.prods input[type=number]{width:92px;text-align:right}
-
-.grid2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
-@media (max-width:860px){.grid2{grid-template-columns:minmax(0,1fr)}}
-.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
-label.f{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted)}
-label.f input,label.f select,label.f textarea{font-size:15px}
-textarea{width:100%;min-height:150px;resize:vertical;line-height:1.5}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
-.panel + .panel{margin-top:14px}
-.big{font:600 30px/1.1 var(--f-mono);font-variant-numeric:tabular-nums}
-.kv{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:14px;margin-top:10px}
-.kv span:nth-child(even){font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
-.hint{font-size:13px;color:var(--muted);margin-top:10px}
-.back{background:none;border:0;color:var(--muted);cursor:pointer;font:500 14px var(--f-body);padding:0;margin-bottom:10px}
+/* Recipe detail */
+.back{display:inline-flex;align-items:center;gap:6px;border:0;background:none;color:var(--muted);cursor:pointer;font-weight:600;padding:0;margin-bottom:14px}
 .back:hover{color:var(--fg)}
-.note{font-size:13px;color:var(--muted);border-left:3px solid var(--accent);padding:6px 12px;margin:16px 0;background:var(--surface);border-radius:0 8px 8px 0}
+.back .ico{width:16px;height:16px}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:24px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:var(--shadow);margin-bottom:18px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;right:-80px;top:-120px;width:320px;height:320px;border-radius:50%;background:radial-gradient(closest-side,var(--accent-soft),transparent);pointer-events:none}
+.hero > *{position:relative}
+.title-in{font:800 clamp(24px,3.4vw,36px)/1.1 var(--f-display);letter-spacing:-.03em;border:1px solid transparent;background:transparent;padding:2px 8px;margin:0 -9px;width:calc(100% + 18px)}
+.title-in:hover{border-color:var(--line)}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px 30px;margin-top:14px}
+.hero-stats div{display:flex;flex-direction:column}
+.hero-stats b{font-size:20px}
+.hero-stats small{font-size:12.5px;color:var(--muted)}
+.hero-ring{position:relative;display:grid;place-items:center}
+.hero-ring span{position:absolute;display:flex;flex-direction:column;align-items:center;text-align:center}
+.hero-ring b{font-size:20px}
+.hero-ring small{font-size:10.5px;color:var(--muted);max-width:80px;line-height:1.2}
+.hero-acts{display:flex;flex-direction:column;gap:8px;align-self:start}
+@media (max-width:700px){.hero{grid-template-columns:minmax(0,1fr) auto;padding:18px;gap:16px}.hero-acts{grid-column:1/-1;flex-direction:row;justify-content:flex-end}.hero-ring svg{width:92px;height:92px}}
+.grid2{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(300px,1fr);gap:18px;align-items:start}
+.col{display:flex;flex-direction:column;gap:18px;min-width:0}
+@media (max-width:1000px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.f{display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.f input,.f select,.f textarea{font-size:15px;font-weight:400}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%}
+th,td{padding:8px 10px;text-align:left;vertical-align:middle}
+td{border-top:1px solid var(--line)}
+th{font:600 11.5px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted);white-space:nowrap;background:var(--surface-2)}
+th:first-child,td:first-child{padding-left:18px} th:last-child,td:last-child{padding-right:12px}
+.r{text-align:right}
+tfoot td{font-weight:700;background:var(--surface-2)}
+table.edit{min-width:700px}
+table.edit select{width:100%;min-width:220px}
+table.edit input[type=number]{width:84px;text-align:right;padding:7px 8px}
+table.edit tbody tr:hover{background:color-mix(in srgb,var(--surface-2) 50%,transparent)}
+td.r.mono{position:relative;white-space:nowrap}
+.share{position:absolute;right:10px;bottom:3px;height:3px;border-radius:99px;background:var(--accent);opacity:.7;max-width:calc(100% - 20px)}
+.qty{display:inline-flex;align-items:center;gap:6px}
+.qty em{font-style:normal;font-size:12.5px;color:var(--muted);min-width:22px;text-align:left}
+.sim-price{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sim-price b{font-size:30px;font-weight:700}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;background:transparent;border:0;padding:12px 0;box-shadow:none!important}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:99px;background:linear-gradient(90deg,var(--bad),var(--warn) 35%,var(--good) 70%)}
+input[type=range]::-moz-range-track{height:8px;border-radius:99px;background:linear-gradient(90deg,var(--bad),var(--warn) 35%,var(--good) 70%)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--surface);border:3px solid var(--fg);margin-top:-8px;cursor:grab;box-shadow:var(--shadow)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--surface);border:3px solid var(--fg);cursor:grab}
+.range-l{display:flex;justify-content:space-between;font:500 11.5px var(--f-mono);color:var(--muted);margin-top:-4px}
+.sim-out{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:center;margin-top:14px}
+.sim-out .kv{flex:1;min-width:170px;margin:0}
+.big2{font-size:22px!important}
+.kv{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:14px;margin-top:10px}
+.kv span:nth-child(even){font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right;font-weight:600}
+.portions{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.portions input{width:76px;padding:6px 8px;text-align:right}
+.plist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;max-height:300px;overflow:auto}
+.plist li{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.plist li span{min-width:0}
+.plist b{white-space:nowrap}
+.alg-big{display:flex;flex-wrap:wrap;gap:6px}
+.alg-big span{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:4px 12px 4px 4px;font-size:13.5px}
+.alg-big b{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--fg);color:var(--bg);font:700 12px var(--f-mono)}
 
-dialog{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg);padding:0;width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 40px)}
-dialog::backdrop{background:rgba(10,20,16,.45)}
-dialog form{padding:20px;display:flex;flex-direction:column;gap:12px}
-dialog h3{margin:0;font:600 18px var(--f-display)}
+/* Products */
+table.prods{min-width:820px}
+table.prods input[type=number]{width:86px;text-align:right;padding:7px 8px}
+table.prods tbody tr{transition:background .15s}
+table.prods tbody tr:hover{background:color-mix(in srgb,var(--surface-2) 55%,transparent)}
+.pn{display:block;font-weight:600}
+.cnt{display:inline-grid;place-items:center;min-width:28px;height:24px;border-radius:99px;background:var(--accent-soft);color:var(--accent);font:700 12px var(--f-mono);padding:0 6px}
+.cnt.zero{background:var(--surface-2);color:var(--muted)}
+
+/* Dialog, Palette, Toast */
+dialog{border:1px solid var(--line);border-radius:20px;background:var(--surface);color:var(--fg);padding:0;width:min(580px,calc(100vw - 32px));max-height:calc(100vh - 40px);box-shadow:0 30px 80px -20px rgba(0,0,0,.45)}
+dialog[open]{animation:pop .2s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+dialog::backdrop{background:rgba(8,14,12,.5);backdrop-filter:blur(3px)}
+dialog form{padding:22px;display:flex;flex-direction:column;gap:14px}
+.dlg-h{display:flex;justify-content:space-between;align-items:center}
+dialog h3{margin:0;font:800 22px var(--f-display);letter-spacing:-.02em}
+.dlg-p{margin:0}
 .dlg-actions{display:flex;gap:8px;align-items:center;margin-top:6px}
 .dlg-actions .sp{flex:1}
-.algs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px 10px;font-size:13.5px}
-.algs label{display:flex;gap:6px;align-items:center}
-.empty{padding:28px 16px;text-align:center;color:var(--muted)}
+.algs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+.algc{position:relative;cursor:pointer}
+.algc input{position:absolute;opacity:0;pointer-events:none}
+.algc span{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:13.5px;transition:background .15s,border-color .15s}
+.algc b{font-family:var(--f-mono)}
+.algc input:checked + span{background:var(--accent-soft);border-color:var(--accent)}
+.algc input:focus-visible + span{outline:2px solid var(--accent)}
+textarea.code{min-height:200px;font:12px/1.4 var(--f-mono)}
+#pal{position:fixed;inset:0;z-index:50;background:rgba(8,14,12,.5);backdrop-filter:blur(3px);display:flex;justify-content:center;align-items:flex-start;padding:max(10vh,calc(env(safe-area-inset-top,0px) + 16px)) max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px))}
+.pal-box{width:min(620px,100%);background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);overflow:hidden;animation:pop .18s ease-out}
+.pal-in{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);color:var(--muted)}
+.pal-in input{flex:1;border:0;background:transparent;font-size:17px;padding:4px 0;box-shadow:none!important}
+.pal-in kbd{font:500 11px var(--f-mono);border:1px solid var(--line);border-radius:6px;padding:2px 6px}
+#palList{list-style:none;margin:0;padding:6px;max-height:min(420px,60vh);overflow:auto}
+#palList button{display:grid;grid-template-columns:96px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;border:0;background:transparent;text-align:left;padding:10px 12px;border-radius:10px;cursor:pointer}
+#palList button.sel,#palList button:hover{background:var(--surface-2)}
+.pg{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+#palList .pn{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ps{font:500 12px var(--f-mono);color:var(--muted);white-space:nowrap}
+@media (max-width:560px){#palList button{grid-template-columns:minmax(0,1fr)}.ps,.pg{display:none}}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:60;max-width:calc(100vw - 32px);text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+@media (max-width:900px){#toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}}
 
 #print{display:none}
 @media print{
   body > *:not(#print){display:none!important}
   body::before{display:none}
-  #print{display:block;color:#000;background:#fff;font:12px/1.4 var(--f-body);padding:0}
+  #print{display:block;color:#000;background:#fff;font:12px/1.4 var(--f-body)}
   #print h1{font:700 16px var(--f-body);margin:6px 0 2px}
   #print table{width:100%;border-collapse:collapse;margin-top:10px}
   #print th,#print td{border:1px solid #000;padding:4px 6px;color:#000;background:#fff}
@@ -151,25 +362,34 @@ dialog h3{margin:0;font:600 18px var(--f-display)}
   #print .sign{display:flex;justify-content:space-between;margin-top:30px}
   @page{size:A4;margin:14mm}
 }
-@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+@media (prefers-reduced-motion: reduce){*,*::before{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-<header class="top">
-  <div class="wrap">
-    <div class="brand"><b>DAHUAM<i>.</i>202</b><span>Küche · Rezepturen, Speisekarte, Wareneinsatz</span></div>
-    <nav class="tabs" id="tabs">
-      <button type="button" data-tab="menu">Speisekarte</button>
-      <button type="button" data-tab="cards">Rezepturen</button>
-      <button type="button" data-tab="products">Produkte</button>
-      <button type="button" data-tab="setup">Einstellungen</button>
-    </nav>
+<div class="shell">
+  <aside class="side">
+    <div class="brand"><span class="logo">202</span><span><b>DAHUAM.202</b><small>Küche · Gerlos</small></span></div>
+    <button type="button" class="kbd-btn" data-act="palette"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Suchen<kbd>Strg K</kbd></button>
+    <nav class="nav-slot" aria-label="Hauptnavigation"></nav>
+    <div class="side-foot"><span>Restobar | Café</span><button type="button" class="theme-btn" data-act="theme" aria-label="Design wechseln"></button></div>
+  </aside>
+  <div>
+    <header class="topbar">
+      <div class="brand"><span class="logo">202</span><span><b>DAHUAM.202</b><small>Küche · Gerlos</small></span></div>
+      <button type="button" class="theme-btn" data-act="palette" aria-label="Suchen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
+      <button type="button" class="theme-btn" data-act="theme" aria-label="Design wechseln"></button>
+    </header>
+    <main id="app"></main>
   </div>
-</header>
-<main class="wrap" id="app"></main>
+</div>
+<nav class="bottom" aria-label="Navigation"><div class="nav-slot"></div></nav>
+<div id="pal" hidden><div class="pal-box" role="dialog" aria-label="Schnellsuche">
+  <label class="pal-in"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="palIn" placeholder="Gericht, Rezeptur, Produkt oder Aktion" autocomplete="off"><kbd>Esc</kbd></label>
+  <ul id="palList"></ul>
+</div></div>
+<div id="toast" role="status" aria-live="polite"></div>
 <dialog id="dlg"><form id="dlgForm" method="dialog"></form></dialog>
 <div id="print"></div>
-
 <script>
 'use strict';
 const KEY = 'dahuam202_kueche_de_v1';
@@ -421,72 +641,170 @@ function fcBadge(fc){ return `<span class="fc ${fcClass(fc)}">${fc==null ? 'kein
 function chips(set){ const a = [...set].sort(); return a.length ? `<div class="chips">${a.map(x=>`<span class="alg" title="${esc(ALG[x]||x)}">${esc(x)}</span>`).join('')}</div>` : ''; }
 function usage(ref){ return S.cards.filter(c => c.items.some(i => i.ref === ref)); }
 
-/* ---------- Darstellung ---------- */
-function render(){
-  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === view.tab));
-  const app = $('#app');
-  if(view.tab === 'menu') app.innerHTML = renderMenu();
-  else if(view.tab === 'cards') app.innerHTML = view.card && C(view.card) ? renderCard(C(view.card)) : renderCards();
-  else if(view.tab === 'products') app.innerHTML = renderProducts();
-  else app.innerHTML = renderSetup();
-}
-function demoNote(){ return S.demo ? `<div class="note">Demodaten. Speisekarte und Preise stammen von dahuam202.at. Rezepturen und Einkaufspreise sind Richtwerte: Ersetzen Sie sie unter „Rezepturen“ und „Produkte“ durch Ihre eigenen.</div>` : ''; }
+/* ---------- Icons ---------- */
+const ICO = {
+  dash:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
+  menu:'<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M9 9h6M9 13h6"/>',
+  cards:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/>',
+  products:'<path d="M3 7l9-4 9 4-9 4z"/><path d="M3 7v10l9 4 9-4V7M12 11v10"/>',
+  setup:'<path d="M4 6h9M19 6h1M4 12h3M13 12h7M4 18h11M21 18h-1"/><circle cx="16" cy="6" r="2.2"/><circle cx="10" cy="12" r="2.2"/><circle cx="18" cy="18" r="2.2"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.4 1.4M17.6 17.6L19 19M5 19l1.4-1.4M17.6 6.4L19 5"/>',
+  moon:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  arrow:'<path d="M15 5l-7 7 7 7"/>',
+  print:'<path d="M7 9V3h10v6M7 17H4v-7h16v7h-3"/><rect x="7" y="14" width="10" height="7"/>',
+  copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+  trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  spark:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6"/>',
+};
+const ico = (n, cls='') => `<svg class="ico ${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICO[n]}</svg>`;
 
+const TABS = [['dash','Übersicht'],['menu','Speisekarte'],['cards','Rezepturen'],['products','Produkte'],['setup','Einstellungen']];
+view = {tab:'dash', card:null, q:'', sec:'all', ctype:'all', pq:'', sim:null, portions:20};
+
+/* ---------- Bausteine ---------- */
+function ring(fc, size=46, stroke=5){
+  const r = (size-stroke)/2, c = 2*Math.PI*r, v = fc==null ? 0 : Math.min(fc,60)/60;
+  return `<svg class="ring ${fcClass(fc)}" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true">
+    <circle class="trk" cx="${size/2}" cy="${size/2}" r="${r}" stroke-width="${stroke}" fill="none"/>
+    <circle class="val" cx="${size/2}" cy="${size/2}" r="${r}" stroke-width="${stroke}" fill="none" stroke-linecap="round" stroke-dasharray="${(c*v).toFixed(2)} ${c.toFixed(2)}" transform="rotate(-90 ${size/2} ${size/2})"/></svg>`;
+}
+function secHue(name){ const secs = [...new Set(S.menu.map(m=>m.section).concat(S.cards.map(c=>c.category)))]; const i = Math.max(0, secs.indexOf(name)); return (i*47 + 20) % 360; }
+function catDot(name){ return `<span class="dot" style="--h:${secHue(name)}"></span>`; }
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove('show'), 1800); }
+function demoNote(){ return S.demo ? `<div class="note">${ico('spark')}<span>Demodaten: Speisekarte und Preise von dahuam202.at. Rezepturen und Einkaufspreise sind Richtwerte, bitte durch eigene ersetzen.</span></div>` : ''; }
+
+/* ---------- Rahmen ---------- */
+function render(){
+  document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === view.tab));
+  const app = $('#app');
+  const fn = {dash:renderDash, menu:renderMenu, products:renderProducts, setup:renderSetup}[view.tab];
+  app.innerHTML = fn ? fn() : (view.card && C(view.card) ? renderCard(C(view.card)) : renderCards());
+  app.classList.remove('enter'); void app.offsetWidth; app.classList.add('enter');
+}
+function navHtml(){
+  return TABS.map(([k,l])=>`<button type="button" class="nav-i" data-tab="${k}">${ico(k)}<span>${l}</span></button>`).join('');
+}
+
+/* ---------- Übersicht ---------- */
+function renderDash(){
+  const all = S.menu.map(m => ({m, k:menuCalc(m)}));
+  const linked = all.filter(x => x.k.cost != null).sort((a,b)=>b.k.fc-a.k.fc);
+  const avg = linked.length ? linked.reduce((s,x)=>s+x.k.fc,0)/linked.length : null;
+  const over = linked.filter(x => x.k.fc > S.settings.target);
+  const avgMargin = linked.length ? linked.reduce((s,x)=>s+x.k.margin,0)/linked.length : null;
+  const cover = S.menu.length ? linked.length/S.menu.length*100 : 0;
+  const tg = +S.settings.target;
+  const scale = Math.max(40, Math.ceil(((linked[0]?.k.fc)||0)/10)*10 + 5);
+
+  // Kostentreiber: Produkte nach Anteil am Wareneinsatz aller kalkulierten Gerichte (je 1 Portion)
+  const drv = new Map();
+  const walk = (c, f, d=0) => { if(d>6) return; const t = totals(c, d); c.items.forEach((it,i)=>{ const r = refObj(it.ref); if(!r) return; if(r.t==='p') drv.set(r.o.id,(drv.get(r.o.id)||0)+t.lines[i].cost*f); else if(r.o.yieldG) walk(r.o, f*(+it.qty||0)/r.o.yieldG, d+1); }); };
+  linked.forEach(x => walk(x.k.c, 1));
+  const drvList = [...drv.entries()].sort((a,b)=>b[1]-a[1]);
+  const drvSum = drvList.reduce((s,x)=>s+x[1],0) || 1;
+  const top = drvList.slice(0,6);
+
+  const hour = new Date().getHours();
+  const hi = hour < 11 ? 'Guten Morgen' : hour < 17 ? 'Servus' : 'Guten Abend';
+  return `<div class="page-h"><div><div class="eyebrow">${new Date().toLocaleDateString('de-AT',{weekday:'long', day:'numeric', month:'long'})}</div><h1>${hi}, Küche!</h1></div></div>
+  ${demoNote()}
+  <div class="tiles">
+    <div class="tile"><div class="tile-ring">${ring(avg,58,6)}<b>${avg==null?'—':num(avg,0)+'%'}</b></div><div><div class="t-l">Ø Wareneinsatz</div><div class="t-s">Ziel ${num(tg)} %</div></div></div>
+    <div class="tile"><div><div class="t-v">${linked.length}<small>/${S.menu.length}</small></div><div class="t-l">Gerichte kalkuliert</div><div class="meter"><i style="width:${cover.toFixed(1)}%"></i></div></div></div>
+    <button type="button" class="tile click" data-act="goMenu" data-id="over"><div><div class="t-v ${over.length?'bad-t':'good-t'}">${over.length}</div><div class="t-l">über dem Ziel</div><div class="t-s">${over.length?'Ansehen →':'Alles im grünen Bereich'}</div></div></button>
+    <div class="tile"><div><div class="t-v">${avgMargin==null?'—':eur(avgMargin)}</div><div class="t-l">Ø Rohertrag pro Gericht</div><div class="t-s">exkl. ${num(S.settings.vat)} % MwSt.</div></div></div>
+  </div>
+  <div class="dash-grid">
+    <section class="panel">
+      <div class="panel-h"><h2>Wareneinsatz je Gericht</h2><span class="legend"><i class="tl"></i>Ziel ${num(tg)} %</span></div>
+      <div class="bars" style="--tg:${(tg/scale*100).toFixed(2)}%">
+        ${linked.map(({m,k})=>`<button type="button" class="bar-r" data-act="openCard" data-id="${k.c.id}" title="${esc(m.name)}">
+          <span class="bar-n">${esc(m.name)}</span>
+          <span class="bar-t"><i class="${fcClass(k.fc)}" style="width:${Math.min(100,k.fc/scale*100).toFixed(2)}%"></i></span>
+          <span class="bar-v">${num(k.fc,1)}%</span></button>`).join('') || '<div class="empty">Noch keine Gerichte kalkuliert.</div>'}
+        <div class="bar-axis"><span></span><span class="ax"><i>0 %</i><i>${num(scale/2)} %</i><i>${num(scale)} %</i></span><span></span></div>
+      </div>
+    </section>
+    <div class="stack">
+      <section class="panel">
+        <div class="panel-h"><h2>Größte Kostentreiber</h2></div>
+        <div class="stackbar">${top.map(([id,v],i)=>`<i style="width:${(v/drvSum*100).toFixed(2)}%;background:var(--s${i+1})"></i>`).join('')}<i style="flex:1;background:var(--s7)"></i></div>
+        <ul class="leg">${top.map(([id,v],i)=>`<li><span class="sw" style="background:var(--s${i+1})"></span><span class="ln">${esc(P(id)?.name)}</span><span class="mono">${num(v/drvSum*100,1)} %</span></li>`).join('')}
+          <li><span class="sw" style="background:var(--s7)"></span><span class="ln muted">Übrige Produkte</span><span class="mono">${num((1-top.reduce((s,x)=>s+x[1],0)/drvSum)*100,1)} %</span></li></ul>
+        <p class="hint">Anteil am Wareneinsatz aller kalkulierten Gerichte, je eine Portion. Preise dieser Produkte zuerst verhandeln.</p>
+      </section>
+      <section class="panel">
+        <div class="panel-h"><h2>Zu erledigen</h2></div>
+        <ul class="todo">
+          <li><button type="button" data-act="goMenu" data-id="none"><b>${S.menu.length-linked.length}</b><span>Gerichte ohne Rezeptur</span>${ico('arrow','flip')}</button></li>
+          <li><button type="button" data-act="goMenu" data-id="over"><b class="${over.length?'bad-t':''}">${over.length}</b><span>Gerichte über ${num(tg)} % Wareneinsatz</span>${ico('arrow','flip')}</button></li>
+          <li><button type="button" data-act="goTab" data-id="products"><b>${S.products.length}</b><span>Einkaufspreise prüfen</span>${ico('arrow','flip')}</button></li>
+        </ul>
+      </section>
+    </div>
+  </div>`;
+}
+
+/* ---------- Speisekarte ---------- */
 function renderMenu(){
   const q = view.q.trim().toLowerCase();
   const all = S.menu.map(m => ({m, k:menuCalc(m)}));
-  const linked = all.filter(x => x.k.cost != null);
-  const avg = linked.length ? linked.reduce((s,x)=>s+x.k.fc,0)/linked.length : null;
-  const over = linked.filter(x => x.k.fc > S.settings.target).length;
-  const shown = all.filter(({m}) => !q || (m.name+' '+m.desc+' '+m.section).toLowerCase().includes(q));
-  const sections = [...new Set(shown.map(x => x.m.section))];
-  let h = `<h1>Speisekarte</h1>
-  <div class="kpis">
-    <div class="kpi"><div class="v">${S.menu.length}</div><div class="l">Gerichte auf der Karte</div></div>
-    <div class="kpi"><div class="v">${linked.length}</div><div class="l">mit Rezeptur</div></div>
-    <div class="kpi"><div class="v">${pct(avg)}</div><div class="l">Ø Wareneinsatz</div></div>
-    <div class="kpi"><div class="v" style="color:${over?'var(--bad)':'var(--good)'}">${over}</div><div class="l">über Ziel ${num(S.settings.target)} %</div></div>
-  </div>
-  ${demoNote()}
-  <div class="bar"><input id="mq" class="search" type="search" placeholder="Speisekarte durchsuchen" value="${esc(view.q)}"><span class="sp"></span><button type="button" class="btn primary" data-act="newMenu">+ Gericht</button></div>`;
-  if(!shown.length) h += `<div class="list"><div class="empty">Nichts gefunden.</div></div>`;
-  for(const s of sections){
-    h += `<h2>${esc(s)}</h2><div class="list">`;
-    for(const {m,k} of shown.filter(x => x.m.section === s)){
-      h += `<div class="row">
-        <div><div class="nm">${esc(m.name)}</div>${m.desc?`<div class="ds">${esc(m.desc)}</div>`:''}${k.t?chips(k.t.alg):''}</div>
-        <div class="nums"><div class="p">${eur(m.price)}</div><div class="s">${k.cost!=null?'WE '+eur(k.cost):'&nbsp;'}</div></div>
-        <div class="acts">${fcBadge(k.fc)}
-          ${k.c ? `<button type="button" class="btn" data-act="openCard" data-id="${k.c.id}">Rezeptur</button>` : `<button type="button" class="btn" data-act="newCardFor" data-id="${m.id}">+ Rezeptur</button>`}
-          <button type="button" class="icon" title="Gericht bearbeiten" aria-label="Gericht bearbeiten" data-act="editMenu" data-id="${m.id}">✎</button></div>
-      </div>`;
+  const secs = [...new Set(S.menu.map(m=>m.section))];
+  const f = view.sec;
+  const shown = all.filter(({m,k}) => (!q || (m.name+' '+m.desc+' '+m.section).toLowerCase().includes(q))
+    && (f==='all' || (f==='none' ? k.cost==null : f==='over' ? (k.fc!=null && k.fc > S.settings.target) : m.section===f)));
+  const cnt = x => all.filter(x).length;
+  const chip = (k,l,n,dot) => `<button type="button" class="chip ${f===k?'on':''}" data-act="sec" data-id="${esc(k)}">${dot||''}${esc(l)}<small>${n}</small></button>`;
+  let h = `<div class="page-h"><div><div class="eyebrow">${S.menu.length} Gerichte · ${secs.length} Kategorien</div><h1>Speisekarte</h1></div>
+    <button type="button" class="btn primary" data-act="newMenu">${ico('plus')}Gericht</button></div>
+  <div class="toolbar"><label class="search">${ico('search')}<input id="mq" type="search" placeholder="Gericht, Zutat oder Kategorie" value="${esc(view.q)}" autocomplete="off"></label></div>
+  <div class="chips-row">${chip('all','Alle',all.length)}${chip('over','Über Ziel',cnt(x=>x.k.fc!=null&&x.k.fc>S.settings.target))}${chip('none','Ohne Rezeptur',cnt(x=>x.k.cost==null))}<span class="sep"></span>${secs.map(s=>chip(s,s,cnt(x=>x.m.section===s),catDot(s))).join('')}</div>`;
+  if(!shown.length) return h + `<div class="panel empty">Keine Gerichte für diesen Filter.</div>`;
+  for(const s of [...new Set(shown.map(x=>x.m.section))]){
+    h += `<h2 class="sec-h">${catDot(s)}${esc(s)}</h2><div class="dish-grid">`;
+    for(const {m,k} of shown.filter(x=>x.m.section===s)){
+      h += `<article class="dish ${k.c?'':'nocard'}">
+        <button type="button" class="dish-main" data-act="${k.c?'openCard':'newCardFor'}" data-id="${k.c?k.c.id:m.id}">
+          <span class="dish-top"><span class="dish-n">${esc(m.name)}</span><span class="price">${eur(m.price)}</span></span>
+          ${m.desc?`<span class="dish-d">${esc(m.desc)}</span>`:''}
+          <span class="dish-b">${k.c ? `<span class="fcw">${ring(k.fc,34,4)}<span><b class="mono">${pct(k.fc)}</b><small>WE ${eur(k.cost)}</small></span></span>${chips(k.t.alg)}`
+            : `<span class="add">${ico('plus')}Rezeptur anlegen</span>`}</span>
+        </button>
+        <button type="button" class="icon-btn edit" title="Gericht bearbeiten" aria-label="Gericht bearbeiten" data-act="editMenu" data-id="${m.id}">${ico('edit')}</button>
+      </article>`;
     }
     h += `</div>`;
   }
   return h;
 }
 
+/* ---------- Rezepturen ---------- */
 function renderCards(){
   const q = view.q.trim().toLowerCase();
   const list = S.cards.filter(c => (view.ctype==='all' || c.type===view.ctype) && (!q || (c.name+' '+c.category).toLowerCase().includes(q)))
     .sort((a,b) => a.type===b.type ? byName(a,b) : (a.type==='semi'?1:-1));
-  let h = `<h1>Rezepturen</h1>${demoNote()}
-  <div class="bar"><input id="cq" class="search" type="search" placeholder="Rezepturen durchsuchen" value="${esc(view.q)}">
-    <div class="seg">${[['all','Alle'],['dish','Gerichte'],['semi','Basisrezepte']].map(([k,l])=>`<button type="button" class="${view.ctype===k?'on':''}" data-act="ctype" data-id="${k}">${l}</button>`).join('')}</div>
-    <span class="sp"></span>
-    <button type="button" class="btn" data-act="newCard" data-id="semi">+ Basisrezept</button>
-    <button type="button" class="btn primary" data-act="newCard" data-id="dish">+ Gericht</button></div>
-  <div class="list">`;
-  if(!list.length) h += `<div class="empty">Noch keine Rezepturen. Legen Sie die erste mit „+ Gericht“ an.</div>`;
+  const n = t => S.cards.filter(c=>t==='all'||c.type===t).length;
+  let h = `<div class="page-h"><div><div class="eyebrow">${n('dish')} Gerichte · ${n('semi')} Basisrezepte</div><h1>Rezepturen</h1></div>
+    <div class="row-btns"><button type="button" class="btn" data-act="newCard" data-id="semi">${ico('plus')}Basisrezept</button><button type="button" class="btn primary" data-act="newCard" data-id="dish">${ico('plus')}Gericht</button></div></div>
+  <div class="toolbar"><label class="search">${ico('search')}<input id="cq" type="search" placeholder="Rezeptur suchen" value="${esc(view.q)}" autocomplete="off"></label>
+    <div class="seg">${[['all','Alle'],['dish','Gerichte'],['semi','Basisrezepte']].map(([k,l])=>`<button type="button" class="${view.ctype===k?'on':''}" data-act="ctype" data-id="${k}">${l}<small>${n(k)}</small></button>`).join('')}</div></div>`;
+  if(!list.length) return h + `<div class="panel empty">Keine Rezepturen gefunden. Legen Sie eine mit „Gericht“ an.</div>`;
+  h += `<div class="rc-grid">`;
   for(const c of list){
     const t = totals(c);
     const per100 = c.yieldG ? t.cost / c.yieldG * 100 : 0;
-    const menus = S.menu.filter(m => m.card === c.id).map(menuCalc);
-    h += `<div class="row click" data-act="openCard" data-id="${c.id}">
-      <div><div class="nm">${esc(c.name)}</div><div class="ds"><span class="tag ${c.type==='semi'?'semi':''}">${c.type==='semi'?'Basisrezept':'Gericht'}</span> Nr. ${c.no||'—'} · ${esc(c.category||'ohne Kategorie')} · Ausbeute ${num(c.yieldG)} g · ${c.items.length} Zutaten</div>${chips(t.alg)}</div>
-      <div class="nums"><div class="p">${eur(t.cost)}</div><div class="s">${eur(per100)} / 100 g</div></div>
-      <div class="acts">${c.type==='dish' ? fcBadge(menus.length ? menus[0].fc : null) : ''}</div>
-    </div>`;
+    const mk = S.menu.filter(m => m.card === c.id).map(menuCalc)[0];
+    h += `<button type="button" class="rc" data-act="openCard" data-id="${c.id}">
+      <span class="rc-top"><span class="tag ${c.type}">${c.type==='semi'?'Basisrezept':'Gericht'} · Nr. ${c.no||'—'}</span>${c.type==='dish'?`<span class="fcw sm">${ring(mk?mk.fc:null,28,4)}<b class="mono">${mk?pct(mk.fc):'—'}</b></span>`:''}</span>
+      <span class="rc-n">${esc(c.name)}</span>
+      <span class="rc-m">${catDot(c.category)}${esc(c.category||'ohne Kategorie')} · ${c.items.length} Zutaten · ${num(c.yieldG)} g</span>
+      <span class="rc-b"><span><b class="mono">${eur(t.cost)}</b><small>${c.type==='semi'?'pro Charge':'pro Portion'}</small></span><span><b class="mono">${eur(per100)}</b><small>pro 100 g</small></span></span>
+      ${chips(t.alg)}
+    </button>`;
   }
   return h + `</div>`;
 }
@@ -494,134 +812,187 @@ function renderCards(){
 function refOptions(sel, selfId){
   const ps = [...S.products].sort(byName);
   const cs = S.cards.filter(c => c.type==='semi' && c.id!==selfId).sort(byName);
-  return `<option value="">— wählen —</option><optgroup label="Produkte">${ps.map(p=>`<option value="p:${p.id}" ${sel==='p:'+p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</optgroup>`
+  return `<option value="">— Zutat wählen —</option><optgroup label="Produkte">${ps.map(p=>`<option value="p:${p.id}" ${sel==='p:'+p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</optgroup>`
     + (cs.length ? `<optgroup label="Basisrezepte">${cs.map(c=>`<option value="c:${c.id}" ${sel==='c:'+c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</optgroup>` : '');
+}
+
+function simHtml(cost, price){
+  const np = price/(1+S.settings.vat/100), fc = np ? cost/np*100 : null;
+  return `<div class="sim-out"><div class="fcw">${ring(fc,52,6)}<span><b class="mono big2">${pct(fc)}</b><small>Wareneinsatz</small></span></div>
+    <div class="kv"><span>Rohertrag exkl. MwSt.</span><span>${eur(np-cost)}</span><span>Aufschlagsfaktor</span><span>${cost?num(np/cost,2)+'×':'—'}</span></div></div>`;
+}
+function prodHtml(c, n){
+  const t = totals(c), f = c.type==='semi' && c.yieldG ? 1 : n;
+  const rows = c.items.map((it,i)=>{ const l = t.lines[i]; if(l.missing) return ''; const q = (+it.qty||0)*f; const v = l.unit==='Stk' ? num(q,1)+' Stk' : q>=1000 ? num(q/1000,2)+(l.unit==='ml'?' l':' kg') : num(q)+' '+l.unit; return `<li><span>${esc(l.name)}</span><b class="mono">${v}</b></li>`; }).join('');
+  return `<ul class="plist">${rows}</ul><div class="kv"><span>Wareneinsatz gesamt</span><span>${eur(t.cost*f)}</span></div>`;
 }
 
 function renderCard(c){
   const t = totals(c);
   const per100 = c.yieldG ? t.cost / c.yieldG * 100 : 0;
   const menus = S.menu.filter(m => m.card === c.id);
+  const m0 = menus[0], k0 = m0 ? menuCalc(m0) : null;
   const cats = [...new Set([...S.menu.map(m=>m.section), ...S.cards.map(x=>x.category)].filter(Boolean))];
   const usedIn = usage('c:'+c.id);
   const vat = 1 + S.settings.vat/100;
   const rec = t.cost / (S.settings.target/100) * vat;
-  let rows = c.items.map((it,i) => {
+  // Kostenstruktur
+  const parts = t.lines.map((l,i)=>({n:l.name, v:l.cost})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
+  const top = parts.slice(0,5), rest = parts.slice(5).reduce((s,x)=>s+x.v,0), sum = t.cost || 1;
+  // Simulator
+  const base = m0 ? +m0.price : Math.round(rec*10)/10;
+  if(!view.sim || view.sim.id !== c.id) view.sim = {id:c.id, price:base};
+  const smin = Math.max(1, Math.floor(t.cost*vat*1.2)), smax = Math.max(smin+5, Math.ceil(Math.max(base, rec)*1.6));
+
+  const rows = c.items.map((it,i) => {
     const l = t.lines[i];
     return `<tr>
-      <td><select id="ref-${i}" data-li="${i}" data-lf="ref" aria-label="Zutat">${refOptions(it.ref, c.id)}</select></td>
-      <td class="r"><input id="qty-${i}" type="number" step="any" min="0" data-li="${i}" data-lf="qty" value="${esc(it.qty)}" aria-label="Brutto"></td>
-      <td class="muted">${l.unit}</td>
-      <td class="r"><input id="net-${i}" type="number" step="any" min="0" data-li="${i}" data-lf="net" value="${esc(it.net)}" placeholder="${num(l.netAuto,1)}" aria-label="Netto in g"></td>
-      <td class="r num">${num(l.out,1)}</td>
-      <td class="r num">${eur(l.cost)}</td>
-      <td><button type="button" class="icon" data-act="delLine" data-id="${i}" title="Zeile entfernen" aria-label="Zeile entfernen">×</button></td>
+      <td class="c-ing"><select id="ref-${i}" data-li="${i}" data-lf="ref" aria-label="Zutat">${refOptions(it.ref, c.id)}</select></td>
+      <td class="r"><span class="qty"><input id="qty-${i}" type="number" step="any" min="0" inputmode="decimal" data-li="${i}" data-lf="qty" value="${esc(it.qty)}" aria-label="Brutto"><em>${l.unit}</em></span></td>
+      <td class="r"><input id="net-${i}" type="number" step="any" min="0" inputmode="decimal" data-li="${i}" data-lf="net" value="${esc(it.net)}" placeholder="${num(l.netAuto,1)}" aria-label="Netto in g"></td>
+      <td class="r mono">${num(l.out,1)}</td>
+      <td class="r mono">${eur(l.cost)}<span class="share" style="width:${(l.cost/sum*100).toFixed(1)}%"></span></td>
+      <td><button type="button" class="icon-btn" data-act="delLine" data-id="${i}" title="Zeile entfernen" aria-label="Zeile entfernen">${ico('x')}</button></td>
     </tr>`;
   }).join('');
-  return `<button type="button" class="back" data-act="backCards">← Alle Rezepturen</button>
-  <div class="bar" style="margin-top:0"><h1 style="flex:1 1 300px">${esc(c.name)}</h1>
-    ${FRAMED ? '' : `<button type="button" class="btn" data-act="printCard" data-id="${c.id}">Rezeptur drucken</button>`}
-    <button type="button" class="btn" data-act="dupCard" data-id="${c.id}">Duplizieren</button>
-    <button type="button" class="btn danger" data-act="delCard" data-id="${c.id}">Löschen</button></div>
-  <div class="grid2">
-    <div style="min-width:0">
-      <div class="panel"><div class="fields">
-        <label class="f">Bezeichnung<input id="cf-name" data-cf="name" value="${esc(c.name)}"></label>
-        <label class="f">Typ<select id="cf-type" data-cf="type"><option value="dish" ${c.type==='dish'?'selected':''}>Gericht</option><option value="semi" ${c.type==='semi'?'selected':''}>Basisrezept</option></select></label>
-        <label class="f">Kategorie<input id="cf-category" data-cf="category" list="cats" value="${esc(c.category)}"><datalist id="cats">${cats.map(x=>`<option value="${esc(x)}">`).join('')}</datalist></label>
-        <label class="f">${c.type==='semi'?'Ausbeute Charge, g':'Portionsgewicht, g'}<input id="cf-yieldG" data-cf="yieldG" type="number" step="any" min="0" value="${esc(c.yieldG)}" placeholder="${num(t.out)}"></label>
-      </div></div>
-      <h2>Zutaten ${c.type==='semi'?'pro Charge':'pro Portion'}</h2>
-      <div class="tbl-wrap"><table class="edit">
-        <thead><tr><th>Zutat</th><th class="r">Brutto</th><th></th><th class="r">Netto, g</th><th class="r">Fertig, g</th><th class="r">Betrag</th><th></th></tr></thead>
-        <tbody>${rows || `<tr><td colspan="7" class="muted">Erste Zutat hinzufügen.</td></tr>`}</tbody>
-        <tfoot><tr><td>Summe</td><td class="r num">${num(t.gross)}</td><td></td><td class="r num">${num(t.net)}</td><td class="r num">${num(t.out)}</td><td class="r num">${eur(t.cost)}</td><td></td></tr></tfoot>
-      </table></div>
-      <div class="bar"><button type="button" class="btn" data-act="addLine">+ Zutat</button><span class="hint" style="margin:0">Netto wird aus dem Putzverlust des Produkts berechnet. Für einen eigenen Wert einfach überschreiben.</span></div>
-      <h2>Zubereitung</h2>
-      <textarea id="cf-method" data-cf="method" placeholder="Vorbereitung, Reihenfolge, Temperatur, Zeit, Anrichten, Lagerung">${esc(c.method)}</textarea>
+
+  return `<button type="button" class="back" data-act="backCards">${ico('arrow')}Alle Rezepturen</button>
+  <div class="hero">
+    <div class="hero-main">
+      <div class="eyebrow">${c.type==='semi'?'Basisrezept':'Gericht'} · Rezeptur Nr. ${c.no||'—'} · ${esc(c.category||'ohne Kategorie')}</div>
+      <input id="cf-name" class="title-in" data-cf="name" value="${esc(c.name)}" aria-label="Bezeichnung">
+      <div class="hero-stats">
+        <div><b class="mono">${eur(t.cost)}</b><small>Wareneinsatz ${c.type==='semi'?'pro Charge':'pro Portion'}</small></div>
+        <div><b class="mono">${eur(per100)}</b><small>pro 100 g</small></div>
+        ${c.type==='semi' && c.yieldG ? `<div><b class="mono">${eur(t.cost/c.yieldG*1000)}</b><small>pro kg</small></div>` : ''}
+        ${k0 ? `<div><b class="mono">${eur(m0.price)}</b><small>Verkaufspreis</small></div>` : ''}
+      </div>
     </div>
-    <div style="min-width:0">
-      <div class="panel">
-        <div class="muted" style="font-size:13px">Wareneinsatz ${c.type==='semi'?'pro Charge':'pro Portion'}</div>
-        <div class="big">${eur(t.cost)}</div>
-        <div class="kv">
-          <span>pro 100 g</span><span>${eur(per100)}</span>
-          ${c.type==='semi' && c.yieldG ? `<span>pro kg</span><span>${eur(t.cost/c.yieldG*1000)}</span>` : ''}
-          <span>Rezeptur Nr.</span><span>${c.no||'—'}</span>
-          <span>Summe Fertiggewicht</span><span>${num(t.out)} g</span>
+    ${c.type==='dish' ? `<div class="hero-ring">${ring(k0?k0.fc:null,112,10)}<span><b class="mono">${k0?num(k0.fc,1)+'%':'—'}</b><small>${k0?'Wareneinsatz':'nicht auf der Karte'}</small></span></div>` : ''}
+    <div class="hero-acts">
+      ${FRAMED ? '' : `<button type="button" class="icon-btn lg" data-act="printCard" data-id="${c.id}" title="Rezeptur drucken" aria-label="Rezeptur drucken">${ico('print')}</button>`}
+      <button type="button" class="icon-btn lg" data-act="dupCard" data-id="${c.id}" title="Duplizieren" aria-label="Duplizieren">${ico('copy')}</button>
+      <button type="button" class="icon-btn lg danger" data-act="delCard" data-id="${c.id}" title="Löschen" aria-label="Löschen">${ico('trash')}</button>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="col">
+      <section class="panel">
+        <div class="fields">
+          <label class="f">Typ<select id="cf-type" data-cf="type"><option value="dish" ${c.type==='dish'?'selected':''}>Gericht</option><option value="semi" ${c.type==='semi'?'selected':''}>Basisrezept</option></select></label>
+          <label class="f">Kategorie<input id="cf-category" data-cf="category" list="cats" value="${esc(c.category)}"><datalist id="cats">${cats.map(x=>`<option value="${esc(x)}">`).join('')}</datalist></label>
+          <label class="f">${c.type==='semi'?'Ausbeute Charge, g':'Portionsgewicht, g'}<input id="cf-yieldG" data-cf="yieldG" type="number" step="any" min="0" value="${esc(c.yieldG)}" placeholder="${num(t.out)}"></label>
         </div>
-        ${c.type==='dish' ? `<div class="hint">Verkaufspreis für ${num(S.settings.target)} % Wareneinsatz: <b class="mono">${eur(rec)}</b> inkl. ${num(S.settings.vat)} % MwSt.</div>` : ''}
-      </div>
-      <div class="panel"><div class="muted" style="font-size:13px">Allergene (Codes laut EU-VO 1169/2011)</div>
-        ${t.alg.size ? `<div class="kv">${[...t.alg].sort().map(a=>`<span>${esc(ALG[a]||a)}</span><span>${esc(a)}</span>`).join('')}</div>` : '<div class="hint">Keine gefunden. Bitte die Produktdaten prüfen.</div>'}
-      </div>
-      ${c.type==='dish' ? `<div class="panel"><div class="muted" style="font-size:13px">Auf der Speisekarte</div>
-        ${menus.length ? menus.map(m=>{const k=menuCalc(m);return `<div class="kv"><span>${esc(m.name)}</span><span>${eur(m.price)}</span><span>Wareneinsatz</span><span>${fcBadge(k.fc)}</span><span>Rohertrag exkl. MwSt.</span><span>${eur(k.margin)}</span></div>`}).join('<hr style="border:0;border-top:1px solid var(--line)">') : '<div class="hint">Mit keinem Gericht verknüpft. Verknüpfen Sie sie unter „Speisekarte“ mit ✎.</div>'}
-      </div>` : `<div class="panel"><div class="muted" style="font-size:13px">Verwendet in</div>
-        ${usedIn.length ? `<div class="kv">${usedIn.map(u=>`<span>${esc(u.name)}</span><span><button type="button" class="btn" data-act="openCard" data-id="${u.id}">Öffnen</button></span>`).join('')}</div>` : '<div class="hint">Noch in keiner Rezeptur verwendet.</div>'}
-      </div>`}
+      </section>
+      <section class="panel flush">
+        <div class="panel-h pad"><h2>Zutaten ${c.type==='semi'?'pro Charge':'pro Portion'}</h2><span class="muted sm">${c.items.length} Positionen</span></div>
+        <div class="tbl-wrap"><table class="edit">
+          <thead><tr><th>Zutat</th><th class="r">Brutto</th><th class="r">Netto, g</th><th class="r">Fertig, g</th><th class="r">Betrag</th><th></th></tr></thead>
+          <tbody>${rows || `<tr><td colspan="6" class="muted">Erste Zutat hinzufügen.</td></tr>`}</tbody>
+          <tfoot><tr><td>Summe</td><td class="r mono">${num(t.gross)} g</td><td class="r mono">${num(t.net)}</td><td class="r mono">${num(t.out)}</td><td class="r mono">${eur(t.cost)}</td><td></td></tr></tfoot>
+        </table></div>
+        <div class="panel-f"><button type="button" class="btn" data-act="addLine">${ico('plus')}Zutat</button><span class="hint">Netto ergibt sich aus dem Putzverlust. Eigenen Wert einfach überschreiben.</span></div>
+      </section>
+      <section class="panel">
+        <div class="panel-h"><h2>Zubereitung</h2></div>
+        <textarea id="cf-method" data-cf="method" placeholder="Vorbereitung, Reihenfolge, Temperatur, Zeit, Anrichten, Lagerung">${esc(c.method)}</textarea>
+      </section>
+    </div>
+    <div class="col">
+      ${c.type==='dish' ? `<section class="panel accent">
+        <div class="panel-h"><h2>Preis-Simulator</h2><span class="muted sm">inkl. ${num(S.settings.vat)} % MwSt.</span></div>
+        <div class="sim-price"><b class="mono" id="simVal">${eur(view.sim.price)}</b>${m0?`<button type="button" class="btn sm" data-act="applySim" data-id="${m0.id}" id="simApply" ${+view.sim.price===+m0.price?'hidden':''}>Übernehmen</button>`:''}</div>
+        <input id="sim" type="range" min="${smin}" max="${smax}" step="0.1" value="${view.sim.price}" aria-label="Verkaufspreis">
+        <div class="range-l"><span>${eur(smin)}</span><span>${eur(smax)}</span></div>
+        <div id="simOut">${simHtml(t.cost, +view.sim.price)}</div>
+        <p class="hint">Für ${num(S.settings.target)} % Wareneinsatz: <button type="button" class="link" data-act="simTo" data-id="${rec.toFixed(1)}">${eur(rec)}</button></p>
+      </section>` : ''}
+      <section class="panel">
+        <div class="panel-h"><h2>Kostenstruktur</h2></div>
+        <div class="stackbar">${top.map((x,i)=>`<i style="width:${(x.v/sum*100).toFixed(2)}%;background:var(--s${i+1})" title="${esc(x.n)}"></i>`).join('')}${rest?`<i style="flex:1;background:var(--s7)"></i>`:''}</div>
+        <ul class="leg">${top.map((x,i)=>`<li><span class="sw" style="background:var(--s${i+1})"></span><span class="ln">${esc(x.n)}</span><span class="mono">${num(x.v/sum*100,0)} %</span></li>`).join('')}${rest?`<li><span class="sw" style="background:var(--s7)"></span><span class="ln muted">Rest</span><span class="mono">${num(rest/sum*100,0)} %</span></li>`:''}</ul>
+      </section>
+      <section class="panel">
+        <div class="panel-h"><h2>Produktionsmenge</h2>${c.type==='dish'?`<label class="portions"><input id="portions" type="number" min="1" step="1" value="${view.portions}" aria-label="Portionen"> Portionen</label>`:'<span class="muted sm">1 Charge</span>'}</div>
+        <div id="prodOut">${prodHtml(c, view.portions)}</div>
+      </section>
+      <section class="panel">
+        <div class="panel-h"><h2>Allergene</h2><span class="muted sm">EU-VO 1169/2011</span></div>
+        ${t.alg.size ? `<div class="alg-big">${[...t.alg].sort().map(a=>`<span><b>${esc(a)}</b>${esc(ALG[a]||a)}</span>`).join('')}</div>` : '<p class="hint">Keine gefunden. Bitte die Produktdaten prüfen.</p>'}
+      </section>
+      ${c.type==='dish' ? (menus.length>1 ? `<section class="panel"><div class="panel-h"><h2>Auf der Speisekarte</h2></div>${menus.map(m=>{const k=menuCalc(m);return `<div class="kv"><span>${esc(m.name)}</span><span>${eur(m.price)} · ${pct(k.fc)}</span></div>`}).join('')}</section>`
+        : !menus.length ? `<section class="panel"><p class="hint">Mit keinem Gericht der Speisekarte verknüpft. Verknüpfen unter „Speisekarte“ mit dem Stift-Symbol.</p></section>` : '')
+      : `<section class="panel"><div class="panel-h"><h2>Verwendet in</h2></div>
+        ${usedIn.length ? `<ul class="todo">${usedIn.map(u=>`<li><button type="button" data-act="openCard" data-id="${u.id}"><span>${esc(u.name)}</span>${ico('arrow','flip')}</button></li>`).join('')}</ul>` : '<p class="hint">Noch in keiner Rezeptur verwendet.</p>'}
+      </section>`}
     </div>
   </div>`;
 }
 
+/* ---------- Produkte ---------- */
 function renderProducts(){
   const q = view.pq.trim().toLowerCase();
   const list = S.products.filter(p => !q || p.name.toLowerCase().includes(q)).sort(byName);
-  return `<h1>Produkte und Einkaufspreise</h1>${demoNote()}
-  <div class="bar"><input id="pq" class="search" type="search" placeholder="Produkt suchen" value="${esc(view.pq)}"><span class="sp"></span><button type="button" class="btn primary" data-act="newProd">+ Produkt</button></div>
-  <div class="tbl-wrap"><table class="prods">
-    <thead><tr><th>Produkt</th><th>Einheit</th><th class="r">Preis €, exkl. MwSt.</th><th class="r">Putzverlust %</th><th class="r">Garverlust %</th><th>Allergene</th><th class="r">In Rezepturen</th><th></th></tr></thead>
-    <tbody>${list.map(p=>`<tr>
-      <td>${esc(p.name)}${p.unit==='Stk'&&p.pieceG?` <span class="muted">(${num(p.pieceG)} g/Stk)</span>`:''}</td>
-      <td>${esc(p.unit)}</td>
-      <td class="r"><input id="pp-${p.id}" type="number" step="0.01" min="0" data-pp="${p.id}" data-pf="price" value="${esc(p.price)}" aria-label="Preis"></td>
-      <td class="r"><input id="plc-${p.id}" type="number" step="any" min="0" max="100" data-pp="${p.id}" data-pf="lossCold" value="${esc(p.lossCold)}" aria-label="Putzverlust"></td>
-      <td class="r"><input id="plh-${p.id}" type="number" step="any" min="0" max="100" data-pp="${p.id}" data-pf="lossHot" value="${esc(p.lossHot)}" aria-label="Garverlust"></td>
+  return `<div class="page-h"><div><div class="eyebrow">${S.products.length} Produkte · Preise exkl. MwSt.</div><h1>Produkte</h1></div>
+    <button type="button" class="btn primary" data-act="newProd">${ico('plus')}Produkt</button></div>
+  ${demoNote()}
+  <div class="toolbar"><label class="search">${ico('search')}<input id="pq" type="search" placeholder="Produkt suchen" value="${esc(view.pq)}" autocomplete="off"></label></div>
+  <section class="panel flush"><div class="tbl-wrap"><table class="prods">
+    <thead><tr><th>Produkt</th><th class="r">Preis €</th><th class="r">Putzverlust</th><th class="r">Garverlust</th><th>Allergene</th><th class="r">Rezepturen</th><th></th></tr></thead>
+    <tbody>${list.map(p=>{ const u = usage('p:'+p.id).length; return `<tr>
+      <td><b class="pn">${esc(p.name)}</b><small class="muted">${p.unit==='Stk'&&p.pieceG?`je Stk · ${num(p.pieceG)} g`:`je ${esc(p.unit)}`}</small></td>
+      <td class="r"><span class="qty"><input id="pp-${p.id}" type="number" step="0.01" min="0" inputmode="decimal" data-pp="${p.id}" data-pf="price" value="${esc(p.price)}" aria-label="Preis"><em>€</em></span></td>
+      <td class="r"><span class="qty"><input id="plc-${p.id}" type="number" step="any" min="0" max="100" data-pp="${p.id}" data-pf="lossCold" value="${esc(p.lossCold)}" aria-label="Putzverlust"><em>%</em></span></td>
+      <td class="r"><span class="qty"><input id="plh-${p.id}" type="number" step="any" min="0" max="100" data-pp="${p.id}" data-pf="lossHot" value="${esc(p.lossHot)}" aria-label="Garverlust"><em>%</em></span></td>
       <td>${chips(new Set(algList(p.alg)))}</td>
-      <td class="r num">${usage('p:'+p.id).length}</td>
-      <td><button type="button" class="icon" data-act="editProd" data-id="${p.id}" title="Bearbeiten" aria-label="Produkt bearbeiten">✎</button></td>
-    </tr>`).join('') || `<tr><td colspan="8" class="muted">Nichts gefunden.</td></tr>`}</tbody>
-  </table></div>
-  <div class="hint">Preis je kg, l oder Stück. Ändern Sie einen Preis, und Wareneinsatz aller Rezepturen und der Speisekarte wird sofort neu berechnet.</div>`;
+      <td class="r"><span class="cnt ${u?'':'zero'}">${u}</span></td>
+      <td><button type="button" class="icon-btn" data-act="editProd" data-id="${p.id}" title="Bearbeiten" aria-label="Produkt bearbeiten">${ico('edit')}</button></td>
+    </tr>`; }).join('') || `<tr><td colspan="7" class="muted">Nichts gefunden.</td></tr>`}</tbody>
+  </table></div></section>
+  <p class="hint">Preis ändern, und Wareneinsatz aller Rezepturen und der ganzen Speisekarte wird sofort neu berechnet.</p>`;
 }
 
+/* ---------- Einstellungen ---------- */
 function renderSetup(){
-  return `<h1>Einstellungen</h1>
-  <div class="grid2" style="margin-top:14px"><div class="panel"><div class="fields">
-    <label class="f">Name des Betriebs<input id="s-name" data-sf="name" value="${esc(S.settings.name)}"></label>
-    <label class="f">MwSt. Speisen, %<input id="s-vat" data-sf="vat" type="number" step="any" min="0" value="${esc(S.settings.vat)}"></label>
-    <label class="f">Ziel-Wareneinsatz, %<input id="s-target" data-sf="target" type="number" step="any" min="1" value="${esc(S.settings.target)}"></label>
-  </div><div class="hint">In Österreich gilt für Speisen der ermäßigte Steuersatz von 10 %. Der Wareneinsatz wird vom Preis exkl. MwSt. berechnet.</div></div>
-  <div class="panel"><div class="muted" style="font-size:13px">Daten</div>
-    <div class="hint" style="margin-top:4px">Die Daten werden nur in diesem Browser gespeichert. Erstellen Sie regelmäßig eine Sicherung und übertragen Sie sie per Import auf andere Geräte.</div>
-    <div class="bar"><button type="button" class="btn" data-act="export">Sicherung erstellen</button>
-      <label class="btn" for="importFile" style="display:inline-block">Sicherung laden</label><input id="importFile" type="file" accept="application/json,.json" hidden>
-      <button type="button" class="btn danger" data-act="reset">Demodaten wiederherstellen</button></div>
-  </div></div>`;
+  return `<div class="page-h"><div><div class="eyebrow">Betrieb & Daten</div><h1>Einstellungen</h1></div></div>
+  <div class="grid2">
+    <section class="panel"><div class="panel-h"><h2>Kalkulation</h2></div><div class="fields">
+      <label class="f">Name des Betriebs<input id="s-name" data-sf="name" value="${esc(S.settings.name)}"></label>
+      <label class="f">MwSt. Speisen, %<input id="s-vat" data-sf="vat" type="number" step="any" min="0" value="${esc(S.settings.vat)}"></label>
+      <label class="f">Ziel-Wareneinsatz, %<input id="s-target" data-sf="target" type="number" step="any" min="1" value="${esc(S.settings.target)}"></label>
+    </div><p class="hint">In Österreich gilt für Speisen der ermäßigte Steuersatz von 10 %. Der Wareneinsatz wird vom Preis exkl. MwSt. berechnet.</p></section>
+    <section class="panel"><div class="panel-h"><h2>Daten</h2></div>
+      <p class="hint">Die Daten werden nur in diesem Browser gespeichert. Erstellen Sie regelmäßig eine Sicherung und übertragen Sie sie per Import auf andere Geräte.</p>
+      <div class="row-btns wrap"><button type="button" class="btn" data-act="export">Sicherung erstellen</button>
+        <label class="btn" for="importFile">Sicherung laden</label><input id="importFile" type="file" accept="application/json,.json" hidden>
+        <button type="button" class="btn danger" data-act="reset">Demodaten wiederherstellen</button></div>
+    </section>
+  </div>`;
 }
 
 /* ---------- Dialoge ---------- */
 function openDialog(title, body, onOk, opts={}){
   const f = $('#dlgForm'), d = $('#dlg');
-  f.innerHTML = `<h3>${esc(title)}</h3>${body}<div class="dlg-actions">${opts.del?'<button type="button" class="btn danger" id="dlgDel">Löschen</button>':''}<span class="sp"></span><button type="button" class="btn" id="dlgCancel">${opts.cancel||'Abbrechen'}</button>${onOk?`<button type="submit" class="btn primary">${opts.ok||'Speichern'}</button>`:''}</div>`;
-  f.onsubmit = e => { e.preventDefault(); if(onOk){ const r = onOk(new FormData(f)); if(r === false) return; } d.close(); save(); render(); };
-  $('#dlgCancel').onclick = () => d.close();
+  f.innerHTML = `<div class="dlg-h"><h3>${esc(title)}</h3><button type="button" class="icon-btn" id="dlgX" aria-label="Schließen">${ico('x')}</button></div>${body}<div class="dlg-actions">${opts.del?'<button type="button" class="btn danger" id="dlgDel">Löschen</button>':''}<span class="sp"></span><button type="button" class="btn" id="dlgCancel">${opts.cancel||'Abbrechen'}</button>${onOk?`<button type="submit" class="btn primary">${opts.ok||'Speichern'}</button>`:''}</div>`;
+  f.onsubmit = e => { e.preventDefault(); if(onOk){ const r = onOk(new FormData(f)); if(r === false) return; } d.close(); save(); render(); if(opts.toast!==false) toast(opts.done||'Gespeichert'); };
+  $('#dlgCancel').onclick = $('#dlgX').onclick = () => d.close();
   if(opts.del) $('#dlgDel').onclick = () => { d.close(); opts.del(); };
   d.showModal();
 }
-function ask(text, yes, ok='Löschen'){ openDialog('Bitte bestätigen', `<p style="margin:0">${esc(text)}</p>`, () => { yes(); }, {ok}); }
-function info(title, text){ openDialog(title, `<p style="margin:0">${esc(text)}</p>`, null, {cancel:'OK'}); }
+function ask(text, yes, ok='Löschen'){ openDialog('Bitte bestätigen', `<p class="dlg-p">${esc(text)}</p>`, () => { yes(); }, {ok, done: ok==='Löschen'?'Gelöscht':'Erledigt'}); }
+function info(title, text){ openDialog(title, `<p class="dlg-p">${esc(text)}</p>`, null, {cancel:'OK'}); }
 
 function menuDialog(m){
-  const isNew = !m; m = m || {id:uid('m'), section:'', name:'', desc:'', price:'', card:''};
+  const isNew = !m; m = m || {id:uid('m'), section:view.sec!=='all'&&view.sec!=='none'&&view.sec!=='over'?view.sec:'', name:'', desc:'', price:'', card:''};
   const secs = [...new Set(S.menu.map(x=>x.section))];
   const opts = S.cards.filter(c=>c.type==='dish').sort(byName);
   openDialog(isNew ? 'Neues Gericht' : 'Gericht bearbeiten', `
-    <label class="f">Kategorie<input name="section" list="secs" required value="${esc(m.section)}"><datalist id="secs">${secs.map(s=>`<option value="${esc(s)}">`).join('')}</datalist></label>
     <label class="f">Bezeichnung<input name="name" required value="${esc(m.name)}"></label>
     <label class="f">Beschreibung<input name="desc" value="${esc(m.desc)}"></label>
-    <label class="f">Preis inkl. MwSt., €<input name="price" type="number" step="0.01" min="0" required value="${esc(m.price)}"></label>
+    <div class="fields">
+      <label class="f">Kategorie<input name="section" list="secs" required value="${esc(m.section)}"><datalist id="secs">${secs.map(s=>`<option value="${esc(s)}">`).join('')}</datalist></label>
+      <label class="f">Preis inkl. MwSt., €<input name="price" type="number" step="0.01" min="0" required value="${esc(m.price)}"></label>
+    </div>
     <label class="f">Rezeptur<select name="card"><option value="">— nicht verknüpft —</option>${opts.map(c=>`<option value="${c.id}" ${m.card===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label>`,
     fd => { Object.assign(m, {section:fd.get('section').trim(), name:fd.get('name').trim(), desc:fd.get('desc').trim(), price:+fd.get('price'), card:fd.get('card')}); if(isNew) S.menu.push(m); },
     {del: isNew ? null : () => ask(`„${m.name}“ von der Speisekarte löschen? Die Rezeptur bleibt erhalten.`, () => { S.menu = S.menu.filter(x=>x!==m); })});
@@ -634,13 +1005,13 @@ function prodDialog(p){
     <label class="f">Bezeichnung<input name="name" required value="${esc(p.name)}"></label>
     <div class="fields">
       <label class="f">Einheit<select name="unit">${['kg','l','Stk'].map(u=>`<option ${p.unit===u?'selected':''}>${u}</option>`).join('')}</select></label>
-      <label class="f">Preis je Einheit, € exkl. MwSt.<input name="price" type="number" step="0.01" min="0" required value="${esc(p.price)}"></label>
-      <label class="f">Gewicht 1 Stk, g (bei „Stk“)<input name="pieceG" type="number" step="any" min="0" value="${esc(p.pieceG)}"></label>
+      <label class="f">Preis je Einheit, €<input name="price" type="number" step="0.01" min="0" required value="${esc(p.price)}"></label>
+      <label class="f">Gewicht 1 Stk, g<input name="pieceG" type="number" step="any" min="0" value="${esc(p.pieceG)}"></label>
       <label class="f">Putzverlust, %<input name="lossCold" type="number" step="any" min="0" max="100" value="${esc(p.lossCold)}"></label>
       <label class="f">Garverlust, %<input name="lossHot" type="number" step="any" min="0" max="100" value="${esc(p.lossHot)}"></label>
     </div>
-    <div class="muted" style="font-size:12.5px">Allergene</div>
-    <div class="algs">${Object.entries(ALG).map(([k,v])=>`<label><input type="checkbox" name="alg" value="${k}" ${has.has(k)?'checked':''}> <b class="mono">${k}</b> ${esc(v)}</label>`).join('')}</div>`,
+    <div class="f">Allergene</div>
+    <div class="algs">${Object.entries(ALG).map(([k,v])=>`<label class="algc"><input type="checkbox" name="alg" value="${k}" ${has.has(k)?'checked':''}><span><b>${k}</b>${esc(v)}</span></label>`).join('')}</div>`,
     fd => { Object.assign(p, {name:fd.get('name').trim(), unit:fd.get('unit'), price:+fd.get('price'), pieceG:fd.get('pieceG'), lossCold:+fd.get('lossCold')||0, lossHot:+fd.get('lossHot')||0, alg:fd.getAll('alg').join(' ')}); if(isNew) S.products.push(p); },
     {del: isNew ? null : () => { const u = usage('p:'+p.id); if(u.length) return info('Produkt wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(c=>c.name).join(', ')}. Entfernen Sie es dort zuerst.`); ask(`Produkt „${p.name}“ löschen?`, () => { S.products = S.products.filter(x=>x!==p); }); }});
 }
@@ -648,7 +1019,7 @@ function prodDialog(p){
 function newCard(type, fromMenu){
   const c = {id:uid(type==='semi'?'semi':'dish'), no:S.settings.nextNo++, name: fromMenu ? fromMenu.name : (type==='semi'?'Neues Basisrezept':'Neues Gericht'), type, category: fromMenu ? fromMenu.section : (type==='semi'?'Basisrezepte':''), yieldG:'', method:'', items:[{ref:'',qty:'',net:''}]};
   S.cards.push(c); if(fromMenu) fromMenu.card = c.id;
-  view = {...view, tab:'cards', card:c.id}; save(); render(); scrollTo(0,0);
+  go('cards', c.id); save(); toast('Rezeptur angelegt');
 }
 
 function printCard(id){
@@ -669,31 +1040,78 @@ function printCard(id){
 
 function exportData(){
   const json = JSON.stringify(S, null, 1);
-  openDialog('Sicherung', `<p class="hint" style="margin:0">Kopieren Sie den Text und speichern Sie ihn als .json-Datei. Wiederherstellen unter „Einstellungen“ mit „Sicherung laden“.</p>
-    <textarea id="expTxt" readonly style="min-height:200px;font:12px var(--f-mono)">${esc(json)}</textarea>
-    <div class="bar" style="margin:0"><button type="button" class="btn" id="copyBtn">Kopieren</button>${FRAMED?'':'<button type="button" class="btn" id="dlBtn">Datei herunterladen</button>'}<span class="hint" id="copyMsg" style="margin:0"></span></div>`, null, {cancel:'Schließen'});
-  $('#copyBtn').onclick = () => { const ta = $('#expTxt'); const done = () => $('#copyMsg').textContent = 'Kopiert'; navigator.clipboard?.writeText(json).then(done, () => { ta.select(); $('#copyMsg').textContent = 'Text markiert, mit Strg+C kopieren'; }) ?? (ta.select()); };
+  openDialog('Sicherung', `<p class="dlg-p">Kopieren Sie den Text und speichern Sie ihn als .json-Datei. Wiederherstellen unter „Einstellungen“ mit „Sicherung laden“.</p>
+    <textarea id="expTxt" readonly class="code">${esc(json)}</textarea>
+    <div class="row-btns"><button type="button" class="btn" id="copyBtn">${ico('copy')}Kopieren</button>${FRAMED?'':'<button type="button" class="btn" id="dlBtn">Datei herunterladen</button>'}</div>`, null, {cancel:'Schließen'});
+  $('#copyBtn').onclick = () => { const ta = $('#expTxt'); const p = navigator.clipboard?.writeText(json); if(p) p.then(()=>toast('Kopiert'), () => { ta.select(); toast('Text markiert, mit Strg+C kopieren'); }); else { ta.select(); toast('Text markiert, mit Strg+C kopieren'); } };
   if(!FRAMED) $('#dlBtn').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([json],{type:'application/json'})); a.download = 'dahuam202-kueche-'+new Date().toISOString().slice(0,10)+'.json'; a.click(); };
 }
 
+/* ---------- Schnellsuche (Strg+K) ---------- */
+let palSel = 0, palItems = [];
+function palData(){
+  return [
+    ...TABS.map(([k,l])=>({g:'Bereich', n:l, s:'', run:()=>go(k)})),
+    ...S.menu.map(m=>({g:'Speisekarte', n:m.name, s:eur(m.price)+' · '+m.section, run:()=> m.card ? go('cards', m.card) : menuDialog(m)})),
+    ...S.cards.map(c=>({g:'Rezeptur', n:c.name, s:(c.type==='semi'?'Basisrezept':'Gericht')+' · Nr. '+c.no, run:()=>go('cards', c.id)})),
+    ...S.products.map(p=>({g:'Produkt', n:p.name, s:eur(p.price)+' / '+p.unit, run:()=>prodDialog(p)})),
+    {g:'Aktion', n:'Neues Gericht auf die Speisekarte', s:'', run:()=>menuDialog()},
+    {g:'Aktion', n:'Neue Rezeptur anlegen', s:'', run:()=>newCard('dish')},
+    {g:'Aktion', n:'Neues Produkt anlegen', s:'', run:()=>prodDialog()},
+  ];
+}
+function palOpen(){ const p = $('#pal'); p.hidden = false; const i = $('#palIn'); i.value = ''; palFilter(''); i.focus(); }
+function palClose(){ $('#pal').hidden = true; }
+function palFilter(q){
+  q = q.trim().toLowerCase();
+  const all = palData();
+  palItems = (q ? all.filter(x => (x.n+' '+x.s+' '+x.g).toLowerCase().includes(q)) : all.filter(x=>x.g==='Bereich'||x.g==='Aktion')).slice(0,40);
+  palSel = 0; palDraw();
+}
+function palDraw(){
+  $('#palList').innerHTML = palItems.length ? palItems.map((x,i)=>`<li><button type="button" class="${i===palSel?'sel':''}" data-pal="${i}"><span class="pg">${esc(x.g)}</span><span class="pn">${esc(x.n)}</span><span class="ps">${esc(x.s)}</span></button></li>`).join('') : '<li class="empty">Nichts gefunden.</li>';
+  $('#palList .sel')?.scrollIntoView({block:'nearest'});
+}
+
+/* ---------- Navigation ---------- */
+function go(tab, card=null){
+  view = {...view, tab, card, q: tab===view.tab ? view.q : ''};
+  if(card) view.sim = null;
+  try { if(location.hash.slice(1) !== tab) history.replaceState(null, '', '#'+tab); } catch(e){}
+  render(); window.scrollTo({top:0});
+}
+
+function setTheme(t){ document.documentElement.dataset.theme = t; try { localStorage.setItem(KEY+'_theme', t); } catch(e){} themeIcon(); }
+function themeIcon(){ const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme==='dark' : matchMedia('(prefers-color-scheme: dark)').matches; document.querySelectorAll('[data-act=theme]').forEach(b => { b.innerHTML = ico(dark?'sun':'moon'); b.title = dark ? 'Helles Design' : 'Dunkles Design'; }); return dark; }
+
 /* ---------- Ereignisse ---------- */
 document.addEventListener('click', e => {
-  const tab = e.target.closest('#tabs button');
-  if(tab){ view = {...view, tab:tab.dataset.tab, card:null, q:''}; location.hash = tab.dataset.tab; render(); return; }
+  const tab = e.target.closest('[data-tab]');
+  if(tab){ go(tab.dataset.tab); return; }
+  const pi = e.target.closest('[data-pal]');
+  if(pi){ const x = palItems[+pi.dataset.pal]; palClose(); x && x.run(); return; }
+  if(e.target.id === 'pal'){ palClose(); return; }
   const el = e.target.closest('[data-act]'); if(!el) return;
   const id = el.dataset.id, act = el.dataset.act;
   const c = view.card ? C(view.card) : null;
   switch(act){
+    case 'theme': setTheme(themeIcon() ? 'light' : 'dark'); break;
+    case 'palette': palOpen(); break;
+    case 'goTab': go(id); break;
+    case 'goMenu': view.sec = id; go('menu'); break;
+    case 'sec': view.sec = id; render(); break;
     case 'newMenu': menuDialog(); break;
     case 'editMenu': menuDialog(S.menu.find(m=>m.id===id)); break;
-    case 'openCard': view = {...view, tab:'cards', card:id}; location.hash = 'cards'; render(); scrollTo(0,0); break;
-    case 'backCards': view.card = null; render(); break;
+    case 'openCard': go('cards', id); break;
+    case 'backCards': go('cards'); break;
     case 'newCardFor': newCard('dish', S.menu.find(m=>m.id===id)); break;
     case 'newCard': newCard(id); break;
     case 'ctype': view.ctype = id; render(); break;
-    case 'addLine': c.items.push({ref:'',qty:'',net:''}); save(); render(); break;
-    case 'delLine': c.items.splice(+id,1); save(); render(); break;
-    case 'dupCard': { const src = C(id); const cp = JSON.parse(JSON.stringify(src)); cp.id = uid(src.type); cp.no = S.settings.nextNo++; cp.name += ' (Kopie)'; S.cards.push(cp); view.card = cp.id; save(); render(); break; }
+    case 'addLine': c.items.push({ref:'',qty:'',net:''}); save(); render(); setTimeout(()=>document.getElementById('ref-'+(c.items.length-1))?.focus(),0); break;
+    case 'delLine': c.items.splice(+id,1); save(); render(); toast('Zeile entfernt'); break;
+    case 'simTo': { const r = $('#sim'); view.sim.price = Math.min(+r.max, Math.max(+r.min, +id)); r.value = view.sim.price; r.dispatchEvent(new Event('input',{bubbles:true})); break; }
+    case 'applySim': { const m = S.menu.find(x=>x.id===id); m.price = Math.round(view.sim.price*10)/10; save(); render(); toast('Verkaufspreis auf '+eur(m.price)+' gesetzt'); break; }
+    case 'dupCard': { const src = C(id); const cp = JSON.parse(JSON.stringify(src)); cp.id = uid(src.type); cp.no = S.settings.nextNo++; cp.name += ' (Kopie)'; S.cards.push(cp); save(); go('cards', cp.id); toast('Kopie angelegt'); break; }
     case 'delCard': { const src = C(id); const u = usage('c:'+id); if(u.length){ info('Basisrezept wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(x=>x.name).join(', ')}. Entfernen Sie es dort zuerst.`); break; }
       ask(`Rezeptur „${src.name}“ löschen? Die Gerichte bleiben auf der Speisekarte, aber ohne Rezeptur.`, () => { S.cards = S.cards.filter(x=>x.id!==id); S.menu.forEach(m=>{ if(m.card===id) m.card=''; }); view.card = null; }); break; }
     case 'printCard': printCard(id); break;
@@ -706,26 +1124,54 @@ document.addEventListener('click', e => {
 
 document.addEventListener('input', e => {
   const t = e.target;
-  if(t.id === 'mq' || t.id === 'cq'){ view.q = t.value; const pos = t.selectionStart; render(); const n = $('#'+t.id); n.focus(); n.setSelectionRange(pos,pos); }
-  if(t.id === 'pq'){ view.pq = t.value; const pos = t.selectionStart; render(); const n = $('#pq'); n.focus(); n.setSelectionRange(pos,pos); }
+  if(t.id === 'mq' || t.id === 'cq' || t.id === 'pq'){
+    if(t.id === 'pq') view.pq = t.value; else view.q = t.value;
+    const pos = t.selectionStart; render(); const n = $('#'+t.id); n.focus(); try { n.setSelectionRange(pos,pos); } catch(err){}
+  }
+  if(t.id === 'sim'){
+    const c = C(view.card); view.sim.price = +t.value;
+    $('#simVal').textContent = eur(+t.value); $('#simOut').innerHTML = simHtml(totals(c).cost, +t.value);
+    const ap = $('#simApply'); if(ap){ const m = S.menu.find(x=>x.card===c.id); ap.hidden = Math.abs(+t.value - +m.price) < 0.05; }
+  }
+  if(t.id === 'portions'){ view.portions = Math.max(1, +t.value||1); $('#prodOut').innerHTML = prodHtml(C(view.card), view.portions); }
+  if(t.id === 'palIn') palFilter(t.value);
+});
+
+document.addEventListener('keydown', e => {
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k'){ e.preventDefault(); $('#pal').hidden ? palOpen() : palClose(); return; }
+  if(!$('#pal').hidden){
+    if(e.key === 'Escape'){ palClose(); }
+    else if(e.key === 'ArrowDown'){ e.preventDefault(); palSel = Math.min(palItems.length-1, palSel+1); palDraw(); }
+    else if(e.key === 'ArrowUp'){ e.preventDefault(); palSel = Math.max(0, palSel-1); palDraw(); }
+    else if(e.key === 'Enter'){ e.preventDefault(); const x = palItems[palSel]; palClose(); x && x.run(); }
+    return;
+  }
+  if(e.key === 'Enter' && e.target.matches('input[data-li],input[data-pp],input[data-cf]')){ e.preventDefault(); e.target.blur(); }
+  if(e.key === '/' && !e.target.closest('input,textarea,select')){ e.preventDefault(); palOpen(); }
 });
 
 document.addEventListener('change', e => {
   const t = e.target, c = view.card ? C(view.card) : null;
-  if(t.dataset.cf && c){ const f = t.dataset.cf; c[f] = f==='yieldG' ? (t.value===''?'':+t.value) : t.value; save(); if(f!=='method') render(); return; }
-  if(t.dataset.li != null && c){ const it = c.items[+t.dataset.li]; const f = t.dataset.lf; it[f] = f==='ref' ? t.value : (t.value===''?'':+t.value); if(f==='ref') it.net = ''; save(); render(); const n = document.getElementById(t.id); n && n.focus(); return; }
-  if(t.dataset.pp){ const p = P(t.dataset.pp); p[t.dataset.pf] = +t.value || 0; save(); render(); return; }
-  if(t.dataset.sf){ const f = t.dataset.sf; S.settings[f] = f==='name' ? t.value : (+t.value || 0); save(); return; }
+  if(t.dataset.cf && c){ const f = t.dataset.cf; c[f] = f==='yieldG' ? (t.value===''?'':+t.value) : t.value; save(); if(f!=='method') render(); toast('Gespeichert'); return; }
+  if(t.dataset.li != null && c){ const it = c.items[+t.dataset.li]; const f = t.dataset.lf; it[f] = f==='ref' ? t.value : (t.value===''?'':+t.value); if(f==='ref') it.net = ''; save(); render(); return; }
+  if(t.dataset.pp){ const p = P(t.dataset.pp); const old = +p[t.dataset.pf]; p[t.dataset.pf] = +t.value || 0; save(); render(); if(t.dataset.pf==='price' && old !== p.price) toast(`${p.name}: ${eur(old)} → ${eur(p.price)} · ${usage('p:'+p.id).length} Rezepturen neu berechnet`); return; }
+  if(t.dataset.sf){ const f = t.dataset.sf; S.settings[f] = f==='name' ? t.value : (+t.value || 0); save(); toast('Gespeichert'); return; }
   if(t.id === 'importFile' && t.files[0]){
     const r = new FileReader();
-    r.onload = () => { try { const d = JSON.parse(r.result); if(!d.products || !d.cards || !d.menu) throw 0; S = d; save(); view = {tab:'menu',card:null,q:'',ctype:'all',pq:''}; render(); info('Fertig', 'Daten wurden geladen.'); } catch(err){ info('Laden fehlgeschlagen', 'Die Datei ist keine Sicherung dieser App. Wählen Sie eine .json-Datei, die mit „Sicherung erstellen“ gespeichert wurde.'); } };
+    r.onload = () => { try { const d = JSON.parse(r.result); if(!d.products || !d.cards || !d.menu) throw 0; S = d; save(); go('dash'); toast('Sicherung geladen'); } catch(err){ info('Laden fehlgeschlagen', 'Die Datei ist keine Sicherung dieser App. Wählen Sie eine .json-Datei, die mit „Sicherung erstellen“ gespeichert wurde.'); } };
     r.readAsText(t.files[0]); t.value = '';
   }
 });
 
-function fromHash(){ const h = location.hash.slice(1); if(['menu','cards','products','setup'].includes(h) && h !== view.tab){ view = {...view, tab:h, card:null, q:''}; render(); } }
+/* ---------- Start ---------- */
+document.querySelectorAll('.nav-slot').forEach(n => n.innerHTML = navHtml());
+try { const th = localStorage.getItem(KEY+'_theme'); if(th) document.documentElement.dataset.theme = th; } catch(e){}
+themeIcon();
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', themeIcon);
+function fromHash(){ const h = location.hash.slice(1); if(TABS.some(t=>t[0]===h) && h !== view.tab){ view = {...view, tab:h, card:null, q:''}; render(); } }
 window.addEventListener('hashchange', fromHash);
 fromHash(); render();
+
 </script>
 </body>
 </html>
