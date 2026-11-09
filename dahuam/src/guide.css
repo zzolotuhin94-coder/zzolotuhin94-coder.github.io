@@ -257,3 +257,6 @@ body.simple .ms-t small,body.simple .au-t small{font-size:14px}
 body.simple .plate-c .fc{white-space:nowrap;font-size:10.500px}
 body.simple .fcw small,body.simple .ring small{white-space:nowrap}
 @media print{.gd,.gd-bub,.gd-helpbar,.side-help,.crumb-q,.wozu-q{display:none!important}}
+/* Handy: neue Bedienelemente mindestens 40 px */
+.gw-in h2:focus{outline:0}
+@media (max-width:900px){.topbar .theme-btn{width:40px;height:40px}.ms-sk,.gd-panel .btn.sm,.bg-search{min-height:40px}.bg-search{height:44px}.gd-panel .hint .link{min-height:40px}body.simple .lt-wrap{overflow-x:auto}}

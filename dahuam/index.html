@@ -2245,6 +2245,268 @@ table.recv td[data-l="Preis lt. Rechnung"] .qty{display:inline-grid;grid-templat
 }
 .sh-chip.used{opacity:1;background:var(--surface-2);border-style:dashed}
 .sh-chip.used b{color:var(--muted);font-weight:500}
+
+/* ===================== Begleitung: Rundgang, Hilfe, Aufgaben, Einfach-Modus ===================== */
+/* Maßstab wie im Feinschliff: Radien 6/8, eine Linie statt Kasten, Gold nur als Markierung */
+
+/* ---------- Rundgang: Lichtkegel und Karte ---------- */
+.gd{position:fixed;inset:0;z-index:400;pointer-events:none}
+.gd-b{position:fixed;pointer-events:auto;background:transparent}
+.gd-hole{position:fixed;border-radius:8px;box-shadow:0 0 0 200vmax rgba(22,24,26,.58);outline:2px solid var(--gold);pointer-events:none}
+.gd-hole.none{outline:0;border-radius:0}
+.gd-hole.off{display:none}
+.gd-hole.open{animation:gdPulse 1.8s ease-in-out infinite}
+.gd-ok .gd-hole{outline-color:var(--good);animation:none}
+@keyframes gdPulse{0%,100%{outline-offset:0}50%{outline-offset:4px}}
+.gd-move .gd-hole{transition:left .32s cubic-bezier(.2,.8,.2,1),top .32s cubic-bezier(.2,.8,.2,1),width .32s cubic-bezier(.2,.8,.2,1),height .32s cubic-bezier(.2,.8,.2,1)}
+.gd-move .gd-card{transition:left .32s cubic-bezier(.2,.8,.2,1),top .32s cubic-bezier(.2,.8,.2,1)}
+.gd-card{position:fixed;left:12px;top:12px;pointer-events:auto;box-sizing:border-box;width:min(348px,calc(100vw - 24px));background:var(--surface);color:var(--fg);border:1px solid var(--line-strong);border-radius:10px;box-shadow:0 20px 48px -14px rgba(0,0,0,.5);padding:14px 16px 12px;font-family:var(--f-body);outline:0}
+.gd-top{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.gd-n{margin-left:auto;font-variant-numeric:tabular-nums}
+.gd-mark{width:18px;height:18px;flex:none;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.gd-mark .post{stroke:currentColor}
+.gd-mark .board{stroke:var(--gold);fill:color-mix(in srgb,var(--gold) 26%,transparent)}
+.gd-card h3{font:500 23px/1.15 var(--f-display);letter-spacing:.005em;margin:8px 0 5px}
+.gd-card p{margin:0;font-size:14.5px;line-height:1.5;text-wrap:pretty}
+.gd-card .gd-do{display:flex;gap:9px;align-items:flex-start;margin-top:10px;padding:9px 11px;border-radius:6px;background:color-mix(in srgb,var(--gold) 15%,var(--surface));font-weight:600;font-size:14px;line-height:1.4}
+.gd-tap,.gd-okm{width:20px;height:20px;flex:none;fill:none;stroke:var(--accent);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.gd-card.ok .gd-do{background:color-mix(in srgb,var(--good) 14%,var(--surface))}
+.gd-okm{stroke:var(--good);stroke-width:2.6;stroke-dasharray:24;stroke-dashoffset:24;animation:gdDraw .45s ease-out .05s forwards}
+@keyframes gdDraw{to{stroke-dashoffset:0}}
+.gd-card .gd-ro{margin-top:8px;font-size:13px;color:var(--muted)}
+.gd-f{display:flex;align-items:center;gap:8px;margin-top:14px}
+.gd-skip{border:0;background:none;padding:0;min-height:36px;color:var(--muted);font:500 13px var(--f-body);cursor:pointer;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line-strong)}
+.gd-skip:hover{color:var(--fg)}
+.gd-dots{display:flex;gap:4px;flex:1;justify-content:center;min-width:0}
+
+.gd-bar{height:2px;background:var(--line);border-radius:1px;margin-top:9px;overflow:hidden}
+.gd-bar i{display:block;height:100%;background:var(--gold);transition:width .3s}
+.gd-dots i{width:5px;height:5px;border-radius:50%;background:var(--line-strong);flex:none}
+.gd-dots i.d{background:var(--gold)}
+.gd-dots i.on{background:var(--fg);transform:scale(1.25)}
+.gd-card .btn.sm{min-height:36px;padding:0 14px}
+.gd-card.nudge{animation:gdNudge .32s ease-out}
+@keyframes gdNudge{0%,100%{transform:none}30%{transform:translateY(-4px)}60%{transform:translateY(2px)}}
+.gd.docked .gd-card{box-shadow:0 12px 30px -10px rgba(0,0,0,.5)}
+.gd-live{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+:root[data-theme="dark"] .gd-hole{box-shadow:0 0 0 200vmax rgba(0,0,0,.66)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .gd-hole{box-shadow:0 0 0 200vmax rgba(0,0,0,.66)}}
+@media (max-width:900px){.gd-card .btn.sm,.gd-skip{min-height:40px}.gd-card h3{font-size:21px}}
+@media (prefers-reduced-motion:reduce){.gd-move .gd-hole,.gd-move .gd-card{transition:none}.gd-hole.open,.gd-card.nudge{animation:none}.gd-okm{animation:none;stroke-dashoffset:0}}
+
+/* ---------- Fragezeichen am Titel, Brotkrumen ---------- */
+.wozu-q{cursor:pointer}
+.crumb{display:flex;align-items:center;gap:8px;min-width:0;margin-bottom:10px}
+.crumb .back{margin-bottom:0;flex:none}
+.crumb-sep{color:var(--muted)}
+.crumb-here{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--fg);font-weight:600;font-size:14px}
+.crumb .sp{flex:1}
+.crumb-q{display:inline-flex;align-items:center;gap:6px;flex:none;border:0;background:none;padding:0 2px;min-height:36px;color:var(--muted);font:500 13px var(--f-body);cursor:pointer}
+.crumb-q .ico{width:16px;height:16px}
+.crumb-q:hover{color:var(--fg)}
+@media (max-width:900px){.crumb-q{min-height:40px;min-width:40px;justify-content:flex-end}.crumb-q span{display:none}.crumb-q .ico{width:20px;height:20px}}
+
+/* ---------- Seitenleiste unten, Kopf am Handy ---------- */
+.side-help{margin-top:auto;display:flex;flex-direction:column;gap:2px;padding-top:10px;border-top:1px solid color-mix(in srgb,var(--side-fg) 10%,transparent)}
+.side-help + .side-foot{margin-top:0}
+.side-help ~ .side-foot{margin-top:0}
+.sh-i{display:flex;align-items:center;gap:12px;width:100%;border:0;background:transparent;color:var(--side-muted);padding:7px 12px;border-radius:6px;cursor:pointer;font:500 13.5px var(--f-body);text-align:left}
+.sh-i:hover{background:var(--side-2);color:var(--side-fg)}
+.sh-i .ico,.sh-i .gd-mark{width:18px;height:18px;flex:none}
+.sh-i span{flex:1}
+.sh-sw{width:26px;height:14px;border-radius:7px;background:color-mix(in srgb,var(--side-fg) 20%,transparent);position:relative;flex:none;transition:background .15s}
+.sh-sw::after{content:"";position:absolute;left:2px;top:2px;width:10px;height:10px;border-radius:50%;background:var(--side-fg);transition:transform .15s}
+.sh-i[aria-pressed="true"]{color:var(--side-fg)}
+.sh-i[aria-pressed="true"] .sh-sw{background:var(--gold)}
+.sh-i[aria-pressed="true"] .sh-sw::after{transform:translateX(12px)}
+.topbar .theme-btn[data-act="helpMode"][aria-pressed="true"]{background:var(--gold);color:#1f2326}
+
+/* ---------- Hilfe-Modus ---------- */
+body.gd-help #app,body.gd-help .side,body.gd-help .bottom,body.gd-help .topbar{cursor:help}
+body.gd-help #app *,body.gd-help .side *,body.gd-help .bottom *,body.gd-help .topbar *{cursor:help}
+@media (hover:hover){body.gd-help [data-help]:hover{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px}}
+.gd-helpbar{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:130;display:flex;align-items:center;gap:10px;max-width:calc(100vw - 24px);box-sizing:border-box;background:var(--side);color:var(--side-fg);border:1px solid color-mix(in srgb,var(--gold) 55%,transparent);border-radius:8px;padding:6px 6px 6px 12px;font-size:13.5px;line-height:1.35;box-shadow:var(--float)}
+.gd-helpbar .ico{width:18px;height:18px;flex:none;color:var(--gold)}
+.gd-helpbar b{font-weight:600}
+.gd-helpbar .btn{flex:none;min-height:34px;background:transparent;color:var(--side-fg);border-color:color-mix(in srgb,var(--side-fg) 28%,transparent)}
+.gd-bub{position:fixed;left:10px;top:10px;z-index:410;box-sizing:border-box;width:max-content;max-width:min(320px,calc(100vw - 20px));background:var(--side);color:var(--side-fg);border-radius:8px;padding:10px 12px 11px;font-size:13.5px;line-height:1.45;box-shadow:0 14px 36px -12px rgba(0,0,0,.55);opacity:0;transition:opacity .14s}
+.gd-bub.in{opacity:1}
+.gd-bub{border:1px solid color-mix(in srgb,var(--gold) 50%,transparent)}
+.gd-bub::before{border-left:1px solid color-mix(in srgb,var(--gold) 50%,transparent);border-top:1px solid color-mix(in srgb,var(--gold) 50%,transparent)}
+.gd-bub.up::before{border:0;border-right:1px solid color-mix(in srgb,var(--gold) 50%,transparent);border-bottom:1px solid color-mix(in srgb,var(--gold) 50%,transparent)}
+.gd-bub.side::before{border:0;border-left:1px solid color-mix(in srgb,var(--gold) 50%,transparent);border-bottom:1px solid color-mix(in srgb,var(--gold) 50%,transparent)}
+.gd-bub b{display:block;font:500 17px/1.2 var(--f-display);letter-spacing:.01em;color:var(--gold-hi,var(--gold));margin-bottom:3px}
+.gd-bub p{margin:0;text-wrap:pretty}
+.gd-bub small{display:block;margin-top:6px;font-size:12px;color:var(--side-muted)}
+.gd-bub-l{display:inline-block;margin-top:6px;border:0;background:none;padding:0;min-height:28px;color:var(--side-fg);font:500 12.5px var(--f-body);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.gd-bub::before{content:"";position:absolute;width:10px;height:10px;background:var(--side);transform:rotate(45deg)}
+.gd-bub.down::before{top:-6px;left:calc(var(--ax,24px) - 5px)}
+.gd-bub.up::before{bottom:-6px;left:calc(var(--ax,24px) - 5px)}
+.gd-bub.side::before{left:-6px;top:calc(var(--ay,20px) - 5px)}
+@media (max-width:900px){.gd-helpbar{bottom:calc(74px + env(safe-area-inset-bottom,0px));width:calc(100vw - 24px)}.gd-helpbar span{flex:1}.gd-helpbar .btn{min-height:40px}.gd-bub-l{min-height:40px}}
+
+/* ---------- Erster Start ---------- */
+dialog.gd-wel{width:min(560px,calc(100vw - 24px));padding:0;border-radius:10px}
+.gw-in{padding:24px 24px 18px}
+.gw-in > .gd-mark{width:26px;height:26px;color:var(--fg)}
+.gw-in h2{font:500 30px/1.1 var(--f-display);margin:10px 0 4px;letter-spacing:.005em}
+.gw-q{margin:0 0 16px;font-size:15.5px;line-height:1.5;color:var(--muted)}
+.gw-opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gw-o{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;border:1px solid var(--line-strong);background:var(--surface);color:var(--fg);border-radius:8px;padding:14px 14px 16px;cursor:pointer;font-family:var(--f-body);transition:border-color .15s,background .15s}
+.gw-o:hover,.gw-o:focus-visible{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 7%,var(--surface))}
+.gw-o svg{width:96px;height:56px;margin-bottom:8px;fill:var(--surface-2);stroke:var(--line-strong);stroke-width:1.5}
+.gw-o svg .g{fill:color-mix(in srgb,var(--gold) 40%,var(--surface));stroke:var(--gold)}
+.gw-o svg path{fill:none}
+.gw-o b{font:500 21px/1.15 var(--f-display)}
+.gw-o span{font-size:13.5px;line-height:1.45;color:var(--muted)}
+.gw-f{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;font-size:12.5px;color:var(--muted)}
+.gw-f2{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
+.gw-f2 .btn{justify-content:center}
+@media (max-width:520px){.gw-opts{grid-template-columns:1fr}.gw-o{flex-direction:row;flex-wrap:wrap;align-items:center;column-gap:12px}.gw-o svg{width:72px;height:42px;margin:0}.gw-o b{flex:1}.gw-o span{flex-basis:100%}.gw-in{padding:20px 16px 14px}.gw-in h2{font-size:26px}.gw-f2 .btn{min-height:44px;flex:1}}
+
+/* ---------- Aufbau: Aufgaben ---------- */
+.ms-lvl{display:flex;align-items:baseline;gap:6px 12px;flex-wrap:wrap;margin:-4px 0 18px}
+.ms-lvl-n{font:500 20px/1.1 var(--f-display);letter-spacing:.01em}
+.ms-lvl-t{font-size:13.5px;color:var(--muted)}
+.ms-pips{display:flex;gap:4px;margin-left:auto;align-self:center}
+.ms-pips i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--line-strong);box-sizing:border-box}
+.ms-pips i.on{background:var(--gold);border-color:var(--gold)}
+.ms-next{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px 28px;align-items:center;padding:18px 0 18px 18px;border-left:3px solid var(--gold);margin-bottom:22px}
+.ms-kick{font-size:12.5px;font-weight:500;color:var(--accent)}
+.ms-next h2{font:500 26px/1.15 var(--f-display);margin:2px 0 4px;letter-spacing:.005em}
+.ms-next p{margin:0;font-size:14px;line-height:1.45;color:var(--muted);max-width:60ch;text-wrap:pretty}
+.ms-next-p{display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ms-next-p b{font-weight:600;color:var(--fg)}
+.ms-next-p .au-m.big{width:150px}
+.ms-go{min-height:44px;padding:0 18px;font-size:15px}
+.ms-go .ico{width:16px;height:16px}
+.ms-alldone{display:flex;align-items:center;gap:8px;margin:0 0 20px;font-size:14px;color:var(--muted)}
+.ms-alldone .ico{width:18px;height:18px;color:var(--good)}
+.ms-tier{border-top:1px solid var(--line)}
+.ms-tiers{border-bottom:1px solid var(--line);margin-bottom:8px}
+.ms-th{margin:0;font:inherit}
+.ms-th button{display:flex;align-items:center;gap:10px;width:100%;min-height:46px;border:0;background:none;padding:0;color:var(--fg);font:500 18px var(--f-display);letter-spacing:.01em;cursor:pointer;text-align:left}
+.ms-th small{font:500 13px var(--f-body);color:var(--muted);font-variant-numeric:tabular-nums}
+.ms-tier.all .ms-th small{color:var(--good)}
+.ms-chev{width:7px;height:7px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(-45deg);transition:transform .15s;flex:none;margin:0 4px 0 2px}
+.ms-th button[aria-expanded="true"] .ms-chev{transform:rotate(45deg)}
+.ms-list{list-style:none;margin:0;padding:0 0 6px}
+.ms-row{display:grid;grid-template-columns:32px minmax(0,1.5fr) minmax(150px,.7fr) minmax(150px,auto);gap:6px 20px;align-items:center;padding:11px 0;border-top:1px solid var(--line)}
+.ms-st{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line-strong);font:600 13px var(--f-display);color:var(--muted);background:var(--surface)}
+.ms-st .ico{width:15px;height:15px;stroke-width:2.6}
+.ms-row.done .ms-st{background:var(--gold);border-color:var(--gold);color:#1f2326}
+.ms-row.next .ms-st{border-color:var(--gold);color:var(--fg);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 22%,transparent)}
+.ms-t{min-width:0}
+.ms-t b{display:block;font:600 16px/1.25 var(--f-display);letter-spacing:.01em}
+.ms-t small{display:block;font-size:13px;color:var(--muted);margin-top:2px;line-height:1.4;text-wrap:pretty}
+.ms-row.done .ms-t b{color:var(--muted)}
+.ms-row.done .ms-t small{display:none}
+.ms-p{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:0}
+.ms-a{display:flex;justify-content:flex-end;min-width:0}
+.ms-ro{font-size:12.5px;color:var(--muted)}
+.ms-sth{margin-top:34px}
+@media (max-width:1000px){
+  .ms-next{grid-template-columns:minmax(0,1fr);padding:14px 0 14px 14px;gap:12px}
+  .ms-next-p{flex-direction:row;align-items:center;gap:12px}
+  .ms-next-p .au-m.big{flex:1;width:auto}
+  .ms-go{justify-self:start}
+  .ms-row{grid-template-columns:32px minmax(0,1fr) auto;gap:4px 12px}
+  .ms-p{grid-column:2;grid-row:2;flex-direction:row;align-items:center;gap:10px}
+  .ms-p .au-m{width:90px;flex:none}
+  .ms-a{grid-column:3;grid-row:1 / span 2;align-self:center}
+  .ms-row.done .ms-p{grid-column:2}
+  .ms-pips{display:none}
+}
+@media (max-width:900px){.ms-a .btn.sm{min-height:40px}.ms-ro{max-width:92px;text-align:right;line-height:1.3}}
+
+/* ---------- Stempelkarte ---------- */
+.sk-card{max-width:760px;background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:22px 26px 16px;position:relative}
+.sk-card::before{content:"";position:absolute;inset:5px;border:1px solid var(--line);border-radius:5px;pointer-events:none}
+.sk-h{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--line-strong)}
+.sk-brand{display:block;font:500 13px var(--f-display);letter-spacing:.14em;color:var(--accent)}
+.sk-title{display:block;font:500 30px/1.05 var(--f-display);letter-spacing:.01em;margin-top:2px}
+.sk-lvl{text-align:right;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.sk-lvl b{display:block;font:500 19px/1.1 var(--f-display);color:var(--fg);letter-spacing:.01em}
+.sk-tier h2{font:500 15px var(--f-display);letter-spacing:.04em;color:var(--muted);margin:16px 0 4px}
+.sk-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px 6px}
+.stamp{display:flex;flex-direction:column;align-items:center;gap:1px;border:0;background:none;padding:6px 2px 8px;border-radius:6px;cursor:pointer;color:var(--fg);font-family:var(--f-body);text-align:center;min-width:0}
+.stamp:hover{background:color-mix(in srgb,var(--gold) 8%,transparent)}
+.stamp b{font:500 12.5px/1.25 var(--f-body);max-width:100%;overflow-wrap:anywhere;margin-top:2px}
+.stamp small{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.stamp:not(.on) b{color:var(--muted)}
+.stamp-svg{fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.stamp-svg .e{stroke:var(--line-strong);stroke-width:1.4;stroke-dasharray:2.500 4.500}
+.stamp-svg .ic{stroke:var(--line-strong);stroke-width:1.500}
+.stamp-svg.on{--ink:var(--accent);opacity:.95}
+.stamp-svg.on .o{stroke:var(--ink);stroke-width:2.300}
+.stamp-svg.on .i{stroke:var(--ink);stroke-width:1}
+.stamp-svg.on .ic{stroke:var(--ink);stroke-width:2}
+.stamp-svg.on .tx{fill:var(--ink);stroke:none;font:600 6.300px var(--f-display);letter-spacing:.118em}
+:root[data-theme="dark"] .stamp-svg.on{--ink:var(--gold)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .stamp-svg.on{--ink:var(--gold)}}
+.sk-f{margin-top:14px;padding-top:10px;border-top:1px solid var(--line);font-size:12.5px;color:var(--faint)}
+.sk-f > span{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sk-f span.on{color:var(--fg);font-weight:600}
+.sk-f i{width:14px;height:1px;background:var(--line-strong)}
+.sk-hint{max-width:760px}
+.gd-rw .rw-box{padding-top:18px}
+.gd-rw-stamp{display:grid;place-items:center;margin:0 auto 6px;animation:skPress .5s cubic-bezier(.2,.9,.3,1.2) .15s both}
+@keyframes skPress{0%{transform:scale(1.5) rotate(-8deg);opacity:0}60%{opacity:1}100%{transform:none;opacity:1}}
+@media (max-width:700px){.sk-card{padding:18px 14px 12px}.sk-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.sk-title{font-size:25px}.stamp{min-height:44px}}
+@media (prefers-reduced-motion:reduce){.gd-rw-stamp{animation:none}}
+
+/* ---------- Begriffe ---------- */
+.bg-list{margin:4px 0 0;columns:2;column-gap:44px;max-width:1040px}
+.bg-grp{break-inside:avoid-column;display:grid;grid-template-columns:28px minmax(0,1fr);column-gap:8px;border-top:1px solid var(--line);padding:10px 0 4px}
+.bg-l{font:500 22px/1.1 var(--f-display);color:var(--accent);grid-row:1 / span 99}
+.bg-e{grid-column:2;padding:0 0 10px;border-radius:4px}
+.bg-e dt{font-weight:600;font-size:14.5px}
+.bg-e dd{margin:1px 0 0;font-size:13.5px;line-height:1.5;color:var(--muted);text-wrap:pretty}
+.bg-e.hit{box-shadow:-10px 0 0 var(--surface),-13px 0 0 var(--gold)}
+.bg-e.hit dt{color:var(--accent)}
+@media (max-width:900px){.bg-list{columns:1}}
+
+/* ---------- Einstellungen: Hilfe ---------- */
+.gd-panel{margin-bottom:16px}
+.gd-rows{list-style:none;margin:0;padding:0}
+.gd-rows li{display:flex;align-items:center;justify-content:space-between;gap:10px 20px;padding:11px 0;border-top:1px solid var(--line)}
+.gd-rows li:first-child{border-top:0;padding-top:4px}
+.gd-r-t{min-width:0}
+.gd-r-t b{display:block;font-weight:600;font-size:14.5px}
+.gd-r-t small{display:block;font-size:13px;color:var(--muted);line-height:1.4;margin-top:1px;text-wrap:pretty}
+.gd-rows .seg{flex:none}
+.gd-rows .row-btns{flex:none;flex-wrap:nowrap}
+.gd-panel .hint{margin-top:6px}
+.gd-panel .hint .link{font-family:var(--f-body);font-weight:500;color:var(--muted)}
+@media (max-width:700px){.gd-rows li{flex-wrap:wrap}.gd-rows .btn.sm,.gd-rows .seg button{min-height:40px}.gd-rows .seg{height:auto}.gd-r-t{flex:1 1 200px}}
+
+/* ---------- Einfach-Modus: weniger, größer, einfache Wörter ---------- */
+body.simple .adv,body.simple .vsw{display:none!important}
+body.simple{--ctl:44px}
+body.simple .page-h .sub{font-size:15px}
+body.simple .side .nav-i{font-size:15px;padding-top:10px;padding-bottom:10px}
+body.simple table.lt thead th button{pointer-events:none}
+body.simple .ms-t b,body.simple .au-t b{font-size:17px}
+body.simple .ms-t small,body.simple .au-t small{font-size:14px}
+@media (min-width:901px){
+  body.simple #app{font-size:15.5px}
+  body.simple .lt-n b{font-size:15.5px}
+  body.simple .btn{font-size:15px;padding:0 16px}
+  body.simple .btn.sm{min-height:40px;font-size:14px;padding:0 13px}
+  body.simple .seg button{height:38px;font-size:14.5px;padding:0 14px}
+  body.simple .chip{height:38px;font-size:14px;padding:0 13px}
+  body.simple table.lt td{padding-top:12px;padding-bottom:12px}
+  body.simple .lt-price{min-height:40px;font-size:15.5px}
+  body.simple .icon-btn{width:40px;height:40px}
+  body.simple .t-l{font-size:13.5px}
+}
+@media (max-width:900px){body.simple{--ctl:44px}body.simple .btn{font-size:15px}body.simple table.lt td{padding-top:11px;padding-bottom:11px}}
+body.simple .plate-c .fc{white-space:nowrap;font-size:10.500px}
+body.simple .fcw small,body.simple .ring small{white-space:nowrap}
+@media print{.gd,.gd-bub,.gd-helpbar,.side-help,.crumb-q,.wozu-q{display:none!important}}
+/* Handy: neue Bedienelemente mindestens 40 px */
+.gw-in h2:focus{outline:0}
+@media (max-width:900px){.topbar .theme-btn{width:40px;height:40px}.ms-sk,.gd-panel .btn.sm,.bg-search{min-height:40px}.bg-search{height:44px}.gd-panel .hint .link{min-height:40px}body.simple .lt-wrap{overflow-x:auto}}
 .m-only{display:none}@media (max-width:900px){.m-only{display:flex}}
 .dish-main:focus-visible,.rc:focus-visible{outline-offset:-3px}
 .title-in{hyphens:auto;-webkit-hyphens:auto}
@@ -2677,6 +2939,7 @@ function seed(){
   gameMigrate(d);
   hausMigrate(d);
   fixesMigrate(d);
+  guideMigrate(d);
   return d;
 }
 
@@ -2703,6 +2966,7 @@ function migrate(d){
   gameMigrate(d);
   hausMigrate(d);
   fixesMigrate(d);
+  guideMigrate(d);
   return d;
 }
 
@@ -2814,7 +3078,7 @@ function fmtDate(iso){ return new Date(iso).toLocaleDateString('de-AT',{day:'2-d
 function render(){
   document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === view.tab));
   const app = $('#app');
-  const fn = {dash:renderDash, menu:renderMenu, stock:renderStock, products:renderProducts, setup:renderSetup, buy:renderBuy, report:renderReport, aufbau:renderAufbau, pcheck:renderPriceCheck, labor:renderLabor}[view.tab];
+  const fn = {dash:renderDash, menu:renderMenu, stock:renderStock, products:renderProducts, setup:renderSetup, buy:renderBuy, report:renderReport, aufbau:renderAufbau, pcheck:renderPriceCheck, labor:renderLabor, begriffe:renderBegriffe, stempel:renderStempel}[view.tab];
   app.innerHTML = fn ? fn() : (view.card && C(view.card) ? renderCard(C(view.card)) : renderCards());
   app.dataset.view = view.tab; app.classList.toggle('v-list', vmode('buy') !== 'cards');
   app.classList.remove('enter'); void app.offsetWidth; app.classList.add('enter');
@@ -7323,7 +7587,7 @@ function roBlocked(el){
   return false;
 }
 function roGate(ok){ if(ok === undefined ? canEditAll() : ok) return true; toast(RO_MSG + ' können das ändern'); return false; }
-window.addEventListener('click', e => { if(canEditAll()) return; const el = e.target.closest && e.target.closest('[data-act],.sh-chip,[data-pick]'); if(el && roBlocked(el)){ e.preventDefault(); e.stopImmediatePropagation(); roGate(false); } }, true);
+window.addEventListener('click', e => { if(canEditAll() || document.body.classList.contains('gd-help')) return; /* Hilfe-Modus erklärt statt zu sperren */ const el = e.target.closest && e.target.closest('[data-act],.sh-chip,[data-pick]'); if(el && roBlocked(el)){ e.preventDefault(); e.stopImmediatePropagation(); roGate(false); } }, true);
 window.addEventListener('pointerdown', e => { if(canEditAll()) return; const el = e.target.closest && e.target.closest('.ti-grip,.sh-chip'); if(el){ e.stopImmediatePropagation(); } }, true);
 ['change','input'].forEach(ev => window.addEventListener(ev, e => { if(canEditAll()) return; const t = e.target; if(!t || !t.matches || !t.closest('#app') || !roBlocked(t)) return; e.stopImmediatePropagation(); if(t.type === 'checkbox' || t.type === 'radio') t.checked = t.defaultChecked; else if(t.tagName !== 'SELECT') t.value = t.defaultValue; if(ev === 'change') roGate(false); }, true));
 /* Dialoge, die auch über die Schnellsuche erreichbar sind */
@@ -7483,6 +7747,1147 @@ document.addEventListener('click', e => {
   if(el.dataset.act === 'safetyRestore'){ const sf = safetyGet(); if(!sf) return; ask(`Daten vom ${fmtDate(sf.at)} (${sf.why}) wiederherstellen? Der jetzige Stand wird dabei ersetzt. Das geht nur einmal.`, () => { setTimeout(safetyRestore, 0); }, 'Wiederherstellen'); }
   if(el.dataset.act === 'safetyDl'){ const sf = safetyGet(); if(sf) saveFile(`dahuam202-sicherheitskopie-${String(sf.at).slice(0,10)}.json`, new Blob([JSON.stringify(sf.data)], {type:'application/json'})).then(ok => ok && toast('Sicherheitskopie gespeichert')); }
 });
+
+/* =====================================================================
+   Begleitung, Teil 1: alle Texte.
+   Bereiche in einem Satz, Erklärungen für den Hilfe-Modus, Begriffe,
+   Rundgang und die kleinen Anleitungen je Seite.
+   Sprache: kurze Sätze, Küchenwörter, „Sie“.
+   ===================================================================== */
+
+/* ---------- Bereiche: ein Satz, wozu ---------- */
+const NAV_DESC = {
+  aufbau:'Kleine Aufgaben, die Sie Schritt für Schritt durch die App führen.',
+  dash:'Was heute zu bestellen ist und welche Lieferung kommt.',
+  menu:'Alle Gerichte mit Preis. Hier machen Sie auch die Karte für die Gäste.',
+  cards:'Was in ein Gericht kommt und was es kostet.',
+  labor:'Zutaten eintippen, die App schlägt Gerichte daraus vor.',
+  stock:'Was im Haus ist. Lieferung einbuchen, Schwund buchen, zählen.',
+  buy:'Beim Lieferanten bestellen und Lieferungen prüfen.',
+  products:'Jede Zutat mit ihrem Einkaufspreis.',
+  report:'Was verkauft wurde und was es gebracht hat.',
+  setup:'Name, Steuer, Team, Sicherung und Hilfe.',
+  pcheck:'Einkaufspreise eintragen, einen nach dem anderen.',
+  begriffe:'Alle Fachwörter der App, kurz erklärt.',
+  stempel:'Ihre gesammelten Stempel.',
+};
+const NAV_GROUP_NAMES = {'Start':'Start', 'Küche':'Karte & Rezepte', 'Bestand':'Ware & Einkauf', 'Zahlen':'Verkauf'};
+
+/* ---------- Erklärungen ----------
+   HELP[key] = {t: Titel, x: Text, g: 1 = steht auch unter „Begriffe“} */
+const HELP = {};
+function H(k, t, x, g){ HELP[k] = {k, t, x, g: g ? 1 : 0}; }
+
+/* Begriffe */
+H('wareneinsatz','Wareneinsatz','Was die Zutaten für eine Portion kosten. Nur die Ware: ohne Lohn, Miete und Strom.',1);
+H('we_pct','WE % · Wareneinsatz in Prozent','Wie viel vom Verkaufspreis für die Zutaten draufgeht. Beispiel: Zutaten 3 €, Preis ohne Steuer 10 €. Das sind 30 %. Je niedriger, desto mehr bleibt Ihnen.',1);
+H('ziel_we','Ziel-Wareneinsatz','Ihre eigene Grenze für WE %. Liegt ein Gericht darüber, ist es zu teuer in der Herstellung oder zu billig auf der Karte. Sie stellen die Zahl in den Einstellungen ein.',1);
+H('rohertrag','Rohertrag','Was vom Preis übrig bleibt, wenn die Zutaten bezahlt sind. Davon zahlen Sie Lohn, Miete und Strom.',1);
+H('aufschlag','Aufschlagsfaktor','Preis ohne Steuer geteilt durch Wareneinsatz. Faktor 4 heißt: Das Gericht bringt viermal so viel, wie die Zutaten kosten.',1);
+H('richtwert','Richtwert','Ein Beispielpreis aus den Demodaten. Er gilt nur, bis Sie Ihren echten Einkaufspreis eintragen oder bestätigen.',1);
+H('putzverlust','Putzverlust','Was beim Putzen wegfällt: Schale, Strunk, Knochen. 20 % heißt: Von 1 kg bleiben 800 g.',1);
+H('garverlust','Garverlust','Was beim Garen verloren geht, weil Wasser und Fett austreten. Ein Schnitzel wiegt nach der Pfanne weniger als davor.',1);
+H('brutto_netto_g','Brutto, netto, fertig','Brutto ist die Ware, wie sie geliefert wird. Netto ist sie geputzt. Fertig ist sie gegart am Teller.',1);
+H('mindestbestand','Mindestbestand','So viel soll immer im Haus sein. Liegt der Bestand darunter, schlägt die App eine Bestellung vor.',1);
+H('annahmeschluss','Annahmeschluss','Bis zu dieser Uhrzeit nimmt der Lieferant Bestellungen an. Wer später bestellt, bekommt die Ware erst am nächsten Liefertag.',1);
+H('gebinde','Gebinde','Die Packung, in der der Lieferant verkauft: Kiste, Sack, Karton. Beispiel: 1 Sack Mehl = 25 kg.',1);
+H('bestelltag','Bestelltag und Liefertag','Am Bestelltag nimmt der Lieferant Bestellungen an. Am Liefertag bringt er die Ware. Beides steht beim Lieferanten.',1);
+H('mindestbestellwert','Mindestbestellwert','Unter diesem Betrag liefert der Lieferant nicht oder verlangt einen Zuschlag.',1);
+H('bestellvorschlag','Bestellvorschlag','Die App rechnet aus, was unter dem Mindestbestand liegt, und schlägt die Menge vor. Sie können jede Zahl ändern.',1);
+H('entwurf','Entwurf','Eine Bestellung, die noch nicht beim Lieferanten ist. Sie können sie ändern oder löschen.',1);
+H('freigabe','Freigabe','Bestellungen über einem bestimmten Betrag muss der Inhaber erst erlauben. Den Betrag stellen Sie in den Einstellungen ein.',1);
+H('rezeptur','Rezeptur','Hier steht, was in ein Gericht kommt und was es kostet: Zutaten, Mengen, Zubereitung.',1);
+H('basisrezept','Basisrezept','Etwas, das Sie vorkochen und in mehreren Gerichten brauchen: Fond, Teig, Dressing. Einmal anlegen, überall verwenden.',1);
+H('charge','Charge','Die Menge, die Sie auf einmal herstellen. Beispiel: ein Topf Gulaschansatz mit 5 kg.',1);
+H('ausbeute','Ausbeute','Wie viel Gramm am Ende herauskommen. Bei einem Gericht ist das die Portion, bei einem Basisrezept der ganze Topf.',1);
+H('teller','Teller','Das Bild einer Rezeptur. Jedes Stück ist eine Zutat. Je größer das Stück, desto mehr kostet diese Zutat.',1);
+H('kostenstruktur','Kostenstruktur','Welche Zutat wie viel vom Wareneinsatz ausmacht. Die teuerste steht oben. Dort lohnt sich das Sparen.',1);
+H('preissim','Preis-Simulator','Ein Regler zum Ausprobieren: Was bleibt übrig, wenn das Gericht mehr oder weniger kostet? Erst „Übernehmen“ ändert den Preis.',1);
+H('produktionsmenge','Produktionsmenge','Wie viel Ware Sie für eine bestimmte Zahl von Portionen brauchen. Praktisch fürs Vorbereiten.',1);
+H('allergene','Allergene','Die 14 Stoffe, die auf der Karte stehen müssen, mit Buchstaben von A bis R. Die App liest sie aus den Zutaten der Rezeptur.',1);
+H('saison','Saison','Winter, Frühling, Sommer, Herbst. Ein Gericht kann nur in bestimmten Saisonen auf der Karte stehen.',1);
+H('aktion','Aktion','Eine Karte für kurze Zeit: Wildwochen, Silvester, Ostern. Sie gilt nur an den Tagen, die Sie festlegen.',1);
+H('kategorie','Kategorie','Eine Überschrift auf der Speisekarte: Suppen, Hauptspeisen, Desserts.',1);
+H('gaestekarte','Gästekarte','Die Speisekarte, wie die Gäste sie sehen. Ohne Wareneinsatz, mit Allergenen.',1);
+H('lagerwert','Lagerwert','Was die Ware im Haus wert ist: Bestand mal Einkaufspreis.',1);
+H('lagerort','Lagerort','Wo die Ware liegt: Kühlhaus, Tiefkühler, Trockenlager, Gemüselager, Bar.',1);
+H('wareneingang','Wareneingang','Eine Lieferung ist da. Sie prüfen Menge und Preis und buchen die Ware ins Lager.',1);
+H('entnahme','Entnahme','Ware geht aus dem Lager in die Küche. Der Bestand wird kleiner.',1);
+H('schwund','Schwund','Ware, die Sie nicht verkaufen konnten: verdorben, verkocht, Bruch, Personalessen. Kostet Geld, darum aufschreiben.',1);
+H('inventur','Inventur','Alles im Lager zählen. Die App vergleicht Ihre Zahl mit dem Bestand und zeigt, was fehlt.',1);
+H('soll_ist','Soll und Ist','Soll ist, was laut App da sein müsste. Ist ist, was Sie wirklich gezählt haben.',1);
+H('differenz','Differenz','Der Unterschied zwischen Soll und Ist in Euro. Minus heißt: Es fehlt Ware.',1);
+H('lieferschein','Lieferschein','Der Zettel, den der Fahrer mitbringt. Darauf steht, was geliefert wurde. Die Nummer tragen Sie beim Wareneingang ein.',1);
+H('reklamation','Reklamation','Etwas an der Lieferung stimmt nicht: zu wenig, falsche Ware, zu warm. Die App schreibt den Text für den Lieferanten.',1);
+H('umsatz','Umsatz netto','Was Sie eingenommen haben, ohne Mehrwertsteuer.',1);
+H('mwst','Mehrwertsteuer','Die Steuer im Preis. Auf Speisen sind es in Österreich 10 %. Die App rechnet den Wareneinsatz immer vom Preis ohne Steuer.',1);
+H('portionen','Portionen','Wie oft ein Gericht verkauft wurde.',1);
+H('kassendatei','Kassendatei','Eine Liste aus Ihrer Kasse: welches Gericht wie oft verkauft wurde. Sie laden die Datei in der Auswertung.',1);
+H('zuordnung','Zuordnung','Die Kasse nennt ein Gericht oft anders als die App. Hier sagen Sie einmal, was zusammengehört.',1);
+H('matrix','Menü-Matrix','Ein Bild mit vier Feldern. Oben rechts: Gerichte, die oft verkauft werden und viel bringen. Unten links: Gerichte, die beides nicht tun.',1);
+H('sicherung','Sicherung','Eine Datei mit allen Daten der App. Aufheben, zum Beispiel auf einem USB-Stick. Damit holen Sie alles zurück.',1);
+H('demodaten','Demodaten','Beispieldaten zum Ausprobieren. Die Karte ist echt, Preise und Bestände sind erfunden. Sie ersetzen sie nach und nach.',1);
+H('preischeck','Preis-Check','Die App zeigt ein Produkt nach dem anderen. Sie tippen Ihren Einkaufspreis ein oder bestätigen den Richtwert.',1);
+H('stempel','Stempel','Für jede erledigte Aufgabe im Aufbau gibt es einen Stempel auf Ihrer Stempelkarte.',1);
+
+/* Navigation und Rahmen */
+H('nav_aufbau','Aufbau', NAV_DESC.aufbau);
+H('nav_dash','Heute', NAV_DESC.dash);
+H('nav_menu','Speisekarte', NAV_DESC.menu);
+H('nav_cards','Rezepturen', NAV_DESC.cards);
+H('nav_labor','Rezept-Labor', NAV_DESC.labor);
+H('nav_stock','Lager', NAV_DESC.stock);
+H('nav_buy','Einkauf', NAV_DESC.buy);
+H('nav_products','Produkte', NAV_DESC.products);
+H('nav_report','Auswertung', NAV_DESC.report);
+H('nav_setup','Einstellungen', NAV_DESC.setup);
+H('suche','Suchen','Tippen Sie ein Gericht, ein Produkt oder eine Aktion ein, zum Beispiel „Schwund“. Am Computer geht auch Strg und K.');
+H('design','Hell oder dunkel','Schaltet die Farben um. Dunkel ist angenehm in einer dunklen Küche.');
+H('whoami','Wer arbeitet gerade?','Zeigt, wer angemeldet ist. Mitarbeiter sehen alles, ändern dürfen nur Küchenchef und Inhaber.');
+H('rundgang','Rundgang','Zeigt Ihnen in zwei Minuten alle Bereiche der App.');
+H('hilfe_schalter','Was ist das?','Der Hilfe-Schalter. Solange er an ist, erklärt die App alles, worauf Sie tippen. Es wird dabei nichts geändert.');
+H('hier','So geht’s hier','Eine kurze Anleitung für genau diese Seite, in drei bis fünf Schritten.');
+H('zurueck','Zurück','Bringt Sie eine Ebene zurück zur Liste.');
+
+/* Listen: Werkzeuge */
+H('ansicht','Ansicht','Dieselbe Liste in drei Formen: Liste, eng oder als Karten mit Bild.');
+H('sortieren','Sortieren','Ein Tipp sortiert die Liste nach dieser Spalte. Noch ein Tipp dreht die Reihenfolge um.');
+H('f_ueber','Über Ziel','Zeigt nur Gerichte, bei denen die Zutaten zu viel vom Preis fressen.');
+H('f_ohne_rez','Ohne Rezeptur','Zeigt Gerichte, bei denen die App noch nicht weiß, was hineinkommt. Sie kann darum keinen Wareneinsatz rechnen.');
+H('f_ohne_alg','Ohne Allergene','Zeigt Gerichte, bei denen die Allergene fehlen. In Österreich müssen sie auf der Karte stehen.');
+H('f_ohne_foto','Ohne Foto','Zeigt Gerichte ohne Bild.');
+H('f_kategorie','Kategorie wählen','Zeigt nur eine Kategorie oder nur eine Saison.');
+H('preisfeld','Preisfeld','Der Verkaufspreis mit Steuer. Tippen Sie hinein, schreiben Sie den neuen Preis und drücken Sie Enter.');
+H('status','Status','Zeigt, was bei diesem Gericht noch fehlt: Rezeptur oder Allergene. Der Stern heißt Empfehlung des Hauses.');
+H('reiter_menu','Reiter der Speisekarte','Kalkulation ist zum Rechnen. Gestalten & PDF macht die Karte für die Gäste. Saison & Aktionen plant das Jahr. Aufbau & Reihenfolge ordnet die Karte.');
+
+/* Speisekarte */
+H('neu_gericht','Neues Gericht','Legt ein neues Gericht auf der Speisekarte an: Name, Preis, Kategorie.');
+H('gericht_bearbeiten','Gericht bearbeiten','Name, Beschreibung, Preis, Saison und Allergene dieses Gerichts ändern.');
+H('gericht_foto','Foto','Ein Foto für dieses Gericht aufnehmen oder aussuchen.');
+H('pdf','Als PDF speichern','Macht aus der Gästekarte eine Datei. Die können Sie drucken oder verschicken.');
+H('drucken','Drucken','Schickt die Seite an den Drucker.');
+H('gdate','Datum der Karte','Die Karte zeigt, was an diesem Tag gilt: Saison, Wochentag und Aktionen.');
+H('gstil','Gestaltung','Drei fertige Stile für die Gästekarte. Ein Tipp wechselt den Stil, der Inhalt bleibt gleich.');
+H('ausblenden','Ausblenden','Das Gericht bleibt in der App, steht aber nicht auf der Gästekarte.');
+H('reihenfolge','Reihenfolge','Schiebt das Gericht oder die Kategorie auf der Karte nach oben oder unten.');
+
+/* Rezepturen */
+H('neu_rezept','Neue Rezeptur','Legt eine leere Rezeptur für ein Gericht an. Danach kommen die Zutaten auf den Teller.');
+H('neu_basis','Neues Basisrezept','Für alles, was Sie vorkochen: Fond, Teig, Dressing.');
+H('r_typ','Gerichte oder Basisrezepte','Gerichte gehen an den Gast. Basisrezepte kochen Sie vor und verwenden sie in Gerichten.');
+H('zutat_plus','Zutat dazu','Öffnet die Liste aller Produkte und Basisrezepte. Ein Tipp legt die Zutat auf den Teller.');
+H('zutat_weg','Vom Teller nehmen','Nimmt diese Zutat aus der Rezeptur. Sie können es gleich danach rückgängig machen.');
+H('menge','Menge','Wie viel von dieser Zutat in eine Portion kommt. Zahl eintippen und Enter drücken.');
+H('teller_tabelle','Teller oder Tabelle','Dieselben Zutaten als Bild oder als Tabelle mit allen Spalten.');
+H('schritt','Zubereitung','Schritt für Schritt aufschreiben, wie das Gericht gemacht wird. Jeder Schritt kann ein Foto haben.');
+H('portionsgewicht','Portionsgewicht','Wie viel Gramm eine fertige Portion wiegt.');
+H('rez_foto','Foto der Rezeptur','So soll das Gericht am Teller aussehen. Hilft allen, die es nachkochen.');
+H('duplizieren','Duplizieren','Macht eine Kopie dieser Rezeptur. Gut für eine Variante.');
+H('rez_loeschen','Rezeptur löschen','Löscht diese Rezeptur. Das Gericht bleibt auf der Karte, aber ohne Kalkulation.');
+H('auf_karte','Auf die Karte','Setzt dieses Gericht mit einem Preisvorschlag auf die Speisekarte.');
+
+/* Lager */
+H('b_wareneingang','Wareneingang buchen','Eine Lieferung ist da. Hier tragen Sie ein, was gekommen ist. Der Bestand wird größer.');
+H('b_entnahme','Entnahme buchen','Ware geht in die Küche. Der Bestand wird kleiner.');
+H('b_schwund','Schwund buchen','Ware ist verdorben oder verkocht. Mit Grund aufschreiben, damit Sie sehen, wo Geld verloren geht.');
+H('b_verkauf','Verkäufe buchen','Tragen Sie ein, was heute verkauft wurde. Die App zieht die Zutaten vom Lager ab.');
+H('fuellstand','Füllstand','Der Balken zeigt, wie voll das Lager bei diesem Artikel ist. Rot heißt: unter dem Mindestbestand.');
+H('storno','Buchung zurücknehmen','Macht diese Buchung rückgängig. Der Bestand ist danach wie vorher.');
+H('inv_start','Inventur starten','Beginnt eine neue Zählung. Sie können unterbrechen und später weiterzählen.');
+H('inv_fertig','Inventur abschließen','Setzt den Bestand auf Ihre gezählten Mengen. Die Differenz wird gespeichert.');
+H('inv_weg','Inventur verwerfen','Wirft die laufende Zählung weg. Der Bestand bleibt, wie er war.');
+H('inv_feld','Gezählte Menge','Tragen Sie ein, was wirklich da ist. Leer lassen heißt: nicht gezählt.');
+
+/* Einkauf */
+H('best_neu','Neue Bestellung','Lieferant wählen. Die App schlägt vor, was unter dem Mindestbestand liegt.');
+H('best_vorbereiten','Bestellung vorbereiten','Legt einen Entwurf für diesen Lieferanten an. Gesendet wird erst, wenn Sie es sagen.');
+H('best_wie_zuletzt','Wie zuletzt','Nimmt dieselben Artikel und Mengen wie bei der letzten Bestellung.');
+H('best_vorschlag','Vorschlag laden','Fügt alle Artikel dazu, die bei diesem Lieferanten unter dem Mindestbestand liegen.');
+H('best_gesendet','Als gesendet markieren','Erst tippen, wenn die Bestellung wirklich beim Lieferanten ist. Danach wartet die App auf die Lieferung.');
+H('best_kanal','E-Mail oder WhatsApp','Öffnet Ihr Mail-Programm oder WhatsApp mit dem fertigen Bestelltext. Abschicken müssen Sie selbst.');
+H('best_loeschen','Entwurf löschen','Löscht diese Bestellung, solange sie noch nicht gesendet ist.');
+H('best_menge','Bestellmenge','Wie viele Gebinde Sie bestellen. Daneben steht, wie viel das in kg, Liter oder Stück ist.');
+H('lief_neu','Lieferant anlegen','Name, Kontakt, Bestelltage, Liefertage und Annahmeschluss eines Lieferanten.');
+H('r_alles','Alles wie bestellt','Trägt bei jedem Artikel die bestellte Menge als geliefert ein. Danach ändern Sie nur, was nicht stimmt.');
+H('r_preis','Preis laut Rechnung','Steht auf der Rechnung ein anderer Preis? Hier eintragen. Die App merkt sich den neuen Einkaufspreis.');
+H('r_buchen','Einbuchen','Bucht die Lieferung ins Lager. Bei Fehlern schreibt die App eine Reklamation.');
+H('r_status','Zustand der Ware','In Ordnung, zu wenig, fehlt, beschädigt oder falscher Artikel. Alles außer „in Ordnung“ kommt in die Reklamation.');
+H('r_temp','Temperatur','Bei Kühlware die gemessene Temperatur bei der Übernahme. Wichtig für die Hygiene-Aufzeichnung.');
+
+/* Produkte */
+H('prod_neu','Neues Produkt','Legt eine neue Zutat an: Name, Einheit, Einkaufspreis, Lieferant.');
+H('prod_preis','Einkaufspreis','Was Sie dem Lieferanten zahlen, ohne Steuer, je kg, Liter oder Stück. Eintippen und Enter drücken.');
+H('prod_ok','Richtwert bestätigen','Der Beispielpreis stimmt ungefähr? Dann bestätigen. Er gilt ab jetzt als Ihr Preis.');
+H('prod_alle_ok','Alle bestätigen','Bestätigt alle Richtwerte, die gerade in der Liste stehen. Nur tippen, wenn Sie die Preise angesehen haben.');
+H('prod_import','Preisliste importieren','Lädt eine Preisliste vom Lieferanten als Datei. Die App zeigt vorher, was sich ändert.');
+H('pc_start','Preis-Check starten','Die App zeigt ein Produkt nach dem anderen. Sie tippen Ihren Preis ein. Enter geht weiter.');
+H('pc_ok','Richtwert stimmt','Der gezeigte Preis passt. Er wird als Ihr Preis übernommen.');
+H('pc_skip','Überspringen','Dieses Produkt jetzt nicht. Es kommt beim nächsten Preis-Check wieder.');
+H('pc_feld','Ihr Einkaufspreis','Netto, wie auf der Rechnung. Leer lassen, wenn der Richtwert stimmt.');
+H('prod_stand','Stand','Zeigt, ob der Preis noch ein Richtwert ist oder wann Sie ihn zuletzt bestätigt haben.');
+
+/* Auswertung */
+H('rp_zeitraum','Zeitraum','Tag, Woche, Monat oder ein eigener Zeitraum. Die Pfeile gehen einen Schritt zurück oder vor.');
+H('rp_vergleich','Vergleich','Stellt die Zahlen neben den Zeitraum davor oder neben dasselbe im Vorjahr.');
+H('rp_datei','Kassendatei wählen','Wählen Sie die Datei, die Ihre Kasse ausgibt. Die App zeigt zuerst eine Vorschau.');
+H('rp_beispiel','Beispiel einfügen','Füllt das Feld mit erfundenen Zeilen. So sehen Sie, wie eine Kassendatei aussehen soll.');
+H('rp_pruefen','Prüfen','Liest die Datei und zeigt, was importiert würde. Noch wird nichts gespeichert.');
+H('rp_csv','Tabelle (CSV)','Speichert die Zahlen als Datei für Excel oder den Steuerberater.');
+H('rp_bericht','Bericht drucken','Macht aus der Auswertung eine Seite zum Drucken oder als PDF.');
+H('rp_delta','Δ Menge','Wie viele Portionen mehr oder weniger als im Vergleichszeitraum.');
+H('rp_anteil','Anteil','Wie viel Prozent aller verkauften Portionen auf dieses Gericht fallen.');
+
+/* Einstellungen */
+H('s_sicherung','Sicherung erstellen','Speichert alle Daten als Datei. Am besten einmal pro Woche.');
+H('s_laden','Sicherung laden','Holt Daten aus einer Sicherungsdatei zurück. Die jetzigen Daten werden dabei ersetzt.');
+H('s_reset','Demodaten wiederherstellen','Ersetzt alles durch die Beispieldaten. Ihre eigenen Eingaben sind danach weg.');
+H('s_rolle','Rolle wechseln','Stellt um, wer gerade arbeitet. Mitarbeiter sehen alles, ändern dürfen nur Küchenchef und Inhaber.');
+H('s_modus','Einfach oder Alles zeigen','Einfach zeigt nur das Wichtigste mit großen Knöpfen. Alles zeigen bringt alle Spalten und Werkzeuge.');
+H('s_limit','Freigabe-Limit','Bestellungen über diesem Betrag muss der Inhaber erst erlauben.');
+H('lab_erfinden','Rezepte erfinden','Die App schlägt Gerichte aus Ihren Zutaten vor, mit Mengen und Wareneinsatz.');
+H('mission_start','Aufgabe starten','Bringt Sie an die richtige Stelle und zeigt, wie es geht.');
+H('station','Station','Sechs Stationen zeigen, wie viel von Ihrem Betrieb schon in der App steht. Die App rechnet das aus Ihren Daten.');
+
+/* Wo welche Erklärung hängt: [Selektor, Schlüssel]. Der erste Treffer zählt. */
+const HELP_SEL = [
+  ['.nav-i[data-tab="aufbau"]','nav_aufbau'],['.nav-i[data-tab="dash"]','nav_dash'],['.nav-i[data-tab="menu"]','nav_menu'],['.nav-i[data-tab="cards"]','nav_cards'],
+  ['.nav-i[data-tab="labor"],.m-only [data-tab="labor"]','nav_labor'],['.nav-i[data-tab="stock"]','nav_stock'],['.nav-i[data-tab="buy"]','nav_buy'],
+  ['.nav-i[data-tab="products"],.m-only [data-tab="products"]','nav_products'],['.nav-i[data-tab="report"],.m-only [data-tab="report"]','nav_report'],['.nav-i[data-tab="setup"]','nav_setup'],
+  ['[data-act="palette"]','suche'],['[data-act="theme"]','design'],['#whoami','whoami'],['[data-act="tourMain"]','rundgang'],['[data-act="helpMode"]','hilfe_schalter'],['[data-act="guideHere"]','hier'],['#app .back','zurueck'],
+  ['#app .vsw','ansicht'],['#app table.lt thead th button[data-act="lsort"]','sortieren'],
+  ['[data-act="sec"][data-id="over"],[data-act="goMenu"][data-id="over"]','f_ueber'],['[data-act="sec"][data-id="none"],[data-act="goMenu"][data-id="none"]','f_ohne_rez'],['[data-act="sec"][data-id="noalg"],[data-act="goMenu"][data-id="noalg"]','f_ohne_alg'],['[data-act="sec"][data-id="nophoto"]','f_ohne_foto'],['#app .sel-cat','f_kategorie'],
+  ['#app input[data-mp]','preisfeld'],['#app .lt-st','status'],['#app [data-act="mtab"]','reiter_menu'],
+  ['#app [data-act="newMenu"]','neu_gericht'],['#app button[data-act="editMenu"]','gericht_bearbeiten'],['#app [data-act="photoMenu"]','gericht_foto'],['#app [data-pdf]','pdf'],['#app [data-act="printMenu"],#app [data-act="printCard"],#app [data-act="ordPrint"]','drucken'],
+  ['#gdate,#app [data-act="gdate"]','gdate'],['#app [data-act="gStyle"]','gstil'],['#app [data-act="itemHide"]','ausblenden'],['#app [data-act="itemMove"],#app [data-act="secMove"]','reihenfolge'],['#app [data-act="gseason"],#app [data-act="editSeason"]','saison'],['#app [data-act="newSpecial"],#app [data-act="editSpecial"]','aktion'],
+  ['#app [data-act="newCard"][data-id="dish"]','neu_rezept'],['#app [data-act="newCard"][data-id="semi"]','neu_basis'],['#app [data-act="ctype"]','r_typ'],['#app [data-act="tellerPick"]','zutat_plus'],['#app [data-act="delLine"]','zutat_weg'],
+  ['#app input[data-lf="qty"]','menge'],['#app [data-act="tellerMode"]','teller_tabelle'],['#app [data-act="stepAdd"],#app textarea[data-step]','schritt'],['#cf-yieldG','portionsgewicht'],['#app [data-act="photoCard"]','rez_foto'],['#app [data-act="dupCard"]','duplizieren'],['#app [data-act="delCard"]','rez_loeschen'],['#app [data-act="toMenu"]','auf_karte'],
+  ['#app .plate','teller'],['#sim','preissim'],['#portions','produktionsmenge'],['#app [data-act="pcFor"]','preischeck'],
+  ['#app [data-act="moveDlg"][data-id^="in"],#app [data-act="ordRecv"]','b_wareneingang'],['#app [data-act="moveDlg"][data-id^="out"]','b_entnahme'],['#app [data-act="moveDlg"][data-id^="waste"]','b_schwund'],['#app [data-act="sales"]','b_verkauf'],
+  ['#app .lvl,#app .level','fuellstand'],['#app [data-act="moveUndo"]','storno'],['#app [data-act="invStart"]','inv_start'],['#app [data-act="invFinish"]','inv_fertig'],['#app [data-act="invCancel"]','inv_weg'],['#app input[data-inv]','inv_feld'],['#app [data-act="loc"]','lagerort'],
+  ['#app [data-act="buyNew"]','best_neu'],['#app [data-act="ordNew"]','best_vorbereiten'],['#app [data-act="ordRe"]','best_wie_zuletzt'],['#app [data-act="olSuggest"]','best_vorschlag'],['#app [data-act="ordMarkSent"]','best_gesendet'],['#app [data-act="ordOpened"]','best_kanal'],['#app [data-act="ordDel"]','best_loeschen'],['#app input[data-ol]','best_menge'],['#app [data-act="supEdit"]','lief_neu'],
+  ['#app [data-act="rAll"]','r_alles'],['#app input[data-rp]','r_preis'],['#app [data-act="rBook"]','r_buchen'],['#rTemp','r_temp'],['#app select[data-rs]','r_status'],['#rNo','lieferschein'],
+  ['#app [data-act="newProd"]','prod_neu'],['#app input[data-pp]','prod_preis'],['#app [data-act="pConfirm"]','prod_ok'],['#app [data-act="pConfirmAll"]','prod_alle_ok'],['#app [data-act="plImport"]','prod_import'],['#app [data-act="pcStart"]','pc_start'],['#app [data-act="pcOk"]','pc_ok'],['#app [data-act="pcSkip"]','pc_skip'],['#pcIn','pc_feld'],['#app [data-act="pFilter"][data-id="demo"]','richtwert'],
+  ['#app .rp-period [data-act="rpUnit"],#app [data-act="rpStep"]','rp_zeitraum'],['#app [data-act="rpCmp"]','rp_vergleich'],['#app [data-act="rpFile"]','rp_datei'],['#app [data-act="rpSample"]','rp_beispiel'],['#app [data-act="rpAnalyse"]','rp_pruefen'],['#app [data-act="rpCsv"]','rp_csv'],['#app [data-act="rpPrint"]','rp_bericht'],['#app [data-act="rpTab"][data-id="import"]','kassendatei'],['#app [data-act="rpTab"][data-id="map"]','zuordnung'],
+  ['#app [data-act="export"]','s_sicherung'],['#app [data-act="importPick"]','s_laden'],['#app [data-act="reset"]','s_reset'],['#app [data-act="userSwitch"]','s_rolle'],['#app [data-act="guideMode"]','s_modus'],['#s-target','ziel_we'],['#s-vat','mwst'],['#app [data-us="limit"]','s_limit'],
+  ['#app [data-act="labGen"]','lab_erfinden'],['#app [data-act="missionGo"]','mission_start'],['#app .au-row','station'],['#app .stamp','stempel'],
+];
+/* Tabellenköpfe und Kennzahlen: nach ihrem Text */
+const HELP_TXT = {
+  'we':'wareneinsatz','wareneinsatz':'wareneinsatz','ø wareneinsatz':'we_pct','we %':'we_pct','we gesamt':'wareneinsatz','wareneinsatz pro portion':'wareneinsatz','wareneinsatz je gericht':'we_pct',
+  'rohertrag':'rohertrag','rohertrag exkl. mwst.':'rohertrag','größter rohertrag':'rohertrag','aufschlagsfaktor':'aufschlag','putzverlust':'putzverlust','garverlust':'garverlust',
+  'mindest':'mindestbestand','unter mindestbestand':'mindestbestand','lagerwert':'lagerwert','lagerort':'lagerort','füllstand':'fuellstand','soll':'soll_ist','ist gezählt':'soll_ist','differenz':'differenz','differenz letzte inventur':'differenz',
+  'saison':'saison','allergene':'allergene','preis €':'prod_preis','stand':'prod_stand','= einheit':'gebinde','gebinde':'gebinde','annahmeschluss':'annahmeschluss','mindestbestellwert':'mindestbestellwert',
+  'umsatz netto':'umsatz','umsatz brutto':'mwst','portionen':'portionen','anteil':'rp_anteil','δ menge':'rp_delta','menü-matrix':'matrix','kostenstruktur':'kostenstruktur','preis-simulator':'preissim','produktionsmenge':'produktionsmenge',
+  'heute noch bestellen':'annahmeschluss','kalkuliert':'rezeptur','preis lt. rechnung':'r_preis','geliefert':'wareneingang','pro 100 g':'wareneinsatz','richtwert':'richtwert','zubereitung':'schritt','typ':'r_typ','kategorie':'kategorie',
+};
+
+/* ---------- Rundgang und Anleitungen ----------
+   Schritt: {t Titel, x Text (auch Funktion), sel Ziel (Selektor, Liste oder Funktion), go vorher ausführen,
+             do: {hint, init(ctx), done(ctx)} = der Mensch macht es selbst, when: nur wenn wahr} */
+const gq = s => { for(const el of document.querySelectorAll(s)){ const r = el.getBoundingClientRect(); if(r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden') return el; } return null; };
+const gPanel = s => () => { const el = gq(s); return el ? (el.closest('.panel, section') || el) : null; };
+const gNav = k => () => gq(`.side .nav-i[data-tab="${k}"]`) || gq(`.bottom .nav-i[data-tab="${k}"]`) || gq(`#app .m-only [data-tab="${k}"]`);
+const gNavGo = k => () => { if(gq(`.side .nav-i[data-tab="${k}"]`) || document.querySelector(`.bottom .nav-i[data-tab="${k}"]`)){ view.card = null; view.order = null; view.recv = null; go(k); } else go('setup'); };
+const gPhoneMore = k => () => !gq(`.side .nav-i[data-tab="${k}"]`) && !document.querySelector(`.bottom .nav-i[data-tab="${k}"]`) ? ' Am Handy steht das unter „Mehr“.' : '';
+const gFirstDish = () => { const withMenu = S.cards.find(c => c.type === 'dish' && S.menu.some(m => m.card === c.id)); return withMenu || S.cards.find(c => c.type === 'dish') || S.cards[0]; };
+const gSum = fn => { try { return JSON.stringify(fn()); } catch(e){ return ''; } };
+
+const TOURS = {};
+TOURS.main = {id:'main', name:'Rundgang', steps:[
+  {t:'Aufbau', go:gNavGo('aufbau'), sel:gNav('aufbau'), x:'Hier fangen Sie an. Kleine Aufgaben führen Sie Schritt für Schritt durch die App. Für jede erledigte Aufgabe gibt es einen Stempel.'},
+  {t:'Heute', go:gNavGo('dash'), sel:gNav('dash'), x:'Ihr Tagesblatt. Hier steht, was heute zu bestellen ist und welche Lieferung kommt. Schauen Sie jeden Morgen kurz hinein.'},
+  {t:'Speisekarte', go:() => { view.mtab = 'calc'; gNavGo('menu')(); }, sel:gNav('menu'), x:'Alle Gerichte mit Preis. Sie sehen, was jedes Gericht in der Herstellung kostet. Hier machen Sie auch die Karte für die Gäste.'},
+  {t:'Rezepturen', go:gNavGo('cards'), sel:gNav('cards'), x:'Rezeptur: Hier steht, was in ein Gericht kommt und was es kostet. Ein Tipp auf eine Zeile öffnet das Rezept.'},
+  {t:'Der Teller', go:() => { const c = gFirstDish(); if(c){ setV('teller','teller'); go('cards', c.id); } }, sel:() => gq(window.innerWidth <= 900 ? '#app .plate' : '#app .teller') || gq('#app .teller-sec'), x:'So sieht ein Rezept aus. Jedes Stück am Teller ist eine Zutat. Je größer das Stück, desto mehr kostet sie.'},
+  {t:'Rezept-Labor', go:gNavGo('labor'), sel:gNav('labor'), x:() => 'Zutaten übrig? Tippen Sie sie ein. Das Labor schlägt Gerichte daraus vor, mit Mengen und Kosten.' + gPhoneMore('labor')()},
+  {t:'Lager', go:() => { view.stab = 'bestand'; gNavGo('stock')(); }, sel:gNav('stock'), x:'Was ist im Haus? Hier buchen Sie Lieferungen ein, schreiben Schwund auf und zählen bei der Inventur.'},
+  {t:'Einkauf', go:() => { view.stab = 'bestellung'; gNavGo('buy')(); }, sel:gNav('buy'), x:'Beim Lieferanten bestellen. Die App weiß, was fehlt, und schlägt die Mengen vor. Kommt die Ware, prüfen Sie sie hier.'},
+  {t:'Produkte & Preis-Check', go:gNavGo('products'), sel:gNav('products'), x:() => 'Jede Zutat mit ihrem Einkaufspreis. Im Preis-Check tragen Sie Ihre echten Preise ein, einen nach dem anderen. Erst dann stimmt die Rechnung.' + gPhoneMore('products')()},
+  {t:'Auswertung', go:() => { view.rp.tab = 'sales'; gNavGo('report')(); }, sel:gNav('report'), x:() => 'Was wurde verkauft? Was hat es gebracht? Dafür laden Sie die Datei aus Ihrer Kasse.' + gPhoneMore('report')()},
+  {t:'Einstellungen', go:gNavGo('setup'), sel:gNav('setup'), x:'Name, Steuer, Team und Sicherung. Hier stellen Sie auch um zwischen „Einfach“ und „Alles zeigen“.'},
+  {t:'Suchen', sel:['.side [data-act="palette"]', '.topbar [data-act="palette"]'], x:'Sie finden etwas nicht? Tippen Sie hier ein Gericht, ein Produkt oder eine Aktion ein. Am Computer geht auch Strg und K.'},
+  {t:'Was ist das?', sel:['.side [data-act="helpMode"]', '.topbar [data-act="helpMode"]'], x:'Der Hilfe-Schalter. Einschalten und auf etwas tippen, das Sie nicht kennen. Die App erklärt es und ändert dabei nichts. Das Fragezeichen neben jedem Titel zeigt, wie die Seite geht.'},
+]};
+
+TOURS.aufbau = {id:'aufbau', name:'Aufbau', steps:[
+  {t:'Die nächste Aufgabe', sel:'#app .ms-next', x:'Hier steht immer, was als Nächstes dran ist. Der Knopf bringt Sie an die richtige Stelle und zeigt, wie es geht.'},
+  {t:'Drei Stufen', sel:'#app .ms-tiers', x:'Start, Alltag, Profi. Sie müssen die Reihenfolge nicht einhalten. Die Zahl rechts zeigt, wie weit Sie sind.'},
+  {t:'Stempelkarte', sel:'#app [data-act="goTab"][data-id="stempel"]', x:'Für jede erledigte Aufgabe gibt es einen Stempel. Hier sehen Sie alle auf einen Blick.'},
+  {t:'Stand des Betriebs', sel:'#app .au-list', x:'Sechs Stationen zeigen, wie viel von Ihrem Betrieb schon in der App steht. Das rechnet die App aus Ihren Daten.'},
+]};
+TOURS.dash = {id:'dash', name:'Heute', steps:[
+  {t:'Ihr Tag', sel:'#app .page-h > div', x:'Oben steht das Datum und ob heute noch etwas zu bestellen ist.'},
+  {t:'Was zu tun ist', sel:'#app .day-sec', x:'Bestellungen und Lieferungen von heute. Der Knopf rechts in jeder Zeile führt direkt hin.'},
+  {t:'Vier Zahlen', sel:'#app .tiles', x:'Was kosten Ihre Gerichte im Schnitt, wie viele sind durchgerechnet, was liegt im Lager, was fehlt. Ein Tipp auf Lagerwert öffnet das Lager.'},
+  {t:'Wareneinsatz je Gericht', sel:gPanel('#app .bars'), x:'Jeder Balken ist ein Gericht. Der Strich ist Ihr Ziel. Ein langer roter Balken heißt: Dieses Gericht ist zu teuer in der Herstellung.'},
+  {t:'Wareneingang', sel:'#app .page-h [data-act="moveDlg"]', x:'Ist eine Lieferung gekommen? Mit diesem Knopf buchen Sie die Ware ins Lager.'},
+]};
+TOURS.menu = {id:'menu', name:'Speisekarte', steps:[
+  {t:'Vier Reiter', sel:() => { const b = gq('#app [data-act="mtab"]'); return b && b.parentNode; }, x:'Kalkulation ist zum Rechnen. „Gestalten & PDF“ macht die Karte für die Gäste. Die anderen zwei planen Saison und Reihenfolge.'},
+  {t:'Die Liste', sel:['#app table.lt thead', '#app .dish-grid'], x:'Eine Zeile je Gericht: Preis, was die Zutaten kosten und was übrig bleibt. Ein Strich heißt: Es gibt noch keine Rezeptur.'},
+  {t:'Preis ändern', sel:'#app input[data-mp]', x:'Der Preis lässt sich direkt in der Zeile ändern.', do:{hint:'Tippen Sie hier einen Preis ein und drücken Sie Enter. Den alten Preis können Sie danach wieder eintragen.', init:c => { c.v = gSum(() => S.menu.map(m => m.price)); }, done:c => c.v !== gSum(() => S.menu.map(m => m.price))}},
+  {t:'Filter', sel:'#app .toolbar.filters', x:'„Ohne Rezeptur“ und „Ohne Allergene“ zeigen, wo noch Arbeit wartet. „Über Ziel“ zeigt die zu teuren Gerichte.'},
+  {t:'Neues Gericht', sel:'#app .page-h [data-act="newMenu"]', x:'Ein neues Gericht kommt mit diesem Knopf auf die Karte.'},
+]};
+TOURS.alg = {id:'alg', name:'Allergene', steps:[
+  {t:'Gerichte ohne Allergene', sel:'#app [data-act="sec"][data-id="noalg"]', x:'Der Filter zeigt jetzt nur Gerichte, bei denen die Allergene fehlen.'},
+  {t:'Gericht öffnen', sel:() => gq('#app table.lt tbody button[data-act="editMenu"]') || gq('#app [data-act="editMenu"]'), x:'Der Stift öffnet das Gericht. Unten im Fenster kreuzen Sie die Allergene an.', do:{hint:'Tippen Sie auf den Stift, kreuzen Sie die Allergene an und speichern Sie.', init:c => { c.n = S.menu.filter(hasAlg).length; }, done:c => S.menu.filter(hasAlg).length > c.n}},
+  {t:'Mit Rezeptur geht es von selbst', sel:'#app table.lt thead', x:'Hat ein Gericht eine Rezeptur, liest die App die Allergene aus den Zutaten. Dann müssen Sie nichts ankreuzen.'},
+]};
+TOURS.guest = {id:'guest', name:'Gestalten & PDF', steps:[
+  {t:'Welcher Tag?', sel:gPanel('#gdate'), x:'Die Karte zeigt, was an diesem Tag gilt: Saison, Wochentag und Aktionen. „Heute“ ist der Normalfall.'},
+  {t:'Gestaltung', sel:gPanel('#app [data-act="gStyle"]'), x:'Drei fertige Stile. Ein Tipp wechselt das Aussehen, der Inhalt bleibt gleich.'},
+  {t:'Vorschau', sel:['#app .hs-stage', '#app .guest-prev', '#app .guest-wrap'], x:'So sehen die Gäste die Karte. Jede Änderung links sehen Sie hier sofort.'},
+  {t:'Als PDF speichern', sel:'#app [data-pdf="printMenu"]', x:'Macht aus der Karte eine Datei zum Drucken oder Verschicken.', do:{ro:1, hint:'Tippen Sie auf „Als PDF speichern“. Das dauert ein paar Sekunden.', init:c => { c.n = gdActs().pdf; }, done:c => gdActs().pdf > c.n}},
+]};
+TOURS.plan = {id:'plan', name:'Saison & Aktionen', steps:[
+  {t:'Das Jahr', sel:gPanel('#app .tl-bar'), x:'Die vier Balken sind Ihre Saisonen. Ein Tipp auf einen Balken ändert, von wann bis wann er gilt.'},
+  {t:'Aktionen', sel:'#app .page-h [data-act="newSpecial"]', x:'Wildwochen, Silvester, Ostern: Eine Aktion ist eine eigene kleine Karte für ein paar Tage.'},
+  {t:'Welches Gericht wann?', sel:gPanel('#app input[data-ms]'), x:'Ein Haken je Saison. Ohne Haken steht das Gericht in dieser Saison nicht auf der Karte.'},
+]};
+TOURS.layout = {id:'layout', name:'Aufbau & Reihenfolge', steps:[
+  {t:'Kategorien', sel:'#app input[data-secname]', x:'Das sind die Überschriften Ihrer Karte. Den Namen ändern Sie direkt im Feld.'},
+  {t:'Reihenfolge', sel:'#app [data-act="itemMove"]', x:'Die Pfeile schieben ein Gericht nach oben oder unten. So steht es dann auch auf der Gästekarte.'},
+  {t:'Ausblenden', sel:'#app [data-act="itemHide"]', x:'Das Auge nimmt ein Gericht von der Gästekarte. In der App bleibt es erhalten.'},
+  {t:'Neue Kategorie', sel:'#app [data-act="addSec"]', x:'Eine neue Überschrift für die Karte, zum Beispiel „Für Kinder“.'},
+]};
+TOURS.cards = {id:'cards', name:'Rezepturen', steps:[
+  {t:'Gerichte und Basisrezepte', sel:() => { const b = gq('#app [data-act="ctype"]'); return b && b.parentNode; }, x:'Gerichte gehen an den Gast. Basisrezepte kochen Sie vor: Fond, Teig, Dressing.'},
+  {t:'Neue Rezeptur', sel:'#app .page-h [data-act="newCard"][data-id="dish"]', x:'Legt ein leeres Rezept an. Danach kommen die Zutaten auf den Teller.'},
+  {t:'Rezept öffnen', sel:() => gq('#app table.lt tbody tr.row') || gq('#app .rc'), x:'Jede Zeile ist eine Rezeptur.', do:{ro:1, hint:'Tippen Sie auf eine Zeile, um das Rezept zu öffnen.', done:() => !!(view.card && C(view.card))}},
+  {t:'Der Teller', sel:['#app .teller', '#app .teller-sec'], x:'Jedes Stück ist eine Zutat. Je größer das Stück, desto mehr kostet sie. Das Fragezeichen oben erklärt diese Seite genauer.'},
+]};
+TOURS.card = {id:'card', name:'Rezeptur', steps:[
+  {t:'Der Teller', sel:'#app .plate', x:'In der Mitte steht, was eine Portion kostet. Jedes Stück im Ring ist eine Zutat. Das größte Stück ist die teuerste Zutat.'},
+  {t:'Menge ändern', sel:'#app input[data-lf="qty"]', x:'Jede Zutat hat eine Menge für eine Portion.', do:{hint:'Ändern Sie hier eine Menge und drücken Sie Enter. Der Teller rechnet sofort neu.', init:c => { c.v = gSum(() => C(view.card).items.map(i => i.qty)); }, done:c => c.v !== gSum(() => C(view.card).items.map(i => i.qty))}},
+  {t:'Zutat dazu', sel:'#app [data-act="tellerPick"]', x:'Öffnet die Liste aller Produkte. Ein Tipp legt die Zutat auf den Teller.'},
+  {t:'Zubereitung', sel:gPanel('#app [data-act="stepAdd"]'), x:'Schreiben Sie Schritt für Schritt auf, wie das Gericht gemacht wird. Jeder Schritt kann ein Foto haben.'},
+  {t:'Preis-Simulator', sel:gPanel('#sim'), x:'Schieben Sie den Regler: Was bleibt übrig, wenn das Gericht mehr oder weniger kostet? Erst „Übernehmen“ ändert den Preis.'},
+  {t:'Foto', sel:'#app .hero [data-act="photoCard"]', x:'Ein Foto zeigt allen, wie das Gericht am Teller aussehen soll.'},
+]};
+TOURS.labor = {id:'labor', name:'Rezept-Labor', steps:[
+  {t:'Zutaten eintippen', sel:'#labIn', x:'Was haben Sie da? Zwei, drei Zutaten reichen.', do:{ro:1, hint:'Tippen Sie hier Zutaten ein, zum Beispiel: Erdäpfel, Speck, Bergkäse.', init:c => { c.v = (document.getElementById('labIn')||{}).value || ''; }, done:c => { const v = (document.getElementById('labIn')||{}).value || ''; return v !== c.v && v.trim().length >= 4; }}},
+  {t:'Rahmen', sel:gPanel('#app [data-lab]'), x:'Was soll es werden und was darf es kosten? Das Labor hält sich daran.'},
+  {t:'Rezepte erfinden', sel:'#app [data-act="labGen"]', x:'Die App schlägt Gerichte vor, mit Mengen und Wareneinsatz. Was Ihnen gefällt, übernehmen Sie als Rezeptur.'},
+]};
+TOURS.stock = {id:'stock', name:'Lager', steps:[
+  {t:'Vier Zahlen', sel:'#app .tiles', x:'Was die Ware im Haus wert ist und wie viele Artikel unter dem Mindestbestand liegen.'},
+  {t:'Bestand, Buchungen, Inventur', sel:() => { const b = gq('#app .toolbar [data-act="stab"]'); return b && b.parentNode; }, x:'Bestand zeigt, was da ist. Buchungen zeigt, was sich geändert hat. Inventur ist zum Zählen.'},
+  {t:'Lieferung für einen Artikel', sel:'#app tbody [data-act="moveDlg"][data-id^="in"]', x:'Das Plus bucht Ware für diesen einen Artikel ein. Das Minus daneben ist die Entnahme für die Küche.'},
+  {t:'Schwund', sel:'#app .page-h [data-act="moveDlg"][data-id="waste"]', x:'Etwas ist verdorben oder verkocht? Hier aufschreiben, mit Grund. So sehen Sie, wo Geld verloren geht.'},
+  {t:'Lagerorte', sel:() => { const b = gq('#app [data-act="loc"]'); return b && b.parentNode; }, x:'Zeigt nur einen Ort: Kühlhaus, Tiefkühler, Trockenlager.'},
+]};
+TOURS.moves = {id:'moves', name:'Buchungen', steps:[
+  {t:'Alle Bewegungen', sel:['#app ul.moves', '#app .panel.flush'], x:'Jede Zeile ist eine Buchung: Lieferung, Entnahme, Schwund, Verkauf. Die neueste steht oben.'},
+  {t:'Zurücknehmen', sel:'#app [data-act="moveUndo"]', x:'Vertippt? Der Pfeil macht eine Buchung rückgängig. Der Bestand ist danach wie vorher.'},
+]};
+TOURS.inventur = {id:'inventur', name:'Inventur', steps:[
+  {t:'Inventur starten', when:() => !S.invDraft, sel:'#app [data-act="invStart"]', x:'Eine Inventur heißt: alles zählen. Sie können unterbrechen und später weitermachen.', do:{ro:1, hint:'Tippen Sie auf „Inventur starten“.', done:() => !!S.invDraft}},
+  {t:'Zählen', sel:'#app input[data-inv]', x:'Links steht, was laut App da sein müsste.', do:{ro:1, hint:'Zählen Sie diesen Artikel und tippen Sie die Menge ein.', init:c => { c.v = gSum(() => S.invDraft.counts); }, done:c => !!S.invDraft && c.v !== gSum(() => S.invDraft.counts)}},
+  {t:'Differenz', sel:['#app .inv-sum', '#app table thead'], x:'Die App zeigt sofort den Unterschied in Euro. Minus heißt: Es fehlt Ware.'},
+  {t:'Abschließen', sel:'#app [data-act="invFinish"]', x:'Wenn alles gezählt ist: abschließen. Der Bestand wird auf Ihre gezählten Mengen gesetzt.'},
+]};
+TOURS.buy = {id:'buy', name:'Einkauf', next:() => view.order && ORD(view.order) && !view.recv ? 'order' : null, steps:[
+  {t:'Vier Zahlen', sel:'#app .tiles', x:'Wie viele Lieferanten heute noch auf eine Bestellung warten und was heute geliefert wird.'},
+  {t:'Heute bestellen', sel:['#app .ord-top .panel', '#app .ord-top', '#app .lo-grid'], x:'Diese Lieferanten nehmen heute Bestellungen an. Daneben steht, bis wann.'},
+  {t:'Lieferanten', sel:'#app .toolbar [data-act="stab"][data-id="lieferanten"]', x:'Hier stehen Kontakt, Bestelltage und Liefertage jedes Lieferanten.'},
+  {t:'Bestellung vorbereiten', sel:() => gq('#app [data-act="ordNew"]') || gq('#app [data-act="buyNew"]'), x:'Die App legt einen Entwurf an und schlägt vor, was fehlt. Gesendet wird erst, wenn Sie es sagen.', do:{ro:1, hint:'Tippen Sie auf den Knopf, um eine Bestellung vorzubereiten.', done:() => !!(view.order && ORD(view.order))}},
+]};
+TOURS.suppliers = {id:'suppliers', name:'Lieferanten', steps:[
+  {t:'Ein Lieferant', sel:['#app article.lo', '#app [data-act="supEdit"][data-id^="sup"]'], x:'Kontakt, Bestelltage, Liefertage und Annahmeschluss. Daraus weiß die App, wann Sie bestellen müssen.'},
+  {t:'Neuer Lieferant', sel:'#app [data-act="supEdit"]:not([data-id^="sup"])', x:'Legt einen neuen Lieferanten an.'},
+  {t:'Preisentwicklung', sel:() => { const h = [...document.querySelectorAll('#app h2')].find(x => /Preisentwicklung/.test(x.textContent)); return h ? (h.nextElementSibling || h) : null; }, x:'Zeigt, welche Artikel teurer oder billiger geworden sind.'},
+]};
+TOURS.order = {id:'order', name:'Bestellung', steps:[
+  {t:'Positionen', sel:['#app table.otab', '#app .panel.flush'], x:'Was Sie bestellen. Die App hat vorgeschlagen, was unter dem Mindestbestand liegt.'},
+  {t:'Menge', sel:'#app input[data-ol]', x:'Die Menge ist in Gebinden. Daneben steht, wie viel das ist.', do:{ro:1, hint:'Ändern Sie hier eine Menge und drücken Sie Enter.', init:c => { c.v = gSum(() => ORD(view.order).lines.map(l => l.n)); }, done:c => c.v !== gSum(() => ORD(view.order).lines.map(l => l.n))}},
+  {t:'Noch etwas dazu', sel:'#olAdd', x:'Hier fügen Sie einen weiteren Artikel dieses Lieferanten dazu.'},
+  {t:'Senden', sel:gPanel('#app [data-act="ordOpened"], #app [data-act="ordCopy"]'), x:'E-Mail oder WhatsApp öffnet den fertigen Bestelltext. Abschicken müssen Sie selbst.'},
+  {t:'Als gesendet markieren', sel:'#app [data-act="ordMarkSent"]', x:'Erst tippen, wenn die Bestellung wirklich beim Lieferanten ist. Dann wartet die App auf die Lieferung.'},
+]};
+TOURS.recv = {id:'recv', name:'Wareneingang', steps:[
+  {t:'Lieferung prüfen', sel:['#app table.recv', '#app .panel.flush'], x:'Links steht, was bestellt war. Sie tragen ein, was wirklich gekommen ist.'},
+  {t:'Alles wie bestellt', sel:'#app [data-act="rAll"]', x:'Stimmt die Lieferung, reicht ein Tipp.', do:{ro:1, hint:'Tippen Sie auf „Alles wie bestellt“. Danach ändern Sie nur, was nicht stimmt.', done:() => { const o = ORD(view.order); return !!o && o.lines.length > 0 && o.lines.every(l => l.delivered != null && l.delivered !== ''); }}},
+  {t:'Preis laut Rechnung', sel:'#app input[data-rp]', x:'Steht auf der Rechnung ein anderer Preis? Hier eintragen. Die App merkt sich den neuen Einkaufspreis.'},
+  {t:'Lieferschein und Temperatur', sel:() => { const a = gq('#rNo'); return a ? (a.closest('.recv-f') || a.closest('.panel-f') || a) : null; }, x:'Nummer vom Lieferschein und bei Kühlware die Temperatur. Ein Foto vom Lieferschein geht auch.'},
+  {t:'Einbuchen', sel:'#app [data-act="rBook"]', x:'Bucht die Ware ins Lager. Fehlt etwas, schreibt die App die Reklamation für den Lieferanten.'},
+]};
+TOURS.products = {id:'products', name:'Produkte', steps:[
+  {t:'Die Liste', sel:'#app table.lt thead', x:'Eine Zeile je Zutat. Wichtig ist der Preis: Was Sie dem Lieferanten zahlen, ohne Steuer.'},
+  {t:'Preis eintragen', sel:'#app input[data-pp][data-pf="price"]', x:'Schauen Sie auf Ihre letzte Rechnung.', do:{hint:'Tippen Sie hier Ihren echten Preis ein und drücken Sie Enter.', init:c => { c.v = gSum(() => S.products.map(p => [p.price, !!p.priceDemo])); }, done:c => c.v !== gSum(() => S.products.map(p => [p.price, !!p.priceDemo]))}},
+  {t:'Richtwert bestätigen', sel:'#app [data-act="pConfirm"]', x:'Stimmt der Beispielpreis ungefähr? Dann reicht ein Tipp auf „Bestätigen“.'},
+  {t:'Preis-Check', sel:'#app .page-h [data-act="pcStart"]', x:'Schneller geht es im Preis-Check: ein Produkt nach dem anderen, Enter geht weiter.'},
+]};
+TOURS.pcheck = {id:'pcheck', name:'Preis-Check', steps:[
+  {t:'Ein Produkt nach dem anderen', sel:'#app .pc-card', x:'Oben steht der Lieferant, groß das Produkt. Links der Richtwert, das ist ein Beispielpreis.'},
+  {t:'Ihr Preis', sel:() => { const i = gq('#pcIn'); return i ? (i.closest('.pc-in') || i) : null; }, x:'Netto, wie auf der Rechnung.', do:{hint:'Tippen Sie Ihren Einkaufspreis ein und drücken Sie Enter. Stimmt der Richtwert, drücken Sie nur Enter.', init:c => { c.n = view.pc ? view.pc.saved + view.pc.confirmed : 0; }, done:c => !!view.pc && view.pc.saved + view.pc.confirmed > c.n}},
+  {t:'Das ändert sich', sel:'#app .pc-fb', x:'Die App zeigt sofort, bei welchen Gerichten sich der Wareneinsatz geändert hat.'},
+  {t:'Überspringen oder aufhören', sel:'#app .pc-acts', x:'Preis nicht zur Hand? Überspringen. Mit „Beenden“ oben hören Sie auf, alles bleibt gespeichert.'},
+]};
+TOURS.report = {id:'report', name:'Auswertung', steps:[
+  {t:'Zeitraum', sel:'#app .rp-period', x:'Tag, Woche, Monat oder Saison. Die Pfeile gehen einen Schritt zurück oder vor.'},
+  {t:'Die wichtigsten Zahlen', sel:'#app .tiles', x:'Was eingenommen wurde, wie viele Portionen verkauft wurden und was nach den Zutaten übrig bleibt.'},
+  {t:'Jedes Gericht', sel:['#app table.rp-items thead', '#app .lt-wrap'], x:'Wie oft wurde ein Gericht verkauft und was hat es gebracht? Ein Tipp auf eine Spalte sortiert.'},
+  {t:'Menü-Matrix', sel:() => { const h = [...document.querySelectorAll('#app h2')].find(x => /Menü-Matrix/.test(x.textContent)); return h ? h.closest('.panel') : null; }, x:'Oben rechts stehen Ihre besten Gerichte: oft verkauft und viel Ertrag. Unten links die Sorgenkinder.'},
+  {t:'Kasse importieren', sel:'#app .toolbar [data-act="rpTab"][data-id="import"]', x:'Die Zahlen kommen aus Ihrer Kasse. Hier laden Sie die Datei.'},
+]};
+TOURS.rimport = {id:'rimport', name:'Kasse importieren', steps:[
+  {t:'Datei wählen', sel:'#app [data-act="rpFile"]', x:'Ihre Kasse kann die Artikelumsätze als Datei ausgeben, meist als CSV oder Excel. Diese Datei wählen Sie hier.'},
+  {t:'Zum Ausprobieren', sel:'#app [data-act="rpSample"]', x:'Noch keine Datei? Das Beispiel zeigt, wie die Zeilen aussehen sollen. Es sind erfundene Zahlen.'},
+  {t:'Prüfen', sel:'#app [data-act="rpAnalyse"]', x:'Die App liest die Datei und zeigt eine Vorschau. Gespeichert wird erst, wenn Sie „Importieren“ tippen.'},
+  {t:'Welche Kasse?', sel:() => { const h = [...document.querySelectorAll('#app h2')].find(x => /Kassen und ihre Exporte/.test(x.textContent)); return h ? h.closest('.panel') : null; }, x:'Hier steht für die üblichen Kassen, wo Sie den Export finden.'},
+]};
+TOURS.rmap = {id:'rmap', name:'Zuordnung', steps:[
+  {t:'Was gehört zusammen?', sel:['#app .lt-wrap', '#app table', '#app .panel'], x:'Die Kasse nennt ein Gericht oft anders als die App. Hier sagen Sie einmal, was zusammengehört. Die App merkt es sich.'},
+]};
+TOURS.setup = {id:'setup', name:'Einstellungen', steps:[
+  {t:'Hilfe', sel:'#app .gd-panel', x:'Rundgang, Begriffe und Stempelkarte. Hier stellen Sie auch um zwischen „Einfach“ und „Alles zeigen“.'},
+  {t:'Ziel-Wareneinsatz', sel:() => { const i = gq('#s-target'); return i ? (i.closest('label') || i) : null; }, x:'Ihre Grenze. Kosten die Zutaten mehr als so viel Prozent vom Preis, zeigt die App das Gericht in Rot.'},
+  {t:'Wer arbeitet gerade?', sel:gPanel('#app [data-act="userSwitch"]'), x:'Mitarbeiter sehen alles, ändern dürfen nur Küchenchef und Inhaber.'},
+  {t:'Sicherung', sel:'#app [data-act="export"]', x:'Speichert alle Daten als Datei. Machen Sie das einmal pro Woche und heben Sie die Datei gut auf.'},
+]};
+
+/* =====================================================================
+   Begleitung, Teil 2: die Technik.
+   Rundgang mit Lichtkegel, Anleitung je Seite, Hilfe-Modus „Was ist das?“,
+   Einfach-Modus, klare Navigation, erster Start.
+   Grundsatz: Hilfe kommt auf Wunsch und immer nur eine Sache auf einmal.
+   ===================================================================== */
+
+/* ---------- Einstellungen je Gerät ---------- */
+const GKEY = KEY + '_guide';
+const G_NOINTRO = /[?&]nointro/.test(location.search);
+const G_FRESH = (() => { try { return localStorage.getItem(KEY) === null; } catch(e){ return false; } })();
+let GP = (() => { try { return JSON.parse(localStorage.getItem(GKEY)) || {}; } catch(e){ return {}; } })();
+function gpSave(){ try { localStorage.setItem(GKEY, JSON.stringify(GP)); } catch(e){} }
+function isSimple(){ return GP.mode === 'simple'; }
+
+/* Wegweiser: das kleine Zeichen der Begleitung, selbst gezeichnet */
+const GD_MARK = '<svg class="gd-mark" viewBox="0 0 24 24" aria-hidden="true"><path class="post" d="M11 3v18"/><path class="board" d="M11 5h7.2l2.8 2.6L18.200 10.2H11z"/><path class="board b2" d="M11 12.2H5.600L3.2 14.400l2.400 2.200H11z"/><path class="post" d="M8 21h6"/></svg>';
+const GD_HAND = '<svg class="gd-tap" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11V5.500a1.500 1.500 0 0 1 3 0V11m0-1.500a1.500 1.500 0 0 1 3 0V12m0-1a1.500 1.500 0 0 1 3 0v4.500A5.500 5.500 0 0 1 12.500 21h-.6a5 5 0 0 1-4.100-2.100L4.600 14.300a1.400 1.400 0 0 1 2.100-1.800L9 14.500"/></svg>';
+const GD_OK = '<svg class="gd-okm" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.500 4.500L19 7.500"/></svg>';
+
+/* =====================================================================
+   Rundgang: Lichtkegel auf ein echtes Element, kleine Karte daneben
+   ===================================================================== */
+const GD = {t:null, root:null};
+function gdCanDo(s){ return !!(s && s.do) && (canEditAll() || !!s.do.ro); }
+function gdFind(sel){
+  try {
+    if(typeof sel === 'function'){ const el = sel(); return el && el.isConnected && el.getClientRects().length ? el : null; }
+    for(const s of (Array.isArray(sel) ? sel : [sel])){ const el = gq(s); if(el) return el; }
+  } catch(e){}
+  return null;
+}
+function gdMount(){
+  if(GD.root) GD.root.remove();
+  const r = document.createElement('div'); r.id = 'gd'; r.className = 'gd';
+  r.innerHTML = '<div class="gd-b" data-b="t"></div><div class="gd-b" data-b="b"></div><div class="gd-b" data-b="l"></div><div class="gd-b" data-b="r"></div><div class="gd-b" data-b="h"></div><div class="gd-hole none"></div><div class="gd-card" role="dialog" aria-modal="false" aria-labelledby="gdT" aria-describedby="gdX" tabindex="-1"></div><div class="gd-live" aria-live="polite"></div>';
+  document.body.appendChild(r); GD.root = r; document.body.classList.add('gd-on');
+  r.addEventListener('click', e => {
+    const b = e.target.closest('[data-gd]');
+    if(b){ const a = b.dataset.gd; if(a === 'next') tourNext(); else if(a === 'back') tourBack(); else tourEnd(false, false); return; }
+    if(e.target.closest('.gd-b')){ const c = r.querySelector('.gd-card'); c.classList.remove('nudge'); void c.offsetWidth; c.classList.add('nudge'); }
+  });
+}
+function tourStart(id, opt){
+  opt = opt || {};
+  const def = typeof id === 'string' ? TOURS[id] : id; if(!def || !S) return false;
+  const from = GD.t ? GD.t.from : (opt.from || document.activeElement);
+  if(GD.t) tourEnd(true, false);
+  if(typeof helpSet === 'function' && HELP_ON) helpSet(false);
+  try { palClose(); } catch(e){}
+  bubHide();
+  const steps = def.steps.filter(s => { try { return !s.when || s.when(); } catch(e){ return false; } });
+  if(!steps.length) return false;
+  GD.t = {id:def.id, def, steps, i:0, dir:1, from, raf:0, back:{tab:view.tab, card:view.card}, shown:0, skipped:0, ctx:{}};
+  gdMount(); tourGo(0, 1);
+  return true;
+}
+function tourNext(){ const T = GD.t; if(!T) return; if(T.i >= T.steps.length - 1) tourEnd(false, true); else tourGo(T.i + 1, 1); }
+function tourBack(){ const T = GD.t; if(!T || T.i <= 0) return; tourGo(T.i - 1, -1); }
+function tourGo(i, dir){
+  const T = GD.t; if(!T) return;
+  if(i >= T.steps.length){ tourEnd(false, true); return; }
+  if(i < 0){ i = 0; dir = 1; }
+  T.i = i; T.dir = dir; const s = T.steps[i];
+  T.since = performance.now(); T.found = false; T.okAt = 0; T.sig = ''; T.ctx = {}; T.el = null; T.focused = false;
+  try { const d = document.querySelector('dialog[open]'); if(d && !s.dlg && !d.classList.contains('gd-wel')) d.close(); if(s.go) s.go(); } catch(e){ console.warn('Rundgang:', e); }
+  T.doing = gdCanDo(s);
+  if(T.doing && s.do.init){ try { s.do.init(T.ctx); } catch(e){ T.doing = false; } }
+  gdCardFill();
+  GD.root.classList.add('gd-move'); clearTimeout(GD.mv); GD.mv = setTimeout(() => GD.root && GD.root.classList.remove('gd-move'), 420);
+  if(!T.raf) T.raf = requestAnimationFrame(gdFrame);
+}
+function gdCardFill(){
+  const T = GD.t, s = T.steps[T.i], n = T.steps.length, card = GD.root.querySelector('.gd-card');
+  const txt = typeof s.x === 'function' ? s.x() : s.x; const last = T.i === n - 1;
+  card.className = 'gd-card' + (T.doing ? ' do' : '');
+  card.innerHTML = `<div class="gd-top">${GD_MARK}<span class="gd-name">${esc(T.def.name)}</span><span class="gd-n">${T.i+1} von ${n}</span></div>${n > 6 ? `<div class="gd-bar" aria-hidden="true"><i style="width:${((T.i+1)/n*100).toFixed(1)}%"></i></div>` : ''}
+    <h3 id="gdT">${esc(s.t)}</h3><p id="gdX">${esc(txt)}</p>
+    ${T.doing ? `<p class="gd-do">${GD_HAND}<span>${esc(s.do.hint)}</span></p>` : s.do ? `<p class="gd-ro">Ausprobieren dürfen das nur Küchenchef und Inhaber.</p>` : ''}
+    <div class="gd-f"><button type="button" class="gd-skip" data-gd="skip">${n > 1 && !last ? 'Überspringen' : 'Schließen'}</button><span class="gd-dots" aria-hidden="true">${n > 1 && n <= 6 ? T.steps.map((_,k) => `<i class="${k < T.i ? 'd' : k === T.i ? 'on' : ''}"></i>`).join('') : ''}</span>${T.i > 0 ? `<button type="button" class="btn sm" data-gd="back">Zurück</button>` : ''}<button type="button" class="btn sm ${T.doing ? '' : 'primary'}" data-gd="next">${last ? 'Fertig' : 'Weiter'}</button></div>`;
+  GD.root.querySelector('.gd-live').textContent = `${T.def.name}, Schritt ${T.i+1} von ${n}. ${s.t}. ${txt} ${T.doing ? s.do.hint : ''}`;
+}
+function gdFocus(){
+  const T = GD.t; if(!T || T.focused) return; T.focused = true;
+  const el = T.el; const card = GD.root.querySelector('.gd-card');
+  // am Handy nicht ins Feld springen: die Tastatur würde die Karte verdecken, bevor man sie gelesen hat
+  if(T.doing && el && el.matches('input,textarea') && !el.disabled && !window.matchMedia('(pointer:coarse)').matches){ el.focus({preventScroll:true}); try { el.select(); } catch(e){} return; }
+  const b = card.querySelector('[data-gd="next"]'); if(b) b.focus({preventScroll:true});
+}
+function gdScrollTo(el){
+  const r = el.getBoundingClientRect(), vh = window.innerHeight, vw = window.innerWidth;
+  const top = vw <= 900 ? 70 : 16, bot = vw <= 900 ? 86 : 16;
+  if(r.left < 0 || r.right > vw){ try { el.scrollIntoView({block:'nearest', inline:'center'}); } catch(e){} }
+  if(r.height > vh - top - bot - 120){ if(r.top < top || r.top > vh * .45) window.scrollBy(0, r.top - top - 8); return; }
+  if(r.top < top || r.bottom > vh - bot){ try { el.scrollIntoView({block:'center', inline:'nearest'}); } catch(e){ el.scrollIntoView(); } }
+}
+function gdHost(){
+  const d = document.querySelector('dialog[open]'); const want = d || document.body;
+  if(GD.root.parentNode !== want) want.appendChild(GD.root);
+  return d;
+}
+function gdFrame(){
+  const T = GD.t; if(!T) return; T.raf = 0;
+  try {
+    const s = T.steps[T.i], now = performance.now();
+    const dlg = gdHost(); const docked = !!dlg && !s.dlg;
+    let el = s.sel && !docked ? gdFind(s.sel) : null;
+    if(s.sel && !docked && !el && !T.found && now - T.since > (s.wait || 900)){
+      // Ziel gibt es hier nicht: Schritt auslassen
+      T.skipped++; if(T.skipped > T.steps.length * 2){ tourEnd(true, false); return; }
+      const n = T.i + T.dir;
+      if(n >= T.steps.length){ if(T.shown) tourEnd(false, true); else { tourEnd(true, false); toast('Hier gibt es gerade nichts zu zeigen.'); } return; }
+      tourGo(n < 0 ? T.i + 1 : n, n < 0 ? 1 : T.dir); return;
+    }
+    if(el && !T.found){ T.found = true; T.shown++; gdScrollTo(el); el = gdFind(s.sel) || el; }
+    if(!s.sel && !T.found){ T.found = true; T.shown++; }
+    T.el = el;
+    if(T.found || docked) gdPlace(el, s, docked);
+    if(T.found && !docked) gdFocus();
+    if(T.doing && !T.okAt){ let ok = false; try { ok = !!s.do.done(T.ctx); } catch(e){} if(ok){ T.okAt = now; gdCardOk(); } }
+    if(T.okAt && now - T.okAt > 1250 && !document.querySelector('dialog[open]')){ tourNext(); if(!GD.t) return; }
+  } catch(err){ console.error('Rundgang beendet:', err); tourEnd(true, false); return; }
+  if(GD.t && !GD.t.raf) GD.t.raf = requestAnimationFrame(gdFrame);
+}
+const GD_PRAISE = ['Genau so.', 'Passt.', 'Gut gemacht.', 'So geht das.'];
+function gdCardOk(){
+  const T = GD.t, card = GD.root.querySelector('.gd-card'); card.classList.add('ok'); GD.root.classList.add('gd-ok');
+  const p = card.querySelector('.gd-do'); const w = GD_PRAISE[(T.i + T.steps.length) % GD_PRAISE.length];
+  if(p) p.innerHTML = GD_OK + `<span>${w}</span>`;
+  GD.root.querySelector('.gd-live').textContent = w;
+  setTimeout(() => GD.root && GD.root.classList.remove('gd-ok'), 1300);
+}
+function gdPlace(el, s, docked){
+  const T = GD.t, root = GD.root, hole = root.querySelector('.gd-hole'), card = root.querySelector('.gd-card');
+  const vv = window.visualViewport; const vw = window.innerWidth, vh = vv && vv.height < window.innerHeight ? Math.round(vv.height) : window.innerHeight; const pad = s.pad != null ? s.pad : 6;
+  let r = null;
+  if(el){ const b = el.getBoundingClientRect(); const l = Math.max(4, b.left - pad), t = Math.max(4, b.top - pad); r = {l, t, w: Math.min(vw - 4, b.right + pad) - l, h: Math.min(vh - 4, b.bottom + pad) - t}; if(r.w < 8 || r.h < 8) r = null; }
+  const cw = card.offsetWidth, ch = card.offsetHeight;
+  const sig = (docked ? 'D' : '') + (r ? [r.l, r.t, r.w, r.h].map(Math.round).join(',') : 'x') + '|' + cw + 'x' + ch + '|' + vw + 'x' + vh + (T.doing ? 'i' : '');
+  if(sig === T.sig) return; T.sig = sig;
+  root.classList.toggle('docked', docked);
+  const B = k => root.querySelector(`.gd-b[data-b="${k}"]`); const box = (n, l, t, w, h) => { n.style.cssText = `left:${l}px;top:${t}px;width:${Math.max(0,w)}px;height:${Math.max(0,h)}px`; };
+  if(docked){ hole.className = 'gd-hole off'; ['t','b','l','r','h'].forEach(k => box(B(k), 0, 0, 0, 0)); }
+  else if(!r){ hole.className = 'gd-hole none'; hole.style.cssText = `left:${vw/2}px;top:${vh/2}px;width:0;height:0`; box(B('t'), 0, 0, vw, vh); ['b','l','r','h'].forEach(k => box(B(k), 0, 0, 0, 0)); }
+  else {
+    hole.className = 'gd-hole' + (T.doing ? ' open' : ''); hole.style.cssText = `left:${r.l}px;top:${r.t}px;width:${r.w}px;height:${r.h}px`;
+    box(B('t'), 0, 0, vw, r.t); box(B('b'), 0, r.t + r.h, vw, vh - r.t - r.h); box(B('l'), 0, r.t, r.l, r.h); box(B('r'), r.l + r.w, r.t, vw - r.l - r.w, r.h);
+    if(T.doing) box(B('h'), 0, 0, 0, 0); else box(B('h'), r.l, r.t, r.w, r.h);
+  }
+  // Karte: neben das Ziel, wo Platz ist
+  const m = 12, g = 14; let x, y;
+  const cl = (v, a, b) => Math.max(a, Math.min(b, v));
+  if(docked){ x = vw <= 700 ? (vw - cw) / 2 : m + 4; y = vw <= 700 ? m : vh - ch - m - 4; }
+  else if(!r){ x = (vw - cw) / 2; y = Math.max(m, (vh - ch) / 2 - 20); }
+  else {
+    const cx = r.l + r.w / 2, cy = r.t + r.h / 2;
+    const fit = {
+      below: r.t + r.h + g + ch <= vh - m, above: r.t - g - ch >= m,
+      right: r.l + r.w + g + cw <= vw - m, left: r.l - g - cw >= m,
+    };
+    const narrow = r.w < vw * .45;
+    const order = s.pos ? [s.pos, 'below', 'above', 'right', 'left'] : (vw > 900 && r.l + r.w < 300) ? ['right', 'below', 'above', 'left'] : narrow && vw > 900 && r.h > 260 ? ['right', 'left', 'below', 'above'] : ['below', 'above', 'right', 'left'];
+    const p = order.find(k => fit[k]);
+    if(p === 'below'){ x = cl(cx - cw / 2, m, vw - cw - m); y = r.t + r.h + g; }
+    else if(p === 'above'){ x = cl(cx - cw / 2, m, vw - cw - m); y = r.t - g - ch; }
+    else if(p === 'right'){ x = r.l + r.w + g; y = cl(r.t, m, vh - ch - m); }
+    else if(p === 'left'){ x = r.l - g - cw; y = cl(r.t, m, vh - ch - m); }
+    else { x = cl(cx - cw / 2, m, vw - cw - m); y = cy < vh / 2 ? vh - ch - m - (vw <= 900 ? 8 : 0) : m + (vw <= 900 ? 56 : 0); }
+  }
+  card.style.left = Math.round(Math.max(m, Math.min(x, vw - cw - m))) + 'px'; card.style.top = Math.round(Math.max(m, y)) + 'px';
+}
+function tourEnd(quiet, finished){
+  const T = GD.t; if(!T) return; GD.t = null;
+  cancelAnimationFrame(T.raf); clearTimeout(GD.mv);
+  if(GD.root){ GD.root.remove(); GD.root = null; }
+  document.body.classList.remove('gd-on');
+  let nextId = null; if(finished && T.def.next){ try { nextId = T.def.next(); } catch(e){} }
+  if(nextId && TOURS[nextId]){ if(tourStart(nextId, {from:T.from})) return; }
+  try {
+    if(T.id === 'main'){
+      if(finished){ gdAct('tour'); GP.tour = 1; gpSave(); go('aufbau'); }
+      else if(!quiet && T.back && TABS.some(t => t[0] === T.back.tab)){ go(T.back.tab, T.back.tab === 'cards' && T.back.card && C(T.back.card) ? T.back.card : null); }
+    } else if(finished && !quiet && T.shown > 1) toast('Das war die Anleitung für diese Seite.');
+  } catch(e){ console.warn(e); }
+  const f = T.from; if(f && f.isConnected && f.focus && f !== document.body){ try { f.focus({preventScroll:true}); } catch(e){} }
+  setTimeout(gdRewards, 500);
+}
+/* Tastatur: ← → Esc, Tab bleibt in Karte und Ziel */
+window.addEventListener('keydown', e => {
+  const T = GD.t; if(!T) return;
+  const dlg = document.querySelector('dialog[open]'); const s = T.steps[T.i];
+  if(e.key === 'Escape'){ if(dlg && !(s && s.dlg)) return; e.preventDefault(); e.stopImmediatePropagation(); tourEnd(false, false); return; }
+  if(dlg) return;
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k'){ e.preventDefault(); e.stopImmediatePropagation(); return; }
+  const typing = e.target.closest && e.target.closest('input,textarea,select,[contenteditable]');
+  if(e.key === '/' && !typing){ e.preventDefault(); e.stopImmediatePropagation(); return; }
+  if(!typing && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')){ e.preventDefault(); e.stopImmediatePropagation(); e.key === 'ArrowRight' ? tourNext() : tourBack(); return; }
+  if(e.key === 'Tab'){
+    const card = GD.root.querySelector('.gd-card'); let list = [...card.querySelectorAll('button')];
+    if(T.doing && T.el){ const inner = T.el.matches(FOCUSABLE) ? [T.el] : [...T.el.querySelectorAll(FOCUSABLE)]; list = inner.filter(x => !x.disabled && x.getClientRects().length).concat(list); }
+    if(!list.length) return; e.preventDefault(); e.stopImmediatePropagation();
+    const k = list.indexOf(document.activeElement); list[(k + (e.shiftKey ? -1 : 1) + list.length) % list.length].focus({preventScroll:true});
+  }
+}, true);
+window.addEventListener('error', () => { if(GD.t) tourEnd(true, false); });
+
+/* ---------- Anleitung für die Seite, auf der man gerade ist ---------- */
+function guideCtx(){
+  const t = view.tab;
+  if(t === 'cards') return view.card && C(view.card) ? 'card' : 'cards';
+  if(t === 'menu') return ({guest:'guest', plan:'plan', layout:'layout'})[view.mtab] || 'menu';
+  if(t === 'buy' || (t === 'stock' && BUY.includes(view.stab))){ if(view.order && ORD(view.order)) return view.recv ? 'recv' : 'order'; return view.stab === 'lieferanten' ? 'suppliers' : 'buy'; }
+  if(t === 'stock') return view.stab === 'inventur' ? 'inventur' : view.stab === 'buchungen' ? 'moves' : 'stock';
+  if(t === 'report') return view.rp && view.rp.tab === 'import' ? 'rimport' : view.rp && view.rp.tab === 'map' ? 'rmap' : 'report';
+  return t;
+}
+function guideHere(){ const id = guideCtx(); if(TOURS[id]) { if(!tourStart(id)) toast('Hier gibt es gerade nichts zu zeigen.'); } else toast('Für diese Seite gibt es keine Anleitung.'); }
+const GD_Q = () => `<button type="button" class="wozu-q" data-act="guideHere" title="So geht’s hier" aria-label="So geht’s hier: kurze Anleitung für diese Seite">${ico('help')}</button>`;
+injectWozu = function(){
+  const t = view.tab; const ph = $('#app .page-h'); if(!ph) return;
+  const h1 = ph.querySelector('h1'); if(!h1) return;
+  if(TOURS[guideCtx()] && !h1.querySelector('.wozu-q')) h1.insertAdjacentHTML('beforeend', GD_Q());
+  const txt = WOZU[t]; if(txt && !view.card && !h1.parentNode.querySelector('.sub')) h1.insertAdjacentHTML('afterend', `<p class="sub">${esc(txt)}</p>`);
+};
+Object.assign(WOZU, {aufbau:'Kleine Aufgaben führen Sie durch die App. Für jede erledigte gibt es einen Stempel.', setup:'Betrieb, Team, Sicherung und Hilfe.'});
+
+/* =====================================================================
+   Hilfe-Modus „Was ist das?“ und die Erklär-Blase
+   ===================================================================== */
+let HELP_ON = false; let BUB = null;
+const HELP_PASS = '[data-tab],[data-act="goTab"],[data-act="goMenu"],[data-act="goStock"],[data-act="goBuyTab"],[data-act="goReportTab"],[data-act="mtab"],[data-act="stab"],[data-act="rpTab"],[data-act="ctype"],[data-act="sec"],[data-act="pFilter"],[data-act="loc"],[data-act="ofilter"],[data-act="backCards"],[data-act="ordBack"],[data-act="openCard"],[data-act="ordOpen"],[data-act="theme"],[data-act="msTier"],[data-act="rpUnit"],[data-act="rpStep"],[data-act="rpToday"]';
+function helpApply(scope){
+  const root = scope || document;
+  root.querySelectorAll('#app th, #app .t-l, #app .panel-h h2, #app .hero small, #app .kv > span:nth-child(odd), #app .fcw small, #app .pc-ex small, #app .ring small, #app dt').forEach(el => {
+    if(el.dataset.help) return; const tx = el.textContent.replace(/[↑↓]/g, '').trim().toLowerCase(); if(!tx || tx.length > 34) return;
+    let k = HELP_TXT[tx] || HELP_TXT[tx.replace(/\s*\d.*$/, '').trim()];
+    // dasselbe Wort, andere Bedeutung je Tabelle
+    if(tx === 'menge') k = el.closest('.rp-items') ? 'portionen' : el.closest('.otab, .recv') ? 'best_menge' : null;
+    else if(tx === 'status') k = el.closest('.recv') ? 'r_status' : el.closest('table.lt') ? 'status' : null;
+    else if(tx === 'bestellt') k = 'best_menge';
+    if(!k) return;
+    const host = el.classList.contains('t-l') ? (el.closest('.tile') || el) : el; if(!host.dataset.help) host.dataset.help = k;
+  });
+  // Spaltenkopf mit Fachwort: das Wort geht vor „Sortieren“
+  for(const [sel, k] of HELP_SEL){ let list; try { list = root.querySelectorAll(sel); } catch(e){ continue; } list.forEach(el => { if(el.dataset.help || (k === 'sortieren' && el.closest('th[data-help]'))) return; el.dataset.help = k; }); }
+  if(HELP_ON && !canEditAll()) root.querySelectorAll('#app .ro[disabled]').forEach(el => { el.disabled = false; }); // gesperrte Knöpfe sollen sich erklären lassen
+}
+function helpFind(t){
+  for(let el = t; el && el !== document.body && el.dataset; el = el.parentElement){ const k = el.dataset.help; if(k && HELP[k]) return {el, h:HELP[k]}; }
+  return null;
+}
+function helpSet(on){
+  on = !!on; if(on === HELP_ON) return; if(on && GD.t) tourEnd(true, false);
+  HELP_ON = on; document.body.classList.toggle('gd-help', on); bubHide();
+  if(S && !canEditAll()){ try { render(); } catch(e){} }
+  document.querySelectorAll('[data-act="helpMode"]').forEach(b => b.setAttribute('aria-pressed', on ? 'true' : 'false'));
+  let bar = document.getElementById('gdHelpBar');
+  if(on){
+    helpApply();
+    if(!bar){ bar = document.createElement('div'); bar.id = 'gdHelpBar'; bar.className = 'gd-helpbar'; bar.setAttribute('role', 'status');
+      bar.innerHTML = `${ico('help')}<span><b>Was ist das?</b> Tippen Sie auf etwas, das Sie nicht kennen.</span><button type="button" class="btn sm" data-act="helpMode">Hilfe aus</button>`; document.body.appendChild(bar); }
+    if(!GP.helpSeen){ GP.helpSeen = 1; gpSave(); }
+  } else if(bar) bar.remove();
+}
+function bubShow(el, h, opt){
+  opt = opt || {}; bubHide();
+  const n = document.createElement('div'); n.className = 'gd-bub'; n.setAttribute('role', 'status'); n.setAttribute('aria-live', 'polite');
+  n.innerHTML = `<b>${esc(h.t)}</b><p>${esc(h.x)}</p>${opt.note ? `<small>${esc(opt.note)}</small>` : ''}${h.g && view.tab !== 'begriffe' ? `<button type="button" class="gd-bub-l" data-act="goTab" data-id="begriffe">Alle Begriffe</button>` : ''}`;
+  document.body.appendChild(n);
+  const refind = el.dataset && el.dataset.act ? `[data-act="${el.dataset.act}"]` + (el.dataset.id != null ? `[data-id="${CSS.escape(el.dataset.id)}"]` : '') : el.dataset && el.dataset.tab ? `.${el.closest('.bottom') ? 'bottom' : el.closest('.side') ? 'side' : 'shell'} [data-tab="${el.dataset.tab}"]` : null;
+  BUB = {n, el, refind, sig:'', lost:0, raf:0, t:opt.ms ? setTimeout(bubHide, opt.ms) : 0};
+  const frame = () => { if(!BUB || BUB.n !== n) return;
+    try {
+      let a = BUB.el; if(!a.isConnected && BUB.refind){ a = gq(BUB.refind); if(a) BUB.el = a; }
+      if(!a || !a.isConnected){ if(!BUB.lost) BUB.lost = performance.now(); if(performance.now() - BUB.lost > 2600){ bubHide(); return; } }
+      else { BUB.lost = 0; bubPlace(a); }
+    } catch(e){ bubHide(); return; }
+    BUB.raf = requestAnimationFrame(frame); };
+  frame(); requestAnimationFrame(() => n.classList.add('in'));
+}
+function bubPlace(a){
+  const n = BUB.n, r = a.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight;
+  const sig = [r.left, r.top, r.width, r.height, vw, vh].map(Math.round).join(',') ; if(sig === BUB.sig) return; BUB.sig = sig;
+  const w = n.offsetWidth, h = n.offsetHeight, m = 10, g = 10;
+  const side = vw > 900 && r.right < 300 && r.right + g + w < vw - m; // Navigation links: Blase rechts daneben
+  let x, y, cls;
+  if(side){ x = r.right + g; y = Math.max(m, Math.min(r.top + r.height / 2 - 22, vh - h - m)); cls = 'side'; n.style.setProperty('--ay', Math.max(12, Math.min(h - 12, r.top + r.height / 2 - y)) + 'px'); }
+  else {
+    const below = r.bottom + g + h <= vh - m || r.top - g - h < m;
+    x = Math.max(m, Math.min(r.left + r.width / 2 - w / 2, vw - w - m)); y = below ? Math.min(r.bottom + g, vh - h - m) : r.top - g - h; cls = below ? 'down' : 'up';
+    n.style.setProperty('--ax', Math.max(14, Math.min(w - 14, r.left + r.width / 2 - x)) + 'px');
+  }
+  n.classList.remove('side', 'down', 'up'); n.classList.add(cls);
+  n.style.left = Math.round(x) + 'px'; n.style.top = Math.round(Math.max(m, y)) + 'px';
+}
+function bubHide(){ if(!BUB) return; cancelAnimationFrame(BUB.raf); clearTimeout(BUB.t); BUB.n.remove(); BUB = null; }
+
+window.addEventListener('click', e => {
+  const t = e.target; if(!t.closest) return;
+  if(GD_LP.block){ GD_LP.block = false; if(t.closest('.nav-i')){ e.preventDefault(); e.stopImmediatePropagation(); return; } }
+  if(!HELP_ON){ if(BUB && !t.closest('.gd-bub') && !t.closest('.stamp')) bubHide(); return; }
+  if(t.closest('.gd-helpbar, [data-act="helpMode"], #gd, dialog, #pal')) return;
+  if(t.closest('.gd-bub')){ if(t.closest('[data-act="goTab"]')) bubHide(); return; }
+  const hit = helpFind(t); const pass = !!t.closest(HELP_PASS);
+  const ctl = t.closest('[data-act],[data-pdf],[data-pick],button,a,input,select,textarea,label,summary,tr.row,.sh-chip');
+  if(!pass && ctl){ e.preventDefault(); e.stopImmediatePropagation(); if(ctl.matches('input,select,textarea')) setTimeout(() => ctl.blur(), 0); }
+  if(hit) bubShow(hit.el, hit.h, {note: !pass && ctl && ctl.matches('[data-act],[data-pdf],button,a') ? 'Solange die Hilfe an ist, wird hier nichts ausgeführt.' : ''});
+  else if(!pass && ctl) bubShow(ctl, {t:'Dazu gibt es noch keine Erklärung', x:'Solange die Hilfe an ist, wird hier nichts ausgeführt. Mit „Hilfe aus“ geht alles wieder wie gewohnt.'});
+  else bubHide();
+}, true);
+window.addEventListener('mousedown', e => { if(!HELP_ON) return; const t = e.target; if(t.closest && t.id !== 'bq' && t.closest('#app') && t.closest('input,select,textarea,.ti-grip,.sh-chip,[draggable="true"]')){ e.preventDefault(); e.stopImmediatePropagation(); } }, true);
+window.addEventListener('pointerdown', e => { if(!HELP_ON) return; const t = e.target; if(t.closest && t.closest('#app .ti-grip, #app .sh-chip, #app [draggable="true"]')) e.stopImmediatePropagation(); }, true);
+['change','input'].forEach(ev => window.addEventListener(ev, e => { if(!HELP_ON) return; const t = e.target; if(!t || !t.closest || !t.closest('#app') || t.id === 'bq') return; e.stopImmediatePropagation(); if(t.type === 'checkbox' || t.type === 'radio') t.checked = t.defaultChecked; else if(t.tagName !== 'SELECT') t.value = t.defaultValue; }, true));
+let gdHoverT = 0;
+document.addEventListener('mouseover', e => {
+  if(!HELP_ON || !window.matchMedia('(hover:hover)').matches) return;
+  const hit = e.target.closest && !e.target.closest('.gd-bub, .gd-helpbar') ? helpFind(e.target) : null; clearTimeout(gdHoverT);
+  if(hit && !(BUB && BUB.el === hit.el)) gdHoverT = setTimeout(() => { if(HELP_ON && hit.el.isConnected) bubShow(hit.el, hit.h); }, 260);
+});
+window.addEventListener('keydown', e => { if(e.key !== 'Escape' || GD.t) return; if(document.querySelector('dialog[open]') || !$('#pal').hidden) return; if(BUB && !HELP_ON){ bubHide(); return; } if(HELP_ON){ e.preventDefault(); e.stopImmediatePropagation(); helpSet(false); } }, true);
+
+/* Lange drücken auf einen Bereich (Handy): ein Satz, wozu er da ist */
+const GD_LP = {t:0, block:false};
+document.addEventListener('pointerdown', e => {
+  const b = e.target.closest && e.target.closest('.nav-i'); clearTimeout(GD_LP.t); if(!b || e.pointerType === 'mouse' || GD.t) return;
+  GD_LP.t = setTimeout(() => { const h = HELP['nav_' + b.dataset.tab]; if(!h) return; GD_LP.block = true; bubShow(b, h, {ms:4200}); try { navigator.vibrate && navigator.vibrate(8); } catch(x){} }, 520);
+}, true);
+['pointerup','pointercancel','pointermove'].forEach(ev => document.addEventListener(ev, e => { if(ev !== 'pointermove' || Math.abs(e.movementX) + Math.abs(e.movementY) > 6) clearTimeout(GD_LP.t); }, true));
+document.addEventListener('contextmenu', e => { if(GD_LP.block && e.target.closest && e.target.closest('.nav-i')) e.preventDefault(); });
+
+/* =====================================================================
+   Einfach-Modus
+   ===================================================================== */
+function setMode(m, quiet){
+  GP.mode = m === 'simple' ? 'simple' : 'full'; GP.asked = 1; gpSave();
+  document.body.classList.toggle('simple', isSimple());
+  if(!quiet){ render(); toast(isSimple() ? 'Einfach: nur das Wichtigste' : 'Alles zeigen: alle Spalten und Werkzeuge'); }
+}
+const _vmodeGd = vmode;
+vmode = function(k){ return isSimple() ? (k === 'teller' ? 'teller' : 'list') : _vmodeGd(k); };
+const SIMPLE_ADV_H2 = ['Cloud & Team', 'Wer arbeitet gerade?', 'Startanimation'];
+const SIMPLE_ADV_TH = ['Putzverlust', 'Garverlust', 'Saison'];
+/* genaue Beschriftung → einfaches Wort */
+const SIMPLE_TXT = {
+  'WE':'Kostet mich', 'WE %':'Anteil am Preis', 'WE gesamt':'Zutaten gesamt', 'Rohertrag':'Bleibt übrig', 'Rohertrag exkl. MwSt.':'Bleibt übrig, ohne Steuer', 'Größter Rohertrag':'Bringt am meisten',
+  'Ø Wareneinsatz':'Zutaten vom Preis, im Schnitt', 'Wareneinsatz pro Portion':'Was kostet mich das Gericht?', 'Wareneinsatz je Gericht':'Was kosten die Zutaten vom Preis?', 'Wareneinsatz gesamt':'Zutaten kosten zusammen',
+  'Preis, Wareneinsatz und Allergene je Gericht. Preis direkt in der Zeile ändern, Klick öffnet die Rezeptur.':'Jedes Gericht mit Preis. Daneben steht, was die Zutaten kosten. Den Preis ändern Sie direkt in der Zeile.',
+  'Zutaten, Mengen, Zubereitung je Gericht. Daraus kommen Wareneinsatz und Allergene.':'Was in ein Gericht kommt und was es kostet. Ein Tipp auf eine Zeile öffnet das Rezept.',
+  'Einkaufspreis je Einheit, netto. Richtwerte sind Beispielpreise, bis Sie sie bestätigen.':'Was Sie dem Lieferanten zahlen, ohne Steuer. Beispielpreise gelten, bis Sie Ihren Preis eintragen.',
+  'Kalkuliert':'Durchgerechnet', 'Richtwert':'Beispielpreis', 'Richtwerte':'Beispielpreise', 'Richtwert stimmt':'Beispielpreis stimmt', 'Angezeigte Richtwerte bestätigen':'Alle gezeigten Preise bestätigen', 'Kostenstruktur':'Was kostet am meisten?', 'Umsatz netto':'Einnahmen', 'Umsatz brutto':'Mit Steuer',
+  'Mindest':'Soll da sein', 'Δ Menge':'± Menge', 'Über Ziel':'Zu teuer', 'Kalkulation':'Preise & Kosten', 'Preis-Simulator':'Preis ausprobieren', 'Produktionsmenge':'Für viele Portionen',
+};
+const SIMPLE_TXT_NARROW = {'WE':'Kostet', 'WE %':'Anteil', 'Rohertrag':'Bleibt', 'Umsatz netto':'Einnahmen', 'Richtwert':'Beispiel'}; // schmale Tabellen am Handy
+function gdSimpleApply(){
+  const app = $('#app'); if(!app) return;
+  // Fortgeschrittenes ausblenden (bleibt über „Alles zeigen“ erreichbar)
+  app.querySelectorAll('[data-act="tellerMode"]').forEach(b => { const s = b.closest('.seg'); if(s) s.classList.add('adv'); });
+  app.querySelectorAll('.teller-sw, [data-act="rpCsv"], [data-act="plImport"], [data-act="addLine"], .rp-cmpnote, [data-act="secSort"], [data-act="dupCard"], [data-act="gdReset"]').forEach(n => n.classList.add('adv'));
+  app.querySelectorAll('[data-act="rpCmp"]').forEach(b => { const s = b.closest('.seg'); if(s){ s.classList.add('adv'); const lab = s.previousElementSibling; if(lab && lab.textContent.trim().length < 20 && !lab.querySelector('button')) lab.classList.add('adv'); const box = s.parentElement; if(box && box.children.length <= 2 && !box.classList.contains('panel')) box.classList.add('adv'); } });
+  app.querySelectorAll('.panel-h h2').forEach(h => { if(SIMPLE_ADV_H2.includes(h.textContent.trim())){ const p = h.closest('.panel'); if(p) p.classList.add('adv'); } });
+  app.querySelectorAll('table').forEach(tb => { const ths = [...tb.querySelectorAll('thead th')]; ths.forEach((th, i) => { if(!SIMPLE_ADV_TH.includes(th.textContent.trim())) return; th.classList.add('adv'); tb.querySelectorAll('tbody tr').forEach(tr => { if(tr.children.length === ths.length) tr.children[i].classList.add('adv'); }); }); });
+  app.querySelectorAll('.kv > span').forEach(r => { if(r.textContent.trim() === 'Aufschlagsfaktor'){ r.classList.add('adv'); if(r.nextElementSibling) r.nextElementSibling.classList.add('adv'); } });
+  // einfache Wörter
+  const w = document.createTreeWalker(app, NodeFilter.SHOW_TEXT, {acceptNode: n => { const p = n.parentElement; if(!p || p.closest('textarea,script,style,.guest-prev,.hs-stage,#print,.gd-keep,tbody .lt-n,.bg-list')) return NodeFilter.FILTER_REJECT; return n.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP; }});
+  const todo = []; let n; while((n = w.nextNode())) todo.push(n);
+  const narrow = window.innerWidth <= 900;
+  todo.forEach(n => { const v = n.nodeValue, tr = v.trim(); let to = (narrow && SIMPLE_TXT_NARROW[tr]) || SIMPLE_TXT[tr];
+    if(!to){ const p = n.parentElement;
+      if(tr === 'Wareneinsatz') to = p.closest('.t-l') ? 'Zutaten gekostet' : p.closest('.kv, .kv-inline, .teller-f') ? 'Zutaten kosten' : 'vom Preis';
+      else if(/\d\s?% WE$/.test(tr)) to = tr.replace(/ WE$/, ' vom Preis');
+      else if(/^Für \d+[\d,]* % Wareneinsatz:?$/.test(tr)) to = tr.replace(/^Für (\S+) % Wareneinsatz:?$/, 'Damit die Zutaten nur $1 % kosten:');
+      else if(/^inkl\. \d+[\d,]* % MwSt\.$/.test(tr)) to = tr.replace('inkl.', 'mit').replace('MwSt.', 'Steuer'); }
+    if(to) n.nodeValue = v.replace(tr, to); });
+}
+document.addEventListener('input', () => { if(isSimple()) requestAnimationFrame(gdSimpleApply); });
+
+/* =====================================================================
+   Navigation: klare Namen, ein Satz je Bereich, „Sie sind hier“
+   ===================================================================== */
+NAV_GROUPS.forEach(g => { if(NAV_GROUP_NAMES[g[0]]) g[0] = NAV_GROUP_NAMES[g[0]]; });
+navHtml = function(short){
+  const item = k => { const t = TABS.find(x => x[0] === k); return `<button type="button" class="nav-i" data-tab="${k}" title="${esc(NAV_DESC[k] || '')}">${ico(k)}<span>${short ? t[2] : t[1]}</span></button>`; };
+  if(short) return ['aufbau','dash','menu','cards','stock','buy','setup'].map(item).join('');
+  return NAV_GROUPS.map(([g,ks]) => (g ? `<div class="nav-group">${g}</div>` : '<div class="nav-group" aria-hidden="true"></div>') + ks.map(item).join('')).join('');
+};
+TABS.push(['begriffe','Begriffe','Begriffe'], ['stempel','Stempelkarte','Stempel']);
+const NAV_PARENT = {begriffe:'setup', stempel:'aufbau', pcheck:'aufbau'};
+function gdNavApply(){
+  const t = view.tab; const par = NAV_PARENT[t];
+  if(par) document.querySelectorAll(`.nav-i[data-tab="${par}"]`).forEach(b => b.classList.add('on'));
+  const bot = document.querySelector('.bottom'); if(bot && !bot.querySelector(`.nav-i[data-tab="${par || t}"]`)){ const m = bot.querySelector('.nav-i[data-tab="setup"]'); if(m) m.classList.add('on'); }
+  document.querySelectorAll('.nav-i').forEach(b => { if(b.classList.contains('on')) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  const tab = TABS.find(x => x[0] === t); const c = t === 'cards' && view.card ? C(view.card) : null;
+  try { document.title = (c ? c.name + ' · ' : '') + (tab ? tab[1] : 'Küche') + ' · DAHUAM.202'; } catch(e){}
+}
+function gdCrumb(){
+  const b = $('#app .back'); if(!b || b.closest('.crumb')) return;
+  let here = '';
+  if(view.tab === 'cards' && view.card && C(view.card)) here = C(view.card).name;
+  else if(view.order && ORD(view.order)){ const o = ORD(view.order); here = (view.recv ? 'Wareneingang · ' : 'Bestellung ') + o.no; }
+  else if(view.tab === 'stempel') here = 'Stempelkarte';
+  const nav = document.createElement('nav'); nav.className = 'crumb'; nav.setAttribute('aria-label', 'Sie sind hier');
+  b.parentNode.insertBefore(nav, b); nav.appendChild(b);
+  nav.insertAdjacentHTML('beforeend', (here ? `<span class="crumb-sep" aria-hidden="true">/</span><span class="crumb-here" aria-current="page">${esc(here)}</span>` : '') + (TOURS[guideCtx()] && !$('#app .page-h .wozu-q') ? `<span class="sp"></span><button type="button" class="crumb-q" data-act="guideHere" aria-label="So geht’s hier: kurze Anleitung für diese Seite">${ico('help')}<span>So geht’s hier</span></button>` : ''));
+}
+
+/* Rahmen: Einträge unten in der Seitenleiste und oben am Handy */
+(function gdShell(){
+  const foot = document.querySelector('.side .side-foot');
+  if(foot && !document.querySelector('.side-help')) foot.insertAdjacentHTML('beforebegin', `<div class="side-help"><button type="button" class="sh-i" data-act="tourMain">${GD_MARK}<span>Rundgang</span></button><button type="button" class="sh-i" data-act="helpMode" aria-pressed="false">${ico('help')}<span>Was ist das?</span><i class="sh-sw" aria-hidden="true"></i></button></div>`);
+  const th = document.querySelector('.topbar [data-act="theme"]');
+  if(th && !document.querySelector('.topbar [data-act="helpMode"]')) th.insertAdjacentHTML('beforebegin', `<button type="button" class="theme-btn" data-act="helpMode" aria-pressed="false" aria-label="Hilfe: Was ist das?">${ico('help')}</button>`);
+  document.body.classList.toggle('simple', isSimple());
+})();
+
+/* Schnellsuche: ein Satz je Bereich, Hilfe und Begriffe */
+const _palDataGd = palData;
+palData = function(){
+  const a = _palDataGd();
+  a.forEach(x => { if(x.g === 'Bereich' && !x.s){ const t = TABS.find(t => t[1] === x.n); if(t && NAV_DESC[t[0]]) x.s = NAV_DESC[t[0]]; } });
+  a.push({g:'Aktion', n:'Rundgang starten', s:'Alle Bereiche in zwei Minuten', run:() => tourStart('main')},
+    {g:'Aktion', n:'So geht’s hier', s:'Kurze Anleitung für diese Seite', run:() => guideHere()},
+    {g:'Aktion', n:'Was ist das? Hilfe-Modus', s:'Erklärt alles, worauf Sie tippen', run:() => helpSet(!HELP_ON)},
+    {g:'Aktion', n:isSimple() ? 'Alles zeigen' : 'Einfach-Modus', s:isSimple() ? 'Alle Spalten und Werkzeuge einblenden' : 'Nur das Wichtigste, große Knöpfe', run:() => setMode(isSimple() ? 'full' : 'simple')});
+  Object.values(HELP).filter(h => h.g).forEach(h => a.push({g:'Begriff', n:h.t, s:h.x, run:() => { view.bq = ''; view.bgo = h.k; go('begriffe'); }}));
+  return a;
+};
+
+/* =====================================================================
+   Erster Start: Frage nach der Ansicht, dann Angebot Rundgang
+   ===================================================================== */
+const GD_PIC_SIMPLE = '<svg viewBox="0 0 96 56" aria-hidden="true"><rect x="6" y="7" width="60" height="11" rx="3"/><rect x="6" y="23" width="60" height="11" rx="3"/><rect x="6" y="39" width="60" height="11" rx="3"/><rect class="g" x="72" y="7" width="18" height="11" rx="3"/><rect class="g" x="72" y="23" width="18" height="11" rx="3"/><rect class="g" x="72" y="39" width="18" height="11" rx="3"/></svg>';
+const GD_PIC_FULL = '<svg viewBox="0 0 96 56" aria-hidden="true"><path d="M6 9h84M6 17h84M6 25h84M6 33h84M6 41h84M6 49h84"/><path class="g" d="M34 5v48M52 5v48M66 5v48M80 5v48"/></svg>';
+function gdWelcome(){
+  if(document.querySelector('.gd-wel')) return;
+  const d = document.createElement('dialog'); d.className = 'gd-wel'; d.setAttribute('aria-labelledby', 'gwT');
+  const one = () => { d.innerHTML = `<div class="gw-in">${GD_MARK}<h2 id="gwT" tabindex="-1" autofocus>Willkommen in Ihrer Küche</h2><p class="gw-q">Wie möchten Sie starten?</p>
+      <div class="gw-opts"><button type="button" class="gw-o" data-gw="simple">${GD_PIC_SIMPLE}<b>Einfach</b><span>Nur das Wichtigste. Große Knöpfe, einfache Wörter.</span></button><button type="button" class="gw-o" data-gw="full">${GD_PIC_FULL}<b>Alles zeigen</b><span>Alle Spalten, Ansichten und Werkzeuge.</span></button></div>
+      <div class="gw-f"><span>Das lässt sich jederzeit in den Einstellungen umstellen.</span><button type="button" class="gd-skip" data-gw="skip">Überspringen</button></div></div>`; };
+  const two = () => { d.innerHTML = `<div class="gw-in">${GD_MARK}<h2 id="gwT">Kurzer Rundgang?</h2><p class="gw-q">In zwei Minuten sehen Sie, wo was ist. Den Rundgang finden Sie später auch ${window.innerWidth > 900 ? 'links unten' : 'unter „Mehr“'}.</p>
+      <div class="gw-f2"><button type="button" class="btn" data-gw="later">Später</button><button type="button" class="btn primary" data-gw="tour">Rundgang starten</button></div></div>`; setTimeout(() => d.querySelector('[data-gw="tour"]')?.focus(), 30); };
+  one(); document.body.appendChild(d);
+  const done = () => { GP.asked = 1; gpSave(); if(d.open) d.close(); d.remove(); };
+  d.addEventListener('click', e => { const b = e.target.closest('[data-gw]'); if(!b) return; const a = b.dataset.gw;
+    if(a === 'simple' || a === 'full'){ setMode(a, true); render(); two(); }
+    else if(a === 'tour'){ done(); tourStart('main'); }
+    else done(); });
+  d.addEventListener('cancel', () => { setTimeout(done, 0); });
+  try { d.showModal(); } catch(e){ d.remove(); }
+}
+function gdFirstRun(){
+  if(G_NOINTRO || !S) return;
+  const start = () => {
+    if(GD.t || document.querySelector('dialog[open]')) return;
+    if(G_FRESH && !GP.asked) gdWelcome();
+    else if(!GP.asked && !GP.hinted){ GP.hinted = 1; gpSave(); toast('Neu: Rundgang und Hilfe für jede Seite.', {label:'Rundgang', action:() => tourStart('main'), ms:9000}); }
+  };
+  const wait = () => { if(document.getElementById('intro')){ setTimeout(wait, 200); return; } setTimeout(start, 500); };
+  wait();
+}
+
+/* =====================================================================
+   Koppeln: Zeichnen, Speichern, Klicks
+   ===================================================================== */
+function gdAfterRender(){
+  gdCrumb(); gdNavApply(); helpApply();
+  if(isSimple()) gdSimpleApply();
+  if(view.tab === 'begriffe') bgAfter();
+}
+let gdFirst = true;
+const _renderGd = render;
+render = function(){
+  let stash = null;
+  if(isSimple()){ stash = {}; Object.keys(SORTS).forEach(k => { stash[k] = SORTS[k]; delete SORTS[k]; }); }
+  try { _renderGd(); } finally { if(stash) Object.assign(SORTS, stash); }
+  try { gdAfterRender(); if(gdTrack()) save(); } catch(e){ console.warn('Begleitung:', e); }
+  if(gdFirst){ gdFirst = false; setTimeout(gdFirstRun, 0); }
+  setTimeout(gdRewards, 700);
+};
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if(!el) return; const id = el.dataset.id;
+  switch(el.dataset.act){
+    case 'tourMain': tourStart('main'); break;
+    case 'helpMode': helpSet(!HELP_ON); break;
+    case 'guideHere': guideHere(); break;
+    case 'guideMode': if((id === 'simple') !== isSimple()) setMode(id); break;
+    case 'missionGo': missionGo(id); break;
+    case 'msTier': view.msOpen = Object.assign({}, view.msOpen, {[id]: !(el.getAttribute('aria-expanded') === 'true')}); render(); break;
+    case 'stampInfo': { const m = MISSIONS.find(x => x.id === id); if(m){ const st = gdGame().stamps[m.id]; bubShow(el, {t:m.t, x: st ? `Erledigt am ${fmtDate(st + 'T12:00:00')}. ${m.wozu}` : m.wozu}, {ms:6000}); } break; }
+    case 'gdReset': ask('Alle Stempel und den Stand der Aufgaben zurücksetzen? Ihre Daten bleiben, wie sie sind.', () => { const g = gdGame(); g.stamps = {}; g.acts = null; g.done = {}; g.init = false; g.minit = false; gdGame(); gameSilentDone(); GSNAP = null; }, 'Zurücksetzen'); break;
+    case 'applySim': if(canEditAll()){ gdAct('sim'); } break;
+  }
+});
+
+/* =====================================================================
+   Begleitung, Teil 3: Aufgaben, Stempelkarte, Begriffe, Hilfe in den Einstellungen.
+   Aufgaben zählen nur, was seit dem ersten Start wirklich getan wurde.
+   Demodaten erledigen nichts von selbst.
+   ===================================================================== */
+
+/* ---------- Spielstand in S.game (wandert mit Sicherung und Cloud mit) ---------- */
+const GD_ACT_LISTS = ['prices','alg','recipes','linked'];
+const GD_ACT_NUMS = ['sent','recv','inv','kasse','pdf','backup','sim','tour'];
+function guideMigrate(d){
+  if(!d || typeof d !== 'object') return d;
+  if(!d.game || typeof d.game !== 'object') d.game = {done:{}, started:todayStr()};
+  const g = d.game;
+  if(!g.acts || typeof g.acts !== 'object') g.acts = {};
+  GD_ACT_LISTS.forEach(k => { if(!Array.isArray(g.acts[k])) g.acts[k] = []; });
+  GD_ACT_NUMS.forEach(k => { if(!(+g.acts[k] >= 0)) g.acts[k] = 0; });
+  if(!g.stamps || typeof g.stamps !== 'object' || Array.isArray(g.stamps)) g.stamps = {};
+  return d;
+}
+function gdGame(){ guideMigrate(S); return S.game; }
+function gdActs(){ return gdGame().acts; }
+function gdAct(k){ const a = gdActs(); a[k] = (+a[k] || 0) + 1; gdStampCheck(); save(); if(view.tab === 'aufbau' || view.tab === 'stempel') render(); }
+
+/* Was hat sich seit dem letzten Blick geändert? Nur Übergänge zählen. */
+let GSNAP = null;
+function gdCardFull(c){ return c.type === 'dish' && c.items.length > 0 && c.items.every(i => refObj(i.ref) && +i.qty > 0) && (c.steps||[]).some(s => s.t && s.t.trim()) && !!c.img; }
+function gdSnap(){
+  return {S,
+    conf:new Set(S.products.filter(p => !p.priceDemo && !p.noStock).map(p => p.id)),
+    alg:new Set(S.menu.filter(hasAlg).map(m => m.id)),
+    full:new Set(S.cards.filter(gdCardFull).map(c => c.id)),
+    link:new Set(S.menu.filter(m => m.card && C(m.card)).map(m => m.id)),
+    sent:new Set((S.orders||[]).filter(o => o.sentAt && o.status !== 'draft' && o.status !== 'approval').map(o => o.id)),
+    ins:new Set((S.moves||[]).filter(m => m.type === 'in').map(m => m.id)),
+    inv:(S.inventories||[]).length, imp:(S.salesImports||[]).length};
+}
+function gdTick(){
+  if(!S || !Array.isArray(S.products)) return false;
+  const n = gdSnap(), p = GSNAP; GSNAP = n;
+  if(!p || p.S !== S) return false; // erster Blick oder Daten ersetzt: nur merken
+  const a = gdActs(); let ch = false;
+  const sets = [['prices','conf'], ['alg','alg'], ['recipes','full'], ['linked','link']];
+  sets.forEach(([k, s]) => {
+    n[s].forEach(id => { if(!p[s].has(id) && !a[k].includes(id)){ a[k].push(id); ch = true; } });
+    const keep = a[k].filter(id => n[s].has(id)); if(keep.length !== a[k].length){ a[k] = keep; ch = true; }
+  });
+  let k = 0; n.sent.forEach(id => { if(!p.sent.has(id)) k++; }); if(k){ a.sent += k; ch = true; }
+  let got = false; n.ins.forEach(id => { if(!p.ins.has(id)) got = true; }); if(got){ a.recv += 1; ch = true; }
+  if(n.inv > p.inv){ a.inv += n.inv - p.inv; ch = true; }
+  if(n.imp > p.imp){ a.kasse += n.imp - p.imp; ch = true; }
+  return ch;
+}
+function gdTrack(){ const a = gdTick(); const b = gdStampCheck(); return a || b; }
+const _saveGd = save;
+save = function(){ try { gdTick(); gdStampCheck(); } catch(e){ console.warn('Aufgaben:', e); } _saveGd(); };
+/* PDF der Speisekarte und Sicherung: zählen erst, wenn die Datei wirklich gespeichert ist */
+const _saveFileGd = saveFile;
+saveFile = async function(name, data){
+  const ok = await _saveFileGd(name, data);
+  try { if(ok && /^Speisekarte.*\.pdf$/i.test(name)) gdAct('pdf'); else if(ok && /^dahuam202-kueche-.*\.json$/.test(name)) gdAct('backup'); } catch(e){}
+  return ok;
+};
+
+/* ---------- Aufgaben ---------- */
+const TIERS = ['Start', 'Alltag', 'Profi'];
+const MS_LEVELS = [[0,'Talstation'], [5,'Mittelstation'], [11,'Bergstation'], [16,'Gipfel']];
+function msStation(k){ const s = stations().find(x => x.k === k); return s || {done:0, total:1}; }
+function msPriceGo(){ if(S.products.some(p => p.priceDemo && !p.noStock)){ view.pcBack = null; pcStart(); setTimeout(() => tourStart('pcheck'), 120); } else { go('products'); setTimeout(() => tourStart('products'), 120); } }
+function msRecipeTarget(){
+  const dishes = S.cards.filter(c => c.type === 'dish' && !gdCardFull(c));
+  const score = c => (c.items.length && c.items.every(i => refObj(i.ref) && +i.qty > 0) ? 2 : 0) + ((c.steps||[]).some(s => s.t && s.t.trim()) ? 2 : 0) + (S.menu.some(m => m.card === c.id) ? 1 : 0);
+  return dishes.sort((a,b) => score(b) - score(a))[0] || null;
+}
+function msRecipeMissing(c){ const out = []; if(!(c.items.length && c.items.every(i => refObj(i.ref) && +i.qty > 0))) out.push('Zutaten'); if(!(c.steps||[]).some(s => s.t && s.t.trim())) out.push('Schritte'); if(!c.img) out.push('Foto'); return out; }
+const MISSIONS = [
+  {id:'tour', tier:0, ico:'aufbau', t:'Rundgang ansehen', short:'Rundgang', goal:1, n:() => gdActs().tour, wozu:'Zwei Minuten, dann wissen Sie, wo was ist.', go:() => tourStart('main')},
+  {id:'prices5', tier:0, ico:'tag', edit:1, t:'5 echte Preise eintragen', short:'5 Preise', goal:5, n:() => gdActs().prices.length, wozu:'Erst mit Ihren Einkaufspreisen stimmt, was ein Gericht kostet.', go:msPriceGo},
+  {id:'recipe1', tier:0, ico:'plate', edit:1, t:'Erstes Rezept komplett machen', short:'Erstes Rezept', goal:1, n:() => gdActs().recipes.length,
+    wozu:'Zutaten, Schritte und ein Foto. Dann kann es jeder in der Küche nachkochen.',
+    info:() => { const c = msRecipeTarget(); if(!c) return ''; const miss = msRecipeMissing(c); return miss.length ? `${c.name}: Es ${miss.length === 1 ? 'fehlt' : 'fehlen'} noch ${miss.join(' und ')}.` : ''; },
+    go:() => { const c = msRecipeTarget(); if(c){ go('cards', c.id); setTimeout(() => tourStart('card'), 120); } else { go('cards'); setTimeout(() => tourStart('cards'), 120); } }},
+  {id:'alg5', tier:0, ico:'leaf', edit:1, t:'Allergene für 5 Gerichte', short:'5 × Allergene', goal:5, n:() => gdActs().alg.length, wozu:'In Österreich müssen die Allergene auf der Karte stehen.', go:() => { view.sec = 'noalg'; view.mtab = 'calc'; go('menu'); setTimeout(() => tourStart('alg'), 120); }},
+  {id:'order1', tier:0, ico:'cart', edit:1, t:'Erste Bestellung senden', short:'Erste Bestellung', goal:1, n:() => gdActs().sent, wozu:'Die App schlägt vor, was fehlt. Sie schicken es dem Lieferanten.', go:() => { view.stab = 'bestellung'; view.order = null; view.recv = null; go('buy'); setTimeout(() => tourStart('buy'), 120); }},
+
+  {id:'recv1', tier:1, ico:'truck', t:'Erste Lieferung prüfen', short:'Erste Lieferung', goal:1, n:() => gdActs().recv, wozu:'Menge und Preis prüfen, dann stimmt das Lager.',
+    go:() => { const o = (S.orders||[]).find(x => ['sent','confirmed'].includes(x.status)); view.stab = 'bestellung'; if(o){ view.order = o.id; view.recv = o.id; go('buy'); setTimeout(() => tourStart('recv'), 120); } else { view.order = null; view.recv = null; view.stab = 'bestand'; go('stock'); setTimeout(() => tourStart('stock'), 120); } }},
+  {id:'inv1', tier:1, ico:'clip', t:'Erste Inventur', short:'Erste Inventur', goal:1, n:() => gdActs().inv, wozu:'Einmal alles zählen. Dann wissen Sie, was wirklich da ist.', go:() => { view.stab = 'inventur'; view.order = null; view.recv = null; go('stock'); setTimeout(() => tourStart('inventur'), 120); }},
+  {id:'prices20', tier:1, ico:'coins', edit:1, t:'20 Preise geprüft', short:'20 Preise', goal:20, n:() => gdActs().prices.length, wozu:'Je mehr echte Preise, desto genauer die Rechnung.', go:msPriceGo},
+  {id:'link5', tier:1, ico:'cards', edit:1, t:'5 Gerichte mit einer Rezeptur verbinden', short:'5 × Rezeptur', goal:5, n:() => gdActs().linked.length, wozu:'Erst mit Rezeptur weiß die App, was ein Gericht kostet.', go:() => { view.sec = 'none'; view.mtab = 'calc'; go('menu'); setTimeout(() => tourStart('link'), 120); }},
+  {id:'pdf', tier:1, ico:'download', t:'Speisekarte als PDF speichern', short:'Karte als PDF', goal:1, n:() => gdActs().pdf, wozu:'Eine Datei zum Drucken oder Verschicken.', go:() => { view.mtab = 'guest'; go('menu'); setTimeout(() => tourStart('guest'), 120); }},
+  {id:'backup', tier:1, ico:'copy', t:'Erste Sicherung speichern', short:'Sicherung', goal:1, n:() => gdActs().backup, wozu:'Eine Datei mit allen Daten. Damit geht nichts verloren.', go:() => { go('setup'); setTimeout(() => tourStart('backup'), 120); }},
+
+  {id:'kasse', tier:2, ico:'report', t:'Kassendatei importieren', short:'Kasse', goal:1, n:() => gdActs().kasse, wozu:'Dann sehen Sie, was verkauft wurde und was es gebracht hat.', go:() => { view.rp.tab = 'import'; go('report'); setTimeout(() => tourStart('rimport'), 120); }},
+  {id:'sim', tier:2, ico:'sparkle', edit:1, t:'Einen Preis im Simulator ändern', short:'Preis geändert', goal:1, n:() => gdActs().sim, wozu:'Ausprobieren, was ein anderer Preis bringt, und dann übernehmen.',
+    go:() => { const m = S.menu.find(x => x.card && C(x.card)); if(m){ go('cards', m.card); setTimeout(() => tourStart('sim'), 120); } else go('cards'); }},
+  {id:'allprices', tier:2, ico:'tag', edit:1, t:'Alle Preise bestätigt', short:'Alle Preise', data:1, goal:() => msStation('prices').total, n:() => msStation('prices').done, wozu:'Kein Beispielpreis mehr: Die ganze Rechnung stimmt.', go:msPriceGo},
+  {id:'allrecipes', tier:2, ico:'pot', edit:1, t:'Jedes Gericht hat eine Rezeptur', short:'Alle Rezepturen', data:1, goal:() => msStation('recipes').total, n:() => msStation('recipes').done, wozu:'Dann kennt die App den Wareneinsatz der ganzen Karte.', go:() => { view.sec = 'none'; view.mtab = 'calc'; go('menu'); setTimeout(() => tourStart('link'), 120); }},
+  {id:'allalg', tier:2, ico:'check', edit:1, t:'Allergene für jedes Gericht', short:'Alle Allergene', data:1, goal:() => msStation('menu').total, n:() => msStation('menu').done, wozu:'Die Gästekarte ist damit vollständig.', go:() => { view.sec = 'noalg'; view.mtab = 'calc'; go('menu'); setTimeout(() => tourStart('alg'), 120); }},
+];
+TOURS.link = {id:'link', name:'Rezeptur verbinden', steps:[
+  {t:'Gerichte ohne Rezeptur', sel:'#app [data-act="sec"][data-id="none"]', x:'Der Filter zeigt jetzt nur Gerichte, bei denen die App noch nicht weiß, was hineinkommt.'},
+  {t:'Gericht öffnen', sel:() => gq('#app table.lt tbody tr.row') || gq('#app [data-act="editMenu"]'), x:'Im Fenster wählen Sie bei „Rezeptur“ eine vorhandene aus und speichern.', do:{hint:'Tippen Sie auf ein Gericht, wählen Sie eine Rezeptur und speichern Sie.', init:c => { c.n = S.menu.filter(m => m.card && C(m.card)).length; }, done:c => S.menu.filter(m => m.card && C(m.card)).length > c.n}},
+  {t:'Noch keine Rezeptur da?', sel:'.side .nav-i[data-tab="cards"], .bottom .nav-i[data-tab="cards"]', x:'Neue Rezepturen legen Sie unter „Rezepturen“ an. Danach verbinden Sie sie hier mit dem Gericht.'},
+]};
+TOURS.sim = {id:'sim', name:'Preis ausprobieren', steps:[
+  {t:'Der Regler', sel:gPanel('#sim'), x:'Der Regler ändert noch nichts. Er zeigt nur, was bei einem anderen Preis übrig bleibt.', do:{hint:'Schieben Sie den Regler auf einen anderen Preis.', init:c => { c.v = view.sim ? view.sim.price : null; }, done:c => !!view.sim && view.sim.price !== c.v}},
+  {t:'Übernehmen', sel:'#simApply', x:'Gefällt Ihnen der neue Preis? Dann steht er mit einem Tipp auf der Speisekarte.', do:{hint:'Tippen Sie auf „Übernehmen“. Den alten Preis können Sie jederzeit wieder einstellen.', init:c => { c.n = gdActs().sim; }, done:c => gdActs().sim > c.n}},
+]};
+TOURS.backup = {id:'backup', name:'Sicherung', steps:[
+  {t:'Sicherung erstellen', sel:'#app [data-act="export"]', x:'Die Sicherung ist eine Datei mit allen Daten der App. Heben Sie sie gut auf, zum Beispiel auf einem USB-Stick.', do:{ro:1, hint:'Tippen Sie auf „Sicherung erstellen“ und dann auf „Datei speichern“.', init:c => { c.n = gdActs().backup; }, done:c => gdActs().backup > c.n}},
+  {t:'Sicherung laden', sel:'#app [data-act="importPick"]', x:'Neues Gerät oder etwas ging schief? Hier holen Sie die Daten aus der Datei zurück.'},
+]};
+function msState(){
+  const g = gdGame(); const can = canEditAll();
+  return MISSIONS.map((m, i) => { const goal = typeof m.goal === 'function' ? Math.max(1, m.goal()) : m.goal; let n = 0; try { n = Math.max(0, Math.min(goal, +m.n() || 0)); } catch(e){}
+    return {m, i, no:i+1, goal, n, done:!!g.stamps[m.id], date:g.stamps[m.id] || '', ro: !!m.edit && !can, pct:Math.round(n / goal * 100)}; });
+}
+function msLevel(k){ let i = 0; MS_LEVELS.forEach(([n], j) => { if(k >= n) i = j; }); return {i, name:MS_LEVELS[i][1], next:MS_LEVELS[i+1] || null}; }
+function gdStampCheck(){
+  if(!S || !S.game) return false; const g = gdGame(); let ch = false;
+  MISSIONS.forEach(m => { if(g.stamps[m.id]) return; let n = 0, goal = 1; try { n = +m.n() || 0; goal = typeof m.goal === 'function' ? Math.max(1, m.goal()) : m.goal; } catch(e){ return; }
+    if(n >= goal){ g.stamps[m.id] = todayStr(); ch = true; if(g.minit){ g.rq = g.rq || []; g.rq.push(m.id); } } });
+  if(!g.minit){ g.minit = true; ch = true; }
+  return ch;
+}
+function missionGo(id){
+  const m = MISSIONS.find(x => x.id === id); if(!m) return;
+  if(m.edit && !canEditAll()){ toast('Diese Aufgabe ist für Küchenchef oder Inhaber.'); return; }
+  try { m.go(); } catch(e){ console.warn(e); }
+}
+
+/* ---------- Stempel: selbst gezeichnet, leicht schief wie von Hand gedrückt ---------- */
+function stampSvg(m, on, size){
+  const h = [...m.id].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) % 997, 7); const rot = on ? (h % 19) - 9 : 0;
+  if(!on) return `<svg class="stamp-svg" width="${size||72}" height="${size||72}" viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="31" class="e"/><g transform="translate(24 24)" class="ic">${ICO[m.ico] || ICO.check}</g></svg>`;
+  // Rundstempel: Schrift im Ring, Zeichen in der Mitte, leicht schief gedrückt
+  return `<svg class="stamp-svg on" width="${size||72}" height="${size||72}" viewBox="0 0 72 72" aria-hidden="true"><g transform="rotate(${rot} 36 36)" filter="url(#skInk)"><circle cx="36" cy="36" r="33" class="o"/><circle cx="36" cy="36" r="21.500" class="i"/><text class="tx"><textPath href="#skRing" startOffset="0">DAHUAM.202 · GERLOS · ERLEDIGT ·</textPath></text><g transform="translate(25.200 25.200) scale(.9)" class="ic">${ICO[m.ico] || ICO.check}</g></g></svg>`;
+}
+(function(){ if(document.getElementById('skDefs')) return; const d = document.createElement('div'); d.id = 'skDefs'; d.setAttribute('aria-hidden', 'true'); d.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+  d.innerHTML = '<svg width="0" height="0"><defs><path id="skRing" d="M36 36m-25.300 0a25.300 25.300 0 1 1 50.600 0a25.300 25.300 0 1 1 -50.600 0"/></defs><filter id="skInk" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.3" xChannelSelector="R" yChannelSelector="G"/></filter></svg>'; document.body.appendChild(d); })();
+
+/* ---------- Aufbau: Aufgaben oben, Stand des Betriebs darunter ---------- */
+const _renderAufbauGd = renderAufbau;
+renderAufbau = function(){
+  const old = _renderAufbauGd(); const cut = old.indexOf('<div class="au-sum">'); const stationsHtml = cut >= 0 ? old.slice(cut) : '';
+  const ms = msState(); const got = ms.filter(x => x.done).length; const lv = msLevel(got);
+  const next = ms.find(x => !x.done && !x.ro) || null; const open = view.msOpen || {};
+  const row = x => { const m = x.m; const cls = x.done ? 'done' : x.ro ? 'ro' : (next && next.m.id === m.id) ? 'next' : 'open';
+    const info = !x.done && m.info ? m.info() : '';
+    return `<li class="ms-row ${cls}">
+      <span class="ms-st">${x.done ? ico('check') : x.no}</span>
+      <span class="ms-t"><b>${esc(m.t)}</b><small>${esc(info || m.wozu)}</small></span>
+      <span class="ms-p">${x.done ? `<span class="ms-date">Stempel vom ${fmtDate(x.date + 'T12:00:00').slice(0,6)}</span>` : `<span>${num(x.n)} von ${num(x.goal)}</span><span class="au-m"><i style="width:${x.pct}%"></i></span>`}</span>
+      <span class="ms-a">${x.done ? '' : x.ro ? '<span class="ms-ro">für Küchenchef/Inhaber</span>' : `<button type="button" class="btn sm" data-act="missionGo" data-id="${m.id}">${x.n > 0 ? 'Weiter' : 'Starten'}</button>`}</span></li>`; };
+  const tiers = TIERS.map((name, t) => { const list = ms.filter(x => x.m.tier === t); const dn = list.filter(x => x.done).length;
+    const isOpen = open[t] != null ? open[t] : (next ? next.m.tier === t : t === 0);
+    return `<section class="ms-tier ${dn === list.length ? 'all' : ''}"><h2 class="ms-th"><button type="button" data-act="msTier" data-id="${t}" aria-expanded="${isOpen}"><span class="ms-chev" aria-hidden="true"></span>${name}<small>${dn} von ${list.length}</small></button></h2>${isOpen ? `<ol class="ms-list">${list.map(row).join('')}</ol>` : ''}</section>`; }).join('');
+  const nx = next ? `<section class="ms-next" aria-label="Nächste Aufgabe">
+      <div class="ms-next-t"><span class="ms-kick">Als Nächstes</span><h2>${esc(next.m.t)}</h2><p>${esc((next.m.info && next.m.info()) || next.m.wozu)}</p></div>
+      <div class="ms-next-p"><b>${num(next.n)} von ${num(next.goal)}</b><span class="au-m big"><i style="width:${next.pct}%"></i></span></div>
+      <button type="button" class="btn primary ms-go" data-act="missionGo" data-id="${next.m.id}">${next.n > 0 ? 'Weitermachen' : 'Los geht’s'}${ico('arrow','flip')}</button></section>`
+    : got >= ms.length ? `<p class="ms-alldone">${ico('check')}Alle Aufgaben erledigt. Sie sind am Gipfel.</p>` : `<p class="ms-alldone">Die offenen Aufgaben sind für Küchenchef oder Inhaber.</p>`;
+  return `<div class="page-h"><div><h1>Aufbau</h1></div><div class="row-btns"><button type="button" class="btn ms-sk" data-act="goTab" data-id="stempel">Stempelkarte</button></div></div>
+  <div class="ms-lvl"><span class="ms-lvl-n">${esc(lv.name)}</span><span class="ms-lvl-t">${got} von ${ms.length} Stempeln${lv.next ? ` · noch ${lv.next[0] - got} bis ${esc(lv.next[1])}` : ''}</span><span class="ms-pips" aria-hidden="true">${ms.map(x => `<i class="${x.done ? 'on' : ''}"></i>`).join('')}</span></div>
+  ${nx}
+  <div class="ms-tiers">${tiers}</div>
+  <h2 class="sec-h ms-sth">Stand des Betriebs</h2>
+  ${stationsHtml}`;
+};
+
+/* ---------- Stempelkarte ---------- */
+function renderStempel(){
+  const ms = msState(); const got = ms.filter(x => x.done).length; const lv = msLevel(got);
+  const cell = x => `<button type="button" class="stamp ${x.done ? 'on' : ''}" data-act="stampInfo" data-id="${x.m.id}" aria-label="${esc(x.m.t)}: ${x.done ? 'Stempel erhalten' : 'noch offen'}">${stampSvg(x.m, x.done)}<b>${esc(x.m.short)}</b><small>${x.done ? fmtDate(x.date + 'T12:00:00').slice(0,6) : `${num(x.n)} von ${num(x.goal)}`}</small></button>`;
+  return `<button type="button" class="back" data-act="goTab" data-id="aufbau">${ico('arrow')}Aufbau</button>
+  <div class="page-h"><div><h1>Stempelkarte</h1><p class="sub">Für jede erledigte Aufgabe ein Stempel. Tippen Sie auf einen Stempel, um zu sehen, wofür er ist.</p></div></div>
+  <section class="sk-card">
+    <header class="sk-h"><div><span class="sk-brand">DAHUAM.202</span><span class="sk-title">Stempelkarte</span></div><div class="sk-lvl"><b>${esc(lv.name)}</b><span>${got} von ${ms.length}</span></div></header>
+    ${TIERS.map((name, t) => `<div class="sk-tier"><h2>${name}</h2><div class="sk-grid">${ms.filter(x => x.m.tier === t).map(cell).join('')}</div></div>`).join('')}
+    <footer class="sk-f"><span>${MS_LEVELS.map(([n, l], i) => `<span class="${lv.i >= i ? 'on' : ''}">${l}${n ? ` ab ${n}` : ''}</span>`).join('<i aria-hidden="true"></i>')}</span></footer>
+  </section>
+  <p class="hint sk-hint">Stempel gibt es nur für das, was Sie selbst in der App gemacht haben. Die Demodaten zählen nicht.</p>`;
+}
+
+/* ---------- Belohnung: die ruhige Goldkarte, ohne Funken ---------- */
+function gdRewards(){
+  if(!S || !S.game || GD.t || document.querySelector('.reward') || document.querySelector('dialog[open]')) return;
+  const g = gdGame(); if(!g.rq || !g.rq.length) return;
+  const id = g.rq.shift(); _saveGd(); const m = MISSIONS.find(x => x.id === id); if(!m) return;
+  const ms = msState(); const got = ms.filter(x => x.done).length; const lv = msLevel(got); const nx = ms.find(x => !x.done && !x.ro);
+  const up = MS_LEVELS.some(([n]) => n === got && n > 0);
+  const el = document.createElement('div'); el.className = 'reward gd-rw'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Stempel erhalten');
+  el.innerHTML = `<div class="rw-box"><div class="gd-rw-stamp">${stampSvg(m, true, 88)}</div>
+    <div class="eyebrow">Stempel ${got} von ${ms.length}${up ? ` · ${esc(lv.name)} erreicht` : ''}</div><h2>${esc(m.t)}</h2>
+    <p>${nx ? `Als Nächstes: ${esc(nx.m.t)}.` : 'Das war die letzte Aufgabe. Sie sind am Gipfel.'}</p>
+    <div class="row-btns rw-acts">${nx ? `<button type="button" class="btn gold" data-rw="next" data-act="missionGo" data-id="${nx.m.id}">Weiter</button>` : ''}<button type="button" class="btn" data-rw="close" data-act="goTab" data-id="stempel">Stempelkarte</button></div><button type="button" class="rw-x icon-btn" data-rw="close" aria-label="Schließen">${ico('x')}</button></div>`;
+  document.body.appendChild(el); requestAnimationFrame(() => el.classList.add('in'));
+  const live = document.getElementById('toast'); if(live && !live.classList.contains('show')){ /* für Vorleser */ el.setAttribute('aria-live', 'polite'); }
+  const bye = () => { el.classList.remove('in'); setTimeout(() => { el.remove(); gdRewards(); }, 320); };
+  el.addEventListener('click', e => { if(e.target.closest('[data-rw]')) bye(); });
+  el._t = setTimeout(bye, 11000);
+  el.addEventListener('pointerenter', () => clearTimeout(el._t)); el.addEventListener('pointerleave', () => { el._t = setTimeout(bye, 5000); });
+  if(view.tab === 'aufbau' || view.tab === 'stempel') render();
+}
+
+/* ---------- Begriffe ---------- */
+function renderBegriffe(){
+  const list = Object.values(HELP).filter(h => h.g).sort((a,b) => a.t.localeCompare(b.t, 'de'));
+  let last = '', body = '';
+  list.forEach(h => { const L = h.t.replace(/^[^A-Za-zÄÖÜäöü]+/, '')[0].toUpperCase().replace('Ä','A').replace('Ö','O').replace('Ü','U');
+    if(L !== last){ if(last) body += '</div>'; body += `<div class="bg-grp"><div class="bg-l" aria-hidden="true">${L}</div>`; last = L; }
+    body += `<div class="bg-e" id="bg-${h.k}" data-s="${esc((h.t + ' ' + h.x).toLowerCase())}"><dt>${esc(h.t)}</dt><dd>${esc(h.x)}</dd></div>`; });
+  if(last) body += '</div>';
+  return `<div class="page-h"><div><h1>Begriffe<span class="h-n">${list.length}</span></h1><p class="sub">Fachwörter der App, kurz erklärt. Im Hilfe-Modus „Was ist das?“ erklärt die App dieselben Wörter dort, wo sie stehen.</p></div></div>
+  <div class="toolbar"><label class="search bg-search">${ico('search')}<input id="bq" type="search" placeholder="Begriff suchen, zum Beispiel Schwund" value="${esc(view.bq || '')}" autocomplete="off" aria-label="Begriff suchen"></label></div>
+  <dl class="bg-list">${body}</dl><p class="hint bg-none" hidden>Dazu gibt es keinen Begriff. Probieren Sie ein anderes Wort.</p>`;
+}
+function bgFilter(){
+  const q = (view.bq || '').trim().toLowerCase(); let n = 0;
+  document.querySelectorAll('#app .bg-e').forEach(e => { const on = !q || e.dataset.s.includes(q); e.hidden = !on; if(on) n++; });
+  document.querySelectorAll('#app .bg-grp').forEach(g => { g.hidden = !g.querySelector('.bg-e:not([hidden])'); });
+  const none = document.querySelector('#app .bg-none'); if(none) none.hidden = n > 0;
+}
+function bgAfter(){
+  bgFilter();
+  if(view.bgo){ const el = document.getElementById('bg-' + view.bgo); view.bgo = null; if(el) setTimeout(() => { el.scrollIntoView({block:'center'}); el.classList.add('hit'); setTimeout(() => el.classList.remove('hit'), 2600); }, 60); }
+}
+document.addEventListener('input', e => { if(e.target.id === 'bq'){ view.bq = e.target.value; bgFilter(); } });
+
+/* ---------- Einstellungen: Hilfe steht oben ---------- */
+const _renderSetupGd = renderSetup;
+renderSetup = function(){
+  let h = _renderSetupGd();
+  h = h.replace(/<section class="panel"><div class="panel-h"><h2>Aufbau & Hilfe<\/h2>[\s\S]*?<\/section>/, '');
+  const ms = msState(); const got = ms.filter(x => x.done).length; const lv = msLevel(got); const nG = Object.values(HELP).filter(x => x.g).length;
+  const panel = `<section class="panel gd-panel"><div class="panel-h"><h2>Hilfe</h2><span class="muted sm">${esc(lv.name)} · ${got} von ${ms.length} Stempeln</span></div>
+    <ul class="gd-rows">
+      <li><span class="gd-r-t"><b>Rundgang</b><small>Zeigt in zwei Minuten alle Bereiche der App.</small></span><button type="button" class="btn sm" data-act="tourMain">Starten</button></li>
+      <li><span class="gd-r-t"><b>Ansicht</b><small>Einfach zeigt nur das Wichtigste, mit großen Knöpfen und einfachen Wörtern.</small></span><span class="seg gd-keep" role="group" aria-label="Ansicht"><button type="button" class="${isSimple() ? 'on' : ''}" data-act="guideMode" data-id="simple" aria-pressed="${isSimple()}">Einfach</button><button type="button" class="${isSimple() ? '' : 'on'}" data-act="guideMode" data-id="full" aria-pressed="${!isSimple()}">Alles zeigen</button></span></li>
+      <li><span class="gd-r-t"><b>Was ist das?</b><small>Einschalten und auf etwas tippen. Die App erklärt es und ändert dabei nichts.</small></span><button type="button" class="btn sm" data-act="helpMode" aria-pressed="${HELP_ON}">${HELP_ON ? 'Ausschalten' : 'Einschalten'}</button></li>
+      <li><span class="gd-r-t"><b>Begriffe</b><small>${nG} Fachwörter, kurz erklärt.</small></span><button type="button" class="btn sm" data-act="goTab" data-id="begriffe">Öffnen</button></li>
+      <li><span class="gd-r-t"><b>Aufgaben und Stempelkarte</b><small>Kleine Aufgaben führen Sie durch die App.</small></span><span class="row-btns"><button type="button" class="btn sm" data-act="goTab" data-id="aufbau">Aufgaben</button><button type="button" class="btn sm" data-act="goTab" data-id="stempel">Stempelkarte</button></span></li>
+    </ul>
+    <p class="hint"><button type="button" class="link" data-act="gdReset">Stempel zurücksetzen</button></p></section>`;
+  let i = h.indexOf('<div class="setup-grid">'); if(i < 0) i = h.indexOf('<div class="grid2">'); return i >= 0 ? h.slice(0, i) + panel + h.slice(i) : h + panel;
+};
 
 /* ---------- Start ---------- */
 S = migrate(load()) || seed();
