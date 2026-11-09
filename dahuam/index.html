@@ -1753,6 +1753,7 @@ dialog h3{font:500 22px var(--f-display);letter-spacing:.01em}
 }
 @media (max-width:700px){#app[data-view="dash"] .day .tiles{display:grid!important;grid-template-columns:1fr 1fr!important;overflow:visible!important}#app[data-view="dash"] .day .tiles .tile{min-width:0!important}}
 @media (max-width:700px){#app[data-view="dash"] .day .tiles .tile:nth-child(odd){border-left:0!important;box-shadow:none!important}}
+html{scrollbar-gutter:stable}
 .m-only{display:none}@media (max-width:900px){.m-only{display:flex}}
 .dish-main:focus-visible,.rc:focus-visible{outline-offset:-3px}
 .title-in{hyphens:auto;-webkit-hyphens:auto}
@@ -1774,6 +1775,43 @@ dialog h3{font:500 22px var(--f-display);letter-spacing:.01em}
   @page{size:A4;margin:14mm}
 }
 @media (prefers-reduced-motion: reduce){*,*::before{transition:none!important;animation:none!important}}
+#print.pdf{display:block!important;position:absolute;left:-12000px;top:0;width:794px;padding:44px 50px;box-sizing:border-box;background:#fff;color:#000;color-scheme:light;
+  --bg:#f7f5f0; --surface:#ffffff; --surface-2:#f1eee7; --fg:#1c1f21; --muted:#6b6f72; --faint:#9a9c9b; --line:#e5e1d8; --line-strong:#d6d0c4;
+  --side:#1f2326; --side-2:#2a2f33; --side-fg:#e9e6df; --side-muted:#8e9296;
+  --accent:#8a6a36; --accent-2:#e7dcc6; --accent-soft:#f3ecdf; --accent-fg:#ffffff; --gold:#b08d57; --gold-hi:#c9a46a;
+  --good:#2f7a55; --good-bg:#e6f0ea; --warn:#a86b12; --warn-bg:#f6ecd9; --bad:#b23b2e; --bad-bg:#f6e3e0;
+  --s1:#8a6a36; --s2:#b08d57; --s3:#cdb289; --s4:#6b6f72; --s5:#9a9c9b; --s6:#c9c4ba; --s7:#e5e1d8;
+  --shadow:none; --float:0 8px 24px -8px rgba(20,22,24,.22),0 0 0 1px rgba(20,22,24,.06);
+  --f-display:"Barlow Condensed","Figtree",system-ui,sans-serif; --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --f-mono:"Figtree",system-ui,sans-serif;
+  --r:8px; --r-s:6px;
+}
+body.print-menu #print.pdf .hk-paper{box-shadow:none;max-width:none;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body.print-menu #print.pdf .hk-cols{columns:2}
+body.print-menu #print.pdf .hk-index{display:none}
+body.print-menu #print.pdf .hk-paper + .hk-paper{break-before:page}
+body.print-report #print.pdf{font:11px/1.4 var(--f-body);color:#000}
+body.print-report #print.pdf .tiles{display:flex;border:1px solid #ccc}
+body.print-report #print.pdf .row-btns,body.print-report #print.pdf .toolbar,body.print-report #print.pdf .note,body.print-report #print.pdf .warn-box,body.print-report #print.pdf .chips-row{display:none!important}
+body.print-report #print.pdf .panel{border:1px solid #ddd;break-inside:avoid;margin-bottom:10px}
+body.print-report #print.pdf table.lt{min-width:0}
+body.print-report #print.pdf table.lt th{position:static}
+body.print-report #print.pdf .lt-wrap{overflow:visible;border:0}
+body.print-menu #print.pdf .wk-paper{box-shadow:none;max-width:none;padding:0}
+body.print-menu #print.pdf .wk-tabs,body.print-menu #print.pdf .wk-filters{display:none}
+body.print-menu #print.pdf .wk-cols{columns:2}
+body.print-menu #print.pdf .wk-dish{padding:7px 0 8px}
+#print.pdf{display:block;color:#000;background:#fff;font:12px/1.4 var(--f-body)}
+#print.pdf h1{font:700 16px var(--f-body);margin:6px 0 2px}
+#print.pdf table{width:100%;border-collapse:collapse;margin-top:10px}
+#print.pdf th,#print.pdf td{border:1px solid #000;padding:4px 6px;color:#000;background:#fff}
+#print.pdf .r{text-align:right}
+#print.pdf .meta{display:flex;justify-content:space-between;font-size:11px}
+#print.pdf .sign{display:flex;justify-content:space-between;margin-top:30px}
+#print.pdf .pr-ph{max-width:60mm;margin:8px 0}
+#print.pdf .pr-steps img{max-width:50mm;margin:4px 0}
+body.print-menu #print.pdf{font:inherit}
+body.print-menu #print.pdf .g-paper{box-shadow:none;border-radius:0;max-width:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#print.pdf .wk-paper{box-shadow:none;max-width:none;padding:0}#print.pdf .wk-tabs,#print.pdf .wk-filters{display:none}#print.pdf .wk-cols{columns:2}
 </style>
 </head>
 <body>
@@ -3268,7 +3306,7 @@ function renderPlan(){
         <h3>${esc(sp.name)}</h3>${sp.note?`<p class="muted sm">${esc(sp.note)}</p>`:''}
         <ul class="sp-items">${sp.items.map(it=>`<li><span>${esc(it.name)}</span><span class="mono">${eur(it.price)}</span></li>`).join('')}</ul>
         <div class="sp-foot"><span class="tag">${sp.mode==='tageskarte'?'Eigene Tageskarte':'Einleger auf der Karte'} · ${esc((SPECIAL_STYLES.find(x=>x[0]===sp.style)||[,''])[1])}</span>
-          <span class="row-btns"><button type="button" class="icon-btn" data-act="previewSpecial" data-id="${sp.id}" title="Vorschau" aria-label="Vorschau">${ico('eye')}</button><button type="button" class="icon-btn" data-act="dupSpecial" data-id="${sp.id}" title="Für nächstes Jahr kopieren" aria-label="Kopieren">${ico('copy')}</button>${!FRAMED && sp.mode==='tageskarte'?`<button type="button" class="icon-btn" data-act="printSpecial" data-id="${sp.id}" title="Tageskarte drucken" aria-label="Drucken">${ico('print')}</button>`:''}<button type="button" class="icon-btn" data-act="editSpecial" data-id="${sp.id}" title="Bearbeiten" aria-label="Bearbeiten">${ico('edit')}</button></span></div>
+          <span class="row-btns"><button type="button" class="icon-btn" data-act="previewSpecial" data-id="${sp.id}" title="Vorschau" aria-label="Vorschau">${ico('eye')}</button><button type="button" class="icon-btn" data-act="dupSpecial" data-id="${sp.id}" title="Für nächstes Jahr kopieren" aria-label="Kopieren">${ico('copy')}</button>${sp.mode==='tageskarte'?`<button type="button" class="icon-btn" data-act="printSpecial" data-id="${sp.id}" title="Tageskarte drucken" aria-label="Drucken">${ico('print')}</button>`:''}<button type="button" class="icon-btn" data-act="editSpecial" data-id="${sp.id}" title="Bearbeiten" aria-label="Bearbeiten">${ico('edit')}</button></span></div>
       </article>`; }).join('')}</div>`; }).join('') || '<div class="panel empty">Noch keine Aktionen geplant.</div>'}
     </section>
     <section class="panel flush">
@@ -3467,7 +3505,7 @@ renderMenu = function(){
   const live = S.specials.filter(sp => spStatus(sp)[0]==='live').length;
   const head = `<div class="page-h"><div><div class="eyebrow">${S.menu.length} Gerichte · ${secList().length} Kategorien${hidden?` · ${hidden} ausgeblendet`:''}</div><h1>Speisekarte</h1></div>
     <div class="row-btns">${view.mtab==='guest' && !FRAMED ? `<button type="button" class="btn" data-act="printMenu">${ico('print')}Drucken</button>` : ''}${view.mtab==='plan' ? `<button type="button" class="btn primary" data-act="newSpecial">${ico('plus')}Aktion</button>` : `<button type="button" class="btn primary" data-act="newMenu">${ico('plus')}Gericht</button>`}</div></div>
-  <div class="toolbar">${seg('mtab', view.mtab, [['calc','Kalkulation'],['guest','Gästekarte'],['plan','Saison & Aktionen', live?'live':null],['layout','Aufbau & Reihenfolge']])}</div>`;
+  <div class="toolbar">${seg('mtab', view.mtab, [['calc','Kalkulation'],['guest','Gestalten & PDF'],['plan','Saison & Aktionen', live?'live':null],['layout','Aufbau & Reihenfolge']])}</div>`;
   return head + (view.mtab==='guest' ? renderGuest() : view.mtab==='layout' ? renderLayout() : view.mtab==='plan' ? renderPlan() : renderMenuCalc());
 };
 printMenu = function(){ $('#print').innerHTML = guestPrevHtml().replace(/<div class="g-closed">.*?<\/div>/,''); document.body.classList.add('print-menu'); window.print(); };
@@ -4621,7 +4659,7 @@ function dPill(dv, inverse){ if(dv == null || !isFinite(dv)) return '<span class
 function renderReport(){
   const rp = view.rp; const t = view.rp.tab;
   const head = `<div class="page-h"><div><div class="eyebrow">${Object.keys(S.salesDays||{}).length} Verkaufstage gespeichert${S.salesDemo?' · Demodaten':''}</div><h1>Auswertung</h1></div>
-    <div class="row-btns">${t==='sales' ? `<button type="button" class="btn" data-act="rpCsv">${ico('copy')}Tabelle (CSV)</button>${FRAMED?'':`<button type="button" class="btn" data-act="rpPrint">${ico('print')}Bericht drucken / PDF</button>`}` : ''}<button type="button" class="btn primary" data-act="rpTab" data-id="import">${ico('plus')}Kasse importieren</button></div></div>
+    <div class="row-btns">${t==='sales' ? `<button type="button" class="btn" data-act="rpCsv">${ico('copy')}Tabelle (CSV)</button>${false?'':`<button type="button" class="btn" data-act="rpPrint">${ico('print')}Bericht drucken / PDF</button>`}` : ''}<button type="button" class="btn primary" data-act="rpTab" data-id="import">${ico('plus')}Kasse importieren</button></div></div>
   <div class="toolbar">${seg('rpTab', t, [['sales','Verkäufe'],['import','Kasse importieren'],['map','Zuordnung', Object.keys(S.salesUnmapped||{}).length || null]])}</div>`;
   if(t === 'import') return head + importView();
   if(t === 'map') return head + mapView();
@@ -5911,6 +5949,113 @@ document.addEventListener('keydown', e => {
 }, true);
 document.addEventListener('change', e => { const t = e.target; if(t.dataset && t.dataset.sel === 'sec'){ view.sec = t.value; render(); } });
 document.addEventListener('click', e => { if(e.target.closest('tr.row') && e.target.closest('input,select,textarea,label,a')) e.stopPropagation(); }, true);
+
+/* ---------- Speisekarte: Karten-Ansicht mit derselben Werkzeugleiste wie Liste/Kompakt ---------- */
+function menuShownIds(){
+  const q = view.q.trim().toLowerCase(), f = view.sec;
+  return new Set(menuSorted().map(m => ({m, k:menuCalc(m)})).filter(({m,k}) => (!q || (m.name+' '+m.desc+' '+m.section+' '+(k.t?k.t.lines.map(l=>l.name).join(' '):'')).toLowerCase().includes(q))
+    && (f==='all' || (f==='none' ? k.cost==null : f==='over' ? (k.fc!=null && k.fc > S.settings.target) : f==='nophoto' ? !menuImg(m) : f==='noalg' ? !hasAlg(m) : SEASONS.some(x=>x[0]===f) ? m.seasons.includes(f) : m.section===f))).map(x => x.m.id));
+}
+const _rmcPolish = renderMenuCalc;
+renderMenuCalc = function(){
+  if(vmode('menu') !== 'cards') return _rmcPolish();
+  VIEWS.menu = 'list'; const swList = vsw('menu'); let head; try { head = _rmcPolish(); } finally { VIEWS.menu = 'cards'; }
+  head = head.replace(swList, vsw('menu'));
+  const cut = head.indexOf('<div class="lt-wrap');
+  if(cut < 0) return head; // leerer Zustand: identisch zur Liste
+  head = head.slice(0, cut);
+  const ids = menuShownIds(); const q0 = view.q, s0 = view.sec; view.q = ''; view.sec = 'all';
+  let full; try { full = _menuCalcCards(); } finally { view.q = q0; view.sec = s0; }
+  const t = document.createElement('template'); t.innerHTML = full;
+  t.content.querySelectorAll('.toolbar,.chips-row,.chips-wrap').forEach(n => n.remove());
+  t.content.querySelectorAll('article.dish').forEach(a => { const id = a.querySelector('[data-act=editMenu]')?.dataset.id; if(!ids.has(id)) a.remove(); });
+  t.content.querySelectorAll('.dish-grid').forEach(g => { if(!g.querySelector('article')){ const h = g.previousElementSibling; if(h && h.classList.contains('sec-h')) h.remove(); g.remove(); } });
+  const box = document.createElement('div'); box.appendChild(t.content.cloneNode(true));
+  return head + box.innerHTML;
+};
+
+/* =====================================================================
+   PDF-Export: Speisekarte, Tageskarte, Rezeptur, Auswertung als A4-PDF.
+   Funktioniert auch dort, wo window.print() gesperrt ist (eingebettet).
+   ===================================================================== */
+const PDF_LIBS = ['https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'];
+let PDF_NAME = null;
+function loadScript(src){ return new Promise((ok, no) => { if([...document.scripts].some(s => s.src === src)) return ok(); const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => no(new Error('Bibliothek konnte nicht geladen werden')); document.head.appendChild(s); }); }
+async function pdfLibs(){ for(const s of PDF_LIBS) await loadScript(s); if(!window.html2canvas || !window.jspdf) throw new Error('PDF-Bibliothek fehlt'); }
+async function saveFile(filename, data){
+  try { const dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null;
+    if(dl){ try { await dl.save({filename, data}); return true; } catch(e){ if(e && e.code === 'declined') return false; if(e && !['unavailable','not_granted','capability_disabled','capability_removed'].includes(e.code)) { toast('Speichern nicht möglich: ' + (e.message || e.code)); return false; } } }
+  } catch(e){}
+  const url = URL.createObjectURL(data instanceof Blob ? data : new Blob([data])); const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000); return true;
+}
+function pdfFileName(base){ return (base || 'DAHUAM202').replace(/[\\/:*?"<>|]+/g, '').replace(/\s+/g, '-').slice(0, 80) + '.pdf'; }
+
+async function exportPdf(filename){
+  const el = $('#print'); if(!el || !el.innerHTML.trim()){ toast('Nichts zum Exportieren'); return; }
+  toast('PDF wird erstellt …');
+  try {
+    await pdfLibs();
+    el.classList.add('pdf'); if(document.fonts && document.fonts.ready) await document.fonts.ready;
+    await Promise.all([...el.querySelectorAll('img')].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; })));
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const W = el.offsetWidth, scale = 2;
+    let blocks = [], cuts = [];
+    // saubere Seitenumbrüche: nie mitten durch ein Gericht, eine Zeile oder einen Absatz
+    const top = el.getBoundingClientRect().top; const H0 = el.scrollHeight;
+    blocks = [...el.querySelectorAll('.wk-dish,.wk-item,.hk-item,.g-item,tr,li,p,h1,h2,h3,h4,figure,img,.pr-steps > *,.wk-legend,.wk-foot')].map(n => { const r = n.getBoundingClientRect(); return [Math.floor(r.top - top), Math.ceil(r.bottom - top)]; }).filter(([t,b]) => b > t);
+    // Überschriften nie allein am Seitenende
+    el.querySelectorAll('.wk-h,.wk-sp-h,.hk-sec-h,#print > h1,#print > h2,.pr-steps-h').forEach(n => { const r = n.getBoundingClientRect(); blocks.push([Math.floor(r.top - top), Math.ceil(r.bottom - top) + 90]); });
+    cuts = [...new Set(blocks.flatMap(([t,b]) => [t - 1, b + 1]))].filter(c => c > 0 && !blocks.some(([t,b]) => t < c && c < b)).sort((a,b) => a-b);
+    const canvas = await window.html2canvas(el, {scale, backgroundColor:'#ffffff', useCORS:true, logging:false, width:W, windowWidth:document.documentElement.clientWidth, windowHeight:window.innerHeight, scrollX:0, scrollY:-window.scrollY, onclone: doc => {
+      // html2canvas-Fehler bei Versalien mit „ß“ u. ä. vermeiden: Großschreibung vorab ausführen
+      const root = doc.getElementById('print'); if(!root) return; const win = doc.defaultView;
+      root.querySelectorAll('*').forEach(n => { const tt = win.getComputedStyle(n).textTransform; if(tt && tt !== 'none'){ n.childNodes.forEach(t => { if(t.nodeType === 3) t.nodeValue = tt === 'uppercase' ? t.nodeValue.toUpperCase() : tt === 'lowercase' ? t.nodeValue.toLowerCase() : t.nodeValue; }); n.style.textTransform = 'none'; } });
+    }});
+    const H2 = Math.floor(canvas.height / scale); const k = H2 / H0; cuts = cuts.map(c => Math.round(c * k));
+    const {jsPDF} = window.jspdf; const pdf = new jsPDF({unit:'pt', format:'a4', compress:true});
+    const pw = pdf.internal.pageSize.getWidth(), ph = pdf.internal.pageSize.getHeight();
+    const M = 26; // Seitenrand oben/unten in pt
+    const pagePx = Math.floor(W * (ph - 2*M) / pw);
+    let y = 0, page = 0;
+    while(y < H2 - 2){
+      if(page && H2 - y < 40) break; // nur noch Rahmenlinie übrig
+      let end = Math.min(H2, y + pagePx);
+      if(end < H2){ const c = cuts.filter(v => v > y + pagePx * .5 && v <= end).pop(); if(c) end = c; }
+      const h = end - y; const part = document.createElement('canvas'); part.width = canvas.width; part.height = Math.round(h * scale);
+      const g = part.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, part.width, part.height); g.drawImage(canvas, 0, Math.round(y * scale), canvas.width, part.height, 0, 0, canvas.width, part.height);
+      if(page++) pdf.addPage();
+      pdf.addImage(part.toDataURL('image/jpeg', .92), 'JPEG', 0, M, pw, h * pw / W);
+      y = end;
+    }
+    const ok = await saveFile(filename, pdf.output('blob'));
+    if(ok) toast(`PDF erstellt: ${filename} (${page} ${page===1?'Seite':'Seiten'})`);
+  } catch(e){ toast('PDF fehlgeschlagen: ' + (e.message || e)); }
+  finally { el.classList.remove('pdf'); }
+}
+
+/* window.print(): eingebettet (wo Drucken gesperrt ist) oder bei PDF-Knopf → PDF */
+const _nativePrint = window.print ? window.print.bind(window) : null;
+window.print = function(){ if(PDF_NAME || FRAMED || !_nativePrint){ const n = PDF_NAME || pdfFileName('DAHUAM202'); PDF_NAME = null; exportPdf(n); } else _nativePrint(); };
+
+function pdfBtn(act, id, label){ return `<button type="button" class="btn" data-pdf="${act}" ${id?`data-id="${esc(id)}"`:''}>${ico('download')}${label||'PDF'}</button>`; }
+ICO.download = ICO.download || '<path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/>';
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-pdf]'); if(!b) return; e.preventDefault(); e.stopPropagation();
+  const a = b.dataset.pdf, id = b.dataset.id;
+  if(a === 'printMenu'){ const k = typeof curSeasonKey === 'function' ? curSeasonKey() : ''; PDF_NAME = pdfFileName(`Speisekarte-${S.settings.name.split(' ')[0]}-${k ? seasonName(k) : ''}-${view.gdate || todayStr()}`); printMenu(); }
+  if(a === 'printCard'){ const c = C(id); PDF_NAME = pdfFileName('Rezeptur-' + (c ? c.name : id)); printCard(id); }
+  if(a === 'printSpecial'){ const sp = S.specials.find(x => x.id === id); PDF_NAME = pdfFileName('Tageskarte-' + (sp ? sp.name : '')); $('#print').innerHTML = tageskarteHtml(sp); document.body.classList.add('print-menu'); window.print(); }
+}, true);
+
+/* Knöpfe einblenden */
+const _renderMenuPdf = renderMenu;
+renderMenu = function(){ let h = _renderMenuPdf();
+  if(view.mtab === 'guest'){ const btns = pdfBtn('printMenu', '', 'Als PDF speichern') + (FRAMED ? '' : `<button type="button" class="btn" data-act="printMenu">${ico('print')}Drucken</button>`);
+    h = h.replace(/<button type="button" class="btn" data-act="printMenu">[\s\S]*?<\/button>/, '');
+    h = h.replace('<div class="row-btns">', '<div class="row-btns">' + btns); }
+  return h; };
+const _renderCardPdf = renderCard;
+renderCard = function(c){ let h = _renderCardPdf(c); if(!/data-pdf="printCard"/.test(h)){ const m = h.match(/<button[^>]*data-act="printCard"[^>]*>[\s\S]*?<\/button>/); const b = `<button type="button" class="icon-btn lg" data-pdf="printCard" data-id="${c.id}" title="Rezeptur als PDF speichern" aria-label="Rezeptur als PDF speichern">${ico('download')}</button>`; h = m ? h.replace(m[0], (FRAMED ? '' : m[0]) + b) : h.replace(/<button type="button" class="icon-btn lg" data-act="dupCard"/, b + '<button type="button" class="icon-btn lg" data-act="dupCard"'); } return h; };
 
 /* ---------- Start ---------- */
 S = migrate(load()) || seed();
