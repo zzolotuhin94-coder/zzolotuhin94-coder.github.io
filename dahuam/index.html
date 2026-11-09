@@ -1297,6 +1297,17 @@ table.lt tfoot td{font-weight:700;height:44px;border-top:1px solid var(--line-st
   body.print-menu #print .wk-cols{columns:2}
   body.print-menu #print .wk-dish{padding:7px 0 8px}
 }
+.pfix{display:grid;gap:8px;margin-top:10px;max-height:52vh;overflow:auto}
+.pfix-r{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+.pfix-r span:first-child{display:flex;flex-direction:column;min-width:0}
+.pfix-r input{width:90px;text-align:right}
+.pl-list{list-style:none;margin:8px 0 0;padding:0;max-height:40vh;overflow:auto}
+.pl-list li{display:grid;grid-template-columns:1fr auto minmax(120px,190px);gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
+.pl-list li span{display:flex;flex-direction:column;min-width:0}
+.sm-sel{font-size:12.5px;padding:4px 6px;max-width:100%}
+.bad-t{color:var(--bad)}
+.dlg-p{margin:0 0 10px;color:var(--muted);font-size:13.5px}
+@media (max-width:600px){.pl-list li{grid-template-columns:1fr auto}.pl-list li select{grid-column:1/-1}}
 .m-only{display:none}@media (max-width:900px){.m-only{display:flex}}
 .dish-main:focus-visible,.rc:focus-visible{outline-offset:-3px}
 .title-in{hyphens:auto;-webkit-hyphens:auto}
@@ -1688,6 +1699,7 @@ function seed(){
   einkaufSeed(d);
   menuV2Migrate(d);
   salesEnsure(d); if(d.demo && !d.salesDemoDone) salesDemo(d);
+  pricesMigrate(d);
   return d;
 }
 
@@ -1710,6 +1722,7 @@ function migrate(d){
   einkaufMigrate(d);
   menuV2Migrate(d);
   salesEnsure(d); if(d.demo && !d.salesDemoDone) salesDemo(d);
+  pricesMigrate(d);
   return d;
 }
 
@@ -2366,7 +2379,7 @@ function prodDialog(p){
     </div>
     <div class="f">Allergene</div>
     <div class="algs">${Object.entries(ALG).map(([k,v])=>`<label class="algc"><input type="checkbox" name="alg" value="${k}" ${has.has(k)?'checked':''}><span><b>${k}</b>${esc(v)}</span></label>`).join('')}</div>`,
-    fd => { Object.assign(p, {name:fd.get('name').trim(), unit:fd.get('unit'), price:+fd.get('price'), pieceG:fd.get('pieceG'), lossCold:+fd.get('lossCold')||0, lossHot:+fd.get('lossHot')||0, alg:fd.getAll('alg').join(' '), loc:fd.get('loc'), supplier:fd.get('supplier'), artNo:fd.get('artNo').trim(), pack:fd.get('pack').trim(), packQty:+fd.get('packQty')||0, minStock:+fd.get('minStock')||0});
+    fd => { if(+fd.get('price') !== +p.price) markPrice(p, 'manuell'); Object.assign(p, {name:fd.get('name').trim(), unit:fd.get('unit'), price:+fd.get('price'), pieceG:fd.get('pieceG'), lossCold:+fd.get('lossCold')||0, lossHot:+fd.get('lossHot')||0, alg:fd.getAll('alg').join(' '), loc:fd.get('loc'), supplier:fd.get('supplier'), artNo:fd.get('artNo').trim(), pack:fd.get('pack').trim(), packQty:+fd.get('packQty')||0, minStock:+fd.get('minStock')||0});
       if(isNew){ p.stock = 0; S.products.push(p); const s = +fd.get('stock')||0; if(s) addMove('in', p.id, s, 'Anfangsbestand'); } },
     {del: isNew ? null : () => { const u = usage('p:'+p.id); if(u.length) return info('Produkt wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(c=>c.name).join(', ')}. Entfernen Sie es dort zuerst.`); ask(`Produkt „${p.name}“ löschen?`, () => { S.products = S.products.filter(x=>x!==p); }); }});
 }
@@ -3167,7 +3180,7 @@ function mailHref(o){ const sp = SUP(o.supplier); return `mailto:${encodeURIComp
 function waHref(o){ const sp = SUP(o.supplier); return `https://wa.me/${String(sp.whatsapp||sp.phone).replace(/\D/g,'').replace(/^00/,'')}?text=${encodeURIComponent(orderText(o))}`; }
 function receiveIn(p, units, unitPrice, note, date){
   const old = p.price; if(unitPrice && Math.abs(unitPrice - p.price) > 0.0001){ const s0 = Math.max(0, +p.stock||0); p.price = Math.round((s0*p.price + units*unitPrice)/(s0+units)*100)/100; }
-  addMove('in', p.id, units, note, unitPrice || p.price, date); if(old !== p.price) S.moves[0].prevPrice = old;
+  addMove('in', p.id, units, note, unitPrice || p.price, date); if(unitPrice) markPrice(p, 'Wareneingang'); if(old !== p.price) S.moves[0].prevPrice = old;
 }
 
 /* ---------- Ansicht: Bestellungen-Cockpit ---------- */
@@ -4517,6 +4530,105 @@ document.addEventListener('click', e => {
   if(el.dataset.act === 'wkFilter'){ const f = view.wk.filters; const i = f.indexOf(id); if(i >= 0) f.splice(i,1); else { f.push(id); if(id==='vg'){ const j = f.indexOf('v'); if(j>=0) f.splice(j,1); } if(id==='v'){ const j = f.indexOf('vg'); if(j>=0) f.splice(j,1); } } refreshGuest(); }
   if(el.dataset.act === 'gStyle'){ S.settings.guestStyle = id; save(); render(); }
 });
+
+/* =====================================================================
+   Echte Einkaufspreise: Richtwerte markieren, Preisliste importieren
+   ===================================================================== */
+function pricesMigrate(d){ (d.products||[]).forEach(p => { if(p.priceDemo === undefined) p.priceDemo = !!d.demo; }); return d; }
+function markPrice(p, src){ p.priceDemo = false; p.priceDate = todayStr(); p.priceSrc = src; }
+function demoPriceLines(c, d=0, acc=new Set()){ if(!c || d > 6) return acc; c.items.forEach(it => { const r = refObj(it.ref); if(!r) return; if(r.t === 'p'){ if(r.o.priceDemo && !r.o.noStock && +r.o.price) acc.add(r.o.id); } else demoPriceLines(r.o, d+1, acc); }); return acc; }
+
+renderProducts = function(){
+  const q = view.pq.trim().toLowerCase(); const f = view.pf || 'all';
+  const all = S.products.filter(p => !p.noStock);
+  const nDemo = all.filter(p=>p.priceDemo).length;
+  const list = all.filter(p => (!q || (p.name+' '+supName(p)+' '+(p.artNo||'')).toLowerCase().includes(q)) && (f==='all' || (f==='demo' ? p.priceDemo : !p.priceDemo))).sort(byName);
+  const chip = (k,l,n) => `<button type="button" class="chip ${f===k?'on':''}" data-act="pFilter" data-id="${k}">${l}<small>${n}</small></button>`;
+  return `<div class="page-h"><div><div class="eyebrow">${all.length} Produkte · Preise je Einheit exkl. MwSt.</div><h1>Produkte & Einkaufspreise</h1></div>
+    <div class="row-btns"><button type="button" class="btn" data-act="plImport">${ico('copy')}Preisliste importieren</button><button type="button" class="btn primary" data-act="newProd">${ico('plus')}Produkt</button></div></div>
+  ${nDemo ? `<div class="warn-box" style="margin-bottom:14px">${ico('spark')}<span><b>${nDemo} von ${all.length} Preisen sind noch Richtwerte</b>, die als Beispiel eingetragen wurden. Der Wareneinsatz stimmt erst mit Ihren echten Einkaufspreisen: direkt in der Liste eintippen, eine Preisliste des Lieferanten importieren oder beim Wareneingang übernehmen.</span><button type="button" class="btn sm" data-act="pFilter" data-id="demo">Richtwerte zeigen</button></div>` : `<div class="ok-box" style="margin-bottom:14px">Alle Einkaufspreise sind bestätigt.</div>`}
+  <div class="toolbar"><label class="search">${ico('search')}<input id="pq" type="search" placeholder="Produkt, Lieferant oder Artikelnummer" value="${esc(view.pq)}" autocomplete="off"></label>${chip('all','Alle',all.length)}${chip('demo','Richtwerte',nDemo)}${chip('ok','Bestätigt',all.length-nDemo)}</div>
+  <div class="lt-wrap"><table class="lt"><thead><tr><th>Produkt</th><th class="hide-m">Lieferant</th><th class="r">Preis €</th><th>Stand</th><th class="r hide-m">Putzverlust</th><th class="r hide-m">Garverlust</th><th class="hide-m">Allergene</th><th class="r hide-m">Rezepturen</th><th></th></tr></thead><tbody>
+  ${list.map(p => { const u = usage('p:'+p.id).length; return `<tr>
+    <td><div class="lt-n"><span><b>${esc(p.name)}</b><small>${p.unit==='Stk'&&p.pieceG?`je Stk · ${num(p.pieceG)} g`:`je ${esc(p.unit)}`}${p.artNo?' · Nr. '+esc(p.artNo):''}${p.pack?' · '+esc(p.pack):''}</small></span></div></td>
+    <td class="hide-m lt-muted">${esc(supName(p))}</td>
+    <td class="r"><input class="lt-price" id="pp-${p.id}" type="number" step="0.01" min="0" inputmode="decimal" data-pp="${p.id}" data-pf="price" value="${(+p.price).toFixed(2)}" aria-label="Preis ${esc(p.name)}"></td>
+    <td>${p.priceDemo ? '<span class="lt-st"><span class="bad">Richtwert</span></span>' : `<span class="lt-muted sm">${p.priceDate?fmtDate(p.priceDate+'T12:00:00'):'bestätigt'}${p.priceSrc?' · '+esc(p.priceSrc):''}</span>`}</td>
+    <td class="r hide-m">${num(+p.lossCold||0,1)} %</td><td class="r hide-m">${num(+p.lossHot||0,1)} %</td>
+    <td class="hide-m">${chips(new Set(algList(p.alg)))}</td><td class="r hide-m">${u}</td>
+    <td><div class="lt-acts">${p.priceDemo?`<button type="button" class="btn sm" data-act="pConfirm" data-id="${p.id}" title="Preis stimmt">Stimmt</button>`:''}<button type="button" class="icon-btn" data-act="editProd" data-id="${p.id}" aria-label="Bearbeiten">${ico('edit')}</button></div></td></tr>`; }).join('') || '<tr><td colspan="9" class="lt-muted">Nichts gefunden.</td></tr>'}
+  </tbody></table></div>
+  <p class="hint">Preis eintippen und Enter: Der Preis gilt als bestätigt, alle Rezepturen und der Wareneinsatz der Speisekarte rechnen sofort neu.</p>`;
+};
+
+/* Hinweis in der Rezeptur */
+const _renderCardP = renderCard;
+renderCard = function(c){
+  const h = _renderCardP(c); const ids = [...demoPriceLines(c)]; if(!ids.length) return h;
+  const names = ids.map(id => P(id)?.name).filter(Boolean);
+  const box = `<div class="warn-box" style="margin:-6px 0 18px">${ico('spark')}<span><b>Wareneinsatz geschätzt:</b> ${names.length} ${names.length===1?'Zutat hat':'Zutaten haben'} noch einen Richtwert-Preis (${esc(names.slice(0,6).join(', '))}${names.length>6?' …':''}). Mit Ihren Einkaufspreisen wird die Zahl genau.</span><button type="button" class="btn sm" data-act="pFix" data-id="${ids.join(',')}">Preise eintragen</button></div>`;
+  return h.replace('<div class="grid2">', box + '<div class="grid2">');
+};
+function priceFixDialog(ids){
+  const ps = ids.map(P).filter(Boolean);
+  openDialog('Einkaufspreise eintragen', `<p class="dlg-p">Preis je Einheit ohne MwSt., wie auf Rechnung oder Preisliste. Leer lassen, wenn unbekannt.</p>
+    <div class="pfix">${ps.map(p=>`<label class="pfix-r"><span><b>${esc(p.name)}</b><small class="muted">${esc(supName(p))} · Richtwert ${eur(p.price)} je ${esc(p.unit)}</small></span><span class="qty"><input name="p_${p.id}" type="number" step="0.01" min="0" inputmode="decimal" placeholder="${(+p.price).toFixed(2)}"><em>€/${esc(p.unit)}</em></span></label>`).join('')}</div>`,
+    fd => { let n = 0; ps.forEach(p => { const v = fd.get('p_'+p.id); if(v !== '' && v != null){ p.price = Math.max(0, +v); markPrice(p, 'manuell'); n++; } }); priceFixDialog.n = n; },
+    {ok:'Übernehmen', done:()=>`${priceFixDialog.n} Preise übernommen, Wareneinsatz neu berechnet`});
+}
+
+/* Preisliste importieren */
+function plMatch(name, art){
+  if(art){ const p = S.products.find(x => x.artNo && String(x.artNo).trim() === String(art).trim()); if(p) return p; }
+  const base = x => normName(String(x).split('(')[0]);
+  const n = base(name); if(!n) return null; let best = null, bs = 0;
+  for(const p of S.products){ const pn = base(p.name); if(!pn) continue; let sc = 0;
+    if(pn === n || normName(p.name) === normName(name)) sc = 1;
+    else { const a = n.split(' ').filter(x=>x.length>2), b = new Set(pn.split(' ').filter(x=>x.length>2)); const hit = a.filter(x=>b.has(x)).length; sc = hit / Math.max(a.length, b.size, 1);
+      if(Math.min(n.length, pn.length) >= 4 && (pn.startsWith(n) || n.startsWith(pn))) sc = Math.max(sc, .75); }
+    if(sc > bs){ bs = sc; best = p; } }
+  return bs >= .6 ? best : null;
+}
+function plAnalyse(text){
+  const rows = csvParse(text); if(rows.length < 2) throw new Error('Die Liste enthält keine Datenzeilen.');
+  const head = rows[0].map(h=>h.trim()); const idx = re => head.findIndex(h => re.test(h));
+  const ci = {name: idx(/^(artikel|bezeichnung|produkt|name|artikelbezeichnung|beschreibung)$/i), art: idx(/^(art(ikel)?\.?\s*-?\s*(nr|nummer)\.?|sku|plu|code)$/i), price: idx(/^(preis|ek|ek-preis|einkaufspreis|netto|preis netto|nettopreis|price|preis\/einheit)$/i), unit: idx(/^(einheit|me|unit|vk-einheit)$/i), pack: idx(/^(gebinde|ve|verpackung|packung|inhalt)$/i)};
+  if(ci.name < 0 || ci.price < 0) throw new Error('Spalten „Artikel“ und „Preis“ nicht gefunden. Erwartet z. B. „Artikelnr; Artikel; Einheit; Preis“.');
+  const lines = rows.slice(1).map(r => { const name = (r[ci.name]||'').trim(), art = ci.art>=0 ? (r[ci.art]||'').trim() : '', price = numDE(r[ci.price]); const p = plMatch(name, art); return {name, art, price, unit: ci.unit>=0 ? (r[ci.unit]||'').trim() : '', pack: ci.pack>=0 ? (r[ci.pack]||'').trim() : '', pid: p ? p.id : '', old: p ? +p.price : null}; }).filter(l => l.name && l.price > 0);
+  return {lines};
+}
+function plDialog(){
+  const sups = (S.suppliers||[]);
+  openDialog('Preisliste importieren', `<p class="dlg-p">CSV oder Excel-Liste des Lieferanten (oder aus der Rechnung abgetippt) mit Spalten <b>Artikel</b>, <b>Preis</b> netto und optional Artikelnr, Einheit, Gebinde. Erkannte Produkte werden aktualisiert, die Liste prüfen Sie vorher.</p>
+    <label class="f">Lieferant<select name="sup"><option value="">— beliebig —</option>${sups.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select></label>
+    <div class="row-btns"><button type="button" class="btn sm" id="plFileBtn">Datei wählen</button><button type="button" class="btn sm" id="plSample">Beispiel</button><input id="plFile" type="file" accept=".csv,.txt,.xlsx,.xls" hidden></div>
+    <textarea id="plText" class="code" rows="6" placeholder="Artikelnr;Artikel;Einheit;Preis"></textarea>
+    <div class="row-btns"><button type="button" class="btn sm" id="plCheck">Prüfen</button></div>
+    <div id="plOut"></div>`,
+    fd => { const res = plDialog.res; if(!res) { toast('Bitte zuerst „Prüfen“'); return false; } let n = 0, add = 0; const sid = fd.get('sup');
+      res.lines.forEach((l, i) => { const sel = fd.get('m_'+i); if(sel === 'skip' || sel == null) return;
+        if(sel === 'new'){ const unit = /^(stk|stück|st)$/i.test(l.unit) ? 'Stk' : /^(l|liter)$/i.test(l.unit) ? 'l' : 'kg'; const p = {id:uid('p'), name:l.name, unit, price:l.price, lossCold:0, lossHot:0, alg:'', pieceG:'', stock:0, minStock:0, loc:'L', supplier:sid||'', artNo:l.art, pack:l.pack, packQty:0}; markPrice(p, 'Preisliste'); S.products.push(p); add++; return; }
+        const p = P(sel); if(!p) return; p.price = l.price; if(l.art) p.artNo = l.art; if(sid && !p.supplier) p.supplier = sid; markPrice(p, 'Preisliste'); n++; });
+      plDialog.msg = `${n} Preise aktualisiert${add?`, ${add} Produkte neu angelegt`:''}`; plDialog.res = null; },
+    {ok:'Preise übernehmen', done:()=>plDialog.msg, after: f => {
+      plDialog.res = null;
+      const show = () => { const res = plDialog.res; const opts = sel => `<option value="skip">nicht übernehmen</option><option value="new">als neues Produkt</option>${[...S.products].sort(byName).map(p=>`<option value="${p.id}" ${sel===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}`;
+        $('#plOut').innerHTML = `<p class="hint">${res.lines.filter(l=>l.pid).length} von ${res.lines.length} Artikeln erkannt.</p><ul class="pl-list">${res.lines.map((l,i)=>`<li><span><b>${esc(l.name)}</b><small class="muted">${l.art?'Nr. '+esc(l.art)+' · ':''}${esc(l.unit||'')} ${l.old!=null?`· bisher ${eur(l.old)}`:''}</small></span><b class="mono">${eur(l.price)}</b><select name="m_${i}" class="sm-sel">${opts(l.pid || 'skip')}</select></li>`).join('')}</ul>`; };
+      const run = () => { try { plDialog.res = plAnalyse($('#plText').value); show(); } catch(x){ $('#plOut').innerHTML = `<p class="hint bad-t">${esc(x.message)}</p>`; } };
+      $('#plCheck').onclick = run;
+      $('#plSample').onclick = () => { const ex = [['romaine',3.95],['parmesan',19.8],['quail',0.29],['capers',12.4],['bread',3.1]].map(([id,pr]) => { const p = P(id); return p ? `${p.artNo||''};${p.name};${p.unit};${String(pr).replace('.',',')}` : ''; }).filter(Boolean); $('#plText').value = ['Artikelnr;Artikel;Einheit;Preis', ...ex, 'NEU-901;Sardellenfilets;kg;24,00'].join('\n'); run(); };
+      $('#plFileBtn').onclick = () => $('#plFile').click();
+      $('#plFile').onchange = async e => { const file = e.target.files[0]; if(!file) return; try { $('#plText').value = await readFileAsCsv(file); run(); } catch(x){ $('#plOut').innerHTML = `<p class="hint bad-t">${esc(x.message)}</p>`; } };
+    }});
+}
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if(!el) return; const id = el.dataset.id;
+  if(el.dataset.act === 'pFilter'){ view.pf = id; if(view.tab !== 'products') go('products'); else render(); }
+  if(el.dataset.act === 'pConfirm'){ const p = P(id); markPrice(p, 'bestätigt'); save(); render(); toast(`${p.name}: ${eur(p.price)} bestätigt`); }
+  if(el.dataset.act === 'pFix') priceFixDialog(id.split(','));
+  if(el.dataset.act === 'plImport') plDialog();
+});
+document.addEventListener('change', e => { const t = e.target; if(t.dataset && t.dataset.pp && t.dataset.pf === 'price'){ const p = P(t.dataset.pp); if(p && +t.value !== +p.price) markPrice(p, 'manuell'); } }, true);
 
 /* ---------- Start ---------- */
 S = migrate(load()) || seed();
