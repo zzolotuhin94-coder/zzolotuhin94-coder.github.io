@@ -1,0 +1,40 @@
+{
+ "matched": [],
+ "unmatched": [
+  {
+   "file": "unmatched/gaststube.webp",
+   "source": "dahuam202.at",
+   "sourceUrl": "https://www.dahuam202.at/assets/images/e/Dahuam202_Restaurant_Gerlos-1625c5cd.jpg",
+   "description": "Gaststube / Innenraum mit Holzdecke, bordeauxroten Sitzbänken (Ambiente)",
+   "sizeKB": 132
+  },
+  {
+   "file": "unmatched/aussen-winter.webp",
+   "source": "dahuam202.at",
+   "sourceUrl": "https://www.dahuam202.at/files/dahuam202/inhaltsbilder-1400x933px/Dahuam202_aussen.jpg",
+   "description": "Aussenansicht des Hauses im Winter (Ambiente)",
+   "sizeKB": 131
+  },
+  {
+   "file": "unmatched/bar-flaschen.webp",
+   "source": "dahuam202.at",
+   "sourceUrl": "https://www.dahuam202.at/assets/images/1/alcoholic-beverages-1845295_1920-85e618a7.jpg",
+   "description": "Bar mit Flaschenregal. ACHTUNG: Dateiname deutet auf Pixabay-Stockfoto (ID 1845295), evtl. nicht eigenes Foto",
+   "sizeKB": 96
+  },
+  {
+   "file": "unmatched/fonduegondel.webp",
+   "source": "dahuam202.at",
+   "sourceUrl": "https://www.dahuam202.at/files/dahuam202/video/fonduegondel.jpg",
+   "description": "Fonduegondel: Anstossen mit Rotwein, Fleischplatte mit Wurst/Fleisch (Zillertaler Käsefondue / Fleischfondue-Ambiente)",
+   "sizeKB": 40
+  },
+  {
+   "file": "unmatched/silvesterabend-fondue.webp",
+   "source": "dahuam202.at",
+   "sourceUrl": "https://www.dahuam202.at/files/dahuam202/video/silvesterabend.jpg",
+   "description": "Tisch mit Käsefondue-Caquelon, Brot/Beilagen, Vorspeisenplatten (evtl. fuer Zillertaler Käsefondue m_9181yya, aber Silvester-Szene mit Personen)",
+   "sizeKB": 33
+  }
+ ]
+}
