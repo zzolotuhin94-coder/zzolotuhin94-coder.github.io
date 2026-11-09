@@ -1494,6 +1494,265 @@ body.dragging,body.dragging *{cursor:grabbing!important;user-select:none;-webkit
 .lab-acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center} .lab-acts .sp{flex:1}
 @media (max-width:900px){.lab{grid-template-columns:minmax(0,1fr)}.lab-form{position:static}}
 @media (max-width:520px){.lab-items{grid-template-columns:minmax(0,1fr)}.lab-acts .btn.primary{width:100%;justify-content:center}}
+/* ===================== Feinschliff: ruhig, handgemacht, ein Maßstab ===================== */
+/* Maßstab: Abstände 4/8/12/16/24/32, Radien 6 (Bedienelemente) und 8 (Flächen), Höhe 36 für Felder und Knöpfe */
+:root{--r:8px;--r-s:6px;--ctl:36px}
+
+/* Kopf: Titel, Anzahl, ein Satz Kontext */
+.page-h{margin-bottom:20px;gap:12px 16px;align-items:flex-start}
+.page-h > div:first-child{min-width:0}
+.page-h h1{font:500 32px/1.1 var(--f-display);letter-spacing:.005em;gap:10px;align-items:baseline}
+.h-n{font:400 20px/1 var(--f-display);color:var(--faint);letter-spacing:.01em}
+.page-h .sub{margin:6px 0 0;font-size:13.5px;line-height:1.45;color:var(--muted);max-width:72ch;text-wrap:pretty}
+.page-h .row-btns{padding-top:2px}
+.page-h .btn:not(.primary) .ico{display:none}
+.wozu-q{width:22px;height:22px;align-self:center;color:var(--faint)} .wozu-q .ico{width:16px;height:16px} .wozu-q:hover{color:var(--fg)} .wozu-q.on{color:var(--faint)}
+.wozu,.au-strip,.note{display:none!important}
+.eyebrow{text-transform:none;letter-spacing:0;font-weight:500;font-size:12.5px}
+
+/* Großbuchstaben nur in Tabellenköpfen */
+.nav-group,table.lt tr.grp td,.pk-g,.pc-ex small,.au-lvl,.pg,.rp-flop-h,.tl-months,.ost,.sp-st,.cloud-chip,.au-now,.au-ok,.rp-matrix .ql,.g-stand{text-transform:none;letter-spacing:0}
+.nav-group{font-size:11px;font-weight:500;padding:14px 12px 4px;opacity:.75}
+table.lt tr.grp td{font:600 13px var(--f-body);color:var(--fg);background:var(--bg)}
+table.lt tr.grp td small{color:var(--faint);font-weight:500;margin-left:8px}
+.pk-g,.rp-flop-h,.pc-ex small{font-size:12px;font-weight:600;color:var(--muted)}
+.sec-h{font-size:18px;margin:24px 0 10px}
+
+/* Bedienelemente: eine Höhe, zwei Radien */
+.btn{min-height:var(--ctl);padding:0 14px;border-radius:var(--r-s);font-size:13.5px;gap:7px}
+.btn.sm{min-height:30px;padding:0 10px;font-size:12.5px;border-radius:var(--r-s)}
+.btn.primary:hover{opacity:.92}
+input:not([type=range]):not([type=checkbox]):not([type=radio]),select{min-height:var(--ctl);padding:0 10px;border-radius:var(--r-s)}
+textarea{border-radius:var(--r-s)}
+.search{height:var(--ctl);border-radius:var(--r-s);padding:0 10px}
+.search input{padding:0!important;min-height:0!important}
+.seg{padding:3px;border-radius:var(--r-s);height:var(--ctl)}
+.seg button{height:30px;padding:0 11px;border-radius:4px;font-weight:500}
+.seg button.on{font-weight:600}
+.seg button small{opacity:.6}
+.vsw{height:var(--ctl)} .vsw button{height:34px;width:36px}
+.chip{height:30px;padding:0 10px;font-weight:500;font-size:12.5px}
+.chips-row{padding-bottom:6px;margin-bottom:6px}
+.icon-btn{border-radius:var(--r-s)} .icon-btn.lg{width:36px;height:36px}
+.toolbar{margin-bottom:12px;gap:8px}
+.toolbar.filters{margin-bottom:14px}
+.sel-cat{max-width:280px;color:var(--fg)}
+.f input,.f select{font-size:14px}
+dialog{border-radius:10px}
+.tag,.vb,.alg,.cnt,.ost,.sp-st,.lt-st span,.ti-flag{border-radius:4px;font-weight:600}
+
+/* Flächen: eine Linie statt Kasten im Kasten */
+.panel{padding:16px 18px}
+.panel-h{margin-bottom:12px}
+.panel-h h2{font:500 17px/1.2 var(--f-display);letter-spacing:.01em}
+.todo{gap:0}
+.todo button{border:0;border-top:1px solid var(--line);border-radius:0;padding:10px 2px}
+.todo li:first-child button{border-top:0}
+.todo button:hover{background:transparent;color:var(--accent)}
+.todo b{font:600 15px var(--f-body)}
+.inv-h{border:0;padding:0}
+.hints{margin-top:10px;gap:0}
+.hints li{border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;padding:8px 0}
+.hints li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--faint);flex:none}
+.hints li.warn::before{background:var(--warn)} .hints li.bad::before{background:var(--bad)}
+.teller-ok{display:flex;gap:8px;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)} .teller-ok .ico{color:var(--good)}
+.empty-s>.ico{width:28px;height:28px;color:var(--muted);stroke-width:1.6}
+.empty-s h3{font-size:19px}
+.pc-card{box-shadow:none;border-radius:var(--r);animation:none}
+.pc-field{border-width:1px;border-color:var(--line-strong)} .pc-field:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
+.pc-name{font-size:30px}
+.pc-prog{border:0;background:transparent;padding:0 0 12px;max-width:760px}
+.pc-done{border-radius:var(--r)}
+.lab-card{border-radius:var(--r)}
+.lab-ing{background:var(--surface-2);border-color:var(--line-strong)}
+.lab-ch .eyebrow{color:var(--faint)}
+.lab-go{padding:0;min-height:40px}
+.ti{border-radius:var(--r-s)}
+.ti-flag{background:transparent;padding:0;color:var(--faint);font-weight:500;font-style:italic;letter-spacing:0}
+.ti-flag.bad{background:transparent;color:var(--bad);font-style:normal}
+.shelf{background:transparent;border-color:var(--line)}
+.sp-card,.oc,.lo{border-radius:var(--r)}
+
+/* Rezeptur: Kopf ohne Kasten */
+.hero{border:0;background:transparent;padding:0 0 20px;border-bottom:1px solid var(--line);border-radius:0;margin-bottom:20px;grid-template-columns:168px minmax(0,1fr) auto auto;gap:22px}
+.hero-ph{border-radius:var(--r)}
+.hero .eyebrow{color:var(--faint);margin-bottom:2px}
+.title-in{font:500 clamp(26px,3.2vw,36px)/1.1 var(--f-display);letter-spacing:.005em}
+.hero-stats{margin-top:10px;gap:8px 26px}
+.hero-stats b{font:500 20px/1.1 var(--f-display)}
+.hero-ring b{font:500 20px var(--f-display)}
+.hero-acts .icon-btn.lg{background:transparent}
+.back{margin-bottom:10px}
+@media (max-width:900px){.hero{grid-template-columns:minmax(0,1fr) auto}.hero-ph{grid-column:1/-1;aspect-ratio:16/9;max-width:360px}}
+
+/* Kennzahlen: eine schmale Leiste, Ziffern in der Hausschrift */
+.tiles{margin-bottom:0}
+.tile{padding:12px 16px 13px}
+.t-v{font:500 24px/1.1 var(--f-display);letter-spacing:.01em;font-variant-numeric:tabular-nums}
+.t-v small{font:400 15px var(--f-display);color:var(--faint)}
+.t-l{font-size:12px}
+.t-s{font-size:11.5px;color:var(--faint)}
+#app[data-view="dash"] .tiles,#app[data-view="stock"] .tiles,#app[data-view="buy"] .tiles,#app[data-view="report"] .tiles{margin-bottom:18px}
+#app[data-view="dash"] .day .tiles{margin-bottom:0}
+
+/* Heute: Tagesblatt */
+.day{display:flex;flex-direction:column;gap:26px}
+.day-h{display:flex;align-items:baseline;gap:10px;margin:0;font:500 18px/1.2 var(--f-display);letter-spacing:.01em}
+.day-h span{font:400 12.5px var(--f-body);color:var(--faint)}
+.rows{list-style:none;margin:6px 0 0;padding:0}
+.rw{display:grid;grid-template-columns:72px minmax(0,1fr) auto auto;gap:4px 16px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.rows .rw:first-child{border-top:0}
+.rw-lead{font-weight:600;font-variant-numeric:tabular-nums;color:var(--fg);display:flex;align-items:center;gap:6px}
+.rw-lead .ico{width:16px;height:16px;color:var(--muted)}
+.rw-main{min-width:0} .rw-main b{font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rw-main small{display:block;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rw-meta{font-size:13px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.rw-act{display:flex;justify-content:flex-end;min-width:0}
+.rw-act:empty{display:none}
+.rw.past{opacity:.55}
+.day-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:24px;align-items:start}
+.day-grid .day-sec{padding-top:2px}
+.day-grid .panel{padding:14px 18px 12px}
+.bar-r{padding:5px 8px}
+.bar-n{font-size:13px}
+.bar-t{height:8px} .bar-t::after{border-left-width:1px;opacity:.4}
+.bar-v{font-size:12.5px;font-weight:500}
+@media (max-width:1000px){.day-grid{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){.rw{grid-template-columns:62px minmax(0,1fr)}.rw-lead{font-size:12.5px;align-self:start;padding-top:2px}.rw-meta,.rw-act{grid-column:2}.rw-act{justify-content:flex-start}.rw-main b,.rw-main small{white-space:normal}}
+
+/* Aufbau: Liste */
+.au-sum{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:-4px 0 18px;font-size:13.5px;color:var(--muted)}
+.au-sum b{color:var(--fg);font-weight:600}
+.au-m{display:block;height:4px;border-radius:2px;background:var(--surface-2);overflow:hidden;width:100%}
+.au-m i{display:block;height:100%;background:var(--gold);border-radius:2px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.au-m.big{width:200px;flex:none}
+.au-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.au-row{display:grid;grid-template-columns:32px minmax(0,1.5fr) minmax(220px,1fr) auto;gap:8px 20px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)}
+.au-n{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line-strong);font:600 13px var(--f-display);color:var(--muted);background:var(--surface)}
+.au-n .ico{width:15px;height:15px;stroke-width:2.6}
+.au-row.done .au-n{background:var(--good);border-color:var(--good);color:var(--surface)}
+.au-row.active .au-n{border-color:var(--gold);color:var(--fg);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 22%,transparent)}
+.au-row.done .au-t b,.au-row.done .au-t small{color:var(--muted)}
+.au-t{min-width:0}
+.au-t b{display:block;font:600 16px/1.25 var(--f-display);letter-spacing:.01em}
+.au-t b em{font:600 11px var(--f-body);font-style:normal;color:var(--accent);margin-left:8px;letter-spacing:.01em}
+.au-t small{display:block;font-size:13px;color:var(--muted);margin-top:2px;line-height:1.4;text-wrap:pretty}
+.au-p{display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--muted);min-width:0}
+.au-p > span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.au-row.done .au-m i{background:var(--good)}
+.au-a .btn{white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis;display:inline-block;line-height:30px}
+@media (max-width:1000px){.au-row{grid-template-columns:32px minmax(0,1fr)}.au-p,.au-a{grid-column:2}.au-a .btn{max-width:none}}
+.au-mini .gring{display:none}
+
+/* Listen: ruhige Zustände, Aktionen beim Zeigen, feste Kopfzeile */
+.lt-st span{background:transparent;padding:0;color:var(--muted);font-weight:500;font-size:12px}
+.lt-st span.open{display:inline-flex;align-items:center;gap:5px}
+.lt-st span.open i{width:7px;height:7px;border-radius:50%;border:1.5px solid var(--faint);display:inline-block}
+.lt-st span.top{color:var(--gold);font-size:13px}
+.lt-st span.ok{background:transparent;color:var(--muted)}
+.lt-st{gap:10px}
+.st-ref{font-size:12.5px;font-style:italic;color:var(--muted)}
+.lt-fc i{width:7px;height:7px}
+.lt-fc.good i,.lt-fc.warn i{background:var(--faint)}
+.lt-fc.bad i{background:var(--bad)}
+.lt-fc.warn{color:var(--fg)}
+table.lt .lt-acts,table.stock td.nowrap .icon-btn{opacity:0;transition:opacity .12s}
+table.lt tr:hover .lt-acts,table.lt tr:focus-within .lt-acts,table.stock tr:hover td.nowrap .icon-btn,table.stock tr:focus-within td.nowrap .icon-btn{opacity:1}
+@media (hover:none){table.lt .lt-acts,table.stock td.nowrap .icon-btn{opacity:1}}
+table.lt td{height:46px}
+table.lt th{font-size:10.5px;letter-spacing:.07em;padding:8px 12px;background:var(--surface);color:var(--faint)}
+table.lt tr.grp td{top:33px}
+.lt-n b{font-weight:500}
+.lt-n small{font-size:12px}
+table.lt tbody tr.row:hover td{background:color-mix(in srgb,var(--surface-2) 70%,transparent)}
+table.stock tbody tr.row{cursor:pointer} table.stock tbody tr.row:hover td{background:color-mix(in srgb,var(--surface-2) 70%,transparent)}
+table.stock tr.is-low td{background:transparent}
+table.stock tr.is-low td:first-child{box-shadow:inset 2px 0 0 var(--warn)}
+input.num-in{text-align:right;font-variant-numeric:tabular-nums}
+.lt-price{width:80px;padding:0 6px!important;min-height:30px!important;border-color:transparent;background:transparent;font-weight:500;color:var(--fg);border-radius:4px}
+.lt-price:hover{border-color:var(--line-strong);background:var(--surface)}
+.lt-price:focus{border-color:var(--accent);background:var(--surface);font-weight:600}
+table.lt tbody tr.row:hover .lt-price{border-color:var(--line-strong)}
+.lt-wrap{border-radius:var(--r)}
+@media (min-width:1000px){
+  .lt-wrap{overflow:clip}
+  .lt-n small{max-width:40ch}
+  table.lt td.hide-m.lt-muted{white-space:normal}
+  table.lt th{top:0}
+  #app[data-view="stock"] .panel.flush:has(table.stock){overflow:visible}
+  table.stock thead th{position:sticky;top:0;z-index:2;background:var(--surface)}
+  table.stock thead th:first-child{border-top-left-radius:var(--r)} table.stock thead th:last-child{border-top-right-radius:var(--r)}
+}
+th{background:var(--surface);color:var(--faint);font-size:10.5px;letter-spacing:.07em;border-bottom:1px solid var(--line)}
+tfoot td{background:transparent;border-top:1px solid var(--line-strong)}
+.vb.warn{background:transparent;color:var(--muted);font-weight:500;font-style:italic;padding:0}
+.cnt{background:transparent;color:var(--muted);font-weight:500;font-size:13px;min-width:0;padding:0} .cnt.zero{color:var(--faint)}
+.lvl{height:6px}
+.lvl i.good{background:var(--faint)} .lvl i.warn{background:var(--warn)}
+
+/* Hinweiskästen: nur noch für seltene, echte Probleme */
+.warn-box{background:var(--surface);border:1px solid var(--line);color:var(--fg);border-radius:var(--r-s)}
+.warn-box .ico{color:var(--warn)}
+.ok-box{background:transparent;color:var(--good);padding:0;font-weight:500}
+.g-closed{border-radius:var(--r-s)}
+
+/* Einkauf, Lieferanten, Auswertung */
+#app[data-view="stock"] .tile .t-v.bad-t,#app[data-view="buy"] .tile .t-v.bad-t{color:inherit}
+.oc .btn.primary{background:var(--surface);border-color:var(--line);color:var(--fg)} .oc .btn.primary:hover{border-color:var(--muted);opacity:1}
+.oc .btn .ico{display:none}
+#app.v-list .oc.urgent{box-shadow:inset 2px 0 0 var(--bad)!important}
+.oc h3,.lo-h b{font:600 15px/1.2 var(--f-display);letter-spacing:.01em}
+.cd{font-weight:500}
+.ost{font-weight:600;font-size:11px}
+.rp-label b{font-size:22px}
+.legend{font-size:12px}
+.rp-chart .bar{fill:var(--gold)}
+.rp-matrix .ql{font-weight:500}
+.sp-card h3{font:600 16px/1.2 var(--f-display)}
+
+/* Dialog, Palette, Einstellungen */
+dialog h3{font:500 22px var(--f-display);letter-spacing:.01em}
+.pg{font-size:11px;font-weight:500}
+.who-b,.sw-preset,.orn-b,.algc span{border-radius:var(--r-s)}
+.algc input:checked + span{background:var(--surface-2);border-color:var(--fg)}
+.au-mini>div b{font-weight:600}
+.rw-box{border-radius:var(--r)}
+
+/* Seitenleiste */
+.brand b{font-weight:400}
+.nav-i{font-weight:500}
+.kbd-btn kbd{font-family:var(--f-body)}
+
+/* Gästekarte-Werkzeuge: Reiter als Segment behalten, nichts in Versalien */
+.guest-tools .f{font-weight:500}
+
+/* Dunkel: Kontraste nachziehen */
+:root[data-theme="dark"] .au-row.done .au-n{color:#16130d}
+:root[data-theme="dark"] .h-n{color:var(--faint)}
+:root[data-theme="dark"] .lt-price:hover,:root[data-theme="dark"] .lt-price:focus{background:var(--surface-2)}
+:root[data-theme="dark"] .au-m{background:var(--line)}
+:root[data-theme="dark"] .pc-ex{background:var(--surface-2)}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .au-row.done .au-n{color:#16130d}
+  :root:not([data-theme="light"]) .lt-price:hover,:root:not([data-theme="light"]) .lt-price:focus{background:var(--surface-2)}
+  :root:not([data-theme="light"]) .au-m{background:var(--line)}
+}
+
+/* Handy */
+@media (max-width:900px){
+  .page-h h1{font-size:28px}
+  .h-n{font-size:17px}
+  .page-h .sub{font-size:13px}
+  .day{gap:20px}
+  .toolbar.filters .seg{max-width:100%;-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
+  .sel-cat{flex:1 1 100%;max-width:none}
+  .au-sum .au-m.big{width:100%}
+}
+@media (max-width:760px){
+  table.lt tr.grp td{top:0}
+}
+@media (max-width:700px){#app[data-view="dash"] .day .tiles{display:grid!important;grid-template-columns:1fr 1fr!important;overflow:visible!important}#app[data-view="dash"] .day .tiles .tile{min-width:0!important}}
+@media (max-width:700px){#app[data-view="dash"] .day .tiles .tile:nth-child(odd){border-left:0!important;box-shadow:none!important}}
 .m-only{display:none}@media (max-width:900px){.m-only{display:flex}}
 .dish-main:focus-visible,.rc:focus-visible{outline-offset:-3px}
 .title-in{hyphens:auto;-webkit-hyphens:auto}
@@ -2262,8 +2521,8 @@ function renderCard(c){
 
   const rows = c.items.map((it,i) => { const l = t.lines[i]; return `<tr>
       <td class="c-ing"><select id="ref-${i}" data-li="${i}" data-lf="ref" aria-label="Zutat">${refOptions(it.ref, c.id)}</select></td>
-      <td class="r"><span class="qty"><input id="qty-${i}" type="number" step="any" min="0" inputmode="decimal" data-li="${i}" data-lf="qty" value="${esc(it.qty)}" aria-label="Brutto"><em>${l.unit}</em></span></td>
-      <td class="r"><input id="net-${i}" type="number" step="any" min="0" inputmode="decimal" data-li="${i}" data-lf="net" value="${esc(it.net)}" placeholder="${num(l.netAuto,1)}" aria-label="Netto in g"></td>
+      <td class="r"><span class="qty"><input id="qty-${i}" class="num-in" type="text" inputmode="decimal" data-li="${i}" data-lf="qty" value="${numIn(it.qty)}" aria-label="Brutto"><em>${l.unit}</em></span></td>
+      <td class="r"><input id="net-${i}" class="num-in" type="text" inputmode="decimal" data-li="${i}" data-lf="net" value="${numIn(it.net)}" placeholder="${num(l.netAuto,1)}" aria-label="Netto in g"></td>
       <td class="r mono">${num(l.out,1)}</td>
       <td class="r mono">${eur(l.cost)}<span class="share" style="width:${(l.cost/sum*100).toFixed(1)}%"></span></td>
       <td><button type="button" class="icon-btn" data-act="delLine" data-id="${i}" title="Zeile entfernen" aria-label="Zeile entfernen">${ico('x')}</button></td></tr>`; }).join('');
@@ -2374,11 +2633,11 @@ function stockList(){
   <div class="chips-row">${chip('all','Alle Lagerorte',all.length)}${Object.entries(LOCS).map(([k,l])=>chip(k,l,all.filter(p=>p.loc===k).length)).join('')}</div>
   <section class="panel flush"><div class="tbl-wrap"><table class="stock">
     <thead><tr><th>Artikel</th><th>Lagerort</th><th>Füllstand</th><th class="r">Bestand</th><th class="r">Mindest</th><th class="r">Wert</th><th></th></tr></thead>
-    <tbody>${list.map(p=>{ const low = (+p.minStock||0) && (+p.stock||0) < +p.minStock; return `<tr class="${low?'is-low':''}">
+    <tbody>${list.map(p=>{ const low = (+p.minStock||0) && (+p.stock||0) < +p.minStock; return `<tr class="row ${low?'is-low':''}" data-act="editProd" data-id="${p.id}">
       <td><b class="pn">${esc(p.name)}</b><small class="muted">${esc(supName(p))}</small></td>
       <td><span class="tag">${esc(LOCS[p.loc]||'—')}</span></td>
       <td>${levelBar(p)}</td>
-      <td class="r mono ${(+p.stock||0)<0?'bad-t':''}">${qtyFmt(+p.stock||0,p)}${low?' <span class="vb warn">nachbestellen</span>':''}</td>
+      <td class="r mono ${(+p.stock||0)<0?'bad-t':''}">${qtyFmt(+p.stock||0,p)}</td>
       <td class="r mono muted">${qtyFmt(+p.minStock||0,p)}</td>
       <td class="r mono">${eur(Math.max(0,+p.stock||0)*(+p.price||0))}</td>
       <td class="nowrap"><button type="button" class="icon-btn" data-act="moveDlg" data-id="in:${p.id}" title="Wareneingang" aria-label="Wareneingang">${ico('plus')}</button><button type="button" class="icon-btn" data-act="moveDlg" data-id="out:${p.id}" title="Entnahme" aria-label="Entnahme">${ico('minus')}</button><button type="button" class="icon-btn" data-act="editProd" data-id="${p.id}" title="Artikel bearbeiten" aria-label="Artikel bearbeiten">${ico('edit')}</button></td>
@@ -3381,7 +3640,7 @@ orderView = function(){
   const open = S.orders.filter(o => ['draft','approval','sent','confirmed','complaint'].includes(o.status));
   const card = sp => { const low = lowStock().filter(p=>p.supplier===sp.id); const val = low.reduce((a,p)=>a+packSuggest(p)*(p.packQty||1)*p.price,0); const left = hm(sp.cutoff)-now; const dr = draftFor(sp.id); const last = lastOrder(sp.id);
     const cls = left < 0 ? 'past' : left < 60 ? 'urgent' : left < 180 ? 'soon' : '';
-    return `<article class="oc ${cls}"><div class="oc-h"><span class="tag">${esc(SUP_CATS[sp.cat]||'')}</span><span class="cd mono">${left<0?'Annahmeschluss vorbei':`noch ${Math.floor(left/60)} h ${String(left%60).padStart(2,'0')} min`}</span></div>
+    return `<article class="oc ${cls}"><div class="oc-h"><span class="tag">${esc(SUP_CATS[sp.cat]||'')}</span><span class="cd mono">${left<0?'Annahmeschluss vorbei':`noch ${left>=60?Math.floor(left/60)+' h ':''}${left%60} min`}</span></div>
       <h3>${esc(sp.name)}</h3><div class="muted sm">${CHANNELS[sp.channel]} · bis ${esc(sp.cutoff)} Uhr · Lieferung ${dayLabel(nextDelivery(sp, left<0?null:t))}</div>
       <div class="oc-m"><span><b class="mono">${low.length}</b><small>unter Mindestbestand</small></span><span><b class="mono">${eur(val)}</b><small>Vorschlag · Mindestwert ${eur(sp.minOrder)}</small></span></div>
       <div class="meter"><i style="width:${Math.min(100, sp.minOrder?val/sp.minOrder*100:100).toFixed(0)}%"></i></div>
@@ -4023,6 +4282,10 @@ document.addEventListener('click', e => { const el = e.target.closest('[data-act
    Premium-Oberfläche: Listenansichten, Umschalter, Navigation, Einkauf
    ===================================================================== */
 const BUY = ['bestellung','lieferanten'];
+/* Zahlen in Eingabefeldern: Anzeige mit Komma, Eingabe mit Komma oder Punkt */
+const num2 = n => fin(n).toLocaleString('de-AT',{minimumFractionDigits:2, maximumFractionDigits:2});
+const numIn = v => (v==='' || v==null || isNaN(+v)) ? '' : String(+v).replace('.', ',');
+function numParse(v){ let s = String(v==null?'':v).trim().replace(/[€%\s]/g,''); if(!s) return NaN; if(s.includes(',') && s.includes('.')) s = s.replace(/\./g,'').replace(',','.'); else s = s.replace(',','.'); return +s; }
 TABS.length = 0;
 TABS.push(['dash','Heute','Heute'],['menu','Speisekarte','Karte'],['cards','Rezepturen','Rezepte'],['stock','Lager','Lager'],['buy','Einkauf','Einkauf'],['products','Produkte','Produkte'],['setup','Einstellungen','Mehr']);
 ICO.buy = '<path d="M3 4h2l2.5 11h10L20 7H6"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/>';
@@ -4060,16 +4323,16 @@ renderMenuCalc = function(){
   const cnt = x => all.filter(x).length;
   const chip = (k,l,n) => `<button type="button" class="chip ${f===k?'on':''}" data-act="sec" data-id="${esc(k)}">${esc(l)}<small>${n}</small></button>`;
   let h = `<div class="toolbar"><label class="search">${ico('search')}<input id="mq" type="search" placeholder="Gericht, Zutat oder Kategorie" value="${esc(view.q)}" autocomplete="off"></label><span class="sp"></span>${vsw('menu')}</div>
-  <div class="chips-row">${chip('all','Alle',all.length)}${chip('over','Über Ziel',cnt(x=>x.k.fc!=null&&x.k.fc>S.settings.target))}${chip('none','Ohne Rezeptur',cnt(x=>x.k.cost==null))}${chip('noalg','Ohne Allergene',cnt(x=>!hasAlg(x.m)))}${chip('nophoto','Ohne Foto',cnt(x=>!menuImg(x.m)))}<span class="sep"></span>${secList().filter(s=>all.some(x=>x.m.section===s)).map(s=>chip(s,s,cnt(x=>x.m.section===s))).join('')}</div>`;
+  <div class="toolbar filters">${seg('sec', f, [['all','Alle',all.length],['over','Über Ziel',cnt(x=>x.k.fc!=null&&x.k.fc>S.settings.target)],['none','Ohne Rezeptur',cnt(x=>x.k.cost==null)],['noalg','Ohne Allergene',cnt(x=>!hasAlg(x.m))],['nophoto','Ohne Foto',cnt(x=>!menuImg(x.m))]])}<select class="sel-cat" data-sel="sec" aria-label="Kategorie"><option value="all">Alle Kategorien</option>${secList().filter(s=>all.some(x=>x.m.section===s)).map(s=>`<option value="${esc(s)}" ${f===s?'selected':''}>${esc(s)} (${cnt(x=>x.m.section===s)})</option>`).join('')}<optgroup label="Saison">${SEASONS.map(([k,l])=>`<option value="${k}" ${f===k?'selected':''}>Nur ${l} (${cnt(x=>x.m.seasons.includes(k))})</option>`).join('')}</optgroup></select></div>`;
   if(!shown.length) return h + `<div class="panel empty">Keine Gerichte für diesen Filter.</div>`;
   const sorted = applySort('menu', shown, {name:x=>x.m.name, price:x=>+x.m.price, cost:x=>x.k.cost, fc:x=>x.k.fc, margin:x=>x.k.margin});
   const grouped = !(SORTS.menu && SORTS.menu.col);
   const row = ({m,k}) => { const img = menuImg(m); const st = [];
-    if(!k.c) st.push('<span class="bad">keine Rezeptur</span>'); if(!hasAlg(m)) st.push('<span class="bad">Allergene fehlen</span>'); if(m.hidden) st.push('<span>ausgeblendet</span>'); if(m.top) st.push('<span class="ok">Empfehlung</span>');
+    if(!k.c) st.push('<span class="open" title="Noch keine Rezeptur verknüpft"><i></i>Rezeptur</span>'); if(!hasAlg(m)) st.push('<span class="open" title="Allergene fehlen"><i></i>Allergene</span>'); if(m.hidden) st.push('<span>ausgeblendet</span>'); if(m.top) st.push('<span class="top" title="Empfehlung des Hauses">★</span>');
     return `<tr class="row ${m.hidden?'off':''}" data-act="${k.c?'openCard':'editMenu'}" data-id="${k.c?k.c.id:m.id}">
       <td><div class="lt-n">${img?`<img src="${IMG[img]}" alt="">`:''}<span><b>${esc(m.name)}${m.vlabel?` <span class="lt-muted">· ${esc(m.vlabel)}</span>`:''}${m.veg?` <span class="lt-muted">${m.veg}</span>`:''}</b><small>${esc(m.desc||'')}</small></span></div></td>
       <td class="hide-m lt-muted">${m.seasons.length ? m.seasons.map(seasonName).join(', ') : 'ganzjährig'}${m.days&&m.days.length?' · '+esc(hkDays(m)):''}</td>
-      <td class="r"><input class="lt-price" type="number" step="0.1" min="0" inputmode="decimal" data-mp="${m.id}" value="${(+m.price).toFixed(2)}" aria-label="Preis ${esc(m.name)}"></td>
+      <td class="r"><input class="lt-price num-in" type="text" inputmode="decimal" data-mp="${m.id}" value="${num2(m.price)}" aria-label="Preis ${esc(m.name)}"></td>
       <td class="r hide-m">${k.cost!=null?eur(k.cost):'<span class="lt-muted">—</span>'}</td>
       <td class="r"><span class="lt-fc ${fcClass(k.fc)}"><i></i>${k.fc!=null?num(k.fc,1)+' %':'—'}</span></td>
       <td class="r hide-m">${k.margin!=null?eur(k.margin):'<span class="lt-muted">—</span>'}</td>
@@ -4079,7 +4342,7 @@ renderMenuCalc = function(){
   if(grouped){ for(const s of secList()){ const list = sorted.filter(x=>x.m.section===s); if(!list.length) continue; body += `<tr class="grp"><td colspan="8">${esc(s)}<small>${list.length}</small></td></tr>` + list.map(row).join(''); } }
   else body = sorted.map(row).join('');
   return h + `<div class="lt-wrap"><table class="lt ${mode}"><thead><tr>${sortHead('menu','name','Gericht')}<th class="hide-m">Saison</th>${sortHead('menu','price','Preis','r')}${sortHead('menu','cost','WE','r hide-m')}${sortHead('menu','fc','WE %','r')}${sortHead('menu','margin','Rohertrag','r hide-m')}<th class="hide-m">Status</th><th></th></tr></thead><tbody>${body}</tbody></table></div>
-  <p class="hint">Preis direkt in der Zeile ändern. Ein Klick auf die Zeile öffnet die Rezeptur. Spaltenkopf antippen zum Sortieren, noch einmal für die Gegenrichtung.</p>`;
+  `;
 };
 
 /* ---------- Rezepturen als Liste ---------- */
@@ -4732,21 +4995,20 @@ renderProducts = function(){
   const nDemo = all.filter(p=>p.priceDemo).length;
   const list = all.filter(p => (!q || (p.name+' '+supName(p)+' '+(p.artNo||'')).toLowerCase().includes(q)) && (f==='all' || (f==='demo' ? p.priceDemo : !p.priceDemo))).sort(byName);
   const chip = (k,l,n) => `<button type="button" class="chip ${f===k?'on':''}" data-act="pFilter" data-id="${k}">${l}<small>${n}</small></button>`;
-  return `<div class="page-h"><div><div class="eyebrow">${all.length} Produkte · Preise je Einheit exkl. MwSt.</div><h1>Produkte & Einkaufspreise</h1></div>
+  return `<div class="page-h"><div><div class="eyebrow">${all.length} Produkte · Preise je Einheit exkl. MwSt.</div><h1>Produkte</h1></div>
     <div class="row-btns"><button type="button" class="btn" data-act="plImport">${ico('copy')}Preisliste importieren</button><button type="button" class="btn primary" data-act="newProd">${ico('plus')}Produkt</button></div></div>
-  ${nDemo ? `<div class="warn-box" style="margin-bottom:14px">${ico('spark')}<span><b>${nDemo} von ${all.length} Preisen sind noch Richtwerte</b>, die als Beispiel eingetragen wurden. Der Wareneinsatz stimmt erst mit Ihren echten Einkaufspreisen: direkt in der Liste eintippen, eine Preisliste des Lieferanten importieren oder beim Wareneingang übernehmen.</span><button type="button" class="btn sm" data-act="pFilter" data-id="demo">Richtwerte zeigen</button></div>` : `<div class="ok-box" style="margin-bottom:14px">Alle Einkaufspreise sind bestätigt.</div>`}
-  <div class="toolbar"><label class="search">${ico('search')}<input id="pq" type="search" placeholder="Produkt, Lieferant oder Artikelnummer" value="${esc(view.pq)}" autocomplete="off"></label>${chip('all','Alle',all.length)}${chip('demo','Richtwerte',nDemo)}${chip('ok','Bestätigt',all.length-nDemo)}</div>
+  <div class="toolbar"><label class="search">${ico('search')}<input id="pq" type="search" placeholder="Produkt, Lieferant oder Artikelnummer" value="${esc(view.pq)}" autocomplete="off"></label>${seg('pFilter', f, [['all','Alle',all.length],['demo','Richtwerte',nDemo],['ok','Bestätigt',all.length-nDemo]])}<span class="sp"></span>${nDemo ? `<button type="button" class="btn sm" data-act="pConfirmAll" data-id="${f}">Angezeigte Richtwerte bestätigen</button>` : ''}</div>
   <div class="lt-wrap"><table class="lt"><thead><tr><th>Produkt</th><th class="hide-m">Lieferant</th><th class="r">Preis €</th><th>Stand</th><th class="r hide-m">Putzverlust</th><th class="r hide-m">Garverlust</th><th class="hide-m">Allergene</th><th class="r hide-m">Rezepturen</th><th></th></tr></thead><tbody>
-  ${list.map(p => { const u = usage('p:'+p.id).length; return `<tr>
+  ${list.map(p => { const u = usage('p:'+p.id).length; return `<tr class="row" data-act="editProd" data-id="${p.id}">
     <td><div class="lt-n"><span><b>${esc(p.name)}</b><small>${p.unit==='Stk'&&p.pieceG?`je Stk · ${num(p.pieceG)} g`:`je ${esc(p.unit)}`}${p.artNo?' · Nr. '+esc(p.artNo):''}${p.pack?' · '+esc(p.pack):''}</small></span></div></td>
     <td class="hide-m lt-muted">${esc(supName(p))}</td>
-    <td class="r"><input class="lt-price" id="pp-${p.id}" type="number" step="0.01" min="0" inputmode="decimal" data-pp="${p.id}" data-pf="price" value="${(+p.price).toFixed(2)}" aria-label="Preis ${esc(p.name)}"></td>
-    <td>${p.priceDemo ? '<span class="lt-st"><span class="bad">Richtwert</span></span>' : `<span class="lt-muted sm">${p.priceDate?fmtDate(p.priceDate+'T12:00:00'):'bestätigt'}${p.priceSrc?' · '+esc(p.priceSrc):''}</span>`}</td>
+    <td class="r"><input class="lt-price num-in" id="pp-${p.id}" type="text" inputmode="decimal" data-pp="${p.id}" data-pf="price" value="${num2(p.price)}" aria-label="Preis ${esc(p.name)}"></td>
+    <td>${p.priceDemo ? '<span class="st-ref" title="Beispielpreis, noch nicht bestätigt">Richtwert</span>' : `<span class="lt-muted sm">${p.priceDate?fmtDate(p.priceDate+'T12:00:00'):'bestätigt'}${p.priceSrc?' · '+esc(p.priceSrc):''}</span>`}</td>
     <td class="r hide-m">${num(+p.lossCold||0,1)} %</td><td class="r hide-m">${num(+p.lossHot||0,1)} %</td>
     <td class="hide-m">${chips(new Set(algList(p.alg)))}</td><td class="r hide-m">${u}</td>
     <td><div class="lt-acts">${p.priceDemo?`<button type="button" class="btn sm" data-act="pConfirm" data-id="${p.id}" title="Preis stimmt">Stimmt</button>`:''}<button type="button" class="icon-btn" data-act="editProd" data-id="${p.id}" aria-label="Bearbeiten">${ico('edit')}</button></div></td></tr>`; }).join('') || '<tr><td colspan="9" class="lt-muted">Nichts gefunden.</td></tr>'}
   </tbody></table></div>
-  <p class="hint">Preis eintippen und Enter: Der Preis gilt als bestätigt, alle Rezepturen und der Wareneinsatz der Speisekarte rechnen sofort neu.</p>`;
+  `;
 };
 
 /* Hinweis in der Rezeptur */
@@ -4813,6 +5075,7 @@ document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if(!el) return; const id = el.dataset.id;
   if(el.dataset.act === 'pFilter'){ view.pf = id; if(view.tab !== 'products') go('products'); else render(); }
   if(el.dataset.act === 'pConfirm'){ const p = P(id); markPrice(p, 'bestätigt'); save(); render(); toast(`${p.name}: ${eur(p.price)} bestätigt`); }
+  if(el.dataset.act === 'pConfirmAll'){ const q = view.pq.trim().toLowerCase(); const list = S.products.filter(p => !p.noStock && p.priceDemo && (!q || (p.name+' '+supName(p)+' '+(p.artNo||'')).toLowerCase().includes(q))); if(!list.length) return; ask(`${list.length} Richtwerte als bestätigte Einkaufspreise übernehmen? Besser: nur Preise bestätigen, die Sie geprüft haben.`, () => { list.forEach(p => markPrice(p, 'bestätigt')); }, 'Bestätigen'); }
   if(el.dataset.act === 'pFix') priceFixDialog(id.split(','));
   if(el.dataset.act === 'plImport') plDialog();
 });
@@ -5017,7 +5280,7 @@ function pcStep(kind){
   else {
     const before = dishesUsing(p.id).map(x => ({name:x.m.name + (x.m.vlabel?' '+x.m.vlabel:''), a:x.k.fc}));
     const old = +p.price;
-    if(kind === 'save'){ const v = $('#pcIn') ? +$('#pcIn').value : NaN; if(!(v > 0)){ kind = 'ok'; } else { p.price = Math.round(v*100)/100; } }
+    if(kind === 'save'){ const v = $('#pcIn') ? numParse($('#pcIn').value) : NaN; if(!(v > 0)){ kind = 'ok'; } else { p.price = Math.round(v*100)/100; } }
     markPrice(p, kind === 'save' ? 'Preis-Check' : 'bestätigt');
     if(kind === 'save') pc.saved++; else pc.confirmed++;
     const after = dishesUsing(p.id).map(x => x.k.fc);
@@ -5035,7 +5298,7 @@ function renderPriceCheck(){
     return head + emptyHtml('tag', n ? `${n} Preise warten auf Bestätigung` : 'Alle Preise sind bestätigt', n ? 'Wir gehen Produkt für Produkt durch: echten Einkaufspreis eintippen oder den Richtwert bestätigen.' : 'Neue Preise übernehmen Sie beim Wareneingang oder direkt in der Produktliste.', n ? `<button type="button" class="btn primary" data-act="pcStart">${ico('tag')}Preis-Check starten</button>` : `<button type="button" class="btn" data-act="goTab" data-id="aufbau">Zurück zum Aufbau</button>`); }
   const total = pc.q.length, i = pc.i;
   const prog = `<div class="pc-prog"><div class="pc-prog-t"><b>${Math.min(i,total)} von ${total}</b><span>${pc.saved} eingetragen · ${pc.confirmed} bestätigt · ${pc.skipped} übersprungen</span></div><div class="meter au-meter"><i style="width:${total?Math.min(100,i/total*100):100}%"></i></div></div>`;
-  const fb = pc.last ? `<div class="pc-fb ${pc.last.changed?'chg':'ok'}">${ico(pc.last.changed?'sparkle':'check')}<div><b>${esc(pc.last.name)}</b> ${pc.last.changed ? `${eur(pc.last.old)} → <b>${eur(pc.last.nw)}</b> je ${esc(pc.last.unit)}` : `${eur(pc.last.nw)} je ${esc(pc.last.unit)} bestätigt`}
+  const fb = pc.last ? `<div class="pc-fb ${pc.last.changed?'chg':'ok'}">${ico('check')}<div><b>${esc(pc.last.name)}</b> ${pc.last.changed ? `${eur(pc.last.old)} → <b>${eur(pc.last.nw)}</b> je ${esc(pc.last.unit)}` : `${eur(pc.last.nw)} je ${esc(pc.last.unit)} bestätigt`}
       ${pc.last.dishes.length ? `<div class="pc-fb-d">${pc.last.dishes.map(d=>`<span>${esc(d.name)} <em class="${fcClass(d.b)}">${num(d.a,1)} % → ${num(d.b,1)} %</em></span>`).join('')}</div>` : (pc.last.changed ? '<div class="pc-fb-d muted">Noch in keiner Rezeptur verwendet.</div>' : '')}</div></div>` : '';
   if(i >= total){
     const avg1 = avgFcAll();
@@ -5053,8 +5316,8 @@ function renderPriceCheck(){
     <div class="pc-sup">${ico('truck')}<span>${esc(supName(p))}${p.artNo?` · Art.-Nr. ${esc(p.artNo)}`:''}${p.pack?` · ${esc(p.pack)}`:''}</span><span class="pc-count">Nr. ${i+1}</span></div>
     <h2 class="pc-name">${esc(p.name)}</h2>
     <div class="pc-grid">
-      <div class="pc-ex"><small>Richtwert (Beispiel)</small><b>${eur(p.price)}</b><span>je ${esc(unitTxt)}${p.unit==='Stk'&&p.pieceG?` · ${num(p.pieceG)} g`:''} · exkl. MwSt.</span></div>
-      <label class="pc-in"><span>Ihr Einkaufspreis je ${esc(p.unit)}</span><span class="pc-field"><em>€</em><input id="pcIn" type="number" step="0.01" min="0" inputmode="decimal" placeholder="${(+p.price).toFixed(2)}" autocomplete="off"></span><small>Wie auf Rechnung oder Preisliste, ohne MwSt. Leer lassen = Richtwert stimmt.</small></label>
+      <div class="pc-ex"><small>Richtwert</small><b>${eur(p.price)}</b><span>je ${esc(unitTxt)}${p.unit==='Stk'&&p.pieceG?` · ${num(p.pieceG)} g`:''} · exkl. MwSt.</span></div>
+      <label class="pc-in"><span>Ihr Einkaufspreis je ${esc(p.unit)}</span><span class="pc-field"><em>€</em><input id="pcIn" class="num-in" type="text" inputmode="decimal" placeholder="${num2(p.price)}" autocomplete="off"></span><small>Netto, wie auf der Rechnung. Leer lassen, wenn der Richtwert stimmt.</small></label>
     </div>
     <div class="pc-uses">${uses.length || semis.length ? `<b>Steckt in:</b> ${uses.slice(0,6).map(x=>`<span>${esc(x.m.name)}${x.m.vlabel?' '+esc(x.m.vlabel):''} <em class="${fcClass(x.k.fc)}">${num(x.k.fc,1)} %</em></span>`).join('')}${semis.map(c=>`<span>${esc(c.name)} <em>Basisrezept</em></span>`).join('')}${uses.length>6?`<span class="muted">+${uses.length-6} weitere</span>`:''}` : '<span class="muted">Noch in keiner Rezeptur verwendet.</span>'}</div>
     <div class="pc-acts"><button type="button" class="btn" data-act="pcSkip">Überspringen<kbd>Esc</kbd></button><span class="sp"></span><button type="button" class="btn" data-act="pcOk">${ico('check')}Richtwert stimmt</button><button type="button" class="btn primary" data-act="pcSave">Übernehmen<kbd>↵</kbd></button></div>
@@ -5068,10 +5331,10 @@ function tellerHints(c){
   if(c.items.some(it => !refObj(it.ref))) h.push({cls:'bad', t:`${c.items.filter(it=>!refObj(it.ref)).length} Zutat ohne Auswahl`, a:'tellerTable', id:'', l:'Zur Tabelle'});
   if(demo.length) h.push({cls:'warn', t:`${demo.length} ${demo.length===1?'Zutat hat':'Zutaten haben'} noch einen Richtwert-Preis: ${demo.slice(0,3).map(id=>P(id)?.name).filter(Boolean).join(', ')}${demo.length>3?' …':''}`, a:'pcFor', id:demo.join(','), l:'Preise prüfen'});
   if(!(+c.yieldG > 0)) h.push({cls:'warn', t:c.type==='semi' ? 'Ausbeute der Charge fehlt (Gramm)' : 'Portionsgewicht fehlt (Gramm)', a:'focusEl', id:'cf-yieldG', l:'Eintragen'});
-  if(!(c.img && IMG[c.img])) h.push({cls:'', t:'Kein Foto. Ein Foto hilft dem Team beim Anrichten.', a:'photoCard', id:c.id, l:'Foto'});
+  if(!(c.img && IMG[c.img])) h.push({cls:'', t:'Kein Foto', a:'photoCard', id:c.id, l:'Foto'});
   if(!(c.steps||[]).some(s=>s.t && s.t.trim())) h.push({cls:'', t:'Zubereitung noch leer', a:'focusEl', id:'st-0', l:'Schritt schreiben'});
   if(c.type==='dish' && !S.menu.some(m=>m.card===c.id)) h.push({cls:'', t:'Noch nicht auf der Speisekarte', a:'toMenu', id:c.id, l:'Auf die Karte'});
-  if(c.items.length && !t.alg.size) h.push({cls:'', t:'Keine Allergene erkannt. Bitte Allergene der Produkte prüfen.', a:'goTab', id:'products', l:'Produkte'});
+  if(c.items.length && !t.alg.size) h.push({cls:'', t:'Keine Allergene erkannt, Produktdaten prüfen', a:'goTab', id:'products', l:'Produkte'});
   return h;
 }
 function tellerHtml(c){
@@ -5087,12 +5350,12 @@ function tellerHtml(c){
   const tile = ({i, it, l}) => { const r = refObj(it.ref); const p = r && r.t==='p' ? r.o : null; const share = sum ? l.cost/sum*100 : 0;
     const flags = [];
     if(!r) flags.push('<span class="ti-flag bad">Zutat wählen</span>');
-    if(p && p.priceDemo && !p.noStock) flags.push('<span class="ti-flag warn" title="Preis ist noch ein Richtwert">Richtwert</span>');
+    if(p && p.priceDemo && !p.noStock) flags.push('<span class="ti-flag" title="Preis ist noch ein Richtwert">Richtwert</span>');
     if(r && r.t==='c') flags.push('<span class="ti-flag">Basisrezept</span>');
     return `<div class="ti" style="--c:${colorOf[i]}">
       <span class="ti-dot"></span>
       <div class="ti-h"><b class="ti-n">${esc(r ? l.name.replace(/^BR · /,'') : 'Neue Zutat')}</b><button type="button" class="icon-btn ti-x" data-act="delLine" data-id="${i}" title="Vom Teller nehmen" aria-label="Vom Teller nehmen">${ico('x')}</button></div>
-      ${r ? `<div class="ti-q"><span class="qty"><input id="qty-${i}" type="number" step="any" min="0" inputmode="decimal" data-li="${i}" data-lf="qty" value="${esc(it.qty)}" aria-label="Menge ${esc(l.name)}"><em>${l.unit}</em></span><span class="ti-c"><b>${eur(l.cost)}</b><small>${num(share)} %</small></span></div>
+      ${r ? `<div class="ti-q"><span class="qty"><input id="qty-${i}" class="num-in" type="text" inputmode="decimal" data-li="${i}" data-lf="qty" value="${numIn(it.qty)}" aria-label="Menge ${esc(l.name)}"><em>${l.unit}</em></span><span class="ti-c"><b>${eur(l.cost)}</b><small>${num(share)} %</small></span></div>
       <div class="ti-bar"><i style="width:${Math.min(100,share).toFixed(1)}%"></i></div>
       <div class="ti-m">${l.unit==='Stk' ? `${num(l.grossG)} g brutto · ` : ''}netto ${num(l.net)} g · fertig ${num(l.out)} g${p && p.alg ? ` · ${esc(p.alg)}` : ''}${flags.length?' ':''}${flags.join('')}</div>`
       : `<div class="ti-q"><select id="ref-${i}" data-li="${i}" data-lf="ref" aria-label="Zutat">${refOptions(it.ref, c.id)}</select></div><div class="ti-m">${flags.join('')}</div>`}
@@ -5102,10 +5365,10 @@ function tellerHtml(c){
     <div class="panel-h"><h2>${ico('plate')}Teller · Zutaten ${c.type==='semi'?'pro Charge':'pro Portion'}</h2>${seg('tellerMode', 'teller', [['teller','Teller'],['table','Tabelle']])}</div>
     <div class="teller">${plate}
       <div class="tl-tiles">${c.items.map((it,i)=>tile({i,it,l:t.lines[i]})).join('')}
-        <button type="button" class="ti ti-add" data-act="tellerPick">${ico('plus')}<b>Zutat auf den Teller</b><small>Produkt oder Basisrezept wählen</small></button></div>
+        <button type="button" class="ti ti-add" data-act="tellerPick">${ico('plus')}<b>Zutat</b><small>Produkt oder Basisrezept</small></button></div>
     </div>
     <div class="teller-f"><span class="kv-inline"><span>Brutto <b>${num(t.gross)} g</b></span><span>Netto <b>${num(t.net)} g</b></span><span>Fertig <b>${num(t.out)} g</b></span><span>Wareneinsatz <b>${eur(t.cost)}</b></span></span><span class="sp"></span><button type="button" class="link-btn" data-act="addLine">${ico('plus')}Leere Zeile</button></div>
-    ${hints.length ? `<ul class="hints">${hints.map(h=>`<li class="${h.cls}"><span>${esc(h.t)}</span><button type="button" class="btn sm" data-act="${h.a}" data-id="${esc(h.id)}">${esc(h.l)}</button></li>`).join('')}</ul>` : `<div class="ok-box teller-ok">${ico('check')}Teller komplett: Zutaten, Preise, Foto und Zubereitung sind da.</div>`}
+    ${hints.length ? `<ul class="hints">${hints.map(h=>`<li class="${h.cls}"><span>${esc(h.t)}</span><button type="button" class="btn sm" data-act="${h.a}" data-id="${esc(h.id)}">${esc(h.l)}</button></li>`).join('')}</ul>` : `<div class="teller-ok muted sm">${ico('check')}Vollständig: Zutaten, Preise, Foto, Zubereitung.</div>`}
   </section>`;
 }
 const _renderCardT = renderCard;
@@ -5323,7 +5586,7 @@ document.addEventListener('input', e => {
 ICO.labor = '<path d="M9 3h6M10 3v6.5L4.6 18.2A1.8 1.8 0 0 0 6.2 21h11.6a1.8 1.8 0 0 0 1.6-2.8L14 9.5V3"/><path d="M7.5 15h9"/>';
 TABS.push(['labor','Rezept-Labor','Labor']);
 (NAV_GROUPS.find(g => g[0]==='Küche') || NAV_GROUPS[0])[1].push('labor');
-WOZU.labor = 'Ideen-Werkstatt: ein paar Zutaten eingeben, Rahmen setzen, Vorschläge bekommen. Kosten und Allergene rechnet die App mit Ihren Preisen. Probieren und entscheiden tut die Küche.';
+WOZU.labor = 'Zutaten eingeben, Rahmen setzen, Vorschläge mit Wareneinsatz und Allergenen bekommen.';
 
 const LAB_TYPES = [['vor','Vorspeise'],['haupt','Hauptspeise'],['dessert','Dessert'],['special','Special']];
 const LAB_STYLES = [['tirol','Tirolerisch'],['modern','Modern'],['huette','Hüttenküche']];
@@ -5436,9 +5699,9 @@ function renderLabor(){
   const res = L.res;
   const card = (rec, i) => { const e = labEval(rec, L);
     return `<article class="lab-card">
-      <div class="lab-ch"><span class="eyebrow">Idee ${i+1}${rec.demo ? ' · Beispiel ohne KI' : ''}</span><h3>${esc(rec.name)}</h3><p>${esc(rec.desc)}</p></div>
+      <div class="lab-ch"><span class="eyebrow">Idee ${i+1}${rec.demo ? ' · Beispiel' : ''}</span><h3>${esc(rec.name)}</h3><p>${esc(rec.desc)}</p></div>
       <div class="lab-kpi"><span><b>${e.missing.length ? 'ab ' : ''}${eur(e.t.cost)}</b><small>Wareneinsatz${e.missing.length ? ' (unvollständig)' : ''}</small></span><span><b>${e.price ? eur(e.price) : '—'}</b><small>${+L.price ? 'Ihr Preis' : `Preis für ${num(+L.fcMax)} %`}</small></span><span><b class="${fcClass(e.fc)}-t">${e.fc!=null ? num(e.fc,1)+' %' : '—'}</b><small>WE-Quote</small></span></div>
-      <ul class="lab-items">${e.items.map(it => { const r = it.ref ? refObj(it.ref) : null; return `<li class="${r?'':'miss'}"><span>${esc(r ? r.o.name : it.name)}${r && r.o.priceDemo ? ' <i class="ti-flag warn">Richtwert</i>' : ''}${r ? '' : ' <i class="ti-flag bad">fehlt im Sortiment</i>'}</span><b class="mono">${num(it.qty)} ${esc(it.unit)}</b></li>`; }).join('')}</ul>
+      <ul class="lab-items">${e.items.map(it => { const r = it.ref ? refObj(it.ref) : null; return `<li class="${r?'':'miss'}"><span>${esc(r ? r.o.name : it.name)}${r && r.o.priceDemo ? ' <i class="ti-flag">Richtwert</i>' : ''}${r ? '' : ' <i class="ti-flag bad">fehlt im Sortiment</i>'}</span><b class="mono">${num(it.qty)} ${esc(it.unit)}</b></li>`; }).join('')}</ul>
       ${e.missing.length ? `<p class="hint">${e.missing.length} Zutat${e.missing.length>1?'en':''} noch ohne Preis, nicht im Wareneinsatz. Beim Übernehmen werden sie als Produkte angelegt und erscheinen im Preis-Check.</p>` : ''}
       <div class="lab-alg"><span class="muted sm">Allergene</span>${e.t.alg.size ? chips(e.t.alg) : '<span class="muted sm">keine erfasst</span>'}</div>
       <details class="lab-steps"><summary>Zubereitung (${rec.steps.length} Schritte)</summary><ol>${rec.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol></details>
@@ -5460,9 +5723,9 @@ function renderLabor(){
         <label class="f">Verkaufspreis (optional)<span class="qty"><input data-lab="price" type="number" min="0" step="0.1" value="${esc(L.price)}" placeholder="frei"><em>€</em></span></label>
       </div>
       <button type="button" class="btn primary lab-go" data-act="labGen" ${L.ings.length && !L.busy ? '' : 'disabled'}>${ico('labor')}${L.busy ? 'Ideen werden entwickelt …' : 'Rezepte erfinden'}</button>
-      <p class="hint">Jetzt: eingebauter Beispiel-Generator. Mit dem KI-Schlüssel in der Cloud kommen hier echte, kreative Vorschläge, die Berechnung bleibt dieselbe.</p>
+      <p class="hint">Beispielgenerator ohne KI. Mit KI-Schlüssel in der Cloud kommen echte Vorschläge, gerechnet wird gleich.</p>
     </section>
-    <div class="lab-res">${res ? (res.length ? res.map(card).join('') : emptyHtml('labor','Keine Idee möglich','Mit dieser Ernährungsform bleibt keine Zutat übrig. Andere Zutaten wählen.')) : emptyHtml('labor','Noch keine Ideen','Zutaten wählen, Rahmen setzen und „Rezepte erfinden“ drücken. Jede Idee wird sofort mit Ihren Preisen durchgerechnet.')}</div>
+    <div class="lab-res">${res ? (res.length ? res.map(card).join('') : emptyHtml('labor','Keine Idee möglich','Mit dieser Ernährungsform bleibt keine Zutat übrig. Andere Zutaten wählen.')) : emptyHtml('labor','Noch keine Vorschläge','Zutaten wählen und „Rezepte erfinden“ drücken.')}</div>
   </div>`;
 }
 
@@ -5497,6 +5760,157 @@ document.addEventListener('change', e => {
   const t = e.target; if(t.id === 'labIn'){ if(S.products.some(p => p.name === t.value) || S.cards.some(c => c.name === t.value)) labAddFromInput(); return; }
   if(!t.dataset || !t.dataset.lab) return; const L = labState(); L[t.dataset.lab] = t.value; if(L.res) labRun();
 });
+
+/* =====================================================================
+   Feinschliff: ruhige, handgemachte Oberfläche.
+   Ein Kontextsatz je Seite, keine Hinweis-Stapel, Zahlen deutsch,
+   Heute als Tagesblatt, Aufbau als Liste, Warnfarbe nur für Seltenes.
+   ===================================================================== */
+
+/* ---------- Texte: kurz, Küchensprache ---------- */
+Object.assign(WOZU, {
+  aufbau:'Sechs Stationen, bis der Betrieb komplett in der App steht. Der Stand rechnet sich aus Ihren Daten.',
+  menu:'Preis, Wareneinsatz und Allergene je Gericht. Preis direkt in der Zeile ändern, Klick öffnet die Rezeptur.',
+  cards:'Zutaten, Mengen, Zubereitung je Gericht. Daraus kommen Wareneinsatz und Allergene.',
+  stock:'Bestand, Wareneingang, Entnahmen, Schwund, Inventur.',
+  buy:'Wer liefert wann, was muss heute noch raus, was kommt morgen.',
+  products:'Einkaufspreis je Einheit, netto. Richtwerte sind Beispielpreise, bis Sie sie bestätigen.',
+  report:'Kassendaten einlesen, Renner und Verlierer sehen.',
+  setup:'Betrieb, Team, Cloud, Sicherung.',
+  pcheck:'Produkt für Produkt: echten Preis eintippen oder Richtwert bestätigen. Enter geht weiter.',
+});
+delete WOZU.dash;
+
+/* ---------- Hinweise: höchstens eine ruhige Zeile unter dem Titel ---------- */
+demoNote = () => '';
+injectDashStrip = function(){};
+injectWozu = function(){
+  const t = view.tab; const txt = WOZU[t]; if(!txt || view.card) return;
+  const ph = $('#app .page-h'); if(!ph) return;
+  const h1 = ph.querySelector('h1'); if(!h1) return;
+  if(!h1.querySelector('.wozu-q')) h1.insertAdjacentHTML('beforeend', `<button type="button" class="wozu-q ${WOZU_OFF[t]?'':'on'}" data-act="wozuToggle" data-id="${t}" title="${WOZU_OFF[t]?'Hinweis zeigen':'Hinweis ausblenden'}" aria-label="Hinweis zum Bereich">${ico('help')}</button>`);
+  if(WOZU_OFF[t]) return;
+  if(!h1.parentNode.querySelector('.sub')) h1.insertAdjacentHTML('afterend', `<p class="sub">${esc(txt)}</p>`);
+};
+/* Vorzeile über dem Titel: weg. Nur bei Listen bleibt die Anzahl, ruhig hinter dem Titel. */
+const COUNT_TABS = {menu:()=>S.menu.length, stock:()=>stockProducts().length, products:()=>S.products.filter(p=>!p.noStock).length};
+function tidyHead(){
+  const ph = $('#app .page-h'); if(!ph) return;
+  const eb = ph.querySelector(':scope > div > .eyebrow'); if(!eb) return;
+  const h1 = ph.querySelector('h1'); const cnt = COUNT_TABS[view.tab];
+  if(h1 && cnt && !h1.querySelector('.h-n')){ const q = h1.querySelector('.wozu-q'); const n = document.createElement('span'); n.className = 'h-n'; n.textContent = num(cnt()); q ? h1.insertBefore(n, q) : h1.appendChild(n); }
+  eb.remove();
+}
+const _renderPolish = render;
+render = function(){
+  _renderPolish();
+  tidyHead();
+  if(view.tab === 'report'){ document.querySelectorAll('#app .note').forEach(n => n.remove()); if(S.salesDemo){ const sub = $('#app .page-h .sub'); if(sub) sub.textContent = 'Demodaten: erfundene Verkäufe, bis zum ersten echten Kassen-Import.'; } }
+  if(view.tab === 'setup' && S.demo){ const sub = $('#app .page-h .sub'); if(sub) sub.textContent = 'Demodaten: Karte und Preise von dahuam202.at, Rezepturen und Bestände sind Richtwerte.'; }
+};
+
+/* ---------- Heute: Tagesblatt ---------- */
+function dayRow(lead, main, sub, meta, act, cls=''){
+  return `<li class="rw ${cls}"><span class="rw-lead">${lead}</span><span class="rw-main"><b>${main}</b>${sub?`<small>${sub}</small>`:''}</span><span class="rw-meta">${meta||''}</span><span class="rw-act">${act||''}</span></li>`;
+}
+function daySec(title, sub, rowsHtml){ return `<section class="day-sec"><h2 class="day-h">${title}${sub?`<span>${sub}</span>`:''}</h2><ul class="rows">${rowsHtml}</ul></section>`; }
+renderDash = function(){
+  const t = todayStr(), w = wd(t), now = nowMin();
+  const closed = (S.settings.closed||[]).includes(w);
+  const sk = seasonFor(t); const sTitle = sk && S.settings.seasons && S.settings.seasons[sk] ? S.settings.seasons[sk].title : '';
+  const all = S.menu.map(m => ({m, k:menuCalc(m)}));
+  const linked = all.filter(x => x.k.cost != null).sort((a,b)=>b.k.fc-a.k.fc);
+  const avg = linked.length ? linked.reduce((s,x)=>s+x.k.fc,0)/linked.length : null;
+  const tg = +S.settings.target; const over = linked.filter(x => x.k.fc > tg);
+  const low = lowStock(); const lastInv = S.inventories[0];
+  const scale = Math.max(40, Math.ceil(((linked[0]?.k.fc)||0)/10)*10 + 5);
+  const sups = (S.suppliers||[]).filter(s=>s.active);
+  const due = sups.filter(sp => sp.orderDays.includes(w)).sort((a,b)=>hm(a.cutoff)-hm(b.cutoff));
+  const exp = (S.orders||[]).filter(o => ['sent','confirmed'].includes(o.status) && o.deliveryDate <= t).sort((a,b)=>a.deliveryDate.localeCompare(b.deliveryDate));
+  const live = specialsFor(t);
+  const dayDishes = S.menu.filter(m => !m.hidden && m.days && m.days.length && m.days.includes(w));
+  const nextSp = S.specials.filter(sp => spStatus(sp)[0]==='soon').sort((a,b)=>a.from.localeCompare(b.from))[0];
+  const o = gameOverall();
+  const dateStr = new Date().toLocaleDateString('de-AT',{weekday:'long', day:'numeric', month:'long'});
+  const subParts = [closed ? `${DAYNAME[w]} ist Ruhetag` : 'Servicetag', sTitle, due.length ? `${due.length} ${due.length===1?'Bestellung':'Bestellungen'} bis ${esc(due[due.length-1].cutoff)} Uhr` : 'kein Bestelltag'];
+
+  const orderRows = due.map(sp => {
+    const left = hm(sp.cutoff) - now; const dr = draftFor(sp.id); const sent = lastOrderToday(sp.id);
+    const lowN = lowStock().filter(p=>p.supplier===sp.id).length; const val = lowStock().filter(p=>p.supplier===sp.id).reduce((a,p)=>a+packSuggest(p)*(p.packQty||1)*p.price,0);
+    const sub = `${CHANNELS[sp.channel]} · Lieferung ${dayLabel(nextDelivery(sp, left<0?null:t))}${lowN?` · ${lowN} unter Mindestbestand, ${eur(val)}`:''}`;
+    const meta = sent ? 'bestellt' : left < 0 ? 'Annahmeschluss vorbei' : `<span class="${left < 90 ? 'bad-t' : ''}">noch ${left>=60?Math.floor(left/60)+' h ':''}${left%60} min</span>`;
+    const act = sent ? '' : dr ? `<button type="button" class="btn sm" data-act="ordOpen" data-id="${dr.id}">Entwurf öffnen</button>` : `<button type="button" class="btn sm" data-act="ordNew" data-id="${sp.id}">Vorbereiten</button>`;
+    return dayRow(`bis ${esc(sp.cutoff)}`, esc(sp.name), sub, meta, act, sent || left < 0 ? 'past' : '');
+  }).join('');
+  const recvRows = exp.map(o => { const sp = SUP(o.supplier); const late = o.deliveryDate < t;
+    return dayRow(late ? `<span class="bad-t">${fmtDate(o.deliveryDate+'T12:00:00').slice(0,6)}</span>` : 'heute', esc(sp ? sp.name : '?'), `${o.no} · ${o.lines.length} Positionen · ${eur(orderTotal(o))}${late?' · überfällig':''}`, statusPill(o.status), `<button type="button" class="btn sm" data-act="ordRecv" data-id="${o.id}">Wareneingang</button>`); }).join('');
+  const cardRows = [
+    ...live.map(sp => dayRow('Aktion', esc(sp.name), `${sp.items.length} ${sp.items.length===1?'Gericht':'Gerichte'}${sp.to && sp.to!==sp.from ? ` · bis ${fmtDate(sp.to+'T12:00:00')}` : ''}`, '', `<button type="button" class="btn sm" data-act="previewSpecial" data-id="${sp.id}">Karte</button>`)),
+    ...dayDishes.map(m => dayRow(DAYNAME[w].slice(0,2), esc(m.name), `${esc(m.section)} · ${eur(m.price)}`, '', m.card && C(m.card) ? `<button type="button" class="btn sm" data-act="openCard" data-id="${m.card}">Rezeptur</button>` : '')),
+    ...(nextSp && !live.length ? [dayRow(fmtDate(nextSp.from+'T12:00:00').slice(0,6), esc(nextSp.name), spStatus(nextSp)[1], '', `<button type="button" class="btn sm" data-act="previewSpecial" data-id="${nextSp.id}">Vorschau</button>`, 'past')] : []),
+  ].join('');
+  const openRows = [
+    S.menu.length-linked.length ? dayRow(num(S.menu.length-linked.length), 'Gerichte ohne Rezeptur', '', '', `<button type="button" class="btn sm" data-act="goMenu" data-id="none">Ansehen</button>`) : '',
+    S.menu.filter(m=>!hasAlg(m)).length ? dayRow(num(S.menu.filter(m=>!hasAlg(m)).length), 'Gerichte ohne Allergenangabe', '', '', `<button type="button" class="btn sm" data-act="goMenu" data-id="noalg">Ansehen</button>`) : '',
+    over.length ? dayRow(`<span class="bad-t">${over.length}</span>`, `Gerichte über ${num(tg)} % Wareneinsatz`, '', '', `<button type="button" class="btn sm" data-act="goMenu" data-id="over">Ansehen</button>`) : '',
+    low.length ? dayRow(num(low.length), 'Artikel unter Mindestbestand', '', '', `<button type="button" class="btn sm" data-act="goStock" data-id="bestellung">Bestellen</button>`) : '',
+    dayRow(S.invDraft ? '…' : ico('clip'), S.invDraft ? 'Inventur läuft' : 'Inventur', lastInv ? `zuletzt ${fmtDate(lastInv.date)}` : 'noch keine', '', `<button type="button" class="btn sm" data-act="goStock" data-id="inventur">${S.invDraft?'Fortsetzen':'Zählen'}</button>`),
+    o.pct < 100 ? dayRow(`${o.pct} %`, 'Aufbau', o.next ? `Stufe ${o.lvl+1} ${esc(o.lvlName)} · als Nächstes ${esc(o.next.name)}` : '', '', `<button type="button" class="btn sm" data-act="goTab" data-id="aufbau">Weiter</button>`) : '',
+  ].join('');
+
+  return `<div class="page-h"><div><h1>${dateStr}</h1><p class="sub">${subParts.filter(Boolean).join(' · ')}</p></div>
+    <div class="row-btns"><button type="button" class="btn" data-act="sales">Verkäufe buchen</button><button type="button" class="btn primary" data-act="moveDlg" data-id="in">${ico('truck')}Wareneingang</button></div></div>
+  <div class="day">
+    ${orderRows ? daySec('Bestellen', `${due.length} Lieferanten, Annahmeschluss`, orderRows) : ''}
+    ${recvRows ? daySec('Lieferungen prüfen', '', recvRows) : ''}
+    ${cardRows ? daySec(live.length || dayDishes.length ? 'Heute auf der Karte' : 'Demnächst', '', cardRows) : ''}
+    <div class="tiles">
+      <div class="tile"><div><div class="t-l">Ø Wareneinsatz</div><div class="t-v ${avg!=null && avg > tg ? 'bad-t' : ''}">${avg==null?'—':num(avg,1)+' %'}</div><div class="t-s">Ziel ${num(tg)} %</div></div></div>
+      <div class="tile"><div><div class="t-l">Kalkuliert</div><div class="t-v">${linked.length}<small> / ${S.menu.length}</small></div><div class="t-s">Gerichte mit Rezeptur</div></div></div>
+      <button type="button" class="tile click" data-act="goStock" data-id="bestand"><div><div class="t-l">Lagerwert</div><div class="t-v">${eur(stockValue())}</div><div class="t-s">${lastInv?'Inventur '+fmtDate(lastInv.date):'noch keine Inventur'}</div></div></button>
+      <button type="button" class="tile click" data-act="goStock" data-id="bestellung"><div><div class="t-l">Unter Mindestbestand</div><div class="t-v">${low.length}</div><div class="t-s">${low.length?'Bestellvorschlag':'alles vorrätig'}</div></div></button>
+    </div>
+    <div class="day-grid">
+      <section class="panel">
+        <div class="panel-h"><h2>Wareneinsatz je Gericht</h2><span class="legend"><i class="tl"></i>Ziel ${num(tg)} %</span></div>
+        <div class="bars" style="--tg:${(tg/scale*100).toFixed(2)}%">
+          ${linked.slice(0,12).map(({m,k})=>`<button type="button" class="bar-r" data-act="openCard" data-id="${k.c.id}" title="${esc(m.name)}"><span class="bar-n">${esc(m.name)}</span><span class="bar-t"><i class="${fcClass(k.fc)}" style="width:${Math.min(100,k.fc/scale*100).toFixed(2)}%"></i></span><span class="bar-v">${num(k.fc,1)} %</span></button>`).join('') || '<div class="empty">Noch keine Gerichte kalkuliert.</div>'}
+          <div class="bar-axis"><span></span><span class="ax"><i>0 %</i><i>${num(scale/2)} %</i><i>${num(scale)} %</i></span><span></span></div>
+        </div>
+      </section>
+      ${daySec('Offen', '', openRows)}
+    </div>
+  </div>`;
+};
+
+/* ---------- Aufbau: Liste statt Bühne ---------- */
+renderAufbau = function(){
+  const o = gameOverall(); const nx = o.next;
+  const row = s => { const st = s.pct >= 100 ? 'done' : (nx && nx.k === s.k) ? 'active' : 'open';
+    return `<li class="au-row ${st}">
+      <span class="au-n">${s.pct>=100 ? ico('check') : s.no}</span>
+      <span class="au-t"><b>${esc(s.name)}${st==='active'?'<em>jetzt dran</em>':''}</b><small>${esc(s.wozu)}</small></span>
+      <span class="au-p"><span>${esc(s.metric)}</span><span class="au-m"><i style="width:${s.pct}%"></i></span></span>
+      <span class="au-a">${st==='done' ? `<button type="button" class="btn sm" data-act="${s.act.a}" data-id="${esc(s.act.id)}">${esc(s.act.l)}</button>` : `<button type="button" class="btn sm ${st==='active'?'primary':''}" data-act="${s.act.a}" data-id="${esc(s.act.id)}">${esc(s.act.l)}</button>`}</span>
+    </li>`; };
+  return `<div class="page-h"><div><h1>Aufbau</h1></div>
+    <div class="row-btns">${nx ? `<button type="button" class="btn primary" data-act="${nx.act.a}" data-id="${esc(nx.act.id)}">${esc(nx.act.l)}</button>` : ''}</div></div>
+  <div class="au-sum"><span class="au-m big"><i style="width:${o.pct}%"></i></span><span class="au-sum-t"><b>${o.pct} %</b> · Stufe ${o.lvl+1} von ${LEVELS.length}, ${esc(o.lvlName)} · ${o.doneN} von ${o.st.length} Stationen fertig${o.pct>=100?' · alles steht':''}</span></div>
+  <ol class="au-list">${o.st.map(row).join('')}</ol>`;
+};
+
+/* ---------- Zahlen: Komma-Eingabe zuerst normalisieren, dann rechnen die alten Handler ---------- */
+window.addEventListener('change', e => { const t = e.target; if(t && t.classList && t.classList.contains('num-in')){ const v = numParse(t.value); t.value = isNaN(v) ? '' : String(v); } }, true);
+document.addEventListener('focusin', e => { if(e.target.matches && e.target.matches('input.lt-price')) setTimeout(() => e.target.select(), 0); });
+
+/* ---------- Bedienung ---------- */
+document.addEventListener('keydown', e => {
+  if(e.key !== '/' || e.target.closest('input,textarea,select,[contenteditable]') || !$('#pal').hidden || $('#dlg').open) return;
+  const s = document.querySelector('#app #mq, #app #cq, #app #pq, #app #labIn, #app #shelfQ'); if(!s) return;
+  e.preventDefault(); e.stopImmediatePropagation(); s.focus(); s.select();
+}, true);
+document.addEventListener('change', e => { const t = e.target; if(t.dataset && t.dataset.sel === 'sec'){ view.sec = t.value; render(); } });
+document.addEventListener('click', e => { if(e.target.closest('tr.row') && e.target.closest('input,select,textarea,label,a')) e.stopPropagation(); }, true);
 
 /* ---------- Start ---------- */
 S = migrate(load()) || seed();
