@@ -1,0 +1,42 @@
+<div id="intro" class="intro" aria-hidden="true">
+  <div class="in-table"></div>
+  <div class="in-scene">
+    <img class="in-plate" src="brand/plate.webp" alt="" decoding="async">
+    <img class="in-knife" src="brand/knife.webp" alt="" decoding="async">
+    <img class="in-fork" src="brand/fork.webp" alt="" decoding="async">
+    <div class="in-card">
+      <div class="in-mark"><svg class="in-ring" viewBox="0 0 64 64"><circle cx="32" cy="32" r="31.4"/></svg><div class="in-em-wrap"><div class="in-gold in-emblem"></div></div></div>
+      <div class="in-gold in-word"></div>
+      <div class="in-gold in-sub"></div>
+      <div class="in-flap"><span>Im<br>Herzen von<b>Gerlos</b></span></div>
+    </div>
+  </div>
+  <div class="in-iris"></div>
+  <div class="ic ic-slate"></div><div class="ic ic-tint"></div>
+  <div class="ic ic-stage"><div class="ic-gold ic-mark"><div class="ic-spec"></div></div><div class="ic-gold ic-word"><div class="ic-spec"></div></div><div class="ic-gold ic-sub"></div><div class="ic-gerlos">Im Herzen von Gerlos</div></div>
+  <div class="ic ic-dark"></div><div class="ic-ember"></div><button class="ic-skip" type="button">Überspringen</button>
+</div>
+<script>
+(function(){
+  var el = document.getElementById('intro'); if(!el) return;
+  var seen = /[?&]nointro/.test(location.search); if(!seen) try { seen = !!sessionStorage.getItem('dahuam202_intro'); sessionStorage.setItem('dahuam202_intro','1'); } catch(e){}
+  var variant = 'candle'; try { variant = localStorage.getItem('dahuam202_kueche_de_v1_intro') || 'candle'; } catch(e){}
+  if(seen || variant === 'off'){ el.remove(); return; }
+  if(variant === 'candle') el.classList.add('v-candle');
+  var done = false, t0 = Date.now();
+  function finish(quick){ if(done) return; done = true;
+    if(!quick && variant === 'candle'){ try { var mk = el.querySelector('.ic-mark'), tg = document.querySelector(window.innerWidth > 900 ? '.side .logo' : '.topbar .logo'); if(mk && tg){ var a = mk.getBoundingClientRect(), b = tg.getBoundingClientRect(); var s = b.width / a.width, dx = (b.left + b.width/2) - (a.left + a.width/2), dy = (b.top + b.height/2) - (a.top + a.height/2); mk.classList.add('fly'); mk.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px)) scale(' + s + ')'; mk.style.opacity = '0'; } } catch(e){} }
+    el.classList.add(quick ? 'quick' : 'out'); setTimeout(function(){ el.remove(); }, quick ? 340 : 720); }
+  function skip(){ finish(true); }
+  el.addEventListener('pointerdown', skip, {once:true}); window.addEventListener('keydown', skip, {once:true});
+  var portrait = window.matchMedia('(orientation:portrait),(max-width:760px)').matches;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var srcs = variant === 'candle' ? ['brand/slate.webp','brand/logo.svg'] : portrait ? ['brand/slate.webp','brand/logo.svg'] : ['brand/table.webp','brand/plate.webp','brand/knife.webp','brand/fork.webp','brand/logo.svg'];
+  var ready = Promise.all(srcs.map(function(s){ var i = new Image(); i.src = s; return i.decode ? i.decode().catch(function(){}) : Promise.resolve(); }));
+  var started = false;
+  function start(){ if(started || done) return; started = true; el.classList.add('play'); var hold = reduce ? 1000 : 2050; setTimeout(function(){ finish(false); }, hold); }
+  ready.then(start);
+  setTimeout(start, 1400);
+  setTimeout(function(){ finish(true); }, 4200);
+})();
+</script>

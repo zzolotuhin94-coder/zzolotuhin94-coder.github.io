@@ -1,0 +1,10 @@
+const L=require('./lib');
+(async()=>{const {b,p,errs}=await L.open({});
+p.on('console',m=>console.log('C:',m.text().slice(0,300)));
+await p.evaluate(()=>go('menu'));await p.waitForTimeout(250);
+const ids=await p.evaluate(()=>[...document.querySelectorAll('input[data-mp]')].slice(0,3).map(i=>i.dataset.mp));
+await p.evaluate(()=>{const os=HTMLInputElement.prototype.select;HTMLInputElement.prototype.select=function(){console.log('SELECT',this.id,new Error().stack.split('\n').slice(2,4).join(' | '));return os.call(this)};const of=HTMLElement.prototype.focus;HTMLElement.prototype.focus=function(...a){console.log('FOCUS',this.tagName,this.id,new Error().stack.split('\n').slice(2,4).join(' | '));return of.apply(this,a)};['change','focusin','focusout','keydown','pointerup'].forEach(ev=>window.addEventListener(ev,e=>console.log(ev,e.target.tagName,e.target.id||e.target.dataset?.act||'',e.key||''),true));const r=render;render=function(){console.log('RENDER active=',document.activeElement.tagName,document.activeElement.id, new Error().stack.split('\n')[2]);r()}});
+await p.locator('#mp-'+ids[0]).click();await p.keyboard.press('Control+a');await p.keyboard.type('15,5');await p.keyboard.press('Tab');
+await p.waitForTimeout(200);
+console.log('after',await p.evaluate(()=>document.activeElement.outerHTML.slice(0,100)));
+await b.close();})();

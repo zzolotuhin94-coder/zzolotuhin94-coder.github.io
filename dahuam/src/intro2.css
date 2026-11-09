@@ -1,0 +1,58 @@
+/* ===== Intro „Kerzenschein“: Licht wie von einer Kerze außerhalb des Bildes ===== */
+@property --lr{syntax:'<length>';inherits:true;initial-value:0px}
+.intro.v-candle{--ox:34%;--oy:84%;--lr:0px;background:#0d0f10}
+.intro.v-candle .in-table,.intro.v-candle .in-scene{display:none}
+.intro:not(.v-candle) .ic{display:none}
+.ic{position:absolute;inset:0}
+.ic-slate{background:#16181a url(brand/slate.webp) center/cover;filter:contrast(1.12) brightness(.85)}
+.ic-tint{background:radial-gradient(circle at var(--ox) var(--oy),rgba(255,176,96,.24),transparent 55%);mix-blend-mode:soft-light;opacity:0}
+.ic-stage{container-type:size}
+.ic-gold{position:absolute;background:#c59c69;-webkit-mask:url(brand/logo.svg) no-repeat;mask:url(brand/logo.svg) no-repeat}
+.ic-spec{position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,241,214,.85) 48%,transparent 66%) 30% 0/260% 100% no-repeat;mix-blend-mode:screen;opacity:0}
+.ic-mark{left:50%;top:44%;width:min(24vmin,38cqh);aspect-ratio:1;transform:translate(-50%,-50%);opacity:0;filter:blur(6px)}
+.ic-mark{-webkit-mask-size:calc(100% * 119.3/64) auto;mask-size:calc(100% * 119.3/64) auto;-webkit-mask-position:calc(27.5/(119.3 - 64) * 100%) calc(7.8/(121.8 - 64) * 100%);mask-position:calc(27.5/(119.3 - 64) * 100%) calc(7.8/(121.8 - 64) * 100%)}
+.ic-word{left:50%;top:calc(44% + min(24vmin,38cqh)/2 + 5cqh);width:min(34vmin,52cqh);aspect-ratio:90/20;transform:translate(-50%,8px);opacity:0;filter:blur(2px);
+  -webkit-mask-size:calc(100% * 119.3/90) auto;mask-size:calc(100% * 119.3/90) auto;-webkit-mask-position:calc(15/(119.3 - 90) * 100%) calc(80/(121.8 - 20) * 100%);mask-position:calc(15/(119.3 - 90) * 100%) calc(80/(121.8 - 20) * 100%)}
+.ic-sub{left:50%;top:calc(44% + min(24vmin,38cqh)/2 + 5cqh + min(34vmin,52cqh)*20/90 + 2cqh);width:min(22vmin,34cqh);aspect-ratio:61/11;transform:translate(-50%,8px);opacity:0;filter:blur(2px);
+  -webkit-mask-size:calc(100% * 119.3/61) auto;mask-size:calc(100% * 119.3/61) auto;-webkit-mask-position:calc(29/(119.3 - 61) * 100%) calc(104.8/(121.8 - 11) * 100%);mask-position:calc(29/(119.3 - 61) * 100%) calc(104.8/(121.8 - 11) * 100%)}
+.ic-gerlos{position:absolute;left:0;right:0;top:86%;text-align:center;font:300 clamp(11px,1.5vmin,15px)/1 "Barlow Condensed",sans-serif;letter-spacing:.4em;text-transform:uppercase;color:rgba(239,230,214,.7);opacity:0}
+.ic-dark{background:radial-gradient(circle at var(--ox) var(--oy),transparent 0,transparent calc(var(--lr)*.32),rgba(13,15,16,.55) calc(var(--lr)*.7),#0d0f10 var(--lr))}
+.ic-ember{position:absolute;left:var(--ox);top:var(--oy);width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:#ffd9a0;filter:blur(3px);box-shadow:0 0 18px 6px rgba(255,190,110,.55);opacity:0;transform:scale(.3)}
+.ic-skip{position:absolute;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));border:0;background:none;color:rgba(239,230,214,.6);font:500 13px "Figtree",sans-serif;letter-spacing:.04em;cursor:pointer;padding:8px;opacity:0}
+@media (orientation:portrait),(max-width:760px){
+  .intro.v-candle{--ox:50%;--oy:82%}
+  .ic-mark{width:58vw;top:38%}
+  .ic-word{width:64vw;top:calc(38% + 29vw + 4.5cqh)}
+  .ic-sub{width:40vw;top:calc(38% + 29vw + 4.5cqh + 64vw*20/90 + 2cqh)}
+  .ic-gerlos{top:88%}
+}
+.intro.v-candle.play{animation:icLight 2.05s cubic-bezier(.16,1,.3,1) .18s forwards}
+@keyframes icLight{0%{--lr:0px}38%{--lr:92vmax}100%{--lr:98vmax}}
+.intro.v-candle.play .ic-ember{animation:icEmber .18s cubic-bezier(.2,.8,.2,1) forwards,inFadeOut .4s linear .2s forwards}
+.intro.v-candle.play .ic-tint{animation:inFade .77s linear .18s forwards}
+.intro.v-candle.play .ic-dark{animation:icFlicker 1.1s ease-in-out .9s 1}
+.intro.v-candle.play .ic-mark{animation:icMark .8s cubic-bezier(.22,.61,.36,1) .45s forwards}
+.intro.v-candle.play .ic-mark .ic-spec,.intro.v-candle.play .ic-word .ic-spec{animation:icSpec 1.1s ease-in-out .9s forwards}
+.intro.v-candle.play .ic-word{animation:icRise .5s cubic-bezier(.2,.7,.2,1) 1.15s forwards}
+.intro.v-candle.play .ic-sub{animation:icRise .5s cubic-bezier(.2,.7,.2,1) 1.29s forwards}
+.intro.v-candle.play .ic-gerlos{animation:icGerlos .35s cubic-bezier(.2,.7,.2,1) 1.6s forwards}
+.intro.v-candle.play .ic-skip{animation:inFade .4s linear .6s forwards}
+@keyframes icEmber{to{opacity:1;transform:scale(1)}}
+@keyframes icMark{to{opacity:1;filter:none}}
+@keyframes icRise{to{opacity:1;filter:none;transform:translate(-50%,0)}}
+@keyframes icGerlos{to{opacity:1;letter-spacing:.28em}}
+@keyframes icSpec{0%{opacity:0;background-position:30% 0}30%{opacity:.3}70%{opacity:.3}100%{opacity:0;background-position:62% 0}}
+@keyframes icFlicker{0%{opacity:1;transform:none}25%{opacity:.95;transform:translate(.6%,-.4%)}50%{opacity:1;transform:translate(-.4%,.2%)}75%{opacity:.97;transform:translate(.3%,.5%)}100%{opacity:1;transform:none}}
+/* Ausgang: Licht füllt den Raum, Emblem fliegt an seinen Platz in der App */
+.intro.v-candle.out{animation:icOut .7s cubic-bezier(.65,0,.35,1) forwards}
+.intro.v-candle.out .ic-dark,.intro.v-candle.out .ic-slate,.intro.v-candle.out .ic-tint{animation:inFadeOut .55s linear forwards}
+.intro.v-candle.out .ic-word,.intro.v-candle.out .ic-sub,.intro.v-candle.out .ic-gerlos,.intro.v-candle.out .ic-skip{animation:inFadeOut .3s linear forwards}
+.intro.v-candle .ic-mark.fly{transition:transform .6s cubic-bezier(.65,0,.35,1),opacity .2s linear .5s}
+@keyframes icOut{0%{background-color:#0d0f10}60%{background-color:rgba(31,35,38,.6)}100%{background-color:transparent;visibility:hidden}}
+@media (prefers-reduced-motion: reduce){
+  .intro.v-candle.play{--lr:98vmax;animation:inFade .4s linear}
+  .intro.v-candle.play .ic-mark,.intro.v-candle.play .ic-word,.intro.v-candle.play .ic-sub{opacity:1;filter:none;transform:translate(-50%,-50%)}
+  .intro.v-candle.play .ic-word,.intro.v-candle.play .ic-sub{transform:translate(-50%,0)}
+  .intro.v-candle.play .ic-gerlos,.intro.v-candle.play .ic-tint{opacity:1}
+  .intro.v-candle.out{animation:inOut .35s linear forwards!important}
+}

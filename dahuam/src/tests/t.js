@@ -1,0 +1,15 @@
+const {chromium}=require('playwright');
+(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1280,height:900}});
+const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&errs.push(m.text()));
+await p.goto('file:///home/user/zzolotuhin94-coder.github.io/dahuam/index.html');
+await p.waitForTimeout(800);
+console.log(await p.evaluate(()=>S.menu.filter(m=>m.card).map(m=>{const k=menuCalc(m);return m.name+' '+k.cost.toFixed(2)+' '+k.fc.toFixed(1)+'%'}).join('\n')));
+await p.screenshot({path:'menu.png'});
+await p.click('[data-act=openCard][data-id=dish_schnitzel_veal]');await p.waitForTimeout(200);
+await p.screenshot({path:'card.png'});
+await p.click('#tabs button[data-tab=products]');
+const m=await b.newPage({viewport:{width:390,height:844}});m.on('pageerror',e=>errs.push(e.message));
+await m.goto('file:///home/user/zzolotuhin94-coder.github.io/dahuam/index.html#cards');await m.waitForTimeout(500);
+console.log('mobile overflow',await m.evaluate(()=>document.documentElement.scrollWidth));
+await m.screenshot({path:'mob.png'});
+console.log('errors',errs);await b.close();})();

@@ -1,0 +1,199 @@
+
+/* =====================================================================
+   Audit-Korrekturen: neue Bausteine, Kontrast, Telefon-Layout, Tippflächen
+   ===================================================================== */
+/* ---------- Bausteine ---------- */
+#toast.has-act{pointer-events:auto;display:flex;align-items:center;gap:12px;padding:6px 6px 6px 18px}
+.toast-act{border:0;border-radius:999px;background:var(--bg);color:var(--fg);font:600 13.5px var(--f-body);padding:8px 14px;cursor:pointer;white-space:nowrap}
+.toast-act:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input.bad-in,.qty input.bad-in{outline:2px solid var(--bad);outline-offset:1px;border-color:var(--bad)}
+.f-err{display:block;margin-top:6px;font:500 13px/1.4 var(--f-body);color:var(--bad)}
+.dlg-warn{margin:12px 0 0;align-items:flex-start}
+.dlg-warn .btn{flex:none;margin-left:auto}
+.demo-ask{border:1px solid var(--line);border-radius:var(--r-s,8px);padding:10px 14px 12px;margin:14px 0 0;min-width:0}
+.demo-ask legend{font:600 12.5px var(--f-body);color:var(--muted);padding:0 6px}
+.demo-ask .dlg-p{margin:0 0 8px}
+.ro-note{display:flex;gap:10px;align-items:center;margin:0 0 16px;padding:9px 14px;border:1px solid var(--line-strong);border-radius:var(--r-s,8px);background:var(--surface-2);font-size:13.5px;color:var(--fg)}
+.ro-note .ico{width:18px;height:18px;flex:none;color:var(--muted)}
+.ro[disabled],.ro[aria-disabled="true"]{opacity:.55;cursor:not-allowed}
+input.ro[disabled],textarea.ro[disabled],select.ro[disabled]{opacity:.8;background:transparent}
+.btn:disabled,.btn[aria-disabled="true"]{opacity:.45;cursor:not-allowed;filter:saturate(.4);box-shadow:none}
+.btn.primary:disabled{background:var(--surface-2);color:var(--muted);border-color:var(--line-strong);opacity:1}
+.row-open{all:unset;cursor:pointer;display:inline;max-width:100%;border-radius:4px}
+.row-open:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row-open:disabled{cursor:default}
+.safety{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:13.5px}
+.safety small{display:block;font-size:12.5px}
+.who-can{display:block;font-size:11.5px!important;line-height:1.3}
+.moves li.mv-grp{align-items:start}
+.mv-det summary{cursor:pointer;font-size:12.5px;color:var(--muted);padding:2px 0}
+.mv-det ul{list-style:none;margin:6px 0 2px;padding:0;display:grid;gap:3px;font-size:12.5px}
+.mv-det li{display:flex!important;justify-content:space-between;gap:12px;padding:0!important;border:0!important}
+.tot-l{font:500 11.5px var(--f-body);color:var(--muted);margin-right:2px}
+.otab .dev{display:block;font:500 11.5px var(--f-body);color:var(--muted);white-space:nowrap}
+.otab .dev.bad-t{color:var(--bad)} .otab .dev.good-t{color:var(--good)}
+.otab .rc-sum{display:block;font:400 12px var(--f-body)}
+.otab tfoot .tf-l{font-size:12px}
+.pc-msg{display:block;margin-top:8px;font:500 13.5px/1.45 var(--f-body);color:var(--bad)}
+.pc-msg .btn{margin-left:8px;vertical-align:baseline}
+.lab-pick{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:10px}
+.lab-pick .muted{flex-basis:100%}
+.lab-pick .lab-new{border-style:dashed}
+.lab-ing.free{border-style:dashed}
+.lab-ing.free small{font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:10.5px;color:var(--warn,#9a6200);margin-left:6px}
+.lab-hint{margin:8px 0 0}
+.rw.rw-fold{display:block;padding-top:8px;padding-bottom:8px}
+.rw-more{border:0;background:none;padding:6px 0;font:500 13px var(--f-body);color:var(--muted);cursor:pointer;text-align:left;text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px}
+.rw-more:hover{color:var(--fg)} .rw-more:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.plist .exact{font:400 11.5px var(--f-body);margin-left:6px}
+.oc.done .cd{color:var(--good)}
+
+/* ---------- Saison-Zeitleiste: nichts überdeckt sich ---------- */
+.tl-track{margin-top:20px}
+.tl-months span{padding-bottom:4px}
+.tl-today::after{top:-17px;font-size:10px;background:var(--fg);color:var(--bg);padding:1px 5px;border-radius:3px;line-height:1.3;white-space:nowrap}
+.tl-today.r::after{left:auto;right:-2px;transform:none} .tl-today.l::after{left:-2px;transform:none}
+.tl-pin{flex-direction:row;align-items:center;gap:6px;max-width:none;height:24px}
+.tl-pin:nth-child(even){top:auto}
+.tl-pin i{flex:none}
+.tl-pin span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:118px}
+.tl-pin.r{flex-direction:row-reverse;transform:translateX(-100%)}
+.tl-track{margin-top:26px}
+
+/* ---------- Kontrast im hellen Design: gedämpfter Text bleibt lesbar ---------- */
+:root{--muted:#5d6164;--faint:#70757a}
+/* dunkles Design: Werte aus ui3.css gelten weiter (höhere Spezifität) */
+/* „vorbei“ wird über die Farbe leiser, nicht über Durchsichtigkeit (die drückt den Kontrast unter die Grenze) */
+.rw.past,.oc.past,.sp-card.past{opacity:1}
+.rw.past .rw-lead,.rw.past .rw-main b,.oc.past h3{color:var(--muted);font-weight:500}
+.rw.past .rw-main small,.rw.past .rw-meta{color:var(--muted)}
+.sp-card.past h3{color:var(--muted)}
+.st-ref,.ti-flag{color:var(--muted)}
+
+/* ---------- Listen: Kopf und Gruppenzeile schließen bündig, keine Zeilenreste dazwischen ---------- */
+table.lt thead th{height:35px;box-sizing:border-box;padding-top:0;padding-bottom:0}
+table.lt tr.grp td{top:34px}
+@media (min-width:1000px){
+  /* Auswertung: Tabelle passt immer in die Breite, statt rechts abgeschnitten zu werden */
+  table.lt.rp-items{min-width:0}
+  table.lt.rp-items th,table.lt.rp-items td{padding-left:9px;padding-right:9px}
+  table.lt.rp-items th:first-child,table.lt.rp-items td:first-child{padding-left:14px}
+  table.lt.rp-items .lt-n b{white-space:normal}
+}
+@media (min-width:1000px) and (max-width:1420px){table.lt.rp-items .c-x1{display:none}}
+@media (min-width:1000px) and (max-width:1180px){table.lt.rp-items .c-x2{display:none}}
+.lt-wrap:has(> table.rp-items){overflow-x:auto}
+@media (min-width:1000px){.lt-wrap:has(> table.rp-items){overflow:clip}}
+.rp-matrix .pt text{font-size:10.5px}
+.rp-cmpnote{margin-top:-6px}
+
+/* ---------- Einkauf ---------- */
+#app.v-list .oc{grid-template-columns:minmax(130px,1fr) minmax(140px,1.4fr) 136px 96px 142px minmax(0,max-content)}
+#app.v-list .oc .row-btns{flex-wrap:wrap;min-width:0;gap:6px}
+.oc .row-btns{flex-wrap:wrap}
+table.otab input.num-in{width:84px;text-align:right;padding:6px 8px}
+table.otab td:first-child small{white-space:nowrap}
+table.otab td[data-l="Menge"] .qty{display:inline-grid;grid-template-columns:84px 124px;gap:8px;align-items:center;text-align:left}
+table.otab td[data-l="Menge"] .qty em{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+table.otab td.ol-x{width:42px;text-align:right}
+table.recv td[data-l="Preis lt. Rechnung"] .qty{display:inline-grid;grid-template-columns:84px 58px;gap:8px;align-items:center;text-align:left}
+.ol-tot{white-space:nowrap}
+
+/* ---------- Einstellungen: Karten ohne Löcher (Spaltenfluss statt Raster) ---------- */
+.setup-grid{display:block;columns:2 400px;column-gap:18px}
+.setup-grid > .panel{break-inside:avoid;margin:0 0 18px;display:block;width:100%}
+
+/* ---------- Telefon ---------- */
+@media (max-width:700px){
+  /* Kennzahlen als Raster, kein verstecktes Wischen zur Seite */
+  .tiles{display:grid!important;grid-template-columns:1fr 1fr!important;overflow:visible!important}
+  .tiles .tile{min-width:0!important;border-left:0!important;box-shadow:none!important;border-top:1px solid var(--line)}
+  .tiles .tile:nth-child(-n+2){border-top:0}
+  .tiles .tile:nth-child(even){border-left:1px solid var(--line)!important}
+  .tiles .tile:last-child:nth-child(odd){grid-column:1/-1}
+  .tiles .t-v{font-size:22px;overflow-wrap:anywhere}
+  /* Bestellung und Wareneingang: jede Position eine Karte, alle Werte sichtbar */
+  .tbl-wrap:has(> table.otab){overflow:visible}
+  table.otab{min-width:0;display:block}
+  table.otab thead{display:none}
+  table.otab tbody,table.otab tfoot{display:block}
+  table.otab tr{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;padding:12px 16px;border-top:1px solid var(--line)}
+  table.otab tbody tr:first-child{border-top:0}
+  table.otab td{display:block;padding:0!important;border:0!important;height:auto;text-align:left!important;min-width:0}
+  table.otab td:empty,table.otab td.ol-x:not(:has(button)){display:none}
+  table.otab td[data-l="Artikel"]{grid-column:1/-1}
+  table.otab td[data-l]:not([data-l="Artikel"])::before{content:attr(data-l);display:block;font:500 11.5px var(--f-body);color:var(--muted);margin-bottom:2px}
+  table.otab td[data-l="Menge"]{grid-column:1/-1}
+  table.otab td[data-l="Menge"] .qty{grid-template-columns:110px minmax(0,1fr)}
+  table.otab input.num-in{width:110px;min-height:44px;font-size:16px}
+  table.otab td.ol-x{position:absolute;right:10px;margin-top:-4px;width:auto}
+  table.otab tr{position:relative}
+  table.otab td:first-child small{white-space:normal}
+  table.otab tfoot td[colspan]{grid-column:1/-1;font-weight:600}
+  table.otab tfoot .tf-l{display:none}
+  table.recv td[data-l="Bestellt"]{grid-column:1/-1}
+  table.recv td[data-l="Status"]{grid-column:1/-1}
+  table.recv select{width:100%;min-height:44px}
+  table.recv td[data-l="Preis lt. Rechnung"] .qty{grid-template-columns:110px minmax(0,1fr)}
+  .recv-f{flex-direction:column;align-items:stretch}
+  .recv-f .f{min-width:0}
+  /* Auswertung: Kopf in ein bis zwei Zeilen */
+  .rp-period{gap:8px;padding:12px}
+  .rp-units .seg{display:flex;overflow-x:auto;scrollbar-width:none;max-width:100%}
+  .rp-units .seg button{flex:none}
+  .rp-nav{display:grid;grid-template-columns:40px minmax(0,1fr) 40px;gap:8px;align-items:center}
+  .rp-nav .f{grid-column:1/-1;flex:none}
+  .rp-nav > .sp,.rp-nav > .muted.sm{display:none}
+  .rp-nav > [data-act="rpToday"]{grid-column:1/3;grid-row:auto;justify-self:start}
+  .rp-nav > .seg{grid-column:2/-1;justify-self:end;margin-top:-48px}
+  .rp-label{min-width:0}
+  .rp-label b{font-size:18px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rp-label small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px}
+  .lt-wrap:has(> table.rp-items){overflow:visible}
+  table.lt.rp-items{min-width:0;table-layout:auto}
+  table.lt.rp-items th,table.lt.rp-items td{padding-left:8px;padding-right:8px}
+  table.lt.rp-items th:nth-child(8),table.lt.rp-items td:nth-child(8):not([colspan]){display:none}
+  table.lt.rp-items .lt-n b{white-space:normal;overflow-wrap:anywhere}
+  table.lt.rp-items .rp-d{font-size:11.5px}
+  .page-h .sub{font-size:13px}
+  .setup-grid{columns:1}
+}
+@media (max-width:420px){table.lt.rp-items td.rp-net{font-size:13px}}
+
+/* ---------- Tippflächen: mindestens 40 px auf Touch-Geräten, Desktop bleibt dicht ---------- */
+@media (pointer:coarse), (max-width:700px){
+  .seg{height:auto;min-height:46px}
+  .seg button{height:auto;min-height:40px;min-width:40px;padding-left:12px;padding-right:12px}
+  .chip{height:auto;min-height:40px;padding-left:12px;padding-right:12px}
+  .btn.sm{min-height:40px;padding-left:12px;padding-right:12px}
+  .vsw{height:auto} .vsw button{width:42px;height:40px}
+  .icon-btn,.lt-acts .icon-btn,.lay-acts .icon-btn,.lay-list .icon-btn{min-width:40px;min-height:40px}
+  .ti-x{width:40px;height:40px;margin:-10px -12px -6px 0}
+  .ti-grip{width:40px;height:40px;margin:-10px -6px -6px -14px}
+  .wozu-q{width:40px;height:40px;margin:-8px -6px}
+  table.lt th button,table.stock th button{min-height:40px;min-width:40px}
+  table.lt thead th{height:44px}
+  table.lt tr.grp td{top:43px}
+  .lt-price{min-height:40px!important;font-size:16px}
+  .qty input.num-in,input.num-in{min-height:40px}
+  .toast-act{min-height:40px}
+  .rw-more{min-height:40px}
+  .row-open{display:inline-block;min-height:40px;line-height:40px}
+  .lt-n .row-open{line-height:1.3;padding:10px 0;min-height:0}
+  .who-b{min-height:44px}
+  .link-btn,.link{min-height:40px;display:inline-flex;align-items:center}
+  .mv-det summary{min-height:40px;display:flex;align-items:center}
+  .lab-ing button{min-width:40px;min-height:40px}
+  .back{min-height:40px}
+}
+.row-open{display:block;width:fit-content}
+.f > input.num-in,.dlg-p + .f input.num-in{text-align:left}
+.seg button small{opacity:1;color:var(--muted)}
+.seg button.on small{color:var(--muted)}
+.sh-chip small{opacity:1;color:var(--muted)}
+@media (pointer:coarse), (max-width:700px){
+  .lt-n .row-open{padding:11px 0;min-width:40px}
+  .row-open{min-width:40px}
+}
+.sh-chip.used{opacity:1;background:var(--surface-2);border-style:dashed}
+.sh-chip.used b{color:var(--muted);font-weight:500}

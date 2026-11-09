@@ -1,0 +1,27 @@
+const {chromium}=require('playwright');
+(async()=>{const b=await chromium.launch();const errs=[];
+const F='http://127.0.0.1:8765/dahuam/index.html?nointro';
+const p=await b.newPage({viewport:{width:1440,height:960},deviceScaleFactor:1});p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&errs.push(m.text()));
+await p.goto(F);await p.evaluate(()=>localStorage.clear());await p.reload();await p.waitForTimeout(1200);const ev=(f,a)=>p.evaluate(f,a);
+console.log('demo prices',await ev(()=>S.products.filter(p=>p.priceDemo).length),'/',await ev(()=>S.products.length));
+const cid=await ev(()=>S.cards.find(c=>/Caesar/.test(c.name)&&c.items.some(i=>i.ref==='p:romaine')).id);
+await ev(id=>{go('cards');view.card=id;render()},cid);await p.waitForTimeout(300);
+console.log('card hint',await ev(()=>!!document.querySelector('[data-act=pcFor]')));
+await ev(()=>priceFixDialog(['romaine','quail']));
+await p.screenshot({path:'pr-card.png'});
+await p.waitForTimeout(200);
+await p.fill('input[name=p_romaine]','3.95');await p.fill('input[name=p_quail]','0.29');
+await p.screenshot({path:'pr-fix.png'});
+await p.click('#dlg button[value=ok], #dlg .btn.primary');await p.waitForTimeout(300);
+console.log('after fix',await ev(()=>JSON.stringify([P('romaine').price,P('romaine').priceDemo,P('quail').price,P('parmesan').priceDemo])));
+await ev(()=>{go('products')});await p.waitForTimeout(300);await p.screenshot({path:'pr-prods.png'});
+await p.click('[data-act=plImport]');await p.waitForTimeout(200);await p.click('#plSample');await p.waitForTimeout(200);
+console.log('pl',await p.textContent('#plOut .hint'));await p.screenshot({path:'pr-pl.png'});
+await p.click('#dlg .btn.primary');await p.waitForTimeout(300);
+console.log('after pl',await ev(()=>JSON.stringify([P('parmesan').price,P('parmesan').priceDemo,P('parmesan').priceSrc,S.products.filter(p=>p.priceDemo).length])));
+// inline edit
+await p.fill('#pp-capers','11.5');await p.press('#pp-capers','Enter');await p.waitForTimeout(300);
+console.log('inline',await ev(()=>JSON.stringify([P('capers').price,P('capers').priceDemo])));
+await p.click('[data-act=pFilter][data-id=demo]');await p.waitForTimeout(200);console.log('demo rows',await ev(()=>document.querySelectorAll('.lt tbody tr').length));
+const m=await b.newPage({viewport:{width:390,height:844}});await m.goto(F);await m.waitForTimeout(900);await m.evaluate(()=>go('products'));await m.waitForTimeout(300);console.log('m width',await m.evaluate(()=>document.documentElement.scrollWidth));
+console.log('errors',errs);await b.close();})();
