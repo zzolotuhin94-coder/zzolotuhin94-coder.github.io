@@ -32,7 +32,7 @@ const L = require('./lib'); const fs = require('fs'); const path = require('path
   const XLSX = require(path.join('/home/user/zzolotuhin94-coder.github.io/dahuam/vendor/xlsx.full.min.js'));
   const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['Artikel', 'Einheit', 'Preis'], ['Mehl glatt', 'kg', 1.11], ['Butter', 'kg', 9.99]]), 'Preise'); const xf = __dirname + '/tmp_preise.xlsx'; fs.writeFileSync(xf, Buffer.from(XLSX.write(wb, {type:'array', bookType:'xlsx'})));
   await p.evaluate(() => { go('products'); plDialog(); }); await p.waitForTimeout(300); await p.setInputFiles('#plFile', xf); await p.waitForTimeout(1500);
-  const pl = await p.evaluate(() => ({txt:document.querySelector('#plText').value, out:document.querySelector('#plOut').innerText.replace(/\s+/g, ' ').slice(0, 200), lib:[...document.scripts].some(s => /vendor\/xlsx\.full\.min\.js$/.test(s.src))}));
+  const pl = await p.evaluate(() => ({txt:document.querySelector('#plText').value, out:document.querySelector('#plOut').innerText.replace(/\s+/g, ' ').slice(0, 260) /* D1: zwei Beispiel-Artikel mehr stehen vor „Butter“ */, lib:[...document.scripts].some(s => /vendor\/xlsx\.full\.min\.js$/.test(s.src))}));
   L.ok(pl.lib && /Mehl glatt;kg;1[.,]11/.test(pl.txt) && /Butter/.test(pl.out), 'ohne Netz: Excel-Preisliste gelesen, Vorschau zeigt die Zeilen', pl);
   await p.evaluate(() => document.querySelector('#dlg').close()); fs.unlinkSync(xf);
   L.ok(await p.evaluate(() => { go('setup'); return new Promise(r => setTimeout(() => r(document.querySelector('#relOff').textContent), 300)); }) === 'ja', 'Einstellungen: „Ohne Internet nutzbar: ja“');

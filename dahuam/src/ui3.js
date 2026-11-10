@@ -51,7 +51,7 @@ function renderMenuCalc(){
       : `<td class="lt-miss hide-m" colspan="2"></td><td class="lt-miss r"><button type="button" class="link" data-act="newCardFor" data-id="${m.id}">Rezeptur fehlt</button></td>`;
     return `<tr class="row ${m.hidden?'off':''}" data-mid="${m.id}" data-sec="${esc(m.section)}" data-act="${k.c?'openCard':'editMenu'}" data-id="${k.c?k.c.id:m.id}">
       ${drag ? `<td class="lt-gripc"><button type="button" class="lt-grip" data-mgrip="${m.id}" title="Ziehen, um die Reihenfolge zu ändern (oder Pfeiltasten)" aria-label="${esc(dishLabel(m))} verschieben">${GRIP_SVG}</button></td>` : ''}
-      <td><div class="lt-n">${img?`<img src="${IMG[img]}" alt="">`:''}<span><b>${esc(m.name)}${m.vlabel?` <span class="lt-muted">· ${esc(m.vlabel)}</span>`:''}${m.veg?` <span class="lt-muted">${m.veg}</span>`:''}</b><small>${esc(m.desc||'')}${when ? `${m.desc ? ' · ' : ''}<em class="lt-when">${esc(when)}</em>` : ''}</small></span></div></td>
+      <td><div class="lt-n">${img?`<img src="${IMG[img]}" alt="">`:''}<span><b>${esc(m.name)}${menuTag(m)?` <span class="lt-muted">· ${esc(menuTag(m))}</span>`:''}${m.veg?` <span class="lt-muted">${m.veg}</span>`:''}</b><small>${esc(m.desc||'')}${when ? `${m.desc ? ' · ' : ''}<em class="lt-when">${esc(when)}</em>` : ''}</small></span></div></td>
       <td class="r"><input class="lt-price num-in" id="mp-${m.id}" type="text" inputmode="decimal" data-num="req price" data-mp="${m.id}" value="${num2(m.price)}" aria-label="Preis ${esc(dishLabel(m))}"></td>
       ${calc}
       <td class="hide-m"><span class="lt-st">${st.join('')}</span></td>
@@ -112,20 +112,21 @@ function menuReorder(mid, beforeId){
 const CARD_SORTS = [['','Gerichte zuerst, nach Name'],['name','Name'],['cat','Kategorie'],['cost','Wareneinsatz'],['fc','Wareneinsatz in %'],['items','Anzahl Zutaten']];
 function renderCards(){
   const q = view.q.trim().toLowerCase();
-  const list0 = S.cards.filter(c => (view.ctype==='all' || c.type===view.ctype) && (!q || (c.name+' '+c.category).toLowerCase().includes(q)));
-  const n = t => S.cards.filter(c=>t==='all'||c.type===t).length;
+  const ofType = (c, t) => t === 'all' || (t === 'drink' ? !!c.drink && c.type === 'dish' : c.type === t && !(t === 'dish' && c.drink));
+  const list0 = S.cards.filter(c => ofType(c, view.ctype) && (!q || (c.name+' '+c.category).toLowerCase().includes(q)));
+  const n = t => S.cards.filter(c => ofType(c, t)).length; const dk = view.ctype === 'drink';
   const rows = list0.map(c => { const t = totals(c); const mk = S.menu.filter(m => m.card === c.id).map(menuCalc)[0]; return {c, t, mk}; });
   const sorted = applySort('cards', rows.sort((a,b)=> a.c.type===b.c.type ? byName(a.c,b.c) : (a.c.type==='semi'?1:-1)), {name:x=>x.c.name, cat:x=>x.c.category||'', cost:x=>x.t.cost, fc:x=>x.mk?x.mk.fc:null, items:x=>x.c.items.length});
   const sCol = (SORTS.cards && SORTS.cards.col) || '';
-  const more = moreOpts('cards', `<label class="f inl">Sortieren<select data-sel="csort" aria-label="Sortieren">${CARD_SORTS.map(([k,l]) => `<option value="${k}" ${sCol===k?'selected':''}>${l}</option>`).join('')}</select></label><button type="button" class="btn sm" data-act="newCard" data-id="semi">${ico('plus')}Basisrezept</button>`);
+  const more = moreOpts('cards', `<label class="f inl">Sortieren<select data-sel="csort" aria-label="Sortieren">${CARD_SORTS.map(([k,l]) => `<option value="${k}" ${sCol===k?'selected':''}>${l}</option>`).join('')}</select></label><button type="button" class="btn sm" data-act="newCard" data-id="semi">${ico('plus')}Basisrezept</button><button type="button" class="btn sm" data-act="newCard" data-id="${dk ? 'dish' : 'drink'}">${ico('plus')}${dk ? 'Rezeptur' : 'Schankrezeptur'}</button>`);
   let h = `<div class="page-h"><div><h1>Rezepte</h1></div>
-    <div class="row-btns"><button type="button" class="btn primary" data-act="newCard" data-id="dish">${ico('plus')}Rezeptur</button></div></div>
+    <div class="row-btns"><button type="button" class="btn primary" data-act="newCard" data-id="${dk ? 'drink' : 'dish'}">${ico('plus')}${dk ? 'Schankrezeptur' : 'Rezeptur'}</button></div></div>
   <div class="toolbar"><label class="search">${ico('search')}<input id="cq" type="search" placeholder="Rezeptur suchen" value="${esc(view.q)}" autocomplete="off"></label>
-    ${seg('ctype', view.ctype, [['all','Alle',n('all')],['dish','Gerichte',n('dish')],['semi','Basisrezepte',n('semi')]])}</div>`;
+    ${seg('ctype', view.ctype, [['all','Alle',n('all')],['dish','Gerichte',n('dish')],['semi','Basisrezepte',n('semi')]].concat(n('drink') || dk ? [['drink','Getränke',n('drink')]] : []))}</div>`;
   if(!sorted.length) return h + `<div class="panel empty">Keine Rezepturen gefunden.</div>` + more;
   return h + `<div class="lt-wrap"><table class="lt"><thead><tr><th>Rezeptur</th><th class="hide-m">Kategorie</th><th class="r hide-m">Zutaten</th><th class="r">Wareneinsatz</th><th class="r">in %</th><th class="hide-m"></th></tr></thead><tbody>
     ${sorted.map(({c,t,mk}) => `<tr class="row" data-act="openCard" data-id="${c.id}">
-      <td><div class="lt-n">${c.img&&IMG[c.img]?`<img src="${IMG[c.img]}" alt="">`:''}<span><b>${esc(c.name)}</b><small>${c.type==='semi'?'Basisrezept · ':''}Nr. ${c.no||'—'} · ${(c.steps||[]).length} Schritte${+c.yieldG > 0 ? ` · ${num(c.yieldG)} g` : ''}</small></span></div></td>
+      <td><div class="lt-n">${c.img&&IMG[c.img]?`<img src="${IMG[c.img]}" alt="">`:''}<span><b>${esc(c.name)}</b><small>${c.type==='semi'?'Basisrezept · ':''}Nr. ${c.no||'—'}${c.drink ? (+c.yieldG > 0 ? ' · ' + volTxt(+c.yieldG) : '') : ` · ${(c.steps||[]).length} Schritte${+c.yieldG > 0 ? ` · ${num(c.yieldG)} g` : ''}`}</small></span></div></td>
       <td class="hide-m lt-muted">${esc(c.category||'—')}</td>
       <td class="r hide-m">${c.items.length}</td><td class="r">${eur(t.cost)}</td>
       <td class="r">${c.type==='dish'&&mk?`<span class="lt-fc ${fcClass(mk.fc)}"><i></i>${num(mk.fc,1)} %</span>`:''}</td>

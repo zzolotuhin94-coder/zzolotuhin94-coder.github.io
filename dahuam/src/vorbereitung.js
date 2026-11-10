@@ -83,7 +83,7 @@ function vbForecastRaw(D){
   const maps = pick.map(plDayMap); const av = pick.map(d => [ix.seaOf[d], ix.wdOf[d]]);
   const items = [];
   for(const m of S.menu){
-    if(m.hidden || !plAvail(m, sea, w)) continue;
+    if(m.hidden || !plAvail(m, sea, w) || isDrinkEntry(m)) continue;   // die Prep-Liste ist für die Küche: Getränke stehen nicht darauf
     let nu = 0, den = 0; const vals = [];
     pick.forEach((d, i) => { if(!plAvail(m, av[i][0], av[i][1])) return; const q = maps[i].get(m.id) || 0; nu += wts[i] * q; den += wts[i]; vals.push([q, wts[i]]); });
     let f = 0, sd = 0, flag = '';

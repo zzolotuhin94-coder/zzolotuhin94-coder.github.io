@@ -3090,6 +3090,84 @@ dialog:has(#dlgForm[data-wide]){width:min(900px,calc(100vw - 32px))}
   .ab-prev{grid-template-columns:1fr;max-height:48vh}
   .alg-st{min-height:40px}
 }
+/* ---------- Bar & Getränke ---------- */
+.dk-q{display:inline-flex;align-items:center;gap:6px;justify-content:flex-end}
+.dk-q input{width:84px;min-height:40px;text-align:right;padding:6px 8px;font-weight:600}
+.dk-q select,table.edit .dk-q select,label.f > .dk-q select{flex:none;width:68px;min-width:0;min-height:40px;padding:6px 8px}
+.dk-q em{font-style:normal;font-size:12.5px;color:var(--muted);width:68px;text-align:left}
+table.edit .dk-q input{flex:none;width:84px}
+label.f > .dk-q{display:flex;margin-top:4px;justify-content:flex-start}
+label.f > .dk-q input{flex:1;width:auto;min-width:0;text-align:left;font-weight:400}
+.dk-loss{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+table.edit.dk-t{min-width:0;width:100%}
+table.edit.dk-t td.c-ing select{min-width:150px}
+table.dk-t td.c-ing{min-width:160px}
+table.dk-t th:nth-child(2),table.dk-t td:nth-child(2){width:170px}table.dk-t th:nth-child(3),table.dk-t td:nth-child(3){width:84px;white-space:nowrap}table.dk-t td:last-child{width:44px}
+.dk-on{list-style:none;margin:0;padding:0}
+.dk-on li + li{border-top:1px solid var(--line)}
+.dk-on button{display:grid;grid-template-columns:minmax(0,1fr) auto auto 72px;gap:6px 16px;align-items:center;width:100%;min-height:52px;padding:8px 18px;background:none;border:0;text-align:left;color:inherit;font:inherit;cursor:pointer}
+.dk-on button:hover{background:var(--surface-2,rgba(127,127,127,.06))}
+.dk-on-n{min-width:0}
+.dk-on-n b{display:block;font-weight:600}
+.dk-on-n small{display:block;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dk-on-c{color:var(--muted);font-size:13px}
+.dk-on .lt-fc{justify-content:flex-end;font-size:13.5px}
+.dk-on .lt-fc i{width:7px;height:7px;border-radius:50%;background:var(--muted)}.dk-on .lt-fc.good i{background:var(--good)}.dk-on .lt-fc.warn i{background:var(--warn)}.dk-on .lt-fc.bad i{background:var(--bad)}
+/* Artikel: Lebensmittel oder Getränk */
+.togs.kind{margin:2px 0 4px}
+.geb-out{grid-column:1/-1;margin:0;min-height:1.4em}
+/* Inventur: volle Flaschen, die angebrochene in Zehnteln */
+.inv-l li.bar{row-gap:8px}
+.inv-t{grid-column:1/-1;display:flex;align-items:center;gap:4px;padding:0 0 2px}
+.inv-t small{flex:none;width:44px;font-size:12.5px;color:var(--muted)}
+.inv-t button{flex:1 1 0;max-width:58px;min-width:0;height:36px;padding:0;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:4px;font:500 13px/1 var(--f-mono,inherit);font-variant-numeric:tabular-nums;cursor:pointer}
+.inv-t button.on{background:var(--fg);border-color:var(--fg);color:var(--bg);font-weight:600}
+/* Leergut */
+.lg-l{list-style:none;margin:0 0 6px;padding:0;border-top:1px solid var(--line)}
+.lg-l li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px 18px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.lg-n{min-width:0}
+.lg-n b{display:block;font-weight:600}
+.lg-n small{display:block;font-size:12.5px;color:var(--muted)}
+.lg-v{font-weight:600;font-variant-numeric:tabular-nums}
+.sec-h small{font:400 13px/1.3 var(--f-body,inherit);letter-spacing:0}
+.lg-k{display:grid;gap:8px;margin:4px 0 12px}
+.lg-kr{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:12px;align-items:center}
+.lg-kr b{display:block;font-weight:600}
+.lg-kr small{display:block;font-size:12.5px;color:var(--muted)}
+.lg-kr input{text-align:right;min-height:44px;font-size:16px}
+.lg-sum{margin:10px 0 0;min-height:1.4em;font-size:14px;color:var(--muted)}
+.lg-h ul{list-style:none;margin:8px 0 0;padding:0}
+.lg-h li{display:grid;grid-template-columns:84px minmax(0,1fr) auto auto;gap:10px;align-items:baseline;padding:5px 0;font-size:13px;border-top:1px solid var(--line)}
+tr.pf-row td{color:var(--muted);font-weight:400;border-top:0;padding-top:0}
+@media (max-width:640px){
+  .dk-on button{grid-template-columns:minmax(0,1fr) auto 68px;padding:8px 14px}
+  .dk-on-c{display:none}
+  .lg-l li{grid-template-columns:minmax(0,1fr) auto}
+  .lg-l li .btn{grid-column:1/-1;justify-self:start}
+  .inv-t button{height:42px}
+  .inv-t small{width:36px}
+  table.dk-t thead{display:none}
+  table.edit.dk-t tbody tr{display:grid;grid-template-columns:auto minmax(0,1fr) 40px;align-items:center;gap:6px 10px;padding:10px 14px;border-top:1px solid var(--line)}
+  table.edit.dk-t tbody tr:first-child{border-top:0}
+  table.edit.dk-t tbody td{display:block;padding:0;border:0;width:auto;min-width:0}
+  table.edit.dk-t tbody td.c-ing{grid-column:1/-1}
+  table.edit.dk-t td.c-ing select{min-width:0;width:100%}
+  table.edit.dk-t tbody td:nth-child(3){text-align:right}
+  table.edit.dk-t,table.edit.dk-t tbody,table.edit.dk-t tfoot{display:block;width:100%}
+  table.edit.dk-t tfoot tr{display:flex;justify-content:space-between;padding:12px 14px;border-top:1px solid var(--line)}
+  table.edit.dk-t tfoot td{display:block;padding:0;border:0;width:auto}
+  table.edit.dk-t tfoot td:empty{display:none}
+}
+/* Gästekarte: Getränke mit Menge je Preis, mehrere Größen in einer Zeile */
+.wk-ps{display:inline-flex;flex-wrap:wrap;justify-content:flex-end;gap:2px 16px}
+.wk-p small{font:400 13px/1.25 var(--wk-text);color:var(--wk-m);margin-right:7px;letter-spacing:.01em}
+.hs-ps.dr{flex-direction:row;align-items:baseline;gap:16px}
+@media (min-width:1000px){
+  .inv-l li.bar{grid-template-columns:150px minmax(0,1fr) auto 150px}
+  .inv-l li.bar .inv-t{grid-column:3;grid-row:1;padding:0}
+  .inv-l li.bar .inv-t button{flex:none;width:42px}
+  .inv-l li.bar .inv-d{grid-column:4;grid-row:1}
+}
 
 .m-only{display:none}@media (max-width:900px){.m-only{display:flex}}
 .rc:focus-visible{outline-offset:-3px}
@@ -3397,6 +3475,7 @@ function line(it, depth){
     const p = r.o; res.name = p.name;
     if(p.unit === 'Stk'){ res.unit = 'Stk'; res.cost = q * fin(+p.price); res.grossG = q * fin(+p.pieceG); }
     else { res.unit = p.unit === 'l' ? 'ml' : 'g'; res.cost = q/1000 * fin(+p.price); res.grossG = q; }
+    { const pl = pourLossOf(p); if(pl) res.cost /= (1 - pl/100); }   // Schankverlust (Fassbier, offener Wein): für ein volles Glas läuft mehr aus dem Gebinde
     res.netAuto = res.grossG * (1 - fin(+p.lossCold)/100);
     res.net = it.net !== '' && it.net != null ? +it.net : res.netAuto;
     res.out = res.net * (1 - fin(+p.lossHot)/100);
@@ -3419,11 +3498,15 @@ function totals(c, depth=0){
 /* MwSt.: Speisen oder Getränke. Die Klasse kommt vom Gericht (wenn dort gewählt), sonst von der Kategorie. EIN Helfer für alle Rechnungen. */
 function vatClass(m){ if(m && (m.vat === 'g' || m.vat === 's')) return m.vat; const sv = S.settings.secVat; return m && sv && sv[m.section] === 'g' ? 'g' : 's'; }
 function vatRate(m){ const s = S.settings; if(vatClass(m) === 'g'){ const v = +s.vatDrinks; return isFinite(v) && s.vatDrinks !== '' && s.vatDrinks != null ? v : 20; } return s.vat; }
+/* Schankverlust eines Artikels in % (0 bis unter 100); ohne Angabe 0 */
+function pourLossOf(p){ const v = p ? +p.pourLoss : 0; return v > 0 && v < 100 ? v : 0; }
+/* Getränk in anderer Größe: dieselbe Schankrezeptur, nach Menge gerechnet (0,3 l aus der Rezeptur für 0,5 l = Faktor 0,6). Speisen: immer 1. */
+function menuFactor(m){ const c = m && m.card ? C(m.card) : null; return c && c.drink && +m.vol > 0 && +c.yieldG > 0 ? +m.vol / +c.yieldG : 1; }
 function menuCalc(m){
   const c = m.card ? C(m.card) : null;
   const t = c ? totals(c) : null;
   const netPrice = (+m.price||0) / (1 + vatRate(m)/100);
-  const cost = t ? t.cost : null;
+  const cost = t ? t.cost * menuFactor(m) : null;
   return {c, t, cost, netPrice, fc: cost!=null && netPrice ? cost/netPrice*100 : null, margin: cost!=null ? netPrice - cost : null};
 }
 function fcClass(fc){ if(fc==null) return 'na'; const tg = +S.settings.target; return fc <= tg ? 'good' : fc <= tg+7 ? 'warn' : 'bad'; }
@@ -3440,7 +3523,7 @@ function usage(ref){ return S.cards.filter(c => c.items.some(i => i.ref === ref)
    Ohne IndexedDB: localStorage wie früher, aber Fehler werden sichtbar.
    ===================================================================== */
 const APP_SCHEMA = 2;                       // Datenformat; ohne Angabe = 1 (vor Paket A)
-const APP_VERSION = '1.3.0', APP_BUILD = '8d192f85d5';
+const APP_VERSION = '1.4.0', APP_BUILD = 'ff450352f4';
 function schemaNewer(d){ return !!d && typeof d === 'object' && +d.schema > APP_SCHEMA; }
 
 const STORE = (() => {
@@ -3984,6 +4067,7 @@ function seed(){
   fixesMigrate(d);
   plusMigrate(d);
   teamMigrate(d);
+  barDemo(d); barMigrate(d);
   return d;
 }
 
@@ -4013,6 +4097,7 @@ function migrate(d){
   fixesMigrate(d);
   plusMigrate(d);
   teamMigrate(d);
+  barMigrate(d);
   return d;
 }
 
@@ -4039,7 +4124,9 @@ function photo(imgId, name, hue, cls=''){
 
 /* ---------- Lager-Logik ---------- */
 function unitOf(p){ return p ? p.unit : ''; }
-function qtyFmt(q, p){ const d = p && p.unit==='Stk' ? 0 : (Math.abs(q) < 10 ? 2 : 1); return num(q, d)+' '+unitOf(p); }
+function qtyFmt(q, p){
+  if(isDrink(p)){ const n = q / p.gebL; return Math.abs(n) >= 1 || !q ? num(n, 1) + ' ' + cntWord(p) : num(q, 2) + ' l'; }   // Getränke: in Flaschen oder Fässern, kleine Mengen in Litern
+  const d = p && p.unit==='Stk' ? 0 : (Math.abs(q) < 10 ? 2 : 1); return num(q, d)+' '+unitOf(p); }
 function stockProducts(){ return S.products.filter(p => !p.noStock); }
 function stockValue(){ return stockProducts().reduce((s,p)=>s + Math.max(0,+p.stock||0)*(+p.price||0), 0); }
 function lowStock(){ return stockProducts().filter(p => (+p.minStock||0) > 0 && (+p.stock||0) < +p.minStock); }
@@ -4051,7 +4138,7 @@ function addMove(type, pid, delta, note='', price=null, date=null){
 function explode(c, f, acc=new Map(), d=0){
   if(!c || d > 6) return acc;
   for(const it of c.items){ const r = refObj(it.ref); if(!r) continue; const q = (+it.qty||0)*f;
-    if(r.t==='p'){ if(r.o.noStock) continue; acc.set(r.o.id, (acc.get(r.o.id)||0) + (r.o.unit==='Stk' ? q : q/1000)); }
+    if(r.t==='p'){ if(r.o.noStock) continue; acc.set(r.o.id, (acc.get(r.o.id)||0) + (r.o.unit==='Stk' ? q : q/1000) / (1 - pourLossOf(r.o)/100)); }
     else { const y = +r.o.yieldG || totals(r.o).out; if(y) explode(r.o, q/y, acc, d+1); } }
   return acc;
 }
@@ -4158,7 +4245,31 @@ function prodHtml(c, n){
   return `<ul class="plist">${rows}</ul><div class="kv"><span>Wareneinsatz gesamt</span><span>${eur(t.cost*f)}</span></div>`;
 }
 
+function cardStepsPanel(c){
+  const steps = c.steps || [];
+  const stepsHtml = steps.map((s,i)=>`<li class="step">
+      <span class="step-no">${i+1}</span>
+      <div class="step-body"><textarea id="st-${i}" data-step="${i}" rows="2" aria-label="Zubereitung Schritt ${i+1}" placeholder="Was passiert in diesem Schritt?">${esc(s.t)}</textarea>
+        ${s.img && IMG[s.img] ? `<div class="step-ph"><img src="${IMG[s.img]}" alt="Schritt ${i+1}"><button type="button" class="ph-btn" data-act="stepPhoto" data-id="${i}" aria-label="Foto ändern">${ico('camera')}</button><button type="button" class="ph-btn del" data-act="stepPhotoDel" data-id="${i}" aria-label="Foto entfernen">${ico('x')}</button></div>`
+          : `<button type="button" class="btn sm ghost" data-act="stepPhoto" data-id="${i}">${ico('camera')}Foto</button>`}</div>
+      <div class="step-acts"><button type="button" class="icon-btn" data-act="stepMove" data-id="${i}:-1" ${i===0?'disabled':''} aria-label="Nach oben">${ico('up')}</button><button type="button" class="icon-btn" data-act="stepMove" data-id="${i}:1" ${i===steps.length-1?'disabled':''} aria-label="Nach unten">${ico('down')}</button><button type="button" class="icon-btn" data-act="stepDel" data-id="${i}" aria-label="Schritt löschen">${ico('trash')}</button></div>
+    </li>`).join('');
+  return `<section class="panel">
+        <div class="panel-h"><h2>Zubereitung</h2><span class="muted sm">${steps.length} Schritte</span></div>
+        <ol class="steps">${stepsHtml || '<li class="hint">Noch keine Schritte.</li>'}</ol>
+        <button type="button" class="btn" data-act="stepAdd">${ico('plus')}Schritt</button>
+      </section>`;
+}
+function cardAlgPanel(c){
+  return `<section class="panel">
+        <div class="panel-h"><h2>Allergene</h2><span class="muted sm">EU-VO 1169/2011</span></div>
+        ${(() => { const ai = algInfo({card:c.id}); const big = ai.letters.length ? `<div class="alg-big">${ai.letters.map(a=>`<span><b>${esc(a)}</b>${esc(ALG[a]||a)}</span>`).join('')}</div>` : '';
+          if(ai.state !== 'open') return big || '<p class="hint" style="margin-top:0">Keine Allergene. Alle Zutaten sind geprüft.</p>';
+          return big + `<p class="hint alg-inc" style="margin-top:${big ? '10px' : '0'}"><b>Allergene unvollständig.</b> ${ai.open.length ? `Bei ${plural(ai.open.length, 'Artikel', 'Artikeln')} fehlt die Angabe: ${ai.open.slice(0,6).map(p=>`<button type="button" class="link" data-act="pAlg" data-id="${p.id}">${esc(p.name)}</button>`).join(', ')}${ai.open.length > 6 ? ' …' : ''}.` : ''} ${esc(ai.gaps.map(g => g.charAt(0).toUpperCase() + g.slice(1) + '.').join(' '))}</p>`; })()}
+      </section>`;
+}
 function renderCard(c){
+  if(c.drink && c.type === 'dish') return renderDrinkCard(c);
   const t = totals(c);
   const per100 = c.yieldG ? t.cost / c.yieldG * 100 : 0;
   const menus = S.menu.filter(m => m.card === c.id);
@@ -4181,14 +4292,6 @@ function renderCard(c){
       <td class="r mono">${num(l.out,1)}</td>
       <td class="r mono">${eur(l.cost)}<span class="share" style="width:${(l.cost/sum*100).toFixed(1)}%"></span></td>
       <td><button type="button" class="icon-btn" data-act="delLine" data-id="${i}" title="Zeile entfernen" aria-label="Zeile entfernen">${ico('x')}</button></td></tr>`; }).join('');
-
-  const stepsHtml = steps.map((s,i)=>`<li class="step">
-      <span class="step-no">${i+1}</span>
-      <div class="step-body"><textarea id="st-${i}" data-step="${i}" rows="2" aria-label="Zubereitung Schritt ${i+1}" placeholder="Was passiert in diesem Schritt?">${esc(s.t)}</textarea>
-        ${s.img && IMG[s.img] ? `<div class="step-ph"><img src="${IMG[s.img]}" alt="Schritt ${i+1}"><button type="button" class="ph-btn" data-act="stepPhoto" data-id="${i}" aria-label="Foto ändern">${ico('camera')}</button><button type="button" class="ph-btn del" data-act="stepPhotoDel" data-id="${i}" aria-label="Foto entfernen">${ico('x')}</button></div>`
-          : `<button type="button" class="btn sm ghost" data-act="stepPhoto" data-id="${i}">${ico('camera')}Foto</button>`}</div>
-      <div class="step-acts"><button type="button" class="icon-btn" data-act="stepMove" data-id="${i}:-1" ${i===0?'disabled':''} aria-label="Nach oben">${ico('up')}</button><button type="button" class="icon-btn" data-act="stepMove" data-id="${i}:1" ${i===steps.length-1?'disabled':''} aria-label="Nach unten">${ico('down')}</button><button type="button" class="icon-btn" data-act="stepDel" data-id="${i}" aria-label="Schritt löschen">${ico('trash')}</button></div>
-    </li>`).join('');
 
   return `<button type="button" class="back" data-act="backCards">${ico('arrow')}Alle Rezepturen</button>
   <div class="hero">
@@ -4213,7 +4316,7 @@ function renderCard(c){
   <div class="grid2">
     <div class="col">
       <section class="panel"><div class="fields">
-        <label class="f">Typ<select id="cf-type" data-cf="type"><option value="dish" ${c.type==='dish'?'selected':''}>Gericht</option><option value="semi" ${c.type==='semi'?'selected':''}>Basisrezept</option></select></label>
+        <label class="f">Typ<select id="cf-type" data-cf="type"><option value="dish" ${c.type==='dish'?'selected':''}>Gericht</option><option value="semi" ${c.type==='semi'?'selected':''}>Basisrezept</option><option value="drink">Getränk</option></select></label>
         <label class="f">Kategorie<input id="cf-category" data-cf="category" list="cats" value="${esc(c.category)}"><datalist id="cats">${cats.map(x=>`<option value="${esc(x)}">`).join('')}</datalist></label>
         <label class="f">${c.type==='semi'?'Ausbeute Charge, g':'Portionsgewicht, g'}<input id="cf-yieldG" class="num-in" data-cf="yieldG" type="text" inputmode="decimal" data-msg="Ungültiges Gewicht, nicht geändert" value="${numIn(c.yieldG)}" placeholder="${num(t.out)}"></label>
       </div></section>
@@ -4226,11 +4329,7 @@ function renderCard(c){
         </table></div>
         <div class="panel-f"><button type="button" class="btn" data-act="addLine">${ico('plus')}Zutat</button><button type="button" class="btn" data-act="recPaste" data-id="${c.id}">Rezeptur einfügen</button><span class="hint">Netto ergibt sich aus dem Putzverlust. Eigenen Wert einfach überschreiben.</span></div>
       </section>
-      <section class="panel">
-        <div class="panel-h"><h2>Zubereitung</h2><span class="muted sm">${steps.length} Schritte</span></div>
-        <ol class="steps">${stepsHtml || '<li class="hint">Noch keine Schritte.</li>'}</ol>
-        <button type="button" class="btn" data-act="stepAdd">${ico('plus')}Schritt</button>
-      </section>
+      ${cardStepsPanel(c)}
     </div>
     <div class="col">
       ${c.type==='dish' ? `<section class="panel accent">
@@ -4250,12 +4349,7 @@ function renderCard(c){
         <div class="panel-h"><h2>Produktionsmenge</h2>${c.type==='dish'?`<label class="portions"><input id="portions" type="number" min="1" step="1" value="${view.portions}" aria-label="Portionen"> Portionen</label>`:'<span class="muted sm">1 Charge</span>'}</div>
         <div id="prodOut">${prodHtml(c, view.portions)}</div>
       </section>
-      <section class="panel">
-        <div class="panel-h"><h2>Allergene</h2><span class="muted sm">EU-VO 1169/2011</span></div>
-        ${(() => { const ai = algInfo({card:c.id}); const big = ai.letters.length ? `<div class="alg-big">${ai.letters.map(a=>`<span><b>${esc(a)}</b>${esc(ALG[a]||a)}</span>`).join('')}</div>` : '';
-          if(ai.state !== 'open') return big || '<p class="hint" style="margin-top:0">Keine Allergene. Alle Zutaten sind geprüft.</p>';
-          return big + `<p class="hint alg-inc" style="margin-top:${big ? '10px' : '0'}"><b>Allergene unvollständig.</b> ${ai.open.length ? `Bei ${plural(ai.open.length, 'Artikel', 'Artikeln')} fehlt die Angabe: ${ai.open.slice(0,6).map(p=>`<button type="button" class="link" data-act="pAlg" data-id="${p.id}">${esc(p.name)}</button>`).join(', ')}${ai.open.length > 6 ? ' …' : ''}.` : ''} ${esc(ai.gaps.map(g => g.charAt(0).toUpperCase() + g.slice(1) + '.').join(' '))}</p>`; })()}
-      </section>
+      ${cardAlgPanel(c)}
       ${c.type==='semi' ? `<section class="panel"><div class="panel-h"><h2>Verwendet in</h2></div>
         ${usedIn.length ? `<ul class="todo">${usedIn.map(u=>`<li><button type="button" data-act="openCard" data-id="${u.id}"><span>${esc(u.name)}</span>${ico('arrow','flip')}</button></li>`).join('')}</ul>` : '<p class="hint">Noch in keiner Rezeptur verwendet.</p>'}
       </section>` : ''}
@@ -4330,7 +4424,7 @@ function moveList(){
 function invView(){
   const d = S.invDraft;
   if(!d){
-    return `<p class="fact">Die Zählliste ist nach Lagerorten sortiert: einmal durch Kühlhaus, Tiefkühler und Lager gehen. Nicht gezählte Artikel bleiben unverändert.</p>
+    return `<p class="fact">Die Zählliste ist nach Lagerorten sortiert: einmal durch Kühlhaus, Tiefkühler und Lager gehen. Nicht gezählte Artikel bleiben unverändert.${stockProducts().some(isDrink) ? ' Getränke zählen Sie in vollen Flaschen oder Fässern, die angebrochene dazu in Zehnteln.' : ''}</p>
       <h2 class="sec-h">Bisherige Inventuren</h2>
       ${S.inventories.length ? `<ul class="rows inv-old">${S.inventories.map(i=>`<li class="rw"><span class="rw-lead mono">${fmtDate(i.date)}</span><span class="rw-main"><b>${i.counted} Artikel gezählt</b>${i.demo?'<small>Beispiel</small>':''}</span><span class="rw-meta mono">${eur(i.value)}</span><span class="rw-act mono ${i.diff<0?'bad-t':'good-t'}">${signedEur(i.diff)}</span></li>`).join('')}</ul>` : '<p class="hint">Noch keine abgeschlossene Inventur.</p>'}`;
   }
@@ -4343,10 +4437,11 @@ function invView(){
   for(const [k,l] of Object.entries(LOCS).concat([['','Ohne Lagerort']])){
     const list = items.filter(p => (LOCS[p.loc] ? p.loc : '') === k); if(!list.length) continue;
     h += `<h2 class="sec-h">${esc(l)}<small class="muted sm">${list.length} Artikel</small></h2><ul class="inv-l">
-      ${list.map(p=>{ const c = d.counts[p.id]; const has = c!==undefined && c!==''; const df = has ? c-(+p.stock||0) : 0; const cls = df<0?'bad-t':df>0?'good-t':''; return `<li id="ir-${p.id}" class="${has?'counted':''}">
-        <span class="qty inv-q"><input id="inv-${p.id}" class="num-in" type="text" inputmode="decimal" data-num="de" data-msg="Ungültige Zählmenge, nicht übernommen" data-inv="${p.id}" data-old="${has?numIn(c):''}" value="${has?numIn(c):''}" placeholder="—" aria-label="Gezählt ${esc(p.name)}"><em>${esc(p.unit)}</em></span>
+      ${list.map(p=>{ const c = d.counts[p.id]; const has = c!==undefined && c!==''; const df = has ? c-(+p.stock||0) : 0; const cls = df<0?'bad-t':df>0?'good-t':''; const bar = isDrink(p), b = bar ? barCount(p.id) : null; return `<li id="ir-${p.id}" class="${has?'counted':''}${bar?' bar':''}">
+        <span class="qty inv-q">${bar ? `<input id="inv-${p.id}" class="num-in" type="text" inputmode="decimal" data-num="self" data-invf="${p.id}" value="${b.f === '' ? '' : numIn(b.f)}" placeholder="—" aria-label="Volle ${p.geb === 'fass' ? 'Fässer' : 'Flaschen'} ${esc(p.name)}"><em>${cntWord(p)}</em>`
+          : `<input id="inv-${p.id}" class="num-in" type="text" inputmode="decimal" data-num="de" data-msg="Ungültige Zählmenge, nicht übernommen" data-inv="${p.id}" data-old="${has?numIn(c):''}" value="${has?numIn(c):''}" placeholder="—" aria-label="Gezählt ${esc(p.name)}"><em>${esc(p.unit)}</em>`}</span>
         <span class="inv-n"><b class="pn">${esc(p.name)}</b><small class="muted">Soll ${qtyFmt(+p.stock||0,p)}</small></span>
-        <span class="inv-d"><span class="mono idf ${cls}">${has?(df>0?'+':'')+qtyFmt(df,p):''}</span><span class="mono idv ${cls}">${has?eur(df*(+p.price||0)):''}</span></span></li>`; }).join('')}
+        <span class="inv-d"><span class="mono idf ${cls}">${has?(df>0?'+':'')+qtyFmt(df,p):''}</span><span class="mono idv ${cls}">${has?eur(df*(+p.price||0)):''}</span></span>${bar ? barTenths(p, b) : ''}</li>`; }).join('')}
       </ul>`;
   }
   return h;
@@ -4419,6 +4514,7 @@ function menuDialog(m, prefill){
     <div class="fields">
       <label class="f">Kategorie<select name="section" required>${secList().map(s=>`<option ${m.section===s?'selected':''}>${esc(s)}</option>`).join('')}</select></label>
       <label class="f">Preis inkl. MwSt., €<input name="price" class="num-in" type="text" inputmode="decimal" required value="${m.price===''?'':num2(m.price)}"></label>
+      <label class="f" id="mdVol" hidden>Ausschankmenge<span class="dk-q"><input name="vol" class="num-in" type="text" inputmode="decimal" value="${+m.vol > 0 ? volIn(+m.vol, volUnitFor(m.vol)) : ''}" autocomplete="off">${volSel('name="volU"', +m.vol > 0 ? volUnitFor(m.vol) : 'l')}</span></label>
       <label class="f">Steuersatz<select name="vat"><option value="">wie die Kategorie</option><option value="s" ${m.vat==='s'?'selected':''}>Speisen · ${num(+S.settings.vat||0,1)} %</option><option value="g" ${m.vat==='g'?'selected':''}>Getränke · ${num(+vatRate({vat:'g'})||0,1)} %</option></select></label>
     </div>
     <label class="f">Rezeptur<select name="card"><option value="">— nicht verknüpft —</option>${opts.map(c=>`<option value="${c.id}" ${m.card===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label>
@@ -4434,40 +4530,83 @@ function menuDialog(m, prefill){
       <label class="tog"><input type="checkbox" name="show" ${m.hidden?'':'checked'}><span></span>Auf der Gästekarte zeigen</label></div>`,
     fd => { const ar = algControlRead(fd); if(!ar){ const dt = $('#dlgForm .alg-det'); if(dt) dt.open = true; return false; }
       const sec = fd.get('section'); if(isNew || sec !== m.section) m.order = nextOrder(sec);
+      const oldTag = menuVol(m) ? volTxt(menuVol(m)) : ''; const dc = fd.get('card') ? C(fd.get('card')) : null;
+      if(fd.get('vol') != null) m.vol = +fd.get('vol') > 0 ? Math.round(+fd.get('vol') * VOL_U[fd.get('volU')] * 1000) / 1000 : '';
       if(m.img && m.img !== img) imgDel(m.img);
       if(ar.alg !== algClean(m.alg).join(' ') || ar.algNone !== !!m.algNone){ if(ar.alg || ar.algNone){ m.algAt = todayStr(); m.algBy = me().name; } else { m.algAt = ''; m.algBy = ''; } }
-      Object.assign(m, {section:sec, name:fd.get('name').trim(), desc:fd.get('desc').trim(), price:+fd.get('price'), card:fd.get('card'), img, veg:fd.get('veg')||'', top:!!fd.get('top'), hidden:!fd.get('show'), seasons: fd.getAll('sea').length===4 ? [] : fd.getAll('sea'), days: fd.getAll('day').length===7 ? [] : fd.getAll('day').map(Number), alg: ar.alg, algNone: ar.algNone, vat: fd.get('vat') || ''}); if(isNew) S.menu.push(m); },
+      Object.assign(m, {section:sec, name:fd.get('name').trim(), desc:fd.get('desc').trim(), price:+fd.get('price'), card:fd.get('card'), img, veg:fd.get('veg')||'', top:!!fd.get('top'), hidden:!fd.get('show'), seasons: fd.getAll('sea').length===4 ? [] : fd.getAll('sea'), days: fd.getAll('day').length===7 ? [] : fd.getAll('day').map(Number), alg: ar.alg, algNone: ar.algNone, vat: fd.get('vat') || (dc && dc.drink && vatClass({section:sec}) !== 'g' ? 'g' : '')}); if(isNew) S.menu.push(m); drinkAfterSave(m, isNew, oldTag); },
     {done: isNew ? ()=>`„${m.name}“ steht jetzt unter ${m.section}` : 'Gespeichert',
      del: isNew ? null : () => ask(`„${m.name}“ von der Speisekarte löschen? Die Rezeptur bleibt erhalten.`, () => { imgDel(m.img); S.menu = S.menu.filter(x=>x!==m); }),
-     after: f => { const bind = () => { $('#dlgPhoto').onclick = () => pickImage(data => { const id = uid('img'); imgPut(id, data); img = id; $('#dlgThumb').innerHTML = thumb(); }); const del = $('#dlgPhotoDel'); if(del) del.onclick = () => { img = ''; $('#dlgThumb').innerHTML = thumb(); }; }; bind(); algControlBind(f); }});
+     after: f => { const bind = () => { $('#dlgPhoto').onclick = () => pickImage(data => { const id = uid('img'); imgPut(id, data); img = id; $('#dlgThumb').innerHTML = thumb(); }); const del = $('#dlgPhotoDel'); if(del) del.onclick = () => { img = ''; $('#dlgThumb').innerHTML = thumb(); }; }; bind(); algControlBind(f);
+       /* Getränk: Menge je Glas. Leer heißt: wie in der Schankrezeptur. */
+       const volSync = () => { const c = f.elements.card.value ? C(f.elements.card.value) : null; const on = !!(c && c.drink) || vatClass({section:f.elements.section.value, vat:f.elements.vat.value}) === 'g'; const box = f.querySelector('#mdVol'); box.hidden = !on; box.querySelectorAll('input,select').forEach(i => { i.disabled = !on; }); f.elements.vol.placeholder = c && c.drink && +c.yieldG > 0 ? 'wie Rezeptur: ' + volTxt(+c.yieldG) : 'z. B. 0,5'; };
+       ['card', 'section', 'vat'].forEach(k => f.elements[k].addEventListener('change', volSync)); volSync(); }});
 }
 
-function prodDialog(p){
+function prodDialog(p, pre){
   const isNew = !p; p = p || {id:uid('p'), name:'', unit:'kg', price:'', lossCold:0, lossHot:0, alg:'', algNone:false, pieceG:'', stock:0, minStock:0, loc:'L', supplier:''};
-  const sups = [...new Set(S.products.map(x=>x.supplier).filter(Boolean))];
+  const dr = isDrink(p) || !!(isNew && pre && pre.drink); const L0 = dr && +p.gebL > 0 ? +p.gebL : 0;
+  const r2 = v => Math.round(v*100)/100;
   openDialog(isNew ? 'Neuer Artikel' : 'Artikel bearbeiten', `
     <label class="f">Bezeichnung<input name="name" required value="${esc(p.name)}"></label>
-    <div class="fields">
+    <div class="togs kind"><label class="tog"><input type="radio" name="kind" value="" ${dr?'':'checked'}><span></span>Lebensmittel</label><label class="tog"><input type="radio" name="kind" value="g" ${dr?'checked':''}><span></span>Getränk</label></div>
+    <div class="fields" data-k="food">
       <label class="f">Einheit<select name="unit">${['kg','l','Stk'].map(u=>`<option ${p.unit===u?'selected':''}>${u}</option>`).join('')}</select></label>
       <label class="f">Preis je Einheit, €<input name="price" class="num-in" type="text" inputmode="decimal" required value="${numIn(p.price)}"></label>
       <label class="f">Gewicht 1 Stk, g<input name="pieceG" class="num-in" type="text" inputmode="decimal" value="${numIn(p.pieceG)}"></label>
       <label class="f">Putzverlust, %<input name="lossCold" class="num-in" type="text" inputmode="decimal" data-max="100" value="${numIn(p.lossCold)}"></label>
       <label class="f">Garverlust, %<input name="lossHot" class="num-in" type="text" inputmode="decimal" data-max="100" value="${numIn(p.lossHot)}"></label>
     </div>
+    <div class="fields" data-k="drink">
+      <label class="f">Gebinde<select name="geb">${Object.entries(GEB).map(([k,l])=>`<option value="${k}" ${(p.geb||'fl')===k?'selected':''}>${l}</option>`).join('')}</select></label>
+      <label class="f"><span data-gl="L">Inhalt je Flasche, l</span><input name="gebL" class="num-in" type="text" inputmode="decimal" value="${L0 ? numIn(L0) : ''}" placeholder="z. B. 0,75"></label>
+      <label class="f" data-only="kiste">Flaschen je Kiste<input name="gebN" class="num-in" type="text" inputmode="numeric" value="${dr && p.geb==='kiste' ? numIn(p.gebN) : ''}" placeholder="z. B. 20"></label>
+      <label class="f"><span data-gl="P">Preis je Flasche, €</span><input name="gprice" class="num-in" type="text" inputmode="decimal" value="${dr && +p.price > 0 ? num2(gebPrice(p)) : ''}" placeholder="netto, wie auf der Rechnung"></label>
+      <label class="f"><span data-gl="F">Pfand je Flasche, €</span><input name="pfand" class="num-in" type="text" inputmode="decimal" value="${dr && +p.pfand > 0 ? num2(p.pfand) : ''}" placeholder="ohne Pfand: leer"></label>
+      <label class="f">Schankverlust, %<input name="pourLoss" class="num-in" type="text" inputmode="decimal" data-max="99" data-msg="Schankverlust: bitte 0 bis 99 % eintragen." value="${dr && +p.pourLoss > 0 ? numIn(p.pourLoss) : ''}" placeholder="z. B. 5 bei Fassbier"></label>
+      <p class="hint geb-out" id="gebOut"></p>
+    </div>
     <div class="fields">
-      <label class="f">Lagerort<select name="loc">${Object.entries(LOCS).map(([k,l])=>`<option value="${k}" ${p.loc===k?'selected':''}>${l}</option>`).join('')}</select></label>
+      <label class="f">Lagerort<select name="loc">${Object.entries(LOCS).map(([k,l])=>`<option value="${k}" ${(isNew && dr ? 'W' : p.loc)===k?'selected':''}>${l}</option>`).join('')}</select></label>
       <label class="f">Lieferant<select name="supplier"><option value="">— keiner —</option>${(S.suppliers||[]).map(s=>`<option value="${s.id}" ${p.supplier===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select></label>
       <label class="f">Artikelnummer beim Lieferanten<input name="artNo" value="${esc(p.artNo||'')}"></label>
-      <label class="f">Gebinde<input name="pack" value="${esc(p.pack||'')}" placeholder="z. B. Sack 10 kg"></label>
-      <label class="f">Inhalt Gebinde in ${esc(p.unit)}<input name="packQty" class="num-in" type="text" inputmode="decimal" value="${numIn(p.packQty||'')}"></label>
-      <label class="f">Mindestbestand<input name="minStock" class="num-in" type="text" inputmode="decimal" value="${numIn(p.minStock)}"></label>
-      ${isNew?`<label class="f">Anfangsbestand<input name="stock" class="num-in" type="text" inputmode="decimal" value="0"></label>`:''}
+      <label class="f" data-k="food">Gebinde<input name="pack" value="${esc(dr ? '' : p.pack||'')}" placeholder="z. B. Sack 10 kg"></label>
+      <label class="f" data-k="food">Inhalt Gebinde in ${esc(p.unit)}<input name="packQty" class="num-in" type="text" inputmode="decimal" value="${dr ? '' : numIn(p.packQty||'')}"></label>
+      <label class="f"><span data-gl="M">Mindestbestand</span><input name="minStock" class="num-in" type="text" inputmode="decimal" value="${numIn(L0 ? r2((+p.minStock||0)/L0) : p.minStock)}"></label>
+      ${isNew?`<label class="f"><span data-gl="A">Anfangsbestand</span><input name="stock" class="num-in" type="text" inputmode="decimal" value="0"></label>`:''}
     </div>
     ${algControlHtml(algClean(p.alg), prodAlgState(p), {note:'„Keine Allergene“ ist eine bestätigte Angabe. „Noch nicht geprüft“ bleibt auf der Karte sichtbar offen.'})}
-    <div class="togs"><label class="tog"><input type="checkbox" name="basic" ${p.basic===true?'checked':''}><span></span>Grundzutat wie Salz, Gewürze, Öl: steht nicht auf der Prep-Liste</label></div>`,
-    fd => { const ar = algControlRead(fd); if(!ar) return false; if(+fd.get('price') !== +p.price) markPrice(p, 'manuell'); Object.assign(p, {name:fd.get('name').trim(), unit:fd.get('unit'), price:+fd.get('price'), pieceG:fd.get('pieceG'), lossCold:+fd.get('lossCold')||0, lossHot:+fd.get('lossHot')||0, alg:ar.alg, algNone:ar.algNone, basic: fd.get('basic') ? true : (p.basic === true ? false : p.basic), loc:fd.get('loc'), supplier:fd.get('supplier'), artNo:fd.get('artNo').trim(), pack:fd.get('pack').trim(), packQty:+fd.get('packQty')||0, minStock:+fd.get('minStock')||0});
+    <div class="togs" data-k="food"><label class="tog"><input type="checkbox" name="basic" ${p.basic===true?'checked':''}><span></span>Grundzutat wie Salz, Gewürze, Öl: steht nicht auf der Prep-Liste</label></div>`,
+    fd => { const ar = algControlRead(fd); if(!ar) return false;
+      const common = {name:fd.get('name').trim(), alg:ar.alg, algNone:ar.algNone, loc:fd.get('loc'), supplier:fd.get('supplier'), artNo:fd.get('artNo').trim()};
+      if(fd.get('kind') === 'g'){
+        const geb = GEB[fd.get('geb')] ? fd.get('geb') : 'fl', L = +fd.get('gebL'), N = geb === 'kiste' ? Math.round(+fd.get('gebN')) : 1, gp = +fd.get('gprice') || 0;
+        if(!(L > 0)) return dlgErr('gebL', 'Bitte den Inhalt in Litern eintragen, zum Beispiel 0,75.');
+        if(geb === 'kiste' && !(N >= 1)) return dlgErr('gebN', 'Bitte eintragen, wie viele Flaschen in der Kiste sind.');
+        if(!isNew && p.unit !== 'l' && usage('p:'+p.id).length) return dlgErr('gebL', `Dieser Artikel steckt in ${plural(usage('p:'+p.id).length, 'Rezeptur', 'Rezepturen')} und wird dort in ${p.unit === 'Stk' ? 'Stück' : 'Gramm'} gerechnet. Bitte für das Getränk einen neuen Artikel anlegen.`);
+        const pq = Math.round(L*N*10000)/10000, price = Math.round(gp/pq*10000)/10000;
+        if(Math.abs(price - (+p.price||0)) > 0.00006 || isNew) markPrice(p, 'manuell');
+        Object.assign(p, common, {unit:'l', price, pieceG:'', lossCold:0, lossHot:0, geb, gebL:L, gebN:N, pack:gebLabel(geb, L, N), packQty:pq, pfand:Math.round((+fd.get('pfand')||0)*100)/100, pourLoss:+fd.get('pourLoss')||0, minStock:Math.round((+fd.get('minStock')||0)*L*1000)/1000});
+        if(isNew){ p.stock = 0; S.products.push(p); const s = (+fd.get('stock')||0)*L; if(s) addMove('in', p.id, Math.round(s*1000)/1000, 'Anfangsbestand'); }
+        return;
+      }
+      if(+fd.get('price') !== +p.price) markPrice(p, 'manuell');
+      Object.assign(p, common, {unit:fd.get('unit'), price:+fd.get('price'), pieceG:fd.get('pieceG'), lossCold:+fd.get('lossCold')||0, lossHot:+fd.get('lossHot')||0, basic: fd.get('basic') ? true : (p.basic === true ? false : p.basic), pack:fd.get('pack').trim(), packQty:+fd.get('packQty')||0, minStock:+fd.get('minStock')||0});
+      ['geb','gebL','gebN','pfand','pourLoss'].forEach(k => { delete p[k]; });
       if(isNew){ p.stock = 0; S.products.push(p); const s = +fd.get('stock')||0; if(s) addMove('in', p.id, s, 'Anfangsbestand'); } },
-    {del: isNew ? null : () => { const u = usage('p:'+p.id); if(u.length) return info('Artikel wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(c=>c.name).join(', ')}. Entfernen Sie es dort zuerst.`); ask(`Artikel „${p.name}“ löschen?`, () => { S.products = S.products.filter(x=>x!==p); }); }, after: f => algControlBind(f)});
+    {del: isNew ? null : () => { const u = usage('p:'+p.id); if(u.length) return info('Artikel wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(c=>c.name).join(', ')}. Entfernen Sie es dort zuerst.`); ask(`Artikel „${p.name}“ löschen?`, () => { S.products = S.products.filter(x=>x!==p); }); },
+     after: f => { algControlBind(f);
+      const sync = () => { const g = f.elements.kind.value === 'g'; f.dataset.kind = g ? 'drink' : 'food';
+        f.querySelectorAll('[data-k]').forEach(b => { const on = (b.dataset.k === 'drink') === g; b.hidden = !on; b.querySelectorAll('input,select').forEach(i => { i.disabled = !on; }); });
+        const geb = f.elements.geb.value, one = GEB[geb] || 'Flasche', kiste = geb === 'kiste';
+        const ko = f.querySelector('[data-only="kiste"]'); ko.hidden = !g || !kiste; ko.querySelector('input').disabled = !g || !kiste;
+        const cu = geb === 'fass' ? 'Fässer' : 'Flaschen';
+        const t = {L: geb === 'fass' ? 'Inhalt Fass, l' : 'Inhalt je Flasche, l', P:`Preis je ${one}, €`, F:`Pfand je ${one}, €`, M: g ? `Mindestbestand, ${cu}` : 'Mindestbestand', A: g ? `Anfangsbestand, ${cu}` : 'Anfangsbestand'};
+        f.querySelectorAll('[data-gl]').forEach(n => { n.textContent = t[n.dataset.gl]; });
+        const L = numParse(f.elements.gebL.value), N = kiste ? numParse(f.elements.gebN.value) : 1, gp = numParse(f.elements.gprice.value);
+        f.querySelector('#gebOut').textContent = g && L > 0 && N >= 1 && gp > 0 ? `${gebLabel(geb, L, Math.round(N))} · ${eur(gp/(L*N))} je Liter. Pfand zählt nicht zum Wareneinsatz.` : '';
+      };
+      f.oninput = e => { if(e.target.name === 'kind' && e.target.value === 'g' && isNew) f.elements.loc.value = 'W'; if(e.target.name === 'kind' || e.target.closest('[data-k="drink"]')) sync(); }; sync(); }});
 }
 
 function moveDlg(arg){
@@ -4475,32 +4614,33 @@ function moveDlg(arg){
   const prods = stockProducts().sort(byName);
   const title = {in:'Wareneingang buchen', out:'Entnahme buchen', waste:'Schwund buchen'}[type];
   const p0 = pid ? P(pid) : null;
+  const mu = p => mvUnit(p, type); const lbl = p => mu(p).lbl; const plbl = p => `Preis je ${p && isDrink(p) ? mu(p).word : 'Einheit'}, €`;
   openDialog(title, `
     <label class="f">Artikel<select name="pid" id="mvPid" required>${p0?'':'<option value="">— wählen —</option>'}${prods.map(p=>`<option value="${p.id}" ${p0&&p0.id===p.id?'selected':''}>${esc(p.name)} · ${qtyFmt(+p.stock||0,p)}</option>`).join('')}</select></label>
     <div class="fields">
-      <label class="f">Menge in <span id="mvUnit">${p0?esc(p0.unit):'Einheit'}</span><input name="qty" class="num-in" type="text" inputmode="decimal" required autocomplete="off" autofocus></label>
-      ${type==='in' && canEditAll()?`<label class="f">Preis je Einheit, €<input name="price" id="mvPrice" class="num-in" type="text" inputmode="decimal" autocomplete="off" value="${p0?num2(p0.price):''}"></label>`:''}
+      <label class="f"><span id="mvUnit">${esc(lbl(p0))}</span><input name="qty" class="num-in" type="text" inputmode="decimal" required autocomplete="off" autofocus></label>
+      ${type==='in' && canEditAll()?`<label class="f"><span id="mvPLbl">${esc(plbl(p0))}</span><input name="price" id="mvPrice" class="num-in" type="text" inputmode="decimal" autocomplete="off" value="${p0?num2(p0.price*mu(p0).f):''}"></label>`:''}
       <label class="f">Datum<input name="date" type="date" max="${addDays(todayStr(),1)}" value="${todayStr()}"></label>
     </div>
     ${type==='waste'?`<label class="f">Grund<select name="note">${WASTE.map(w=>`<option>${w}</option>`).join('')}</select></label>`:`<label class="f">${type==='in'?'Lieferschein / Notiz':'Notiz'}<input name="note" placeholder="${type==='in'?'z. B. Lieferschein 2240':'z. B. für Mise en place'}"></label>`}
     ${type==='in' && canEditAll()?`<div class="togs"><label class="tog"><input type="checkbox" name="upd" checked><span></span>Preis in die Kalkulation übernehmen (gleitender Durchschnitt)</label></div>`:''}
     <div id="mvWarn"></div>`,
-    (fd, f) => { const p = P(fd.get('pid')); const q = +fd.get('qty'); if(!p) return false;
+    (fd, f) => { const p = P(fd.get('pid')); if(!p) return false; const u = mu(p); const n = +fd.get('qty'); const q = Math.round(n*u.f*1000)/1000;
       if(!(q > 0)) return dlgErr('qty', 'Bitte eine Menge größer als 0 eingeben.');
       if(dateTooFar(fd.get('date'))) return dlgErr('date', 'Das Datum liegt in der Zukunft. Buchungen sind höchstens für morgen möglich.');
-      const date = fd.get('date') ? new Date(fd.get('date')+'T12:00:00').toISOString() : null;
-      if(type==='in'){ const old = p.price; const pr = fd.get('price')==='' || fd.get('price') == null ? p.price : +fd.get('price'); if(fd.get('upd') && pr !== p.price){ const s0 = Math.max(0, +p.stock||0); p.price = Math.round((s0*p.price + q*pr)/(s0+q)*100)/100; } addMove('in', p.id, q, fd.get('note'), pr, date); if(old !== p.price) S.moves[0].prevPrice = old; }
+      const date = fd.get('date') ? new Date(fd.get('date')+'T12:00:00').toISOString() : null; let pfTxt = '';
+      if(type==='in'){ const old = p.price; const pr = fd.get('price')==='' || fd.get('price') == null ? p.price : +fd.get('price')/u.f; if(fd.get('upd') && Math.abs(pr - p.price) > 1e-9){ const s0 = Math.max(0, +p.stock||0); p.price = prRound(p, (s0*p.price + q*pr)/(s0+q)); } addMove('in', p.id, q, fd.get('note'), pr, date); if(old !== p.price) S.moves[0].prevPrice = old;
+        const pf = isDrink(p) && p.supplier ? Math.round(n*(+p.pfand||0)*100)/100 : 0; if(pf > 0){ S.moves[0].lg = lgAdd(p.supplier, pf, `${p.name}: ${num(n,2)} × ${u.word}`, date).id; pfTxt = ` · Pfand ${eur(pf)} beim Leergut vermerkt`; } }
       else { const st = +p.stock||0; const key = p.id+':'+q;
         if(q > st + 1e-9 && f.dataset.force !== key){
           $('#mvWarn').innerHTML = `<div class="warn-box dlg-warn" role="alert">${ico('spark')}<span><b>Mehr als der Bestand.</b> Im Lager sind ${esc(qtyFmt(st,p))}, gebucht würden ${esc(qtyFmt(q,p))}. Der Bestand ginge auf ${esc(qtyFmt(st-q,p))}. Bitte Menge prüfen oder zuerst den Wareneingang buchen.</span><button type="button" class="btn sm" id="mvForce">Trotzdem buchen</button></div>`;
           $('#mvForce').onclick = () => { f.dataset.force = key; f.requestSubmit(); };
           return false; }
         addMove(type, p.id, -q, fd.get('note'), null, date); }
-      moveDlg.last = `${MOVE[type]}: ${p.name} ${type==='in'?'+':'−'}${qtyFmt(q,p)}` + (type==='in' ? ` · Ø-Preis ${eur(p.price)}` : (+p.stock||0) < 0 ? ` · Bestand jetzt ${qtyFmt(+p.stock||0,p)}` : ''); },
-    {ok:'Buchen', done:()=>moveDlg.last, after: f => { const s = f.querySelector('#mvPid'); const clr = () => { $('#mvWarn').innerHTML = ''; delete f.dataset.force; }; s.onchange = () => { const p = P(s.value); f.querySelector('#mvUnit').textContent = p ? p.unit : 'Einheit'; const pr = f.querySelector('#mvPrice'); if(pr && p) pr.value = num2(p.price); clr(); }; f.elements.qty.addEventListener('input', clr); }});
+      moveDlg.last = `${MOVE[type]}: ${p.name} ${type==='in'?'+':'−'}${qtyFmt(q,p)}` + (type==='in' ? ` · Ø-Preis ${eur(p.price*priceUnit(p).f)}${isDrink(p) ? ' je ' + priceUnit(p).word : ''}${pfTxt}` : (+p.stock||0) < 0 ? ` · Bestand jetzt ${qtyFmt(+p.stock||0,p)}` : ''); },
+    {ok:'Buchen', done:()=>moveDlg.last, after: f => { const s = f.querySelector('#mvPid'); const clr = () => { $('#mvWarn').innerHTML = ''; delete f.dataset.force; }; s.onchange = () => { const p = P(s.value); f.querySelector('#mvUnit').textContent = lbl(p); const pl = f.querySelector('#mvPLbl'); if(pl) pl.textContent = plbl(p); const pr = f.querySelector('#mvPrice'); if(pr && p) pr.value = num2(p.price*mu(p).f); clr(); }; f.elements.qty.addEventListener('input', clr); }});
 }
 
-/* Verkaufsbuchung: eine Buchung = eine Einheit (S.saleGroups[grp]), Storno macht alles rückgängig */
 const DEMO_SALES_OPT = ['Beispielverkäufe löschen (empfohlen)', 'Beispielverkäufe behalten'];
 function demoSalesDays(){ const real = S.salesReal || {}; return Object.keys(S.salesDays||{}).filter(d => !real[d]); }
 function demoSalesText(n){ return `Es sind noch ${plural(n,'Tag','Tage')} mit erfundenen Beispielverkäufen gespeichert. Echte und erfundene Zahlen sollten nicht gemischt werden.`; }
@@ -4519,7 +4659,7 @@ function salesDlg(){
     (fd, f) => { const acc = new Map(); let n = 0; const dk = fd.get('date') || todayStr();
       if(dateTooFar(dk)) return dlgErr('date', 'Das Datum liegt in der Zukunft. Buchungen sind höchstens für morgen möglich.');
       const date = new Date(dk+'T20:00:00').toISOString(); const sold = [];
-      items.forEach(m => { const q = Math.max(0, Math.floor(+fd.get('s_'+m.id)||0)); if(q>0){ n += q; explode(C(m.card), q, acc); sold.push([m, q]); } });
+      items.forEach(m => { const q = Math.max(0, Math.floor(+fd.get('s_'+m.id)||0)); if(q>0){ n += q; explode(C(m.card), q*menuFactor(m), acc); sold.push([m, q]); } });
       if(!n){ $('#salesWarn').innerHTML = `<p class="f-err" role="alert">Noch keine Portionen eingetragen. Bitte bei mindestens einem Gericht die Menge erhöhen.</p>`; return false; }
       const short = [...acc.entries()].map(([pid,q]) => ({p:P(pid), q:Math.round(q*1000)/1000})).filter(x => x.p && x.q > (+x.p.stock||0) + 1e-9);
       const key = dk+'|'+sold.map(([m,q])=>m.id+':'+q).join(',');
@@ -4541,7 +4681,7 @@ function salesDlg(){
     }});
 }
 /* Storno: Einzelbuchung oder ganze Verkaufsbuchung */
-function undoMove(m){ const p = P(m.pid); if(p) p.stock = Math.round(((+p.stock||0) - m.qty)*1000)/1000; if(p && m.prevPrice != null) p.price = m.prevPrice; S.moves = S.moves.filter(x=>x!==m); }
+function undoMove(m){ const p = P(m.pid); if(m.lg) lgRemove(m.lg); if(p) p.stock = Math.round(((+p.stock||0) - m.qty)*1000)/1000; if(p && m.prevPrice != null) p.price = m.prevPrice; S.moves = S.moves.filter(x=>x!==m); }
 function undoSaleGroup(grp){
   const ms = S.moves.filter(m => m.grp === grp); ms.forEach(undoMove);
   const g = (S.saleGroups||{})[grp];
@@ -4553,7 +4693,9 @@ function undoSaleGroup(grp){
 }
 
 function newCard(type, fromMenu){
-  const c = {id:uid(type==='semi'?'semi':'dish'), no:S.settings.nextNo++, name: fromMenu ? fromMenu.name : (type==='semi'?'Neues Basisrezept':'Neues Gericht'), type, category: fromMenu ? fromMenu.section : (type==='semi'?'Basisrezepte':''), yieldG:'', img:'', steps:[{t:'',img:''}], items:[{ref:'',qty:'',net:''}]};
+  const drink = type === 'drink' || !!(fromMenu && type === 'dish' && vatClass(fromMenu) === 'g'); if(drink) type = 'dish';   // Schankrezeptur: rechnet wie ein Gericht, Eingabe in cl/ml/l
+  const c = {id:uid(type==='semi'?'semi':'dish'), no:S.settings.nextNo++, name: fromMenu ? fromMenu.name : (type==='semi'?'Neues Basisrezept':drink?'Neues Getränk':'Neues Gericht'), type, category: fromMenu ? fromMenu.section : (type==='semi'?'Basisrezepte':drink?drinkSection():''), yieldG: drink && fromMenu && +fromMenu.vol > 0 ? +fromMenu.vol : '', img:'', steps: drink ? [] : [{t:'',img:''}], items:[{ref:'',qty:'',net:''}]};
+  if(drink) c.drink = true;
   S.cards.push(c); if(fromMenu) fromMenu.card = c.id;
   go('cards', c.id); save(); toast('Rezeptur angelegt');
 }
@@ -4563,8 +4705,8 @@ function printCard(id){
   $('#print').innerHTML = `
     <div class="meta"><span>${esc(S.settings.name)}</span><span>Datum: ${new Date().toLocaleDateString('de-AT')}</span></div>
     <h1>Rezeptur Nr. ${c.no||''}</h1>
-    <div><b>${esc(c.name)}</b> · ${c.type==='semi'?'Basisrezept':'Gericht'} · ${esc(c.category||'')}</div>
-    <div>Ausbeute: ${num(c.yieldG||t.out)} g ${c.type==='semi'?'(Charge)':'(1 Portion)'}</div>
+    <div><b>${esc(c.name)}</b> · ${c.type==='semi'?'Basisrezept':c.drink?'Getränk':'Gericht'} · ${esc(c.category||'')}</div>
+    <div>${c.drink ? (+c.yieldG > 0 ? 'Ausschankmenge: ' + volTxt(+c.yieldG) : 'Schankrezeptur') : `Ausbeute: ${num(c.yieldG||t.out)} g ${c.type==='semi'?'(Charge)':'(1 Portion)'}`}</div>
     ${c.img&&IMG[c.img]?`<img class="pr-ph" src="${IMG[c.img]}" alt="">`:''}
     <table><thead><tr><th>Nr.</th><th>Zutat</th><th class="r">Brutto</th><th>Einh.</th><th class="r">Netto, g</th><th class="r">Fertig, g</th><th class="r">Betrag, €</th></tr></thead>
     <tbody>${c.items.map((it,i)=>{const l=t.lines[i];return `<tr><td>${i+1}</td><td>${esc(l.name)}</td><td class="r">${num(+it.qty,2)}</td><td>${l.unit}</td><td class="r">${num(l.net,1)}</td><td class="r">${num(l.out,1)}</td><td class="r">${num(l.cost,2)}</td></tr>`}).join('')}</tbody>
@@ -4675,8 +4817,8 @@ document.addEventListener('click', e => {
     case 'newMenu': menuDialog(); break;
     case 'editMenu': menuDialog(S.menu.find(m=>m.id===id)); break;
     case 'photoMenu': setPhoto(S.menu.find(m=>m.id===id)); break;
-    case 'toMenu': { const cc = C(id); const t = totals(cc); const sec = secList().includes(cc.category) ? cc.category : secList().includes(SEC_MAP[cc.category]) ? SEC_MAP[cc.category] : secList()[0]; const rec = t.cost/(S.settings.target/100)*(1+vatRate({section:sec})/100);
-      menuDialog(null, {name:cc.name, section:sec, card:cc.id, price: Math.max(0.9, Math.ceil(rec) - 0.1).toFixed(2)}); break; }
+    case 'toMenu': { const cc = C(id); const t = totals(cc); const sec = secList().includes(cc.category) ? cc.category : secList().includes(SEC_MAP[cc.category]) ? SEC_MAP[cc.category] : secList()[0]; const dv = cc.drink && vatClass({section:sec}) !== 'g' ? 'g' : ''; const rec = t.cost/(S.settings.target/100)*(1+vatRate({section:sec, vat:dv})/100);
+      menuDialog(null, {name:cc.name, section:cc.drink && secList().includes(drinkSection()) && !secList().includes(cc.category) ? drinkSection() : sec, card:cc.id, vat:dv, price: +Math.max(0.9, Math.ceil(rec) - 0.1).toFixed(2)}); break; }
     case 'openCard': go('cards', id); break;
     case 'backCards': go('cards'); break;
     case 'newCardFor': newCard('dish', S.menu.find(m=>m.id===id)); break;
@@ -4705,6 +4847,7 @@ document.addEventListener('click', e => {
       if(m.grp){ const g = (S.saleGroups||{})[m.grp] || {}; const k = S.moves.filter(x=>x.grp===m.grp).length;
         ask(`${g.n ? `Verkaufsbuchung vom ${fmtDate(m.date)} (${plural(g.n,'Portion','Portionen')})` : `Sammelbuchung vom ${fmtDate(m.date)}`} komplett stornieren? ${plural(k,'Artikel wird','Artikel werden')} zurück ins Lager gebucht${g.rows && g.rows.length ? `, ${eur(g.gross)} Umsatz werden aus der Auswertung entfernt` : g.n ? '' : '; der Umsatz in der Auswertung bleibt unverändert'}.`, () => { undoSaleGroup(m.grp); }, 'Stornieren'); break; }
       ask(`Buchung stornieren? ${MOVE[m.type]} ${p?p.name:''} ${qtyFmt(m.qty,p)} wird rückgängig gemacht.`, () => { undoMove(m); }, 'Stornieren'); break; }
+    case 'invT': { const [pid, k] = id.split(':'); barTenth(pid, +k); break; }
     case 'invStart': S.invDraft = {date:new Date().toISOString(), counts:{}}; save(); render(); toast('Inventur gestartet'); break;
     case 'invCancel': ask('Laufende Inventur verwerfen? Die gezählten Mengen gehen verloren.', () => { S.invDraft = null; }, 'Verwerfen'); break;
     case 'invFinish': { const d = S.invDraft; const items = stockProducts().filter(p => d.counts[p.id]!==undefined && d.counts[p.id]!=='' && +d.counts[p.id] >= 0);
@@ -4734,6 +4877,7 @@ document.addEventListener('input', e => {
   if(t.id === 'portions'){ view.portions = Math.max(1, +t.value||1); $('#prodOut').innerHTML = prodHtml(C(view.card), view.portions); }
   if(t.id === 'palIn') palFilter(t.value);
   if(t.dataset.inv){ const v = t.value.trim()==='' ? '' : numParse(t.value); const ok = v === '' || (isFinite(v) && v >= 0); t.classList.toggle('bad-in', !ok); if(ok){ S.invDraft.counts[t.dataset.inv] = v; t.dataset.old = t.value; save(); invUpdate(t.dataset.inv); } }
+  if(t.dataset.invf){ barInput(t); }
   if(t.dataset.step != null && t.closest('#app')){ const c = C(view.card); c.steps[+t.dataset.step].t = t.value; save(); autosize(t); }
   if(t.classList.contains('title-in')) autosize(t);
   if(t.dataset.gs){ S.settings.guest[t.dataset.gs] = t.value; save(); $('.guest-prev').innerHTML = guestHtml(); }
@@ -4749,7 +4893,7 @@ document.addEventListener('keydown', e => {
     else if(e.key === 'Enter'){ e.preventDefault(); const x = palItems[palSel]; palClose(); x && x.run(); }
     return;
   }
-  if(e.key === 'Enter' && e.target.matches('input[data-inv]')){ e.preventDefault(); const all = [...document.querySelectorAll('input[data-inv]')]; const n = all[all.indexOf(e.target)+1]; n ? (n.focus(), n.select()) : e.target.blur(); return; }
+  if(e.key === 'Enter' && e.target.matches('input[data-inv],input[data-invf]')){ e.preventDefault(); const all = [...document.querySelectorAll('input[data-inv],input[data-invf]')]; const n = all[all.indexOf(e.target)+1]; n ? (n.focus(), n.select()) : e.target.blur(); return; }
   if(e.key === 'Enter' && e.target.matches('input[data-li],input[data-pp],input[data-cf],textarea.title-in,input[data-secname]')){ e.preventDefault(); e.target.blur(); }
   if(e.key === '/' && !e.target.closest('input,textarea,select')){ e.preventDefault(); palOpen(); }
 });
@@ -4757,10 +4901,10 @@ document.addEventListener('keydown', e => {
 document.addEventListener('change', e => {
   const t = e.target, c = view.card ? C(view.card) : null;
   if(t.id === 'imgFile'){ const f = t.files[0]; if(!f) return; resizeImage(f).then(d => { pickCb && pickCb(d); pickCb = null; }, () => info('Foto nicht lesbar', 'Bitte ein JPG- oder PNG-Bild wählen.')); return; }
-  if(t.dataset.cf && c){ const f = t.dataset.cf; c[f] = f==='yieldG' ? (t.value===''?'':+t.value) : t.value; save(); softRender(); toast('Gespeichert'); return; }
+  if(t.dataset.cf && c){ const f = t.dataset.cf; if(f === 'type'){ c.drink = t.value === 'drink'; c.type = t.value === 'semi' ? 'semi' : 'dish'; } else c[f] = f==='yieldG' ? (t.value===''?'':+t.value) : t.value; save(); softRender(); toast('Gespeichert'); return; }
   if(t.dataset.li != null && c){ const it = c.items[+t.dataset.li]; const f = t.dataset.lf; it[f] = f==='ref' ? t.value : (t.value===''?'':+t.value); if(f==='ref') it.net = ''; save(); softRender(); return; }
   if(t.dataset.step != null && t.closest('#app')){ toast('Gespeichert'); return; }
-  if(t.dataset.pp){ const p = P(t.dataset.pp); const old = +p[t.dataset.pf]; p[t.dataset.pf] = Math.max(0, +t.value || 0); save(); softRender(); if(t.dataset.pf==='price' && old !== p.price) toast(`${p.name}: ${eur(old)} → ${eur(p.price)} · ${usage('p:'+p.id).length} Rezepturen neu berechnet`); return; }
+  if(t.dataset.pp){ const p = P(t.dataset.pp); const u = priceUnit(p); const pf = t.dataset.pf; const old = +p[pf]; const v = Math.max(0, +t.value || 0); p[pf] = pf === 'price' ? prRound(p, v / u.f) : v; save(); softRender(); if(pf==='price' && old !== p.price) toast(`${p.name}: ${eur(old*u.f)} → ${eur(p.price*u.f)}${u.f !== 1 ? ' je ' + u.word : ''} · ${usage('p:'+p.id).length} Rezepturen neu berechnet`); return; }
   if(t.dataset.sf){ const f = t.dataset.sf; S.settings[f] = f==='name' ? t.value : f==='target' ? Math.min(100, Math.max(1, +t.value || 28)) : Math.min(100, Math.max(0, +t.value || 0)); if(f!=='name') t.value = S.settings[f]; save(); toast('Gespeichert'); return; }
   if(t.dataset.gf){ S.settings.guest[t.dataset.gf] = t.checked; save(); $('.guest-prev').innerHTML = guestHtml(); return; }
   if(t.dataset.secname != null){ const i = +t.dataset.secname, old = S.settings.sections[i], nv = t.value.trim(); if(!nv || nv===old){ t.value = old; return; }
@@ -5171,7 +5315,7 @@ function orderText(o){
 function mailHref(o){ const sp = SUP(o.supplier); return `mailto:${encodeURIComponent(sp.email)}?subject=${encodeURIComponent(`Bestellung ${o.no} – ${S.settings.name}`)}&body=${encodeURIComponent(orderText(o))}`; }
 function waHref(o){ const sp = SUP(o.supplier); return `https://wa.me/${String(sp.whatsapp||sp.phone).replace(/\D/g,'').replace(/^00/,'')}?text=${encodeURIComponent(orderText(o))}`; }
 function receiveIn(p, units, unitPrice, note, date){
-  const old = p.price; const chef = canEditAll(); /* das Team bucht die Menge; Einkaufspreise ändert nur der Chef */ if(chef && unitPrice && Math.abs(unitPrice - p.price) > 0.0001){ const s0 = Math.max(0, +p.stock||0); p.price = Math.round((s0*p.price + units*unitPrice)/(s0+units)*100)/100; }
+  const old = p.price; const chef = canEditAll(); /* das Team bucht die Menge; Einkaufspreise ändert nur der Chef */ if(chef && unitPrice && Math.abs(unitPrice - p.price) > 0.0001){ const s0 = Math.max(0, +p.stock||0); p.price = prRound(p, (s0*p.price + units*unitPrice)/(s0+units)); }
   addMove('in', p.id, units, note, unitPrice || p.price, date); if(chef && unitPrice) markPrice(p, 'Wareneingang'); if(old !== p.price) S.moves[0].prevPrice = old;
 }
 
@@ -5217,7 +5361,7 @@ function orderList(){
 
 /* ---------- Bestellung bearbeiten / senden / empfangen ---------- */
 function orderEditor(o){
-  const sp = SUP(o.supplier); const tot = orderTotal(o); const editable = o.status === 'draft';
+  const sp = SUP(o.supplier); const tot = orderTotal(o); const editable = o.status === 'draft'; const pf = orderPfand(o), pfD = o.receipt ? orderPfand(o, true) : 0;
   const recv = view.recv === o.id && ['sent','confirmed'].includes(o.status);
   const block = sendBlockReason(o);
   const hasCold = o.lines.some(l => P(l.pid)?.loc === 'K' || P(l.pid)?.loc === 'T');
@@ -5255,7 +5399,7 @@ function orderEditor(o){
       <section class="panel flush"><div class="panel-h pad"><h2>Positionen</h2><span class="muted sm">${o.lines.length}</span></div>
         <div class="tbl-wrap"><table class="otab"><thead><tr><th>Artikel</th><th class="r">Menge</th><th class="r">= Einheit</th><th class="r">Preis</th><th class="r">Summe</th>${o.receipt?'<th class="r">Geliefert</th><th class="r">Rechnungspreis</th>':''}<th></th></tr></thead>
         <tbody>${rows || '<tr><td colspan="6" class="muted">Noch keine Positionen.</td></tr>'}</tbody>
-        <tfoot><tr><td colspan="4">${o.receipt ? 'Summe bestellt, exkl. MwSt.' : 'Summe exkl. MwSt.'}</td><td class="r mono" data-l="${o.receipt ? 'Summe bestellt' : 'Summe'}">${eur(tot)}</td>${o.receipt?`<td class="r muted tf-l">geliefert</td><td class="r mono" data-l="Summe geliefert">${eur(deliveredTotal(o))}</td>`:''}<td class="ol-x"></td></tr></tfoot></table></div>
+        <tfoot><tr><td colspan="4">${o.receipt ? 'Summe bestellt, exkl. MwSt.' : 'Summe exkl. MwSt.'}</td><td class="r mono" data-l="${o.receipt ? 'Summe bestellt' : 'Summe'}">${eur(tot)}</td>${o.receipt?`<td class="r muted tf-l">geliefert</td><td class="r mono" data-l="Summe geliefert">${eur(deliveredTotal(o))}</td>`:''}<td class="ol-x"></td></tr>${pf > 0 || pfD > 0 ? `<tr class="pf-row"><td colspan="4">Pfand, kommt mit dem Leergut zurück</td><td class="r mono" data-l="Pfand">${eur(pf)}</td>${o.receipt?`<td class="r muted tf-l">geliefert</td><td class="r mono" data-l="Pfand geliefert">${eur(pfD)}</td>`:''}<td class="ol-x"></td></tr>` : ''}</tfoot></table></div>
         ${editable ? `<div class="panel-f"><select id="olAdd" class="sm-sel" aria-label="Artikel hinzufügen"><option value="">+ Artikel von ${esc(sp.name)} …</option>${addable.map(p=>`<option value="${p.id}">${esc(p.name)}${p.pack?' ('+esc(p.pack)+')':''}</option>`).join('')}</select><button type="button" class="btn sm" data-act="olSuggest" data-id="${o.id}">Vorschlag laden</button></div>` : ''}
       </section>
       ${o.complaint ? `<section class="panel"><div class="panel-h"><h2>Reklamation</h2><select data-cst="${o.id}" class="sm-sel">${Object.entries(CSTAT).map(([k,l])=>`<option value="${k}" ${o.complaint.status===k?'selected':''}>${l}</option>`).join('')}</select></div>
@@ -5268,11 +5412,11 @@ function orderEditor(o){
         <div class="panel-h"><h2>${editable?'Senden':'Status'}</h2></div>
         ${editable ? `<label class="f">Gewünschte Lieferung<select data-od="${o.id}">${[...new Set([o.deliveryDate, ...deliveryOptions(sp)])].sort().map(d=>`<option value="${d}" ${o.deliveryDate===d?'selected':''}>${dayLabel(d)}</option>`).join('')}</select></label>
           <label class="f">Bemerkung an den Lieferanten<input data-on="${o.id}" value="${esc(o.note)}" placeholder="z. B. Leergut 3 Kisten mitnehmen"></label>
-          <div class="kv"><span>Summe</span><span>${eur(tot)}</span><span>Mindestbestellwert</span><span class="${below?'bad-t':''}">${sp.minOrder ? eur(sp.minOrder) + (below ? '' : ' · erreicht') : 'keiner'}</span><span>Annahmeschluss</span><span>${esc(sp.cutoff)} Uhr</span></div>
+          <div class="kv"><span>${pf > 0 ? 'Ware' : 'Summe'}</span><span>${eur(tot)}</span>${pf > 0 ? `<span>Pfand</span><span>${eur(pf)}</span>` : ''}<span>Mindestbestellwert</span><span class="${below?'bad-t':''}">${sp.minOrder ? eur(sp.minOrder) + (below ? '' : ' · erreicht') : 'keiner'}</span><span>Annahmeschluss</span><span>${esc(sp.cutoff)} Uhr</span></div>
           ${below ? `<p class="hint bad-t">Noch ${eur(sp.minOrder-tot)} bis zum Mindestbestellwert.</p>` : ''}
           ${sendBtns()}
           <details class="alg-det"><summary>Bestelltext ansehen</summary><pre class="otext">${esc(orderText(o))}</pre></details>`
-        : `<div class="kv"><span>Lieferung</span><span>${dayLabel(o.deliveryDate)}</span><span>Summe bestellt</span><span>${eur(tot)}</span>${o.receipt?`<span>Summe geliefert</span><span>${eur(deliveredTotal(o))}</span><span>Lieferschein</span><span>${esc(o.receipt.noteNo||'—')}</span><span>Geprüft von</span><span>${esc(userName(o.receipt.checkedBy))}</span>${o.receipt.temp?`<span>Temperatur</span><span>${esc(o.receipt.temp)}</span>`:''}`:''}${o.confirmedNote?`<span>Bestätigung</span><span>${esc(o.confirmedNote)}</span>`:''}</div>
+        : `<div class="kv"><span>Lieferung</span><span>${dayLabel(o.deliveryDate)}</span><span>${pf > 0 ? 'Ware bestellt' : 'Summe bestellt'}</span><span>${eur(tot)}</span>${pf > 0 && !o.receipt ? `<span>Pfand</span><span>${eur(pf)}</span>` : ''}${o.receipt?`<span>${pfD > 0 ? 'Ware geliefert' : 'Summe geliefert'}</span><span>${eur(deliveredTotal(o))}</span>${pfD > 0 ? `<span>Pfand</span><span>${eur(pfD)}</span>` : ''}<span>Lieferschein</span><span>${esc(o.receipt.noteNo||'—')}</span><span>Geprüft von</span><span>${esc(userName(o.receipt.checkedBy))}</span>${o.receipt.temp?`<span>Temperatur</span><span>${esc(o.receipt.temp)}</span>`:''}`:''}${o.confirmedNote?`<span>Bestätigung</span><span>${esc(o.confirmedNote)}</span>`:''}</div>
           <div class="row-btns" style="margin-top:12px">
             ${o.status==='sent'?`<button type="button" class="btn" data-act="ordConfirm" data-id="${o.id}">Bestätigung erhalten</button>`:''}
             ${['sent','confirmed'].includes(o.status)?`<button type="button" class="btn primary" data-act="ordRecv" data-id="${o.id}">${ico('truck')}Wareneingang prüfen</button><button type="button" class="btn" data-act="ordDelay" data-id="${o.id}">Lieferung verschoben</button>`:''}
@@ -5302,7 +5446,7 @@ function receiveForm(o, hasCold){
       <div class="f">Foto Lieferschein<div class="row-btns">${o.receiptDraft?.photo && IMG[o.receiptDraft.photo] ? `<img class="ls-th" src="${IMG[o.receiptDraft.photo]}" alt="">` : ''}<button type="button" class="btn sm" data-act="rPhoto" data-id="${o.id}">${ico('camera')}${o.receiptDraft?.photo?'Ändern':'Aufnehmen'}</button></div></div>
       <span class="sp"></span><button type="button" class="btn" data-act="rCancel">Abbrechen</button><button type="button" class="btn primary" data-act="rBook" data-id="${o.id}">Einbuchen</button>
     </div>
-    <p class="hint pad-x pad-b">Leeres Feld „Geliefert“ heißt: wie bestellt. Preisabweichungen über 3 % werden markiert, der Einkaufspreis wird als gleitender Durchschnitt übernommen. Bei Abweichungen entsteht automatisch eine Reklamation.</p>
+    <p class="hint pad-x pad-b">Leeres Feld „Geliefert“ heißt: wie bestellt. Preisabweichungen über 3 % werden markiert, der Einkaufspreis wird als gleitender Durchschnitt übernommen. Bei Abweichungen entsteht automatisch eine Reklamation.${orderPfand(o) > 0 ? ' Das Pfand der gelieferten Gebinde wird beim Leergut des Lieferanten vermerkt.' : ''}</p>
   </section>`;
 }
 
@@ -5315,9 +5459,10 @@ function supplierView(){
     <div class="kv"><span>Bestellen</span><span>${DAYS.filter(([i])=>sp.orderDays.includes(i)).map(([,l])=>l).join(' ')} bis ${esc(sp.cutoff)}</span><span>Lieferung</span><span>${DAYS.filter(([i])=>sp.deliveryDays.includes(i)).map(([,l])=>l).join(' ')}</span><span>Mindestwert</span><span>${eur(sp.minOrder)}</span><span>Einkauf diesen Monat</span><span>${eur(spend)}</span></div>
     <div class="row-btns"><button type="button" class="btn sm" data-act="supEdit" data-id="${sp.id}">${ico('edit')}Bearbeiten</button><button type="button" class="btn sm" data-act="ordNew" data-id="${sp.id}">${ico('cart')}Bestellen</button></div>
   </article>`; }).join('')}</div>
+  ${lgSection()}
   <h2 class="sec-h">Preisentwicklung</h2>
   <section class="panel flush"><div class="tbl-wrap"><table class="otab"><thead><tr><th>Artikel</th><th>Lieferant</th><th class="r">Aktuell</th><th class="r">Vorher</th><th class="r">Änderung</th></tr></thead><tbody>
-  ${S.products.map(p=>{ const h = priceHistory(p.id); const prev = movesByDate().find(m=>m.pid===p.id && m.prevPrice!=null)?.prevPrice ?? (h[1]); if(prev==null || Math.abs(prev - p.price) < 0.005) return ''; const ch = (p.price/prev-1)*100; return `<tr><td><b class="pn">${esc(p.name)}</b></td><td class="muted">${esc(supName(p))}</td><td class="r mono">${eur(p.price)}</td><td class="r mono muted">${eur(prev)}</td><td class="r mono ${ch>3?'bad-t':ch<0?'good-t':''}">${ch>0?'+':''}${num(ch,1)} %</td></tr>`; }).join('') || '<tr><td colspan="5" class="muted">Noch keine Preisänderungen erfasst.</td></tr>'}
+  ${S.products.map(p=>{ const h = priceHistory(p.id); const prev = movesByDate().find(m=>m.pid===p.id && m.prevPrice!=null)?.prevPrice ?? (h[1]); if(prev==null || Math.abs(prev - p.price) < 0.005) return ''; const ch = (p.price/prev-1)*100; return `<tr><td><b class="pn">${esc(p.name)}</b></td><td class="muted">${esc(supName(p))}</td><td class="r mono">${eur(p.price*priceUnit(p).f)}</td><td class="r mono muted">${eur(prev*priceUnit(p).f)}</td><td class="r mono ${ch>3?'bad-t':ch<0?'good-t':''}">${ch>0?'+':''}${num(ch,1)} %</td></tr>`; }).join('') || '<tr><td colspan="5" class="muted">Noch keine Preisänderungen erfasst.</td></tr>'}
   </tbody></table></div></section>`;
 }
 function supplierDialog(sp){
@@ -5380,10 +5525,12 @@ document.addEventListener('click', e => {
         if(p && l.delivered > 0) receiveIn(p, l.delivered*l.f, l.invPrice/l.f, `${o.no}${r.noteNo?' · '+r.noteNo:''}`, date);
         if(l.ls !== 'ok') diffs.push(`${p?p.name:'?'}: ${LSTAT[l.ls]} (bestellt ${num(l.n,2)} × ${l.ou}, geliefert ${num(l.delivered,2)})`);
         if(l.price && (l.invPrice/l.price-1)*100 > 3) priceUp.push(`${p?p.name:'?'}: ${eur(l.price)} → ${eur(l.invPrice)}`); });
+      o.lines.forEach(l => { l.pf = linePfand(l); }); const pfSum = orderPfand(o, true);
       o.receipt = {date, noteNo:r.noteNo, temp:r.temp, photo:r.photo||'', checkedBy:me().id}; delete o.receiptDraft;
+      if(pfSum > 0){ o.receipt.pfand = pfSum; lgAdd(o.supplier, pfSum, `Lieferung ${o.no}`, date).order = o.id; }
       if(diffs.length || priceUp.length){ o.status = 'complaint'; o.complaint = {status:'open', text:`Sehr geehrte Damen und Herren,\n\nbei der Lieferung zu ${o.no}${r.noteNo?' (Lieferschein '+r.noteNo+')':''} vom ${fmtDate(date)} gab es folgende Abweichungen:\n${[...diffs, ...priceUp.map(x=>'Preis abweichend: '+x)].map(x=>'• '+x).join('\n')}\n\nBitte um Gutschrift bzw. Nachlieferung.\n\nDanke und freundliche Grüße`}; }
       else o.status = 'delivered';
-      view.recv = null; save(); render(); toast(o.status==='complaint' ? `Eingebucht · ${diffs.length + priceUp.length} Abweichungen, Reklamation vorbereitet` : `Eingebucht · ${o.lines.length} Positionen, alles in Ordnung`); break; }
+      view.recv = null; save(); render(); toast((o.status==='complaint' ? `Eingebucht · ${diffs.length + priceUp.length} Abweichungen, Reklamation vorbereitet` : `Eingebucht · ${o.lines.length} Positionen, alles in Ordnung`) + (pfSum > 0 ? ` · Pfand ${eur(pfSum)} beim Leergut vermerkt` : '')); break; }
     case 'cCopy': { const o = ORD(id); navigator.clipboard?.writeText(o.complaint.text).then(()=>toast('Reklamation kopiert'), ()=>{}); break; }
     case 'supEdit': supplierDialog(id ? SUP(id) : null); break;
     case 'userSwitch': S.settings.currentUser = id; save(); render(); toast(`Angemeldet als ${whoLabel(me())}`); break;
@@ -5830,7 +5977,7 @@ function renderMenuCalc(){
       : `<td class="lt-miss hide-m" colspan="2"></td><td class="lt-miss r"><button type="button" class="link" data-act="newCardFor" data-id="${m.id}">Rezeptur fehlt</button></td>`;
     return `<tr class="row ${m.hidden?'off':''}" data-mid="${m.id}" data-sec="${esc(m.section)}" data-act="${k.c?'openCard':'editMenu'}" data-id="${k.c?k.c.id:m.id}">
       ${drag ? `<td class="lt-gripc"><button type="button" class="lt-grip" data-mgrip="${m.id}" title="Ziehen, um die Reihenfolge zu ändern (oder Pfeiltasten)" aria-label="${esc(dishLabel(m))} verschieben">${GRIP_SVG}</button></td>` : ''}
-      <td><div class="lt-n">${img?`<img src="${IMG[img]}" alt="">`:''}<span><b>${esc(m.name)}${m.vlabel?` <span class="lt-muted">· ${esc(m.vlabel)}</span>`:''}${m.veg?` <span class="lt-muted">${m.veg}</span>`:''}</b><small>${esc(m.desc||'')}${when ? `${m.desc ? ' · ' : ''}<em class="lt-when">${esc(when)}</em>` : ''}</small></span></div></td>
+      <td><div class="lt-n">${img?`<img src="${IMG[img]}" alt="">`:''}<span><b>${esc(m.name)}${menuTag(m)?` <span class="lt-muted">· ${esc(menuTag(m))}</span>`:''}${m.veg?` <span class="lt-muted">${m.veg}</span>`:''}</b><small>${esc(m.desc||'')}${when ? `${m.desc ? ' · ' : ''}<em class="lt-when">${esc(when)}</em>` : ''}</small></span></div></td>
       <td class="r"><input class="lt-price num-in" id="mp-${m.id}" type="text" inputmode="decimal" data-num="req price" data-mp="${m.id}" value="${num2(m.price)}" aria-label="Preis ${esc(dishLabel(m))}"></td>
       ${calc}
       <td class="hide-m"><span class="lt-st">${st.join('')}</span></td>
@@ -5891,20 +6038,21 @@ function menuReorder(mid, beforeId){
 const CARD_SORTS = [['','Gerichte zuerst, nach Name'],['name','Name'],['cat','Kategorie'],['cost','Wareneinsatz'],['fc','Wareneinsatz in %'],['items','Anzahl Zutaten']];
 function renderCards(){
   const q = view.q.trim().toLowerCase();
-  const list0 = S.cards.filter(c => (view.ctype==='all' || c.type===view.ctype) && (!q || (c.name+' '+c.category).toLowerCase().includes(q)));
-  const n = t => S.cards.filter(c=>t==='all'||c.type===t).length;
+  const ofType = (c, t) => t === 'all' || (t === 'drink' ? !!c.drink && c.type === 'dish' : c.type === t && !(t === 'dish' && c.drink));
+  const list0 = S.cards.filter(c => ofType(c, view.ctype) && (!q || (c.name+' '+c.category).toLowerCase().includes(q)));
+  const n = t => S.cards.filter(c => ofType(c, t)).length; const dk = view.ctype === 'drink';
   const rows = list0.map(c => { const t = totals(c); const mk = S.menu.filter(m => m.card === c.id).map(menuCalc)[0]; return {c, t, mk}; });
   const sorted = applySort('cards', rows.sort((a,b)=> a.c.type===b.c.type ? byName(a.c,b.c) : (a.c.type==='semi'?1:-1)), {name:x=>x.c.name, cat:x=>x.c.category||'', cost:x=>x.t.cost, fc:x=>x.mk?x.mk.fc:null, items:x=>x.c.items.length});
   const sCol = (SORTS.cards && SORTS.cards.col) || '';
-  const more = moreOpts('cards', `<label class="f inl">Sortieren<select data-sel="csort" aria-label="Sortieren">${CARD_SORTS.map(([k,l]) => `<option value="${k}" ${sCol===k?'selected':''}>${l}</option>`).join('')}</select></label><button type="button" class="btn sm" data-act="newCard" data-id="semi">${ico('plus')}Basisrezept</button>`);
+  const more = moreOpts('cards', `<label class="f inl">Sortieren<select data-sel="csort" aria-label="Sortieren">${CARD_SORTS.map(([k,l]) => `<option value="${k}" ${sCol===k?'selected':''}>${l}</option>`).join('')}</select></label><button type="button" class="btn sm" data-act="newCard" data-id="semi">${ico('plus')}Basisrezept</button><button type="button" class="btn sm" data-act="newCard" data-id="${dk ? 'dish' : 'drink'}">${ico('plus')}${dk ? 'Rezeptur' : 'Schankrezeptur'}</button>`);
   let h = `<div class="page-h"><div><h1>Rezepte</h1></div>
-    <div class="row-btns"><button type="button" class="btn primary" data-act="newCard" data-id="dish">${ico('plus')}Rezeptur</button></div></div>
+    <div class="row-btns"><button type="button" class="btn primary" data-act="newCard" data-id="${dk ? 'drink' : 'dish'}">${ico('plus')}${dk ? 'Schankrezeptur' : 'Rezeptur'}</button></div></div>
   <div class="toolbar"><label class="search">${ico('search')}<input id="cq" type="search" placeholder="Rezeptur suchen" value="${esc(view.q)}" autocomplete="off"></label>
-    ${seg('ctype', view.ctype, [['all','Alle',n('all')],['dish','Gerichte',n('dish')],['semi','Basisrezepte',n('semi')]])}</div>`;
+    ${seg('ctype', view.ctype, [['all','Alle',n('all')],['dish','Gerichte',n('dish')],['semi','Basisrezepte',n('semi')]].concat(n('drink') || dk ? [['drink','Getränke',n('drink')]] : []))}</div>`;
   if(!sorted.length) return h + `<div class="panel empty">Keine Rezepturen gefunden.</div>` + more;
   return h + `<div class="lt-wrap"><table class="lt"><thead><tr><th>Rezeptur</th><th class="hide-m">Kategorie</th><th class="r hide-m">Zutaten</th><th class="r">Wareneinsatz</th><th class="r">in %</th><th class="hide-m"></th></tr></thead><tbody>
     ${sorted.map(({c,t,mk}) => `<tr class="row" data-act="openCard" data-id="${c.id}">
-      <td><div class="lt-n">${c.img&&IMG[c.img]?`<img src="${IMG[c.img]}" alt="">`:''}<span><b>${esc(c.name)}</b><small>${c.type==='semi'?'Basisrezept · ':''}Nr. ${c.no||'—'} · ${(c.steps||[]).length} Schritte${+c.yieldG > 0 ? ` · ${num(c.yieldG)} g` : ''}</small></span></div></td>
+      <td><div class="lt-n">${c.img&&IMG[c.img]?`<img src="${IMG[c.img]}" alt="">`:''}<span><b>${esc(c.name)}</b><small>${c.type==='semi'?'Basisrezept · ':''}Nr. ${c.no||'—'}${c.drink ? (+c.yieldG > 0 ? ' · ' + volTxt(+c.yieldG) : '') : ` · ${(c.steps||[]).length} Schritte${+c.yieldG > 0 ? ` · ${num(c.yieldG)} g` : ''}`}</small></span></div></td>
       <td class="hide-m lt-muted">${esc(c.category||'—')}</td>
       <td class="r hide-m">${c.items.length}</td><td class="r">${eur(t.cost)}</td>
       <td class="r">${c.type==='dish'&&mk?`<span class="lt-fc ${fcClass(mk.fc)}"><i></i>${num(mk.fc,1)} %</span>`:''}</td>
@@ -6053,7 +6201,7 @@ function importApply(res, {replace=true, stock=false}={}){
   for(const [day, mp] of Object.entries(days)){
     const rows = [...mp.entries()].map(([mid,[q,g]]) => [mid, Math.round(q*1000)/1000, Math.round(g*100)/100]);
     if(replace || !S.salesDays[day]) S.salesDays[day] = rows; else { const cur = new Map(S.salesDays[day].map(r=>[r[0],r])); rows.forEach(r => { const c = cur.get(r[0]); if(c){ c[1] += r[1]; c[2] += r[2]; } else cur.set(r[0], r); }); S.salesDays[day] = [...cur.values()]; }
-    n++; rows.forEach(([mid,q]) => { portions += q; if(stock){ const m = S.menu.find(x=>x.id===mid); const c = m && m.card && C(m.card); if(c) explode(c, q, acc); } });
+    n++; rows.forEach(([mid,q]) => { portions += q; if(stock){ const m = S.menu.find(x=>x.id===mid); const c = m && m.card && C(m.card); if(c) explode(c, q*menuFactor(m), acc); } });
   }
   Object.keys(days).forEach(d => markRealDay(d));
   if(stock && acc.size){ const grp = uid('sb'); acc.forEach((q,pid) => { const before = S.moves.length; addMove('sale', pid, -Math.round(q*1000)/1000, 'Kassen-Import'); if(S.moves.length > before) S.moves[0].grp = grp; }); S.saleGroups = S.saleGroups || {}; S.saleGroups[grp] = {day:null, n:Math.round(portions), rows:null, gross:0, imp:true}; }
@@ -6393,7 +6541,7 @@ document.addEventListener('click', async e => {
     case 'rpImport': { const res = view.rpImport; if(!res) break; const replace = $('#rpReplace').checked, stock = $('#rpStock').checked;
       const run = (delDemo) => { let nDemo = 0; if(delDemo) nDemo = clearDemoSales(); const out = doImport(res, replace, stock); view.rpImport = null; view.rpPasteText = ''; save(); rp.tab = Object.keys(S.salesUnmapped).length ? 'map' : 'sales'; const ds = res.lines.map(l=>l.date).sort(); if(ds.length){ rp.unit = 'custom'; rp.from = ds[0]; rp.to = ds[ds.length-1]; rp.auto = true; rp.jumped = false; } run.msg = `${plural(out.days,'Tag','Tage')}, ${plural(Math.round(out.portions),'Portion','Portionen')} importiert` + (nDemo ? ` · ${plural(nDemo,'Tag','Tage')} mit Beispielverkäufen entfernt` : ''); };
       const days = [...new Set(res.lines.map(l=>l.date))]; const nDemo = S.salesDemo ? demoSalesDays().length : 0; const over = replace ? days.filter(d => (S.salesReal||{})[d] && S.salesDays[d]).length : 0;
-      let short = 0; if(stock){ const acc = new Map(); res.lines.forEach(l => { const mid = S.posMap[l.key] !== undefined ? S.posMap[l.key] : l.mid; const m = mid && mid !== '-' && S.menu.find(x=>x.id===mid); const c = m && m.card && C(m.card); if(c) explode(c, l.q, acc); }); acc.forEach((q,pid) => { const p = P(pid); if(p && q > (+p.stock||0) + 1e-9) short++; }); }
+      let short = 0; if(stock){ const acc = new Map(); res.lines.forEach(l => { const mid = S.posMap[l.key] !== undefined ? S.posMap[l.key] : l.mid; const m = mid && mid !== '-' && S.menu.find(x=>x.id===mid); const c = m && m.card && C(m.card); if(c) explode(c, l.q*menuFactor(m), acc); }); acc.forEach((q,pid) => { const p = P(pid); if(p && q > (+p.stock||0) + 1e-9) short++; }); }
       if(!nDemo && !over && !short){ run(false); render(); toast(run.msg); break; }
       openDialog('Kassendaten importieren?', `<p class="dlg-p">Der Import enthält ${plural(days.length,'Verkaufstag','Verkaufstage')}.${over ? ` <b>${plural(over,'bereits gespeicherter Tag wird','bereits gespeicherte Tage werden')} ersetzt.</b>` : ''}</p>
         ${short ? `<div class="warn-box dlg-warn" role="alert">${ico('spark')}<span><b>Bestand reicht nicht für ${plural(short,'Artikel','Artikel')}.</b> Beim Abbuchen gehen diese Bestände ins Minus. Fehlt ein Wareneingang?</span></div>` : ''}
@@ -6433,7 +6581,8 @@ view.wk = {tab:'all', filters:[]};
 function wkGroupsFor(items){
   const known = new Set(WK_GROUPS.flatMap(g=>g[2]));
   const extra = secList().filter(s => !known.has(s) && items.some(m=>m.section===s));
-  const gs = WK_GROUPS.map(g => [...g]); if(extra.length) gs.splice(4, 0, ['mehr','Weitere',extra]);
+  const sv = S.settings.secVat || {}; const dr = extra.filter(s => sv[s] === 'g'), rest = extra.filter(s => sv[s] !== 'g');
+  const gs = WK_GROUPS.map(g => [...g]); if(rest.length) gs.splice(4, 0, ['mehr','Weitere',rest]); if(dr.length) gs.push(['getraenke','Getränke',dr]);
   return gs.filter(g => g[2].some(s => items.some(m=>m.section===s)));
 }
 function wkPass(m){
@@ -6451,10 +6600,12 @@ function wkDish(e, used){
   const ai = algOfVars(vars), alg = ai.letters; alg.forEach(a=>used.add(a)); if(ai.open) used.add(ALG_MARK);
   const veg = vars.every(v=>v.veg==='vg') ? 'vg' : vars.every(v=>v.veg==='v'||v.veg==='vg') ? 'v' : '';
   const desc = [m.desc, hkDays(m)].filter(Boolean).join(' · ');
+  const drink = vars.some(v => guestVol(v));   // Getränke: Menge bei jedem Preis, mehrere Größen in einer Zeile
+  const dp = v => `<span class="wk-p">${guestVol(v) || v.vlabel ? `<small>${esc(guestVol(v) || v.vlabel)}</small>` : ''}${+v.price?wkPrice(v.price):''}</span>`;
   return `<article class="wk-dish ${vars.some(v=>v.top)?'sig':''}">
-    <div class="wk-l1"><h4 class="wk-n">${esc(m.name)}${veg?`<i class="wk-veg" title="${veg==='vg'?'vegan':'vegetarisch'}">${veg==='vg'?'VG':'V'}</i>`:''}</h4>${multi?'':`<span class="wk-p">${+m.price?wkPrice(m.price):''}</span>`}</div>
+    <div class="wk-l1"><h4 class="wk-n">${esc(m.name)}${veg?`<i class="wk-veg" title="${veg==='vg'?'vegan':'vegetarisch'}">${veg==='vg'?'VG':'V'}</i>`:''}</h4>${drink ? `<span class="wk-ps">${vars.map(dp).join('')}</span>` : multi?'':`<span class="wk-p">${+m.price?wkPrice(m.price):''}</span>`}</div>
     ${desc ? `<p class="wk-d">${esc(desc)}</p>` : ''}
-    ${multi ? `<div class="wk-vars">${vars.map(v=>`<div class="wk-var"><span>${esc(v.vlabel||v.name)}</span><span class="wk-p">${wkPrice(v.price)}</span></div>`).join('')}</div>` : ''}
+    ${multi && !drink ? `<div class="wk-vars">${vars.map(v=>`<div class="wk-var"><span>${esc(v.vlabel||v.name)}</span><span class="wk-p">${wkPrice(v.price)}</span></div>`).join('')}</div>` : ''}
     ${alg.length || ai.open ? `<div class="wk-a" title="${esc(alg.map(a=>ALG[a]).join(', ') + (ai.open ? (alg.length ? ' · ' : '') + 'Angabe unvollständig' : ''))}">Allergene ${alg.concat(ai.open ? [ALG_MARK] : []).join(' ')}</div>` : ''}
     ${vars.some(v=>v.top) ? '<div class="wk-sig">Empfehlung des Hauses</div>' : ''}
   </article>`;
@@ -6696,8 +6847,8 @@ function pcStep(kind){
     if(raw === '') kind = 'ok'; // leer = Richtwert stimmt (steht so unter dem Feld)
     else { const v = numParse(raw);
       if(!isFinite(v) || v <= 0){ pc.sure = null; return stay(v === 0 ? 'Ein Preis von 0 ist nicht möglich. Bitte den Einkaufspreis eintippen oder „Richtwert stimmt“ wählen.' : 'Das ist kein gültiger Preis. Bitte eine Zahl eintippen, zum Beispiel 12,50.'); }
-      val = Math.round(v*100)/100; const ref = +p.price;
-      if(ref > 0 && (val > ref*5 || val < ref/5) && pc.sure !== val){ pc.sure = val; return stay(`Wirklich ${eur(val)} je ${esc(p.unit)}? Der Richtwert ist ${eur(ref)}. <button type="button" class="btn sm" data-act="pcSave">Ja, übernehmen</button>`); } }
+      const pu = priceUnit(p); val = Math.round(v*100)/100; const ref = +p.price*pu.f;
+      if(ref > 0 && (val > ref*5 || val < ref/5) && pc.sure !== val){ pc.sure = val; return stay(`Wirklich ${eur(val)} je ${esc(pu.word)}? Der Richtwert ist ${eur(ref)}. <button type="button" class="btn sm" data-act="pcSave">Ja, übernehmen</button>`); } }
   }
   if(kind === 'ok' && !(+p.price > 0)) return stay('Dieser Artikel hat noch keinen Preis. Bitte den Einkaufspreis eintippen oder überspringen.');
   pc.msg = ''; pc.sure = null;
@@ -6706,11 +6857,11 @@ function pcStep(kind){
   else {
     const before = dishesUsing(p.id).map(x => ({name:dishLabel(x.m), a:x.k.fc}));
     const old = +p.price;
-    if(kind === 'save') p.price = val;
+    const pu = priceUnit(p); if(kind === 'save') p.price = prRound(p, val / pu.f);
     markPrice(p, kind === 'save' ? 'Preis-Check' : 'bestätigt');
     if(kind === 'save') pc.saved++; else pc.confirmed++;
     const after = dishesUsing(p.id).map(x => x.k.fc);
-    pc.last = {name:p.name, unit:p.unit, old, nw:+p.price, changed: kind==='save' && Math.abs(old-p.price) > 0.004, dishes: before.map((b,i)=>({name:b.name, a:b.a, b:after[i]})).filter(d=>d.a!=null).sort((x,y)=>Math.abs(y.b-y.a)-Math.abs(x.b-x.a)).slice(0,3)};
+    pc.last = {name:p.name, unit:pu.word, old:old*pu.f, nw:+p.price*pu.f, changed: kind==='save' && Math.abs(old-p.price)*pu.f > 0.004, dishes: before.map((b,i)=>({name:b.name, a:b.a, b:after[i]})).filter(d=>d.a!=null).sort((x,y)=>Math.abs(y.b-y.a)-Math.abs(x.b-x.a)).slice(0,3)};
     save();
   }
   pc.i++; render();
@@ -6746,13 +6897,13 @@ function renderPriceCheck(){
   }
   const p = P(pc.q[i]); if(!p){ pc.i++; return renderPriceCheck(); }
   const uses = dishesUsing(p.id); const semis = usage('p:'+p.id).filter(c=>c.type==='semi');
-  const unitTxt = p.unit === 'Stk' ? 'Stück' : p.unit === 'l' ? 'Liter' : 'Kilogramm';
+  const pu = priceUnit(p); const unitTxt = isDrink(p) ? p.pack : p.unit === 'Stk' ? 'Stück' : p.unit === 'l' ? 'Liter' : 'Kilogramm';
   return head + prog + `<section class="pc-card" data-key="${p.id}">
     <div class="pc-sup">${ico('truck')}<span>${esc(supName(p))}${p.artNo?` · Art.-Nr. ${esc(p.artNo)}`:''}${p.pack?` · ${esc(p.pack)}`:''}</span><span class="pc-count">Nr. ${i+1}</span></div>
     <h2 class="pc-name">${esc(p.name)}</h2>
     <div class="pc-grid">
-      <div class="pc-ex ${+p.price > 0 ? '' : 'none'}"><small>${+p.price > 0 ? 'Richtwert' : 'Preis fehlt'}</small><b>${+p.price > 0 ? eur(p.price) : '—'}</b><span>je ${esc(unitTxt)}${p.unit==='Stk'&&p.pieceG?` · ${num(p.pieceG)} g`:''} · exkl. MwSt.</span></div>
-      <label class="pc-in"><span>Ihr Einkaufspreis je ${esc(p.unit)}</span><span class="pc-field"><em>€</em><input id="pcIn" class="num-in" type="text" inputmode="decimal" data-num="self" placeholder="${+p.price > 0 ? num2(p.price) : '0,00'}" autocomplete="off" aria-describedby="pcMsg"></span><small>${+p.price > 0 ? 'Netto, wie auf der Rechnung. Leer lassen, wenn der Richtwert stimmt.' : 'Netto, wie auf der Rechnung. Für diesen Artikel gibt es noch keinen Preis.'}</small><span class="pc-msg" id="pcMsg" role="alert" ${pc.msg?'':'hidden'}>${pc.msg||''}</span></label>
+      <div class="pc-ex ${+p.price > 0 ? '' : 'none'}"><small>${+p.price > 0 ? 'Richtwert' : 'Preis fehlt'}</small><b>${+p.price > 0 ? eur(p.price*pu.f) : '—'}</b><span>je ${esc(unitTxt)}${p.unit==='Stk'&&p.pieceG?` · ${num(p.pieceG)} g`:''} · exkl. MwSt.</span></div>
+      <label class="pc-in"><span>Ihr Einkaufspreis je ${esc(pu.word)}</span><span class="pc-field"><em>€</em><input id="pcIn" class="num-in" type="text" inputmode="decimal" data-num="self" placeholder="${+p.price > 0 ? num2(p.price*pu.f) : '0,00'}" autocomplete="off" aria-describedby="pcMsg"></span><small>${+p.price > 0 ? 'Netto, wie auf der Rechnung. Leer lassen, wenn der Richtwert stimmt.' : 'Netto, wie auf der Rechnung. Für diesen Artikel gibt es noch keinen Preis.'}</small><span class="pc-msg" id="pcMsg" role="alert" ${pc.msg?'':'hidden'}>${pc.msg||''}</span></label>
     </div>
     <div class="pc-uses">${uses.length || semis.length ? `<b>Steckt in:</b> ${uses.slice(0,6).map(x=>`<span>${esc(dishLabel(x.m))} <em class="${fcClass(x.k.fc)}">${num(x.k.fc,1)} %</em></span>`).join('')}${semis.map(c=>`<span>${esc(c.name)} <em>Basisrezept</em></span>`).join('')}${uses.length>6?`<span class="muted">+${uses.length-6} weitere</span>`:''}` : '<span class="muted">Noch in keiner Rezeptur verwendet.</span>'}</div>
     <p class="pc-alg ${prodAlgState(p)}">Allergene: ${prodAlgState(p) === 'has' ? `<b>${esc(algClean(p.alg).join(' '))}</b>` : prodAlgState(p) === 'none' ? 'keine (bestätigt)' : '<b>nicht gepflegt</b>'} · <button type="button" class="link" data-act="pcAlg" data-id="${p.id}">${prodAlgState(p) === 'open' ? 'eintragen' : 'ändern'}</button></p>
@@ -7402,10 +7553,11 @@ const HS_ILL = {
   teller:'<circle cx="50" cy="52" r="26"/><circle cx="50" cy="52" r="19"/><path d="M16,26v52 M12,26v12a4,4 0 0 0 8,0v-12 M16,26v12"/><path d="M84,26v52 M84,26c-6,8-6,20 0,26"/><path d="M38,52c3-6 9-9 12-9s9 3 12 9" stroke-opacity=".5"/>',
   burger:'<path d="M22,46a28,20 0 0 1 56,0z"/><path d="M38,36l3-2 M48,32l3-1 M58,36l3 1 M44,40l3 0 M54,40l3-1 M34,42l2-1 M64,42l2 1"/><path d="M20,50q5,5 10,0t10,0t10,0t10,0t10,0t10,0"/><rect x="22" y="54" width="56" height="8" rx="4"/><path d="M22,66h56v4a8,8 0 0 1-8,8h-40a8,8 0 0 1-8-8z"/>',
   schmarrn:'<circle cx="52" cy="54" r="27"/><path d="M26,50h-18 M26,58h-18 M8,50v8"/><path d="M38,44l10-3 3 9-10 3z M54,40l9 2-2 9-9-2z M40,60l9-1 2 8-9 1z M56,58l8 3-4 8-7-3z M63,48l7 1 0 7-7-1z"/><circle cx="35" cy="37" r=".9"/><circle cx="46" cy="33" r=".9"/><circle cx="60" cy="31" r=".9"/><circle cx="70" cy="38" r=".9"/><circle cx="74" cy="60" r=".9"/><circle cx="33" cy="68" r=".9"/><circle cx="52" cy="72" r=".9"/>',
+  glas:'<path d="M26,20h26c0,18-4,29-13,29s-13-11-13-29z"/><path d="M39,49v25 M28,76h22"/><path d="M28,33h22" stroke-opacity=".6"/><path d="M60,42h22v35a3,3 0 0 1-3,3h-16a3,3 0 0 1-3-3z"/><path d="M82,50h5a5,5 0 0 1 5,5v10a5,5 0 0 1-5,5h-5"/><path d="M58,42c-1-5 4-8 8-6 2-4 9-4 11 0 4-2 8 1 7 6"/><path d="M67,52v19 M75,52v19" stroke-opacity=".6"/>',
   krake:'<path d="M32,24a14,14 0 0 1 28,0v28h-28z"/><path d="M34,52c-2,10-8,14-12,22 M40,52c-1,10-4,16-6,24 M46,52c0,10 0,16 0,24 M52,52c1,10 4,16 6,24 M58,52c2,10 8,14 12,22"/><circle cx="40" cy="30" r="1.6" fill="currentColor" stroke="none"/><circle cx="52" cy="30" r="1.6" fill="currentColor" stroke="none"/><path d="M41,38q5,4 10,0"/><path d="M70,64h22l-3,16h-16z"/><path d="M75,64l4-14 M81,64l1-14 M87,64l-2-13"/>',
 };
 const HS_ILL_FOR = [[/flamm/i,'flammkuchen'],[/teil|fondue/i,'fondue'],[/supp|vorsp/i,'suppe'],[/salat|bowl/i,'salat'],[/rösti|roesti/i,'roesti'],[/burger|pasta/i,'burger'],[/süß|suess|dessert|nachsp/i,'schmarrn'],[/kind/i,'krake']];
-function hsIll(name, size, color, sw){ const k = (HS_ILL_FOR.find(([re]) => re.test(name)) || [,'teller'])[1]; return hsSvg(HS_ILL[k], '0 0 100 100', size, size, color, sw || 1.5); }
+function hsIll(name, size, color, sw){ const k = (HS_ILL_FOR.find(([re]) => re.test(name)) || [, (S.settings.secVat || {})[name] === 'g' || secLooksDrink(name) ? 'glas' : 'teller'])[1]; return hsSvg(HS_ILL[k], '0 0 100 100', size, size, color, sw || 1.5); }
 const HS_GLYPH = {
   snow:'<path d="M12,2v20 M3.3,7l17.4,10 M3.3,17l17.4-10 M12,2l-2.5,2.5 M12,2l2.5,2.5 M12,22l-2.5-2.5 M12,22l2.5-2.5 M3.3,7l3.4-.9 M3.3,7l.9,3.4 M20.7,17l-3.4,.9 M20.7,17l-.9-3.4 M3.3,17l3.4,.9 M3.3,17l.9-3.4 M20.7,7l-3.4-.9 M20.7,7l-.9,3.4"/>',
   fir:'<path d="M12,3v18 M12,7l-4,4 M12,7l4,4 M12,11l-5,5 M12,11l5,5 M12,15l-6,6 M12,15l6,6"/>',
@@ -7526,12 +7678,13 @@ function hsInfo(e){
   const m = e.head, vars = e.vars, multi = vars.length > 1 || !!(m.group && m.vlabel);
   const ai = algOfVars(vars), alg = ai.letters.concat(ai.open ? [ALG_MARK] : []);
   const veg = vars.every(v => v.veg === 'vg') ? 'vg' : vars.every(v => v.veg === 'v' || v.veg === 'vg') ? 'v' : '';
+  const drink = vars.some(v => guestVol(v));   // Getränke: die Menge steht bei jedem Preis
   return {name:m.name, desc:[m.desc, hkDays(m)].filter(Boolean).join(' · '), alg, veg, top:vars.some(v => v.top), seasonal:vars.some(v => v.seasons && v.seasons.length),
-    prices: multi ? vars.map(v => [v.vlabel || v.name, v.price]) : [['', m.price]], section:m.section};
+    prices: drink ? vars.map(v => [guestVol(v) || v.vlabel || (multi ? v.name : ''), v.price]) : multi ? vars.map(v => [v.vlabel || v.name, v.price]) : [['', m.price]], drink, section:m.section};
 }
 function hsVeg(v){ return v === 'vg' ? '<span class="hs-veg">VEGAN</span>' : v === 'v' ? '<span class="hs-veg">VEG</span>' : ''; }
 function hsAlg(a, used){ if(!a.length) return ''; a.forEach(x => used.add(x)); return `<span class="hs-al">${a.join(' ')}</span>`; }
-function hsPrices(d){ const f = ([l, p]) => `<span class="hs-p">${l ? `<small>${esc(l)}</small>` : ''}${+p ? hkPrice(p) : ''}</span>`; return d.prices.length === 1 ? f(d.prices[0]) : `<span class="hs-ps">${d.prices.map(f).join('')}</span>`; }
+function hsPrices(d){ const f = ([l, p]) => `<span class="hs-p">${l ? `<small>${esc(l)}</small>` : ''}${+p ? hkPrice(p) : ''}</span>`; return d.prices.length === 1 ? f(d.prices[0]) : `<span class="hs-ps${d.drink ? ' dr' : ''}">${d.prices.map(f).join('')}</span>`; }
 function hsDish(d, x){
   const gl = d.seasonal ? `<span class="hs-gl">${hsGl(x.t.gl[0], 12, x.paper ? x.t.ink : x.t.ac)}</span>` : '';
   const al = hsAlg(d.alg, x.used);
@@ -7884,10 +8037,10 @@ function fixesMigrate(d){
 const RO_MSG = 'Das kann nur der Chef ändern';
 function canEditAll(){ return me().role === 'chef'; }
 function whoLabel(u){ const r = ROLES[u.role] || ''; return !r || u.name === r ? u.name : `${u.name} · ${r}`; }
-const RO_ACTS = new Set(['newMenu','editMenu','photoMenu','toMenu','newCardFor','newCard','photoCard','photoCardDel','addLine','delLine','stepAdd','stepDel','stepMove','stepPhoto','stepPhotoDel','applySim','dupCard','delCard','addSec','secMove','secDel','secSort','itemMove','itemHide','newProd','editProd','reset','importPick','safetyRestore','pConfirm','pConfirmAll','pFix','plImport','pcStart','pcFor','pcOk','pcSave','pcSkip','pcBack','tellerPick','gStyle','gcover','gcoverDel','newSpecial','editSpecial','dupSpecial','hkAccent','hsCopyReset','secDlg','sales','moveUndo','invStart','invFinish','invCancel','supEdit','rpImport','rpDemoDel','rpAnalyse','mapSave','pAlg','pAlgNone','pcAlg']);
+const RO_ACTS = new Set(['newMenu','editMenu','photoMenu','toMenu','newCardFor','newCard','photoCard','photoCardDel','addLine','delLine','stepAdd','stepDel','stepMove','stepPhoto','stepPhotoDel','applySim','dupCard','delCard','drinkSize','drinkLine','addSec','secMove','secDel','secSort','itemMove','itemHide','newProd','editProd','reset','importPick','safetyRestore','pConfirm','pConfirmAll','pFix','plImport','pcStart','pcFor','pcOk','pcSave','pcSkip','pcBack','tellerPick','gStyle','gcover','gcoverDel','newSpecial','editSpecial','dupSpecial','hkAccent','hsCopyReset','secDlg','sales','moveUndo','invStart','invFinish','invCancel','supEdit','rpImport','rpDemoDel','rpAnalyse','mapSave','pAlg','pAlgNone','pcAlg']);
 /* Lager buchen: Wareneingang und Schwund darf auch das Team, Entnahmen bucht der Chef */
 function moveTeamOk(arg){ return /^(in|waste)(:|$)/.test(String(arg || '')); }
-const RO_INPUTS = 'input[data-mp],[data-pp],[data-li],[data-cf],textarea[data-step],.title-in,[data-sf],[data-us],[data-secname],[data-secvat],[data-st],[data-smd],[data-ms],[data-hsc],[data-hkk],[data-hka],#pcIn';
+const RO_INPUTS = 'input[data-mp],[data-pp],[data-li],[data-dq],[data-du],[data-dref],[data-dy],[data-dyu],[data-cf],textarea[data-step],.title-in,[data-sf],[data-us],[data-secname],[data-secvat],[data-st],[data-smd],[data-ms],[data-hsc],[data-hkk],[data-hka],#pcIn';
 function roBlocked(el){
   if(canEditAll() || !el) return false;
   const a = el.dataset.act;
@@ -7901,7 +8054,7 @@ window.addEventListener('pointerdown', e => { if(canEditAll()) return; const el 
 ['change','input'].forEach(ev => window.addEventListener(ev, e => { if(canEditAll()) return; const t = e.target; if(!t || !t.matches || !t.closest('#app') || !roBlocked(t)) return; e.stopImmediatePropagation(); if(t.type === 'checkbox' || t.type === 'radio') t.checked = t.defaultChecked; else if(t.tagName !== 'SELECT') t.value = t.defaultValue; if(ev === 'change') roGate(false); }, true));
 /* Dialoge, die auch über die Schnellsuche erreichbar sind */
 const _menuDialogF = menuDialog; menuDialog = function(m, pre){ if(roGate()) return _menuDialogF(m, pre); };
-const _prodDialogF = prodDialog; prodDialog = function(p){ if(roGate()) return _prodDialogF(p); };
+const _prodDialogF = prodDialog; prodDialog = function(p, pre){ if(roGate()) return _prodDialogF(p, pre); };
 const _newCardF = newCard; newCard = function(type, fromMenu){ if(!roGate()) return; _newCardF(type, fromMenu); const c = C(view.card); if(c && !fromMenu){ c.fresh = true; save(); } };
 const _specialDialogF = specialDialog; specialDialog = function(sp){ if(roGate()) return _specialDialogF(sp); };
 const _moveDlgF = moveDlg; moveDlg = function(arg){ if(roGate(canEditAll() || moveTeamOk(arg))) return _moveDlgF(arg); };
@@ -8092,7 +8245,7 @@ H('garverlust','Garverlust','Was beim Garen verloren geht, weil Wasser und Fett 
 H('brutto_netto_g','Brutto, netto, fertig','Brutto ist die Ware, wie sie geliefert wird. Netto ist sie geputzt. Fertig ist sie gegart am Teller.',1);
 H('mindestbestand','Mindestbestand','So viel soll immer im Haus sein. Liegt der Bestand darunter, schlägt die App eine Bestellung vor.',1);
 H('annahmeschluss','Annahmeschluss','Bis zu dieser Uhrzeit nimmt der Lieferant Bestellungen an. Wer später bestellt, bekommt die Ware erst am nächsten Liefertag.',1);
-H('gebinde','Gebinde','Die Packung, in der der Lieferant verkauft: Kiste, Sack, Karton. Beispiel: 1 Sack Mehl = 25 kg.',1);
+H('gebinde','Gebinde','Die Packung, in der der Lieferant verkauft: Kiste, Sack, Karton, bei Getränken Flasche, Fass oder Kiste. Beispiel: 1 Sack Mehl = 25 kg.',1);
 H('bestelltag','Bestelltag und Liefertag','Am Bestelltag nimmt der Lieferant Bestellungen an. Am Liefertag bringt er die Ware. Beides steht beim Lieferanten.',1);
 H('mindestbestellwert','Mindestbestellwert','Unter diesem Betrag liefert der Lieferant nicht oder verlangt einen Zuschlag.',1);
 H('bestellvorschlag','Bestellvorschlag','Die App rechnet aus, was unter dem Mindestbestand liegt, und schlägt die Menge vor. Sie können jede Zahl ändern.',1);
@@ -8192,6 +8345,18 @@ H('inv_start','Inventur starten','Beginnt eine neue Zählung. Sie können unterb
 H('inv_fertig','Inventur abschließen','Setzt den Bestand auf Ihre gezählten Mengen. Die Differenz wird gespeichert.');
 H('inv_weg','Inventur verwerfen','Wirft die laufende Zählung weg. Der Bestand bleibt, wie er war.');
 H('inv_feld','Gezählte Menge','Tragen Sie ein, was wirklich da ist. Leer lassen heißt: nicht gezählt.');
+H('inv_voll','Volle Flaschen','Zählen Sie die vollen Flaschen oder Fässer. Die angebrochene tippen Sie daneben in Zehnteln an.');
+H('inv_offen','Angebrochen','Wie voll ist die offene Flasche oder das Fass im Anstich? 0,3 heißt: knapp ein Drittel ist noch drin. Noch einmal tippen nimmt die Angabe zurück.');
+H('schankrezeptur','Schankrezeptur','Was in ein Glas kommt: Artikel und Menge in cl, ml oder Liter. Daraus rechnet die App, was das Getränk kostet.',1);
+H('schankverlust','Schankverlust','Was beim Zapfen und Einschenken verloren geht: Schaum, Reste im Fass, Kostproben. Sie tragen den Anteil beim Artikel ein, zum Beispiel 5 % bei Fassbier. Die App rechnet ihn in jedes Glas ein.',1);
+H('ausschankmenge','Ausschankmenge','Wie viel ins Glas kommt, zum Beispiel 0,5 l. Die Menge steht auf der Gästekarte beim Preis.',1);
+H('groesse','Weitere Größe','Dasselbe Getränk in einer anderen Menge, zum Beispiel 0,3 l. Sie tragen nur Menge und Preis ein, die Kosten rechnet die App aus derselben Schankrezeptur.');
+H('dk_artikel','Artikel im Ausschank','Fügt eine Zeile hinzu: ein Artikel und die Menge, die ins Glas kommt.');
+H('pfand','Pfand','Geld für Flasche, Kiste oder Fass, das Sie mit dem Leergut zurückbekommen. Es zählt nie zum Wareneinsatz.',1);
+H('leergut','Leergut zurückgeben','Tragen Sie ein, wie viele Kisten oder Fässer zurückgehen. Die App zieht das Pfand vom offenen Betrag bei diesem Lieferanten ab.');
+H('leergut_stand','Pfand beim Lieferanten','So viel Pfand haben Sie bezahlt und noch nicht zurückbekommen. Beim Wareneingang kommt das Pfand dazu, bei der Rückgabe geht es weg.');
+H('neu_schank','Neue Schankrezeptur','Legt ein Getränk an: Bier vom Fass, ein Achtel Wein, ein Spritzer, ein Cocktail.');
+H('f_getraenke','Getränke','Zeigt nur die Getränke: in den Rezepten die Schankrezepturen, bei den Preisen die Artikel mit Flasche, Fass oder Kiste.');
 
 /* Einkauf */
 H('best_neu','Neue Bestellung','Lieferant wählen. Die App schlägt vor, was unter dem Mindestbestand liegt.');
@@ -8211,7 +8376,7 @@ H('r_temp','Temperatur','Bei Kühlware die gemessene Temperatur bei der Übernah
 
 /* Artikel */
 H('prod_neu','Neuer Artikel','Legt eine neue Zutat an: Name, Einheit, Einkaufspreis, Lieferant.');
-H('prod_preis','Einkaufspreis','Was Sie dem Lieferanten zahlen, ohne Steuer, je kg, Liter oder Stück. Eintippen und Enter drücken.');
+H('prod_preis','Einkaufspreis','Was Sie dem Lieferanten zahlen, ohne Steuer, je kg, Liter oder Stück. Bei Getränken je Flasche, Fass oder Kiste, wie es auf der Rechnung steht. Eintippen und Enter drücken.');
 H('prod_ok','Richtwert bestätigen','Der Richtwert stimmt ungefähr? Dann bestätigen. Er gilt ab jetzt als Ihr Preis.');
 H('prod_alle_ok','Alle bestätigen','Bestätigt alle Richtwerte, die gerade in der Liste stehen. Nur tippen, wenn Sie die Preise angesehen haben.');
 H('prod_import','Preisliste importieren','Lädt eine Preisliste vom Lieferanten als Datei. Die App zeigt vorher, was sich ändert.');
@@ -8261,6 +8426,7 @@ const HELP_SEL = [
   ['#app [data-act="rAll"]','r_alles'],['#app input[data-rp]','r_preis'],['#app [data-act="rBook"]','r_buchen'],['#rTemp','r_temp'],['#app select[data-rs]','r_status'],['#rNo','lieferschein'],
   ['#app [data-act="newProd"]','prod_neu'],['#app input[data-pp]','prod_preis'],['#app [data-act="pConfirm"]','prod_ok'],['#app [data-act="pConfirmAll"]','prod_alle_ok'],['#app [data-act="plImport"]','prod_import'],['#app [data-act="pcStart"]','pc_start'],['#app [data-act="pcOk"]','pc_ok'],['#app [data-act="pcSkip"]','pc_skip'],['#pcIn','pc_feld'],['#app [data-act="pFilter"][data-id="demo"]','richtwert'],
   ['#app .rp-period [data-act="rpUnit"],#app [data-act="rpStep"]','rp_zeitraum'],['#app [data-act="rpCmp"]','rp_vergleich'],['#app [data-act="rpFile"]','rp_datei'],['#app [data-act="rpSample"]','rp_beispiel'],['#app [data-act="rpAnalyse"]','rp_pruefen'],['#app [data-act="rpCsv"]','rp_csv'],['#app [data-act="rpPrint"]','rp_bericht'],['#app [data-act="rpTab"][data-id="import"]','kassendatei'],['#app [data-act="rpTab"][data-id="map"]','zuordnung'],
+  ['#app input[data-invf]','inv_voll'],['#app .inv-t','inv_offen'],['#app [data-act="newCard"][data-id="drink"]','neu_schank'],['#app [data-act="ctype"][data-id="drink"],#app [data-act="pFilter"][data-id="drink"]','f_getraenke'],['#app [data-act="drinkLine"]','dk_artikel'],['#app [data-act="drinkSize"]','groesse'],['#dk-y','ausschankmenge'],['#app input[data-dq]','schankrezeptur'],['#app .dk-loss','schankverlust'],['#app [data-act="lgReturn"]','leergut'],['#app .lg-v','leergut_stand'],['#app .pf-row','pfand'],
   ['#app [data-act="export"]','s_sicherung'],['#app [data-act="importPick"]','s_laden'],['#app [data-act="reset"]','s_reset'],['#app [data-act="userSwitch"]','s_rolle'],['#s-target','ziel_we'],['#s-vat','mwst'],
 ];
 /* Tabellenköpfe und Kennzahlen: nach ihrem Text */
@@ -8268,7 +8434,7 @@ const HELP_TXT = {
   'we':'wareneinsatz','wareneinsatz':'wareneinsatz','ø wareneinsatz':'we_pct','we %':'we_pct','we gesamt':'wareneinsatz','wareneinsatz pro portion':'wareneinsatz','wareneinsatz je gericht':'we_pct',
   'rohertrag':'rohertrag','rohertrag exkl. mwst.':'rohertrag','größter rohertrag':'rohertrag','aufschlagsfaktor':'aufschlag','putzverlust':'putzverlust','garverlust':'garverlust',
   'mindest':'mindestbestand','unter mindestbestand':'mindestbestand','lagerwert':'lagerwert','lagerort':'lagerort','füllstand':'fuellstand','soll':'soll_ist','ist gezählt':'soll_ist','differenz':'differenz','differenz letzte inventur':'differenz',
-  'saison':'saison','allergene':'allergene','preis €':'prod_preis','stand':'prod_stand','= einheit':'gebinde','gebinde':'gebinde','annahmeschluss':'annahmeschluss','mindestbestellwert':'mindestbestellwert',
+  'saison':'saison','allergene':'allergene','preis €':'prod_preis','stand':'prod_stand','= einheit':'gebinde','gebinde':'gebinde','ausschank':'schankrezeptur','leergut':'leergut_stand','pfand':'pfand','annahmeschluss':'annahmeschluss','mindestbestellwert':'mindestbestellwert',
   'umsatz netto':'umsatz','umsatz brutto':'mwst','portionen':'portionen','anteil':'rp_anteil','δ menge':'rp_delta','kostenstruktur':'kostenstruktur','preis-simulator':'preissim','produktionsmenge':'produktionsmenge',
   'in %':'we_pct','heute noch bestellen':'annahmeschluss','kalkuliert':'rezeptur','preis lt. rechnung':'r_preis','geliefert':'wareneingang','pro 100 g':'wareneinsatz','richtwert':'richtwert','zubereitung':'schritt','typ':'r_typ','kategorie':'kategorie',
 };
@@ -8735,7 +8901,7 @@ function vbForecastRaw(D){
   const maps = pick.map(plDayMap); const av = pick.map(d => [ix.seaOf[d], ix.wdOf[d]]);
   const items = [];
   for(const m of S.menu){
-    if(m.hidden || !plAvail(m, sea, w)) continue;
+    if(m.hidden || !plAvail(m, sea, w) || isDrinkEntry(m)) continue;   // die Prep-Liste ist für die Küche: Getränke stehen nicht darauf
     let nu = 0, den = 0; const vals = [];
     pick.forEach((d, i) => { if(!plAvail(m, av[i][0], av[i][1])) return; const q = maps[i].get(m.id) || 0; nu += wts[i] * q; den += wts[i]; vals.push([q, wts[i]]); });
     let f = 0, sd = 0, flag = '';
@@ -9980,21 +10146,21 @@ const PROD_SORTS = [['','Name'],['sup','Lieferant'],['price','Preis']];
 function renderProducts(){
   const q = view.pq.trim().toLowerCase(); const f = view.pf || 'all'; const wide = !!view.pcols;
   const all = S.products.filter(p => !p.noStock);
-  const nDemo = all.filter(p => p.priceDemo).length; const nAlg = all.filter(p => prodAlgState(p) === 'open').length; const sCol = (SORTS.products && SORTS.products.col) || '';
-  let list = all.filter(p => (!q || (p.name+' '+supName(p)+' '+(p.artNo||'')).toLowerCase().includes(q)) && (f==='all' || (f==='noalg' ? prodAlgState(p) === 'open' : f==='demo' ? p.priceDemo : !p.priceDemo)));
+  const nDemo = all.filter(p => p.priceDemo).length; const nAlg = all.filter(p => prodAlgState(p) === 'open').length; const nDrink = all.filter(isDrink).length; const sCol = (SORTS.products && SORTS.products.col) || '';
+  let list = all.filter(p => (!q || (p.name+' '+supName(p)+' '+(p.artNo||'')).toLowerCase().includes(q)) && (f==='all' || (f==='noalg' ? prodAlgState(p) === 'open' : f==='drink' ? isDrink(p) : f==='demo' ? p.priceDemo : !p.priceDemo)));
   list = sCol === 'sup' ? list.sort((a,b) => supName(a).localeCompare(supName(b),'de') || byName(a,b)) : sCol === 'price' ? list.sort((a,b) => (+b.price||0) - (+a.price||0)) : list.sort(byName);
   const cols = wide ? 9 : 5;
   const more = moreOpts('products', `${nDemo ? `<button type="button" class="btn sm" data-act="newProd">${ico('plus')}Artikel</button>` : ''}<button type="button" class="btn sm" data-act="plImport">Preisliste importieren</button><button type="button" class="btn sm" data-act="datenOpen" data-id="prod">Artikel importieren</button>${nDemo && list.some(p => p.priceDemo) ? `<button type="button" class="btn sm" data-act="pConfirmAll" data-id="${f}">Angezeigte Richtwerte bestätigen</button>` : ''}
     <label class="f inl">Sortieren<select data-sel="psort" aria-label="Sortieren">${PROD_SORTS.map(([k,l]) => `<option value="${k}" ${sCol===k?'selected':''}>${l}</option>`).join('')}</select></label>
     <label class="tog"><input type="checkbox" data-pcols="1" ${wide?'checked':''}><span></span>Putzverlust, Garverlust, Allergene zeigen</label>`);
   return wareHead(nDemo ? `<button type="button" class="btn primary" data-act="pcStart">${ico('tag')}Preis-Check · ${nDemo}</button>` : `<button type="button" class="btn primary" data-act="newProd">${ico('plus')}Artikel</button>`)
-  + `<p class="fact">${all.length} Artikel · Preise je Einheit ohne Steuer${nDemo ? ` · <b>${nDemo}</b> ${nDemo === 1 ? 'Richtwert' : 'Richtwerte'} noch nicht bestätigt` : ' · alle Preise bestätigt'}${nAlg ? ` · <button type="button" class="link" data-act="pFilter" data-id="noalg">${nAlg} ohne Allergenangabe</button>` : ''}</p>
-  <div class="toolbar"><label class="search">${ico('search')}<input id="pq" type="search" placeholder="Artikel, Lieferant oder Artikelnummer" value="${esc(view.pq)}" autocomplete="off"></label>${seg('pFilter', f, [['all','Alle',all.length],['demo','Richtwerte',nDemo],['ok','Bestätigt',all.length-nDemo]].concat(nAlg || f === 'noalg' ? [['noalg','Allergene offen',nAlg]] : []))}</div>
+  + `<p class="fact">${all.length} Artikel · Preise je Einheit ohne Steuer${nDrink ? ', Getränke je Flasche, Fass oder Kiste' : ''}${nDemo ? ` · <b>${nDemo}</b> ${nDemo === 1 ? 'Richtwert' : 'Richtwerte'} noch nicht bestätigt` : ' · alle Preise bestätigt'}${nAlg ? ` · <button type="button" class="link" data-act="pFilter" data-id="noalg">${nAlg} ohne Allergenangabe</button>` : ''}</p>
+  <div class="toolbar"><label class="search">${ico('search')}<input id="pq" type="search" placeholder="Artikel, Lieferant oder Artikelnummer" value="${esc(view.pq)}" autocomplete="off"></label>${seg('pFilter', f, [['all','Alle',all.length],['demo','Richtwerte',nDemo],['ok','Bestätigt',all.length-nDemo]].concat(nDrink || f === 'drink' ? [['drink','Getränke',nDrink]] : []).concat(nAlg || f === 'noalg' ? [['noalg','Allergene offen',nAlg]] : []))}</div>
   <div class="lt-wrap"><table class="lt"><thead><tr><th>Artikel</th><th class="hide-m">Lieferant</th><th class="r">Preis €</th><th>Stand</th>${wide ? '<th class="r hide-m">Putzverlust</th><th class="r hide-m">Garverlust</th><th class="hide-m">Allergene</th><th class="r hide-m">Rezepturen</th>' : ''}<th></th></tr></thead><tbody>
   ${list.map(p => `<tr class="row" data-act="editProd" data-id="${p.id}">
-    <td><div class="lt-n"><span><b>${esc(p.name)}</b><small>${p.unit==='Stk'&&p.pieceG?`je Stk · ${num(p.pieceG)} g`:`je ${esc(p.unit)}`}${p.artNo?' · Nr. '+esc(p.artNo):''}${p.pack?' · '+esc(p.pack):''}</small>${f === 'noalg' && !wide ? `<span class="alg-under">Allergene: ${algCell(p)}</span>` : ''}</span></div></td>
+    <td><div class="lt-n"><span><b>${esc(p.name)}</b><small>${isDrink(p)?`je ${esc(p.pack)}${+p.pfand > 0 ? ' · Pfand ' + eur(p.pfand) : ''}`:p.unit==='Stk'&&p.pieceG?`je Stk · ${num(p.pieceG)} g`:`je ${esc(p.unit)}`}${p.artNo?' · Nr. '+esc(p.artNo):''}${p.pack&&!isDrink(p)?' · '+esc(p.pack):''}</small>${f === 'noalg' && !wide ? `<span class="alg-under">Allergene: ${algCell(p)}</span>` : ''}</span></div></td>
     <td class="hide-m lt-muted">${esc(supName(p))}</td>
-    <td class="r"><input class="lt-price num-in" id="pp-${p.id}" type="text" inputmode="decimal" data-num="req price" data-pp="${p.id}" data-pf="price" value="${num2(p.price)}" aria-label="Preis ${esc(p.name)}"></td>
+    <td class="r"><input class="lt-price num-in" id="pp-${p.id}" type="text" inputmode="decimal" data-num="req price" data-pp="${p.id}" data-pf="price" value="${num2(p.price*priceUnit(p).f)}" aria-label="Preis ${esc(p.name)}"></td>
     <td>${p.priceDemo ? (+p.price > 0 ? '<span class="st-ref" title="Richtwert, noch nicht bestätigt">Richtwert</span>' : '<span class="st-ref none" title="Für diesen Artikel ist noch kein Preis eingetragen">Preis fehlt</span>') : `<span class="lt-muted sm">${p.priceDate?fmtDate(p.priceDate+'T12:00:00'):'bestätigt'}${p.priceSrc?' · '+esc(p.priceSrc):''}</span>`}</td>
     ${wide ? `<td class="r hide-m">${num(+p.lossCold||0,1)} %</td><td class="r hide-m">${num(+p.lossHot||0,1)} %</td><td class="hide-m">${algCell(p)}</td><td class="r hide-m">${usage('p:'+p.id).length}</td>` : ''}
     <td><div class="lt-acts">${p.priceDemo && +p.price > 0?`<button type="button" class="btn sm" data-act="pConfirm" data-id="${p.id}" title="Preis stimmt">Stimmt</button>`:''}<button type="button" class="icon-btn" data-act="editProd" data-id="${p.id}" aria-label="Bearbeiten">${ico('edit')}</button></div></td></tr>`).join('') || `<tr><td colspan="${cols}" class="lt-muted">Nichts gefunden.</td></tr>`}
@@ -10585,7 +10751,11 @@ function impDays(raw){ const s = String(raw || '').trim().toLowerCase(); if(!s |
 function impUnit(raw){ const s = String(raw || '').trim().toLowerCase().replace(/\.$/, ''); if(!s) return {u:'', empty:true};
   if(/^(kg|kilo|kilogramm)$/.test(s)) return {u:'kg'}; if(/^(l|lt|ltr|liter)$/.test(s)) return {u:'l'}; if(/^(stk|stück|stueck|st|stck|pc|pce|pcs|x)$/.test(s)) return {u:'Stk'};
   if(/^(g|gr|gramm|ml|dl|cl)$/.test(s)) return {u:'', small:s};
-  return {u:'Stk', other:String(raw).trim()}; }
+  const geb = /^(fl|flasche|flaschen|bottle|btl)$/.test(s) ? 'fl' : /^(fass|fässer|faesser|keg)$/.test(s) ? 'fass' : /^(kiste|kisten|kasten|kästen|träger|traeger)$/.test(s) ? 'kiste' : '';
+  return {u:'Stk', other:String(raw).trim(), geb}; }
+/* Inhalt eines Getränke-Gebindes: „0,75 l“, „70 cl“, „30 l“, „20×0,5 l“, „24 x 0,33“ → {L je Flasche/Fass, N Flaschen} */
+function impDrinkPack(text, geb){ const s = String(text || '').toLowerCase().replace(/,/g, '.'); const m = s.match(/(?:(\d+)\s*[x×*]\s*)?(\d+(?:\.\d+)?)\s*(l|lt|ltr|liter|cl|ml)?(?![a-z0-9])/); if(!m || (!m[3] && !m[1] && !/^\s*\d+(\.\d+)?\s*$/.test(s))) return null;
+  let L = +m[2]; if(m[3] === 'cl') L /= 100; else if(m[3] === 'ml') L /= 1000; const N = m[1] ? +m[1] : 1; if(!(L > 0) || !(N >= 1) || L > 1000) return null; if(geb === 'kiste' && !m[1]) return null; return {L:Math.round(L * 10000) / 10000, N: geb === 'kiste' ? N : 1, tot: geb === 'kiste' ? 1 : N}; }
 /* „Sack 10 kg“, „Karton 6×1 l“, „10x250 g“, „Tray 30 Stk“ → Inhalt in der Einheit des Artikels */
 function impPack(text, unit){ const s = String(text || '').toLowerCase().replace(/,/g, '.'); const m = s.match(/(?:(\d+(?:\.\d+)?)\s*[x×*]\s*)?(\d+(?:\.\d+)?)\s*(kg|g|l|ml|cl|stk|stück|st|fl|flaschen?|dosen?)\b/); if(!m) return 0;
   let q = (m[1] ? +m[1] : 1) * +m[2]; const u = m[3];
@@ -10725,6 +10895,8 @@ const IMP_PROD_FIELDS = [
   {k:'loc', label:'Lagerort', syn:['lagerort','lager','ort','lagerplatz']},
   {k:'minStock', label:'Mindestbestand', syn:['mindestbestand','meldebestand','minbestand','mindestmenge','min']},
   {k:'stock', label:'Anfangsbestand', syn:['anfangsbestand','bestand','lagerbestand','istbestand','menge']},
+  {k:'pfand', label:'Pfand', syn:['pfand','pfandbetrag','flaschenpfand','kistenpfand','fasspfand','einsatz','pfandjegebinde']},
+  {k:'pourLoss', label:'Schankverlust, %', syn:['schankverlust','schankverlustprozent','zapfverlust','ausschankverlust']},
 ];
 /* sicherer Treffer: gleiche Artikelnummer oder gleicher Name (auch ohne Klammerzusatz). Sonst nur ein Vorschlag. */
 function impProdMatch(name, art, pool){
@@ -10750,15 +10922,22 @@ function impProdAnalyse(d){
     const data = {name};
     const u = impUnit(impCell(r, map, 'unit'));
     if(u.small){ fail(`Einheit „${impCell(r, map, 'unit')}“: bitte den Preis je kg oder je Liter angeben`); continue; }
-    if(u.other) it.notes.push(`Einheit „${u.other}“ wird als Stück geführt`);
-    if(!u.empty) data.unit = u.u;
-    if(rawPrice !== ''){ const pr = impNum(rawPrice); if(!isFinite(pr)){ fail(`Preis nicht lesbar: „${rawPrice}“`); continue; } if(pr < 0){ fail(`Preis ist negativ: „${rawPrice}“`); continue; } data.price = Math.round(pr * 10000) / 10000; it.price = data.price; if(pr > 500) it.notes.push('Preis ungewöhnlich hoch, bitte prüfen'); }
+    /* Getränk: Einheit Flasche, Fass oder Kiste (Preis je Gebinde) oder Einheit l mit Gebinde „Flasche 0,7 l“, „Fass 30 l“, „Kiste 20×0,5 l“ (Preis je Liter) */
+    const packRaw = impHas(map, 'pack') ? impCell(r, map, 'pack') : '', pqRaw = impHas(map, 'packQty') ? impCell(r, map, 'packQty') : '';
+    const gWord = u.u === 'l' && /^(flaschen?|fl\.?|fass|kisten?|kasten)(\s|$)/i.test(packRaw) ? (/^fass/i.test(packRaw) ? 'fass' : /^k/i.test(packRaw) ? 'kiste' : 'fl') : '';
+    const gk = u.geb || gWord; const dv = gk ? (impDrinkPack(packRaw.replace(/^[^\d]*/, ''), gk) || (pqRaw && gk !== 'kiste' && (gk === 'fass' ? impNum(pqRaw) >= 5 : impNum(pqRaw) <= 3) ? impDrinkPack(pqRaw, gk) : null)) : null;   /* nur die Zahl: bei der Flasche bis 3 (Liter), beim Fass ab 5 */
+    if(dv){ data.geb = gk; data.gebL = dv.L; data.gebN = dv.N; data.unit = 'l'; }
+    else { if(u.other) it.notes.push(`Einheit „${u.other}“ wird als Stück geführt` + (u.geb ? ` (für ein Getränk bei „Gebinde“ den Inhalt angeben, zum Beispiel ${u.geb === 'kiste' ? '„20×0,5 l“' : u.geb === 'fass' ? '„30 l“' : '„0,75 l“'})` : '')); if(!u.empty) data.unit = u.u; }
+    if(rawPrice !== ''){ const pr = impNum(rawPrice); if(!isFinite(pr)){ fail(`Preis nicht lesbar: „${rawPrice}“`); continue; } if(pr < 0){ fail(`Preis ist negativ: „${rawPrice}“`); continue; } data.price = Math.round(pr * 10000) / 10000; it.price = data.price; if(pr > 500) it.notes.push('Preis ungewöhnlich hoch, bitte prüfen'); if(dv && u.geb){ data.gprice = data.price; data.price = Math.round(pr / (dv.L * dv.N) * 10000) / 10000; } }
     if(art) data.artNo = art;
     const pg = qty(it, 'pieceG', 'Stückgewicht'); if(pg != null) data.pieceG = pg;
     const lc = pct(it, 'lossCold', 'Putzverlust'); if(lc != null) data.lossCold = lc; const lh = pct(it, 'lossHot', 'Garverlust'); if(lh != null) data.lossHot = lh;
-    const ms = qty(it, 'minStock', 'Mindestbestand'); if(ms != null) data.minStock = ms; const st = qty(it, 'stock', 'Anfangsbestand'); if(st != null) data.stock = st;
-    if(impHas(map, 'pack') && impCell(r, map, 'pack')) data.pack = impCell(r, map, 'pack');
-    const pq = qty(it, 'packQty', 'Gebindegröße'); if(pq != null) data.packQty = pq;
+    const cf = dv && u.geb ? dv.L : 1;   /* Bestände bei Einheit Flasche/Fass/Kiste: in Flaschen bzw. Fässern */
+    const ms = qty(it, 'minStock', 'Mindestbestand'); if(ms != null) data.minStock = Math.round(ms * cf * 1000) / 1000; const st = qty(it, 'stock', 'Anfangsbestand'); if(st != null) data.stock = Math.round(st * cf * 1000) / 1000;
+    if(dv){ data.pack = gebLabel(gk, dv.L, dv.N); data.packQty = Math.round(dv.L * dv.N * 10000) / 10000; }
+    else { if(packRaw) data.pack = packRaw; const pq = qty(it, 'packQty', 'Gebindegröße'); if(pq != null) data.packQty = pq; }
+    { const pf = qty(it, 'pfand', 'Pfand'); if(pf != null){ if(dv) data.pfand = Math.round(pf * 100) / 100; else if(pf > 0) it.notes.push('Pfand gibt es nur bei Getränken mit Gebinde (Flasche, Fass, Kiste): nicht übernommen'); }
+      const pl = pct(it, 'pourLoss', 'Schankverlust'); if(pl != null){ if(dv) data.pourLoss = pl; else if(pl > 0) it.notes.push('Schankverlust gibt es nur bei Getränken: nicht übernommen'); } }
     if(impHas(map, 'loc')){ const l = impLoc(impCell(r, map, 'loc')); if(l.bad) it.notes.push(`Lagerort „${impCell(r, map, 'loc')}“ nicht erkannt: Trockenlager`); if(l.v) data.loc = l.v; }
     if(impHas(map, 'alg')){ const a = impAlg(impCell(r, map, 'alg')); if(a.bad) it.notes.push(`Allergen „${a.bad.join(', ')}“ unbekannt: Angabe nicht übernommen`); else if(a.state !== 'open'){ data.alg = a.alg; data.algNone = a.state === 'none'; } }
     const supName0 = impCell(r, map, 'supplier'); if(supName0){ const sp = impSupMatch(supName0); data.supName = supName0; if(sp) data.supplier = sp.id; else { const k = normName(supName0); if(!sups.has(k)) sups.set(k, supName0); data.supNew = k; } }
@@ -10771,7 +10950,7 @@ function impProdAnalyse(d){
     if(ex && data.unit && data.unit !== ex.unit){ fail(`Einheit ${data.unit} passt nicht zum vorhandenen Artikel „${ex.name}“ (${ex.unit}). Rezepturen rechnen in ${ex.unit}.`); continue; }
     if(data.pack && data.packQty == null){ const q = impPack(data.pack, unit); if(q){ data.packQty = q; data.packAuto = true; } }
     it.data = data; it.unit = unit;
-    it.sub = [`je ${unit}${unit === 'Stk' && data.pieceG ? ' · ' + num(data.pieceG) + ' g' : ''}`, data.supName ? data.supName + (data.supNew ? ' (neuer Lieferant)' : '') : '', data.artNo ? 'Nr. ' + data.artNo : '', data.pack ? data.pack + (data.packQty ? ` = ${num(data.packQty, 3)} ${unit}` : '') : '', data.alg ? 'Allergene ' + data.alg : data.algNone ? 'keine Allergene' : ''].filter(Boolean).join(' · ');
+    it.sub = [dv ? `${data.pack}${data.price != null ? ' · ' + eur(data.price) + ' je Liter' : ''}${data.pfand ? ' · Pfand ' + eur(data.pfand) : ''}${data.pourLoss ? ' · Schankverlust ' + num(data.pourLoss, 1) + ' %' : ''}` : `je ${unit}${unit === 'Stk' && data.pieceG ? ' · ' + num(data.pieceG) + ' g' : ''}`, data.supName ? data.supName + (data.supNew ? ' (neuer Lieferant)' : '') : '', data.artNo ? 'Nr. ' + data.artNo : '', data.pack && !dv ? data.pack + (data.packQty ? ` = ${num(data.packQty, 3)} ${unit}` : '') : '', data.alg ? 'Allergene ' + data.alg : data.algNone ? 'keine Allergene' : ''].filter(Boolean).join(' · ');
     if(ex){ const ch = impProdDiff(ex, data); it.st = ch.length ? 'akt' : 'gleich'; if(ch.length) it.why = (mt.exact ? '' : `„${ex.name}“: `) + ch.join(' · '); if(data.stock != null) it.notes.push('Bestand vorhandener Artikel ändert nur die Inventur'); }
     else if(data.price == null) it.notes.push('ohne Preis: erscheint im Preis-Check als „Preis fehlt“');
   }
@@ -10789,6 +10968,9 @@ function impProdDiff(p, x){
   if(x.alg != null && (x.alg !== algClean(p.alg).join(' ') || !!x.algNone !== (prodAlgState(p) === 'none'))) ch.push('Allergene ' + (x.alg || 'keine'));
   if(x.loc && x.loc !== p.loc) ch.push('Lagerort ' + LOCS[x.loc]);
   if(x.minStock != null && +x.minStock !== +(p.minStock || 0)) ch.push('Mindestbestand');
+  if(x.geb && (x.geb !== p.geb || +x.gebL !== +p.gebL || +x.gebN !== +(p.gebN || 1)) && !ch.includes('Gebinde')) ch.push('Gebinde');
+  if(x.pfand != null && +x.pfand !== +(p.pfand || 0)) ch.push(`Pfand ${eur(x.pfand)}`);
+  if(x.pourLoss != null && +x.pourLoss !== +(p.pourLoss || 0)) ch.push(`Schankverlust ${num(x.pourLoss, 1)} %`);
   return ch;
 }
 function supNew(name){ return {id:uid('sup'), name, cat:'gross', channel:'email', contact:'', phone:'', whatsapp:'', email:'', shopUrl:'', customerNo:'', orderDays:[], cutoff:'12:00', deliveryDays:[], minOrder:0, freight:0, note:'', prefix:'', active:true}; }
@@ -10805,6 +10987,7 @@ function impProdApply(res, d){
     if(sid) p.supplier = sid; if(x.artNo) p.artNo = x.artNo; if(x.pieceG != null) p.pieceG = x.pieceG; if(x.pack) p.pack = x.pack; if(x.packQty != null) p.packQty = x.packQty;
     if(x.lossCold != null) p.lossCold = x.lossCold; if(x.lossHot != null) p.lossHot = x.lossHot; if(x.loc) p.loc = x.loc; if(x.minStock != null) p.minStock = x.minStock;
     if(x.alg != null){ p.alg = x.alg; p.algNone = !!x.algNone; }
+    if(x.geb){ p.geb = x.geb; p.gebL = x.gebL; p.gebN = x.gebN; if(isNew && !x.loc) p.loc = 'W'; } if(x.pfand != null && isDrink(p)) p.pfand = x.pfand; if(x.pourLoss != null && isDrink(p)) p.pourLoss = x.pourLoss;
     if(isNew && x.stock) addMove('in', p.id, x.stock, 'Anfangsbestand (Import)');
   }
   return out;
@@ -10856,7 +11039,7 @@ function recFind(name, semis){
   return null;
 }
 function recSteps(text){ const s = String(text || '').trim(); if(!s) return []; const parts = s.split(/\r?\n+|\s+(?=\d{1,2}[.)]\s)/).map(x => x.replace(/^\d{1,2}[.)]\s*/, '').trim()).filter(Boolean); return parts; }
-function recType(raw){ const s = String(raw || '').trim().toLowerCase(); if(!s) return ''; if(/basis|^br$|halbfert|semi|kompon|vorbereit|grund|fond|sauce$/.test(s)) return 'semi'; if(/gericht|dish|speise|teller|portion/.test(s)) return 'dish'; return '?'; }
+function recType(raw){ const s = String(raw || '').trim().toLowerCase(); if(!s) return ''; if(/getr[äa]nk|schank|drink|cocktail/.test(s)) return 'drink'; if(/basis|^br$|halbfert|semi|kompon|vorbereit|grund|fond|sauce$/.test(s)) return 'semi'; if(/gericht|dish|speise|teller|portion/.test(s)) return 'dish'; return '?'; }
 function impRecAnalyse(d){
   let map = d.map; const rows = d.rows; const notes = [];
   if(!impHas(map, 'rec')) throw new Error('Es fehlt die Spalte „Rezeptur“. Bitte unten zuordnen.');
@@ -10888,12 +11071,12 @@ function impRecAnalyse(d){
   // Typ, Ausbeute, Verknüpfung
   const semis = [];
   order.forEach(rc => { const t = recType(rc.typeRaw); const exCard = S.cards.find(c => normName(c.name) === rc.key);
-    rc.type = t === 'semi' || t === 'dish' ? t : exCard ? exCard.type : 'dish'; if(t === '?') rc.notes.push(`Typ „${rc.typeRaw}“ nicht erkannt: ${rc.type === 'semi' ? 'Basisrezept' : 'Gericht'}`);
+    rc.type = t === 'drink' ? 'dish' : t === 'semi' || t === 'dish' ? t : exCard ? exCard.type : 'dish'; rc.drink = t === 'drink' || (t !== 'semi' && t !== 'dish' && !!(exCard && exCard.drink)); if(t === '?') rc.notes.push(`Typ „${rc.typeRaw}“ nicht erkannt: ${rc.type === 'semi' ? 'Basisrezept' : 'Gericht'}`);
     rc.ex = S.cards.find(c => normName(c.name) === rc.key && c.type === rc.type) || null;
     if(rc.type === 'semi') semis.push(rc); });
   const unmatched = new Map();
   order.forEach(rc => {
-    if(rc.yieldRaw){ const m = String(rc.yieldRaw).toLowerCase().replace(',', '.').match(/^([\d.\s]+)\s*(kg|g|l|ml)?$/); const v = m ? impNum(m[1]) : NaN; if(isFinite(v) && v > 0) rc.yield = v * (m[2] === 'kg' || m[2] === 'l' ? 1000 : 1); else rc.notes.push(`Ausbeute „${rc.yieldRaw}“ nicht lesbar`); }
+    if(rc.yieldRaw){ const m = String(rc.yieldRaw).toLowerCase().replace(',', '.').match(/^([\d.\s]+)\s*(kg|g|l|ml|cl)?$/); const v = m ? impNum(m[1]) : NaN; if(isFinite(v) && v > 0) rc.yield = v * (m[2] === 'kg' || m[2] === 'l' || (rc.drink && !m[2] && v <= 5) ? 1000 : m[2] === 'cl' ? 10 : 1); else rc.notes.push(`Ausbeute „${rc.yieldRaw}“ nicht lesbar`); }
     const div = rc.type === 'dish' && rc.portions > 1 ? rc.portions : 1; if(div > 1) rc.notes.push(`für ${num(rc.portions)} Portionen geschrieben: Mengen durch ${num(rc.portions)} geteilt`);
     if(rc.type === 'semi' && rc.yield == null && rc.portions && rc.portionG) rc.yield = rc.portions * rc.portionG;
     rc.yieldG = rc.type === 'semi' ? (rc.yield != null ? rc.yield : '') : (rc.portionG != null ? rc.portionG : (rc.yield != null && div === 1 ? rc.yield : ''));
@@ -10958,7 +11141,8 @@ function impRecApply(res, d){
   // erst die Karten anlegen (Basisrezepte zuerst), dann die Zeilen: so stimmen Verweise in beide Richtungen
   todo.sort((a, b) => (a.type === 'semi' ? 0 : 1) - (b.type === 'semi' ? 0 : 1)).forEach(rc => {
     let c = rc.ex; const linkIds = rc.type === 'dish' && rc.link ? rc.link.split(',').filter(Boolean) : []; const m0 = linkIds.length ? S.menu.find(m => m.id === linkIds[0]) : null;
-    if(!c){ c = {id:uid(rc.type === 'semi' ? 'semi' : 'dish'), no:S.settings.nextNo++, name:rc.name, type:rc.type, category:rc.cat || (rc.type === 'semi' ? 'Basisrezepte' : m0 ? m0.section : ''), yieldG:'', img:'', steps:[], items:[]}; S.cards.push(c); out.neu++; } else out.akt++;
+    if(!c){ c = {id:uid(rc.type === 'semi' ? 'semi' : 'dish'), no:S.settings.nextNo++, name:rc.name, type:rc.type, category:rc.cat || (rc.type === 'semi' ? 'Basisrezepte' : m0 ? m0.section : rc.drink ? drinkSection() : ''), yieldG:'', img:'', steps:[], items:[]}; S.cards.push(c); out.neu++; } else out.akt++;
+    if(rc.drink && c.type === 'dish') c.drink = true;
     if(rc.cat) c.category = rc.cat; if(rc.yieldG !== '') c.yieldG = rc.yieldG; if(rc.steps.length) c.steps = rc.steps.map(t => ({t, img:''})); delete c.fresh;
     cardOf.set(rc.key, c);
   });
@@ -11017,12 +11201,15 @@ const IMP_TPL = {
     ['Getränke','Mineralwasser 0,33 l','','','3,40','vegan','','keine','',''],
   ]]]},
   prod:{file:'Vorlage-Artikel', sheets:[['Artikel', [
-    ['Artikel','Einheit','Stückgewicht','Preis netto','Lieferant','Artikelnummer','Gebinde','Gebindegröße','Putzverlust','Garverlust','Allergene','Lagerort','Mindestbestand','Anfangsbestand'],
-    ['Schweinsschnitzel','kg','','9,80','Metzgerei Muster','MM-1001','Vakuum 5 kg','5','4','15','keine','Kühlhaus','8','10'],
-    ['Mehl glatt','kg','','0,89','Großhandel Muster','4401','Sack 10 kg','10','0','0','A','Trockenlager','15','20'],
-    ['Ei M','Stk','60','0,27','Hof Muster','','Tray 30 Stk','30','12','0','C','Kühlhaus','90','180'],
-    ['Schlagobers 36 %','l','','4,40','Molkerei Muster','7712','Karton 6×1 l','','0','0','G','Kühlhaus','6','12'],
-    ['Zwiebel','kg','','1,15','Gemüsehof Muster','','Sack 10 kg','10','12','0','keine','Gemüselager','10','20'],
+    ['Artikel','Einheit','Stückgewicht','Preis netto','Lieferant','Artikelnummer','Gebinde','Gebindegröße','Putzverlust','Garverlust','Allergene','Lagerort','Mindestbestand','Anfangsbestand','Pfand','Schankverlust'],
+    ['Schweinsschnitzel','kg','','9,80','Metzgerei Muster','MM-1001','Vakuum 5 kg','5','4','15','keine','Kühlhaus','8','10','',''],
+    ['Mehl glatt','kg','','0,89','Großhandel Muster','4401','Sack 10 kg','10','0','0','A','Trockenlager','15','20','',''],
+    ['Ei M','Stk','60','0,27','Hof Muster','','Tray 30 Stk','30','12','0','C','Kühlhaus','90','180','',''],
+    ['Schlagobers 36 %','l','','4,40','Molkerei Muster','7712','Karton 6×1 l','','0','0','G','Kühlhaus','6','12','',''],
+    ['Zwiebel','kg','','1,15','Gemüsehof Muster','','Sack 10 kg','10','12','0','keine','Gemüselager','10','20','',''],
+    ['Märzen vom Fass','Fass','','87,00','Getränke Muster','GM-30','30 l','','','','A','Bar','2','2','30,00','5'],
+    ['Weißbier 0,5 l','Kiste','','19,00','Getränke Muster','GM-52','20×0,5 l','','','','A','Bar','20','40','4,50',''],
+    ['Grüner Veltliner 0,75 l','Flasche','','6,40','Weinhandel Muster','','0,75 l','','','','O','Bar','6','12','',''],
   ]]]},
   rec:{file:'Vorlage-Rezepturen', sheets:[['Zutaten', [
     ['Rezeptur','Typ','Zutat','Menge','Einheit','Ausbeute','Portionsgewicht','Gericht auf der Karte'],
@@ -11061,9 +11248,9 @@ const IMPS = {
   menu:{title:'Speisekarte importieren', short:'Speisekarte', one:'Gericht', many:'Gerichte', fields:IMP_MENU_FIELDS, analyse:impMenuAnalyse, apply:impMenuApply,
     intro:'Eine Zeile je Gericht. Pflicht sind <b>Gericht</b> und <b>Preis</b> (inkl. MwSt.). Dazu, wenn vorhanden: Kategorie, Beschreibung, Variante, vegetarisch/vegan, Saison, Allergene (Buchstaben A–R oder „keine“), Empfehlung, Wochentage.'},
   prod:{title:'Artikel & Preise importieren', short:'Artikel & Preise', one:'Artikel', many:'Artikel', fields:IMP_PROD_FIELDS, analyse:impProdAnalyse, apply:impProdApply,
-    intro:'Eine Zeile je Artikel. Pflicht ist <b>Artikel</b>. Dazu, wenn vorhanden: Einheit (kg, l, Stk), Stückgewicht, Preis netto je Einheit, Lieferant, Artikelnummer, Gebinde und Gebindegröße, Putzverlust, Garverlust, Allergene, Lagerort, Mindestbestand, Anfangsbestand.'},
+    intro:'Eine Zeile je Artikel. Pflicht ist <b>Artikel</b>. Dazu, wenn vorhanden: Einheit (kg, l, Stk), Stückgewicht, Preis netto je Einheit, Lieferant, Artikelnummer, Gebinde und Gebindegröße, Putzverlust, Garverlust, Allergene, Lagerort, Mindestbestand, Anfangsbestand. Getränke: Einheit <b>Flasche</b>, <b>Fass</b> oder <b>Kiste</b>, bei Gebinde der Inhalt („0,75 l“, „30 l“, „20×0,5 l“), der Preis je Flasche, Fass oder Kiste; dazu Pfand und Schankverlust.'},
   rec:{title:'Rezepturen importieren', short:'Rezepturen', one:'Rezeptur', many:'Rezepturen', fields:IMP_REC_FIELDS, analyse:impRecAnalyse, apply:impRecApply,
-    intro:'Eine Zeile je Zutat: <b>Rezeptur</b>, <b>Zutat</b>, <b>Menge</b>, Einheit (g, kg, ml, l, Stk, EL, TL, Prise). Dazu, wenn vorhanden: Typ (Gericht oder Basisrezept), Ausbeute, Portionen, Portionsgewicht, Schritt, Gericht auf der Karte.'},
+    intro:'Eine Zeile je Zutat: <b>Rezeptur</b>, <b>Zutat</b>, <b>Menge</b>, Einheit (g, kg, ml, cl, l, Stk, EL, TL, Prise). Dazu, wenn vorhanden: Typ (Gericht, Basisrezept oder Getränk), Ausbeute, Portionen, Portionsgewicht, Schritt, Gericht auf der Karte.'},
   team:{title:'Team importieren', short:'Team', one:'Person', many:'Personen', fields:IMP_TEAM_FIELDS, analyse:impTeamAnalyse, apply:impTeamApply,
     intro:'Eine Zeile je Person: <b>Name</b>, Bereich (Küche, Service, Bar, Abwasch), Wochenstunden.'},
 };
@@ -11142,7 +11329,7 @@ function impRecHtml(it, d){
     const q = l.st === 'ok' ? `<b class="mono">${num(l.qty, 2)} ${tu}</b>` : '';
     const ask = (l.ask || d.dec['q:' + l.n] != null) && l.st !== 'skip' ? `<label class="imp-q">in ${tu}<input class="num-in" type="text" inputmode="decimal" data-impq="${l.n}" value="${d.dec['q:' + l.n] != null ? numIn(d.dec['q:' + l.n]) : ''}" placeholder="${l.st === 'ok' ? numIn(Math.round(l.qty * 100) / 100) : '—'}" aria-label="Menge ${esc(l.name)} in ${tu}"></label>` : '';
     return `<li class="imp-l ${l.st}"><span class="imp-ln"><b>${esc(l.qtyRaw)} ${esc(l.unitRaw)}</b> ${esc(l.name)}${info ? `<small>${info}</small>` : ''}${l.msg ? `<small class="imp-why">${esc(l.msg)}</small>` : ''}</span><span class="imp-lq">${q}${ask}</span></li>`; };
-  const meta = [rc.type === 'semi' ? 'Basisrezept' : 'Gericht', plural(rc.lines.length, 'Zutat', 'Zutaten'), rc.steps.length ? plural(rc.steps.length, 'Schritt', 'Schritte') : '', rc.yieldG !== '' ? (rc.type === 'semi' ? 'Ausbeute ' : 'Portion ') + num(rc.yieldG) + ' g' : ''].filter(Boolean).join(' · ');
+  const meta = [rc.type === 'semi' ? 'Basisrezept' : rc.drink ? 'Getränk' : 'Gericht', plural(rc.lines.length, 'Zutat', 'Zutaten'), rc.steps.length ? plural(rc.steps.length, 'Schritt', 'Schritte') : '', rc.yieldG !== '' ? (rc.drink ? 'Ausschank ' + volTxt(rc.yieldG) : (rc.type === 'semi' ? 'Ausbeute ' : 'Portion ') + num(rc.yieldG) + ' g') : ''].filter(Boolean).join(' · ');
   return `<li class="imp-r imp-rec st-${it.st}" data-n="${it.n}"><span class="imp-st">${IMP_ST[it.st]}<small>Zeile ${it.n}</small></span>
     <div class="imp-m"><b>${esc(rc.name)}</b><small>${esc(meta)}</small>${it.why ? `<small class="imp-why">${esc(it.why)}</small>` : ''}${(it.notes || []).map(n => `<small class="imp-note">${esc(n)}</small>`).join('')}
       ${rc.type === 'dish' && it.st !== 'fehler' ? `<label class="imp-ctl">Gericht auf der Karte${rc.linkAuto ? ' (gleicher Name)' : ''}<select class="sm-sel" data-impdec="${rc.lk}">${menuOpts(rc.link || '')}</select></label>` : ''}
@@ -11331,6 +11518,282 @@ document.addEventListener('change', async e => {
 });
 document.addEventListener('toggle', e => { const t = e.target; if(t && t.dataset && t.dataset.impmore && view.daten) view.daten.more = {...(view.daten.more || {}), [t.dataset.impmore]:t.open}; }, true);
 document.addEventListener('paste', e => { const t = e.target; if(!t || t.id !== 'impPaste') return; const html = e.clipboardData && e.clipboardData.getData('text/html'); if(html && /<table/i.test(html)){ const tsv = impHtmlTable(html); if(tsv){ e.preventDefault(); t.value = tsv; } } });
+
+/* =====================================================================
+   Bar & Getränke (Paket D1)
+   Getränke-Artikel (Flasche, Fass, Kiste), Schankrezeptur, Pfand und Leergut,
+   Zählen in Flaschen und Zehnteln, Beispiel-Getränke.
+   Gerechnet wird überall im vorhandenen Kern: ein Getränk ist ein Artikel in Litern,
+   eine Schankrezeptur ist eine Rezeptur vom Typ „Gericht“ mit c.drink = true.
+   ===================================================================== */
+const GEB = {fl:'Flasche', fass:'Fass', kiste:'Kiste'};
+const VOL_U = {l:1000, cl:10, ml:1};
+const numDe = (v, d = 3) => fin(v).toLocaleString('de-DE', {maximumFractionDigits:d});
+
+/* ---------- Artikel ---------- */
+function isDrink(p){ return !!(p && GEB[p.geb] && +p.gebL > 0 && p.unit === 'l'); }
+function cntWord(p){ return p && p.geb === 'fass' ? 'Fass' : 'Fl.'; }
+function gebLabel(geb, L, N){ return geb === 'kiste' ? `Kiste ${num(N)}×${numDe(L)} l` : `${GEB[geb] || 'Flasche'} ${numDe(L)} l`; }
+function gebPrice(p){ return Math.round((+p.price || 0) * (+p.packQty || 0) * 100) / 100; }
+/* Preis so, wie er auf der Rechnung steht: Getränke je Flasche, Fass oder Kiste, alles andere je Einheit */
+function priceUnit(p){ return isDrink(p) && +p.packQty > 0 ? {f:+p.packQty, word:GEB[p.geb], label:p.pack} : {f:1, word:p ? p.unit : '', label:p ? p.unit : ''}; }
+function prRound(p, v){ const k = isDrink(p) ? 10000 : 100; return Math.round(v * k) / k; }
+/* Lager buchen: Wareneingang in Gebinden, Entnahme und Schwund in Flaschen (Fass: Liter) */
+function mvUnit(p, type){
+  if(!isDrink(p)) return {f:1, lbl:'Menge in ' + (p ? p.unit : 'Einheit'), word:'Einheit'};
+  if(type === 'in') return {f:+p.packQty, lbl:`Anzahl ${{fl:'Flaschen', fass:'Fässer', kiste:'Kisten'}[p.geb]} (${p.pack.replace(/^\S+\s/, '')})`, word:GEB[p.geb]};
+  return p.geb === 'fass' ? {f:1, lbl:'Menge in Litern', word:'Liter'} : {f:+p.gebL, lbl:'Anzahl Flaschen', word:'Flasche'};
+}
+
+/* ---------- Mengen ---------- */
+function volTxt(ml){ ml = +ml || 0; return ml > 0 && ml < 100 ? numDe(ml / 10, 1) + ' cl' : numDe(ml / 1000) + ' l'; }
+function volIn(ml, u){ return numIn(Math.round(ml / VOL_U[u] * 10000) / 10000); }
+function volUnitFor(ml){ return +ml > 0 && +ml < 100 ? 'cl' : 'l'; }
+/* Ausschankmenge eines Eintrags der Karte in ml: eigene Angabe, sonst die der Schankrezeptur */
+function menuVol(m){ if(!m) return 0; if(+m.vol > 0) return +m.vol; const c = m.card ? C(m.card) : null; return c && c.drink && +c.yieldG > 0 ? +c.yieldG : 0; }
+function guestVol(m){ return isDrinkEntry(m) && menuVol(m) ? volTxt(menuVol(m)) : ''; }
+function menuTag(m){ return m.vlabel || (menuVol(m) ? volTxt(menuVol(m)) : ''); }
+function drinkSection(){ const sv = S.settings.secVat || {}; return secList().find(s => sv[s] === 'g') || 'Getränke'; }
+function isDrinkEntry(m){ return !!m && (vatClass(m) === 'g' || !!(m.card && C(m.card) && C(m.card).drink)); }
+function drinkU(it){ return VOL_U[it.u] ? it.u : (+it.qty >= 100 ? 'l' : 'cl'); }
+function volSel(attr, u){ return `<select ${attr} aria-label="Einheit">${Object.keys(VOL_U).map(k => `<option value="${k}" ${u === k ? 'selected' : ''}>${k}</option>`).join('')}</select>`; }
+
+/* ---------- Schankrezeptur ---------- */
+function renderDrinkCard(c){
+  const t = totals(c); const menus = menuSorted().filter(m => m.card === c.id); const m0 = menus.find(m => menuFactor(m) === 1) || menus[0], k0 = m0 ? menuCalc(m0) : null;   // oben steht die Größe, für die die Rezeptur geschrieben ist
+  const cats = [...new Set([...secList(), ...S.cards.map(x => x.category)].filter(Boolean))];
+  const yu = VOL_U[c.yu] ? c.yu : volUnitFor(c.yieldG);
+  const rows = c.items.map((it, i) => { const l = t.lines[i]; const liquid = !l.missing && l.unit === 'ml'; const u = liquid ? drinkU(it) : ''; const r = refObj(it.ref); const pl = r && r.t === 'p' ? pourLossOf(r.o) : 0;
+    return `<tr>
+      <td class="c-ing"><select id="dref-${i}" data-dref="${i}" aria-label="Artikel">${refOptions(it.ref, c.id).replace('— Zutat wählen —', '— Artikel wählen —')}</select>${pl ? `<small class="dk-loss">mit ${num(pl, 1)} % Schankverlust</small>` : ''}</td>
+      <td class="r"><span class="dk-q"><input id="dq-${i}" class="num-in" type="text" inputmode="decimal" data-num="de" data-msg="Ungültige Menge, nicht geändert" data-dq="${i}" value="${it.qty === '' || it.qty == null ? '' : liquid ? volIn(+it.qty, u) : numIn(it.qty)}" aria-label="Menge">${liquid ? volSel(`data-du="${i}"`, u) : `<em>${l.missing ? '' : l.unit}</em>`}</span></td>
+      <td class="r mono">${eur(l.cost)}</td>
+      <td><button type="button" class="icon-btn" data-act="delLine" data-id="${i}" title="Zeile entfernen" aria-label="Zeile entfernen">${ico('x')}</button></td></tr>`; }).join('');
+  const onCard = menus.map(m => { const k = menuCalc(m); const v = menuVol(m); return `<li><button type="button" data-act="editMenu" data-id="${m.id}"><span class="dk-on-n"><b>${esc(v ? volTxt(v) : m.vlabel || m.name)}</b>${m.vlabel && v && m.vlabel !== volTxt(v) ? `<small>${esc(m.vlabel)}</small>` : !v && !m.vlabel ? `<small>${esc(m.section)}</small>` : ''}</span><span class="mono">${eur(m.price)}</span><span class="mono dk-on-c">${eur(k.cost)}</span><span class="lt-fc ${fcClass(k.fc)}"><i></i>${k.fc != null ? num(k.fc, 1) + ' %' : '—'}</span></button></li>`; }).join('');
+  return `<button type="button" class="back" data-act="backCards">${ico('arrow')}Alle Rezepturen</button>
+  <div class="hero">
+    <div class="hero-ph">${photo(c.img, c.name, c.category)}<button type="button" class="ph-btn big" data-act="photoCard" data-id="${c.id}">${ico('camera')}<span>${c.img && IMG[c.img] ? 'Foto ändern' : 'Foto hinzufügen'}</span></button>${c.img && IMG[c.img] ? `<button type="button" class="ph-btn del" data-act="photoCardDel" data-id="${c.id}" aria-label="Foto entfernen">${ico('x')}</button>` : ''}</div>
+    <div class="hero-main">
+      <div class="eyebrow">Getränk · Schankrezeptur Nr. ${c.no || '—'} · ${esc(c.category || 'ohne Kategorie')}</div>
+      <textarea id="cf-name" class="title-in" data-cf="name" rows="1" aria-label="Bezeichnung">${esc(c.name)}</textarea>
+      <div class="hero-stats">
+        <div><b class="mono">${eur(k0 ? k0.cost : t.cost)}</b><small>Wareneinsatz${k0 && menuVol(m0) ? ' für ' + volTxt(menuVol(m0)) : +c.yieldG > 0 ? ' für ' + volTxt(+c.yieldG) : ' pro Glas'}</small></div>
+        ${k0 ? `<div><b class="mono">${eur(m0.price)}</b><small>Verkaufspreis</small></div>` : ''}
+      </div>
+      ${!m0 ? `<button type="button" class="btn primary sm" data-act="toMenu" data-id="${c.id}" style="margin-top:14px">${ico('plus')}Auf die Karte setzen</button>` : ''}
+    </div>
+    <div class="hero-ring">${ring(k0 ? k0.fc : null, 112, 10)}<span><b class="mono">${k0 ? pct(k0.fc) : '—'}</b><small>${k0 ? 'Wareneinsatz' : 'nicht auf der Karte'}</small></span></div>
+    <div class="hero-acts">
+      ${FRAMED ? '' : `<button type="button" class="icon-btn lg" data-act="printCard" data-id="${c.id}" title="Rezeptur drucken" aria-label="Rezeptur drucken">${ico('print')}</button>`}
+      <button type="button" class="icon-btn lg danger" data-act="delCard" data-id="${c.id}" title="Löschen" aria-label="Löschen">${ico('trash')}</button>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="col">
+      <section class="panel"><div class="fields">
+        <label class="f">Typ<select id="cf-type" data-cf="type"><option value="dish">Gericht</option><option value="semi">Basisrezept</option><option value="drink" selected>Getränk</option></select></label>
+        <label class="f">Kategorie<input id="cf-category" data-cf="category" list="cats" value="${esc(c.category)}"><datalist id="cats">${cats.map(x => `<option value="${esc(x)}">`).join('')}</datalist></label>
+        <label class="f">Ausschankmenge<span class="dk-q"><input id="dk-y" class="num-in" type="text" inputmode="decimal" data-num="de" data-msg="Ungültige Menge, nicht geändert" data-dy="1" value="${+c.yieldG > 0 ? volIn(+c.yieldG, yu) : ''}" placeholder="z. B. 0,5">${volSel('data-dyu="1"', yu)}</span></label>
+      </div></section>
+      <section class="panel flush">
+        <div class="panel-h pad"><h2>Ausschank</h2><span class="muted sm">${+c.yieldG > 0 ? 'für ' + volTxt(+c.yieldG) : 'pro Glas'}</span></div>
+        <div class="tbl-wrap"><table class="edit dk-t">
+          <thead><tr><th>Artikel</th><th class="r">Menge</th><th class="r">Betrag</th><th></th></tr></thead>
+          <tbody>${rows || `<tr><td colspan="4" class="muted">Ersten Artikel hinzufügen.</td></tr>`}</tbody>
+          <tfoot><tr><td>Wareneinsatz</td><td></td><td class="r mono">${eur(t.cost)}</td><td></td></tr></tfoot>
+        </table></div>
+        <div class="panel-f"><button type="button" class="btn" data-act="drinkLine">${ico('plus')}Artikel</button>${(c.steps || []).length ? '' : `<button type="button" class="btn" data-act="stepAdd">${ico('plus')}Zubereitung</button>`}</div>
+      </section>
+      ${(c.steps || []).length ? cardStepsPanel(c) : ''}
+    </div>
+    <div class="col">
+      ${m0 ? `<section class="panel flush dk-on-p">
+        <div class="panel-h pad"><h2>Auf der Karte</h2><span class="muted sm">exkl. ${num(vatRate(m0), 1)} % MwSt. gerechnet</span></div>
+        <ul class="dk-on">${onCard}</ul>
+        <div class="panel-f"><button type="button" class="btn" data-act="drinkSize" data-id="${c.id}">${ico('plus')}Weitere Größe</button></div>
+      </section>` : ''}
+      ${cardAlgPanel(c)}
+    </div>
+  </div>`;
+}
+/* Nach dem Speichern eines Getränks auf der Karte: gleiche Getränke in mehreren Größen stehen als ein Eintrag mit mehreren Preisen */
+function drinkAfterSave(m, isNew, oldTag){
+  if(!isDrinkEntry(m)) return;
+  const tag = menuVol(m) ? volTxt(menuVol(m)) : '';
+  if(tag && (!m.vlabel || m.vlabel === oldTag)) m.vlabel = tag;
+  const key = x => String(x.name || '').trim().toLowerCase();
+  const sib = S.menu.filter(x => x !== m && x.section === m.section && key(x) === key(m) && isDrinkEntry(x));
+  if(!sib.length) return;
+  const gid = (sib.find(x => x.group) || {}).group || m.group || uid('g');
+  m.group = gid; sib.forEach(x => { x.group = gid; if(!x.vlabel && menuVol(x)) x.vlabel = volTxt(menuVol(x)); });
+  // nebeneinander, kleinste Menge zuerst
+  const all = sib.concat(m).sort((a, b) => (menuVol(a) || 1e9) - (menuVol(b) || 1e9)); const base = Math.min(...sib.map(x => x.order ?? 0));
+  if(isNew || all.some((x, i) => i && (x.order ?? 0) < (all[i - 1].order ?? 0))) all.forEach((x, i) => { x.order = base + i / (all.length + 1); });
+}
+
+/* ---------- Inventur: volle Flaschen und die angebrochene in Zehnteln ---------- */
+function barCount(pid){ const d = S.invDraft; const b = d && d.bar && d.bar[pid]; return b ? {f:b.f === '' || b.f == null ? '' : +b.f, t:+b.t || 0} : {f:'', t:0}; }
+function barTenths(p, b){ const what = p.geb === 'fass' ? 'Angebrochenes Fass' : 'Angebrochene Flasche';
+  return `<span class="inv-t" role="group" aria-label="${what} ${esc(p.name)}, in Zehnteln"><small>offen</small>${[1,2,3,4,5,6,7,8,9].map(k => `<button type="button" class="${b.t === k ? 'on' : ''}" data-act="invT" data-id="${p.id}:${k}" aria-pressed="${b.t === k}">0,${k}</button>`).join('')}</span>`; }
+function barSet(pid, f, t){
+  const d = S.invDraft, p = P(pid); if(!d || !p) return;
+  d.bar = d.bar || {}; d.bar[pid] = {f, t};
+  d.counts[pid] = f === '' && !t ? '' : Math.round(((+f || 0) + t / 10) * p.gebL * 1000) / 1000;
+  save(); invUpdate(pid);
+  const row = $('#ir-' + pid); if(row) row.querySelectorAll('.inv-t button').forEach(b => { const on = +b.dataset.id.split(':')[1] === t; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+}
+function barInput(t){
+  const pid = t.dataset.invf; const cur = barCount(pid); const raw = t.value.trim();
+  if(raw === ''){ t.classList.remove('bad-in'); barSet(pid, '', cur.t); return; }
+  const v = numParse(raw); const ok = isFinite(v) && v >= 0; t.classList.toggle('bad-in', !ok); if(!ok) return;
+  // „5,3“ getippt: fünf volle und drei Zehntel
+  const f = Math.floor(v + 1e-9), fr = Math.round((v - f) * 10);
+  barSet(pid, f, /[.,]/.test(raw) ? Math.min(9, fr) : cur.t);
+}
+function barTenth(pid, k){ const cur = barCount(pid); barSet(pid, cur.f, cur.t === k ? 0 : k); }
+
+/* ---------- Pfand und Leergut ---------- */
+function lgList(){ if(!Array.isArray(S.leergut)) S.leergut = []; return S.leergut; }
+function lgAdd(sup, amt, note, date){ const e = {id:uid('lg'), date:date || new Date().toISOString(), sup, amt:Math.round(amt * 100) / 100, note:note || '', by:me().id}; lgList().unshift(e); return e; }
+function lgRemove(id){ S.leergut = lgList().filter(e => e.id !== id); }
+function lgBalance(sid){ return Math.round(lgList().filter(e => e.sup === sid).reduce((a, e) => a + (+e.amt || 0), 0) * 100) / 100; }
+function linePfand(l){ if(l.pf != null) return +l.pf || 0; const p = P(l.pid); return isDrink(p) ? +p.pfand || 0 : 0; }
+/* Pfand einer Bestellung: je bestelltem (oder geliefertem) Gebinde. Gehört nie zur Warensumme. */
+function orderPfand(o, delivered){ return Math.round(o.lines.reduce((t, l) => t + (delivered ? +(l.delivered ?? l.n) || 0 : +l.n || 0) * linePfand(l), 0) * 100) / 100; }
+/* Gebinde mit Pfand eines Lieferanten, je Pfandsatz eine Zeile: „Fass 30 l · € 30,00“, „Kiste · € 6,00 (24×0,33 l, 24×0,35 l)“ */
+function lgKinds(sid){ const m = new Map(); S.products.forEach(p => { if(p.supplier !== sid || !isDrink(p) || !(+p.pfand > 0)) return; const k = p.geb + '|' + (+p.pfand).toFixed(2); const x = m.get(k) || {key:k, word:GEB[p.geb], pfand:+p.pfand, packs:[]}; if(!x.packs.includes(p.pack)) x.packs.push(p.pack); m.set(k, x); });
+  return [...m.values()].map(x => ({...x, label:x.packs.length === 1 ? x.packs[0] : x.word, sizes:x.packs.length === 1 ? '' : x.packs.map(s => s.replace(/^\S+\s/, '')).join(', ')})).sort((a, b) => b.pfand - a.pfand); }
+function lgSection(){
+  const rows = (S.suppliers || []).map(sp => ({sp, bal:lgBalance(sp.id), kinds:lgKinds(sp.id), last:lgList().find(e => e.sup === sp.id)})).filter(x => x.kinds.length || Math.abs(x.bal) > 0.004);
+  if(!rows.length) return '';
+  const sum = rows.reduce((a, x) => a + x.bal, 0);
+  return `<h2 class="sec-h">Leergut<small class="muted sm">Pfand, das bei den Lieferanten steht: ${eur(sum)}</small></h2>
+  <ul class="lg-l">${rows.map(x => `<li><span class="lg-n"><b>${esc(x.sp.name)}</b><small>${x.last ? `${fmtDate(x.last.date)} · ${x.last.amt < 0 ? 'zurückgegeben' : 'geliefert'} ${eur(Math.abs(x.last.amt))}` : 'noch nichts gebucht'}</small></span><span class="mono lg-v">${eur(x.bal)}</span><button type="button" class="btn sm" data-act="lgReturn" data-id="${x.sp.id}">Leergut zurückgeben</button></li>`).join('')}</ul>`;
+}
+function lgDialog(sid){
+  const sp = SUP(sid); if(!sp) return; const kinds = lgKinds(sid); const bal = lgBalance(sid); const hist = lgList().filter(e => e.sup === sid).slice(0, 8);
+  openDialog('Leergut zurückgeben', `
+    <p class="dlg-p">${esc(sp.name)} · Pfand offen <b class="mono">${eur(bal)}</b></p>
+    ${kinds.length ? `<div class="lg-k">${kinds.map((k, i) => `<label class="lg-kr"><span><b>${esc(k.label)}</b><small>${eur(k.pfand)} Pfand je ${esc(k.word)}${k.sizes ? ' · ' + esc(k.sizes) : ''}</small></span><input name="k${i}" class="num-in" type="text" inputmode="numeric" placeholder="0" autocomplete="off" aria-label="Anzahl ${esc(k.label)}"></label>`).join('')}</div>` : ''}
+    <label class="f">${kinds.length ? 'Oder Betrag laut Gutschrift, €' : 'Betrag laut Gutschrift, €'}<input name="amt" class="num-in" type="text" inputmode="decimal" autocomplete="off"></label>
+    <p class="lg-sum" id="lgSum" aria-live="polite"></p>
+    ${hist.length ? `<details class="alg-det lg-h"><summary>Letzte Buchungen</summary><ul>${hist.map(e => `<li><span class="mono">${fmtDate(e.date)}</span><span>${esc(e.note || (e.amt < 0 ? 'Rückgabe' : 'Lieferung'))}</span><span class="mono">${signedEur(e.amt)}</span>${e.ret ? `<button type="button" class="link" data-lgundo="${e.id}">stornieren</button>` : '<span></span>'}</li>`).join('')}</ul></details>` : ''}`,
+    (fd, f0) => { let sum = 0; const parts = [];
+      kinds.forEach((k, i) => { const n = Math.round(+fd.get('k' + i) || 0); if(n > 0){ sum += n * k.pfand; parts.push(`${n} × ${k.label}`); } });
+      const amt = +fd.get('amt') || 0; if(amt > 0){ sum += amt; parts.push('Gutschrift'); }
+      sum = Math.round(sum * 100) / 100;
+      if(!(sum > 0)){ dlgErr(null, 'Bitte eintragen, was zurückgeht.'); (f0.elements.k0 || f0.elements.amt).focus(); return false; }
+      const e = lgAdd(sid, -sum, 'Rückgabe: ' + parts.join(', ')); e.ret = true; lgDialog.last = `Leergut zurück an ${sp.name}: ${eur(sum)} · offen ${eur(lgBalance(sid))}`; },
+    {ok:'Buchen', done:() => lgDialog.last, after: f => {
+      const upd = () => { f.querySelectorAll('.f-err').forEach(n => n.remove()); let s = 0; kinds.forEach((k, i) => { const v = numParse(f.elements['k' + i].value); if(v > 0) s += Math.round(v) * k.pfand; }); const a = numParse(f.elements.amt.value); if(a > 0) s += a; f.querySelector('#lgSum').textContent = s > 0 ? `Zurück: ${eur(s)} · danach offen ${eur(bal - s)}` : ''; };
+      f.oninput = upd;
+      f.onclick = e => { const b = e.target.closest('[data-lgundo]'); if(!b) return; lgRemove(b.dataset.lgundo); save(); $('#dlg').close(); render(); toast('Rückgabe storniert'); }; }});
+}
+
+/* ---------- Ereignisse ---------- */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if(!el || el.closest('#dlg') && !el.closest('#dlgForm')) return; const id = el.dataset.id; const c = view.card ? C(view.card) : null;
+  switch(el.dataset.act){
+    case 'drinkLine': if(!c) break; c.items.push({ref:'', qty:'', net:''}); save(); render(); setTimeout(() => document.getElementById('dref-' + (c.items.length - 1))?.focus(), 0); break;
+    case 'drinkSize': { const cc = C(id); if(!cc) break; const m0 = menuSorted().find(m => m.card === id); menuDialog(null, {name:m0 ? m0.name : cc.name, section:m0 ? m0.section : drinkSection(), desc:m0 ? m0.desc : '', card:id, vat:m0 ? m0.vat || '' : '', price:''}); break; }
+    case 'lgReturn': lgDialog(id); break;
+    case 'pDrinks': view.pdrink = !view.pdrink; render(); break;
+  }
+});
+document.addEventListener('change', e => {
+  const t = e.target; if(!t.closest || !t.closest('#app')) return; const c = view.card ? C(view.card) : null; if(!c || !c.drink) return;
+  if(t.dataset.dref != null){ const it = c.items[+t.dataset.dref]; if(!it) return; it.ref = t.value; it.net = ''; delete it.u; save(); softRender(); return; }
+  if(t.dataset.dq != null){ const i = +t.dataset.dq, it = c.items[i]; if(!it) return; const l = line(it, 0); const u = !l.missing && l.unit === 'ml' ? drinkU(it) : ''; const v = numParse(t.value);
+    it.qty = t.value.trim() === '' || !isFinite(v) ? '' : u ? Math.round(v * VOL_U[u] * 1000) / 1000 : v; if(u) it.u = u; save(); softRender(); return; }
+  if(t.dataset.du != null){ const i = +t.dataset.du, it = c.items[i]; if(!it) return; const inp = document.getElementById('dq-' + i); const v = inp ? numParse(inp.value) : NaN; it.u = t.value; if(isFinite(v)) it.qty = Math.round(v * VOL_U[it.u] * 1000) / 1000; save(); softRender(); return; }
+  if(t.dataset.dy != null || t.dataset.dyu != null){ const inp = document.getElementById('dk-y'), sel = document.querySelector('#app [data-dyu]'); const v = numParse(inp.value); c.yu = sel.value; c.yieldG = inp.value.trim() === '' || !isFinite(v) || v <= 0 ? '' : Math.round(v * VOL_U[c.yu] * 1000) / 1000; save(); softRender(); toast('Gespeichert'); return; }
+});
+
+/* ---------- Beispiel-Getränke und Umstellung ---------- */
+/* Nur für frische Beispieldaten (seed). Die sechs Getränke der Beispieldaten sind dort in Stück angelegt; hier werden sie zu Litern mit Gebinde, Pfand und Schankverlust. */
+const BAR_DEMO_CONV = {
+  bier:{geb:'fass', L:30, N:1, pfand:30, loss:5, from:'Zillertaler Bier vom Fass', name:'Märzen vom Fass', price:[2.9, 2.2]},
+  mineral:{geb:'kiste', L:0.33, N:24, pfand:6},
+  almdudler:{geb:'kiste', L:0.35, N:24, pfand:6, from:'Almdudler 0,35 l', name:'Kräuterlimonade 0,35 l'},
+  apfelsaft:{geb:'kiste', L:1, N:6, pfand:3},
+  gv:{geb:'fl', L:0.75, N:1, pfand:0, from:'Grüner Veltliner Qualitätswein 0,75 l', name:'Grüner Veltliner 0,75 l'},
+  zweigelt:{geb:'fl', L:0.75, N:1, pfand:0, from:'Zweigelt Qualitätswein 0,75 l', name:'Zweigelt 0,75 l'},
+};
+// [id, Name, Gebinde, Inhalt l, Flaschen je Kiste, Preis je Gebinde, Pfand, Allergene, Lieferant, Bestand, Mindestbestand (in Flaschen)]
+const BAR_DEMO_NEW = [
+  ['weizen', 'Weißbier 0,5 l', 'kiste', 0.5, 20, 19, 4.5, 'A', 'sup_getraenke', 40, 20],
+  ['prosecco', 'Prosecco 0,75 l', 'fl', 0.75, 1, 5.9, 0, 'O', 'sup_wein', 9, 6],
+  ['bitter', 'Bitter-Aperitif 0,7 l', 'fl', 0.7, 1, 11.9, 0, '', 'sup_wein', 3, 2],
+];
+// [id, Name, Ausschank ml, [[Artikel, Menge, Anzeige-Einheit]]]
+const BAR_DEMO_CARDS = [
+  ['dk_bier', 'Märzen vom Fass', 500, [['bier', 500, 'l']]],
+  ['dk_weizen', 'Weißbier', 500, [['weizen', 500, 'l']]],
+  ['dk_mineral', 'Mineralwasser', 330, [['mineral', 330, 'l']]],
+  ['dk_limo', 'Kräuterlimonade', 350, [['almdudler', 350, 'l']]],
+  ['dk_apfel', 'Apfelsaft gespritzt', 500, [['apfelsaft', 250, 'l'], ['mineral', 250, 'l']]],
+  ['dk_gv', 'Grüner Veltliner', 125, [['gv', 125, 'l']]],
+  ['dk_zw', 'Zweigelt', 125, [['zweigelt', 125, 'l']]],
+  ['dk_spritzer', 'Weißer Spritzer', 250, [['gv', 125, 'l'], ['mineral', 125, 'l']]],
+  ['dk_spritz', 'Aperitif Spritz', '', [['bitter', 40, 'cl'], ['prosecco', 80, 'cl'], ['mineral', 20, 'cl'], ['orange', 0.1, '']]],
+  ['dk_espresso', 'Espresso', '', [['kaffee', 8, '']]],
+  ['dk_capp', 'Cappuccino', '', [['kaffee', 8, ''], ['milk', 120, 'ml']]],
+];
+// [Name, Beschreibung, Preis, Rezeptur, Menge ml (leer = wie Rezeptur), Gruppe]
+const BAR_DEMO_MENU = [
+  ['Märzen vom Fass', '', 4.2, 'dk_bier', 300, 'dk_g_bier'], ['Märzen vom Fass', '', 5.4, 'dk_bier', '', 'dk_g_bier'],
+  ['Weißbier', '', 5.6, 'dk_weizen', '', ''], ['Mineralwasser', '', 3.4, 'dk_mineral', '', ''], ['Kräuterlimonade', '', 3.9, 'dk_limo', '', ''], ['Apfelsaft gespritzt', '', 4.2, 'dk_apfel', '', ''],
+  ['Grüner Veltliner', 'Trocken, vom Glas oder die Flasche', 4.8, 'dk_gv', '', 'dk_g_gv'], ['Grüner Veltliner', 'Trocken, vom Glas oder die Flasche', 29, 'dk_gv', 750, 'dk_g_gv'],
+  ['Zweigelt', '', 5.2, 'dk_zw', '', 'dk_g_zw'], ['Zweigelt', '', 32, 'dk_zw', 750, 'dk_g_zw'],
+  ['Weißer Spritzer', '', 5.4, 'dk_spritzer', '', ''], ['Aperitif Spritz', 'Bitter-Aperitif, Prosecco, Soda, Orange', 7.5, 'dk_spritz', '', ''],
+  ['Espresso', '', 2.9, 'dk_espresso', '', ''], ['Cappuccino', '', 3.9, 'dk_capp', '', ''],
+];
+function barDemo(d){
+  const s = d.settings; const prod = id => d.products.find(p => p.id === id); const r3 = v => Math.round(v * 1000) / 1000, r4 = v => Math.round(v * 10000) / 10000;
+  if(!Array.isArray(d.leergut)) d.leergut = [];
+  const supOk = id => (d.suppliers || []).some(x => x.id === id) ? id : '';
+  // 1 · vorhandene Beispiel-Getränke umstellen
+  Object.entries(BAR_DEMO_CONV).forEach(([id, c]) => { const p = prod(id); if(!p || p.geb) return;
+    if(p.unit === 'Stk'){ const L = c.L;
+      p.unit = 'l'; p.price = r4((+p.price || 0) / L); p.stock = r3((+p.stock || 0) * L); p.minStock = r3((+p.minStock || 0) * L); p.pieceG = '';
+      d.cards.forEach(cd => cd.items.forEach(it => { if(it.ref === 'p:' + id && +it.qty > 0) it.qty = r3(+it.qty * L * 1000); }));
+      (d.orders || []).forEach(o => (o.lines || []).forEach(l => { if(l.pid === id) l.f = r4((+l.f || 1) * L); }));
+      (d.moves || []).forEach(m => { if(m.pid !== id) return; m.qty = r3((+m.qty || 0) * L); if(m.price != null) m.price = r4(+m.price / L); if(m.prevPrice != null) m.prevPrice = r4(+m.prevPrice / L); });
+      if(d.invDraft && d.invDraft.counts && d.invDraft.counts[id] !== '' && d.invDraft.counts[id] != null) d.invDraft.counts[id] = r3(+d.invDraft.counts[id] * L);
+    } else if(p.unit !== 'l') return;
+    if(c.price && p.priceDemo !== false && Math.abs(+p.price - c.price[0]) < 0.0001) p.price = c.price[1];
+    if(c.from && p.name === c.from) p.name = c.name;
+    Object.assign(p, {geb:c.geb, gebL:c.L, gebN:c.N, pack:gebLabel(c.geb, c.L, c.N), packQty:r4(c.L * c.N), pfand:c.pfand, pourLoss:c.loss || 0, loc:'W'});
+    (d.orders || []).forEach(o => (o.lines || []).forEach(l => { if(l.pid === id && Math.abs((+l.f || 0) - p.packQty) < 0.0001) l.ou = p.pack; }));
+  });
+  // Pfand der schon gelieferten Beispiel-Bestellungen steht beim Lieferanten
+  if(!d.leergut.length) (d.orders || []).forEach(o => { if(!o.receipt || !o.lines) return; let sum = 0; o.lines.forEach(l => { const p = prod(l.pid); const pf = p && p.geb ? +p.pfand || 0 : 0; if(pf){ l.pf = pf; sum += (+(l.delivered ?? l.n) || 0) * pf; } }); if(sum > 0){ o.receipt.pfand = sum; d.leergut.push({id:uid('lg'), date:o.receipt.date, sup:o.supplier, amt:sum, note:'Lieferung ' + o.no, by:o.receipt.checkedBy || '', order:o.id}); } });
+  // 2 · eine kleine Getränkekarte dazu, wenn es noch keine gibt
+  const sv = s.secVat || (s.secVat = {});
+  if(d.cards.some(c => c.drink) || d.menu.some(m => sv[m.section] === 'g' || m.vat === 'g') || (s.sections || []).includes('Getränke')) return;
+  if(!['bier', 'mineral', 'almdudler', 'apfelsaft', 'gv', 'zweigelt', 'milk'].every(id => { const p = prod(id); return p && p.unit === 'l'; })) return;
+  let n = 0;
+  BAR_DEMO_NEW.forEach(([id, name, geb, L, N, gp, pfand, alg, sup, st, min]) => { if(prod(id)) return; const sid = supOk(sup); const sp = (d.suppliers || []).find(x => x.id === sid);
+    d.products.push({id, name, unit:'l', price:r4(gp / (L * N)), lossCold:0, lossHot:0, alg, algNone:!alg, pieceG:'', stock:r3(st * L), minStock:r3(min * L), loc:'W', supplier:sid, artNo:sp && sp.prefix ? `${sp.prefix}-${300 + (++n) * 7}` : '', geb, gebL:L, gebN:N, pack:gebLabel(geb, L, N), packQty:r4(L * N), pfand, pourLoss:0, priceDemo:true}); });
+  const plain = (id, name, unit, price, extra) => { if(!prod(id)) d.products.push({id, name, unit, price, lossCold:0, lossHot:0, alg:'', algNone:true, pieceG:'', stock:0, minStock:0, loc:'L', supplier:'', artNo:'', pack:'', packQty:0, priceDemo:true, ...extra}); };
+  plain('kaffee', 'Kaffeebohnen', 'kg', 17.5, {stock:6, minStock:4, loc:'W', supplier:supOk('sup_gross'), pack:'Sack 1 kg', packQty:1});
+  plain('orange', 'Orange', 'Stk', 0.45, {pieceG:200, stock:12, minStock:6, loc:'G', supplier:supOk('sup_gem')});
+  if(!s.sections) s.sections = []; s.sections.push('Getränke'); sv['Getränke'] = 'g';
+  BAR_DEMO_CARDS.forEach(([id, name, y, items]) => { if(d.cards.some(c => c.id === id) || !items.every(i => prod(i[0]))) return;
+    d.cards.push({id, no:s.nextNo++, name, type:'dish', drink:true, category:'Getränke', yieldG:y, img:'', steps:[], items:items.map(([k, q, u]) => { const it = {ref:'p:' + k, qty:q, net:''}; if(u) it.u = u; return it; })}); });
+  let ord = 0;
+  BAR_DEMO_MENU.forEach(([name, desc, price, card, vol, group]) => { const c = d.cards.find(x => x.id === card); if(!c) return; const ml = +vol > 0 ? +vol : +c.yieldG || 0;
+    d.menu.push({id:uid('m'), section:'Getränke', name, desc, price, card, img:'', veg:'', top:false, hidden:false, seasons:[], days:[], alg:'', algNone:false, vat:'', group, vlabel:group && ml ? volTxt(ml) : '', vol, order:ord++}); });
+}
+/* Gespeicherte Stände bleiben, wie sie sind: nichts wird umgerechnet, kein Feld muss vorbelegt werden (Leergut-Liste entsteht bei der ersten Buchung).
+   Hier wird nur aufgeräumt, was nicht zusammenpasst. Die Beispiel-Getränke kommen allein mit frischen Beispieldaten (seed). */
+function barMigrate(d){
+  if(!d || typeof d !== 'object') return d;
+  if(d.leergut !== undefined) d.leergut = Array.isArray(d.leergut) ? d.leergut.filter(e => e && typeof e === 'object' && e.id && isFinite(+e.amt)) : [];
+  (d.products || []).forEach(p => { if(p.geb && !(GEB[p.geb] && +p.gebL > 0 && p.unit === 'l')){ ['geb', 'gebL', 'gebN', 'pfand', 'pourLoss'].forEach(k => { delete p[k]; }); } if(p.pourLoss != null && !(+p.pourLoss >= 0 && +p.pourLoss < 100)) p.pourLoss = 0; });
+  (d.menu || []).forEach(m => { if(m.vol != null && m.vol !== '' && !(+m.vol > 0)) m.vol = ''; });
+  return d;
+}
 
 /* ---------- Start ---------- */
 function startApp(){

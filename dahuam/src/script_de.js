@@ -216,6 +216,7 @@ function line(it, depth){
     const p = r.o; res.name = p.name;
     if(p.unit === 'Stk'){ res.unit = 'Stk'; res.cost = q * fin(+p.price); res.grossG = q * fin(+p.pieceG); }
     else { res.unit = p.unit === 'l' ? 'ml' : 'g'; res.cost = q/1000 * fin(+p.price); res.grossG = q; }
+    { const pl = pourLossOf(p); if(pl) res.cost /= (1 - pl/100); }   // Schankverlust (Fassbier, offener Wein): für ein volles Glas läuft mehr aus dem Gebinde
     res.netAuto = res.grossG * (1 - fin(+p.lossCold)/100);
     res.net = it.net !== '' && it.net != null ? +it.net : res.netAuto;
     res.out = res.net * (1 - fin(+p.lossHot)/100);
@@ -238,11 +239,15 @@ function totals(c, depth=0){
 /* MwSt.: Speisen oder Getränke. Die Klasse kommt vom Gericht (wenn dort gewählt), sonst von der Kategorie. EIN Helfer für alle Rechnungen. */
 function vatClass(m){ if(m && (m.vat === 'g' || m.vat === 's')) return m.vat; const sv = S.settings.secVat; return m && sv && sv[m.section] === 'g' ? 'g' : 's'; }
 function vatRate(m){ const s = S.settings; if(vatClass(m) === 'g'){ const v = +s.vatDrinks; return isFinite(v) && s.vatDrinks !== '' && s.vatDrinks != null ? v : 20; } return s.vat; }
+/* Schankverlust eines Artikels in % (0 bis unter 100); ohne Angabe 0 */
+function pourLossOf(p){ const v = p ? +p.pourLoss : 0; return v > 0 && v < 100 ? v : 0; }
+/* Getränk in anderer Größe: dieselbe Schankrezeptur, nach Menge gerechnet (0,3 l aus der Rezeptur für 0,5 l = Faktor 0,6). Speisen: immer 1. */
+function menuFactor(m){ const c = m && m.card ? C(m.card) : null; return c && c.drink && +m.vol > 0 && +c.yieldG > 0 ? +m.vol / +c.yieldG : 1; }
 function menuCalc(m){
   const c = m.card ? C(m.card) : null;
   const t = c ? totals(c) : null;
   const netPrice = (+m.price||0) / (1 + vatRate(m)/100);
-  const cost = t ? t.cost : null;
+  const cost = t ? t.cost * menuFactor(m) : null;
   return {c, t, cost, netPrice, fc: cost!=null && netPrice ? cost/netPrice*100 : null, margin: cost!=null ? netPrice - cost : null};
 }
 function fcClass(fc){ if(fc==null) return 'na'; const tg = +S.settings.target; return fc <= tg ? 'good' : fc <= tg+7 ? 'warn' : 'bad'; }

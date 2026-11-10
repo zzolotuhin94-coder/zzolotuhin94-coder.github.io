@@ -2,3 +2,4 @@ Tests laufen gegen http://127.0.0.1:8765/dahuam/index.html (python3 -m http.serv
 Je Ordner: sh run_all.sh. fixtests ruft zusätzlich die älteren Abläufe t4 … th2 in diesem Ordner auf.
 btests = Paket B (Navigation, Einrichtung, Umstellung alter Stände, Rollen, Entferntes).
 ctests = Paket C (Eigene Daten: Importe, leer starten, Allergene, zweiter Steuersatz). Beispieldateien in ctests/samples.
+dtests = Paket D1 (Bar & Getränke: Getränke-Artikel, Schankrezeptur, Pfand und Leergut, Bar-Inventur, Getränke in der Gästekarte). samples/pre-d-demo.json ist der Beispielstand von 1.3.0 (make_pre_d.js erzeugt ihn aus der alten index.html auf :8766).

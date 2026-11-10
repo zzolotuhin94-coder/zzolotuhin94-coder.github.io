@@ -35,10 +35,10 @@ function fixesMigrate(d){
 const RO_MSG = 'Das kann nur der Chef ändern';
 function canEditAll(){ return me().role === 'chef'; }
 function whoLabel(u){ const r = ROLES[u.role] || ''; return !r || u.name === r ? u.name : `${u.name} · ${r}`; }
-const RO_ACTS = new Set(['newMenu','editMenu','photoMenu','toMenu','newCardFor','newCard','photoCard','photoCardDel','addLine','delLine','stepAdd','stepDel','stepMove','stepPhoto','stepPhotoDel','applySim','dupCard','delCard','addSec','secMove','secDel','secSort','itemMove','itemHide','newProd','editProd','reset','importPick','safetyRestore','pConfirm','pConfirmAll','pFix','plImport','pcStart','pcFor','pcOk','pcSave','pcSkip','pcBack','tellerPick','gStyle','gcover','gcoverDel','newSpecial','editSpecial','dupSpecial','hkAccent','hsCopyReset','secDlg','sales','moveUndo','invStart','invFinish','invCancel','supEdit','rpImport','rpDemoDel','rpAnalyse','mapSave','pAlg','pAlgNone','pcAlg']);
+const RO_ACTS = new Set(['newMenu','editMenu','photoMenu','toMenu','newCardFor','newCard','photoCard','photoCardDel','addLine','delLine','stepAdd','stepDel','stepMove','stepPhoto','stepPhotoDel','applySim','dupCard','delCard','drinkSize','drinkLine','addSec','secMove','secDel','secSort','itemMove','itemHide','newProd','editProd','reset','importPick','safetyRestore','pConfirm','pConfirmAll','pFix','plImport','pcStart','pcFor','pcOk','pcSave','pcSkip','pcBack','tellerPick','gStyle','gcover','gcoverDel','newSpecial','editSpecial','dupSpecial','hkAccent','hsCopyReset','secDlg','sales','moveUndo','invStart','invFinish','invCancel','supEdit','rpImport','rpDemoDel','rpAnalyse','mapSave','pAlg','pAlgNone','pcAlg']);
 /* Lager buchen: Wareneingang und Schwund darf auch das Team, Entnahmen bucht der Chef */
 function moveTeamOk(arg){ return /^(in|waste)(:|$)/.test(String(arg || '')); }
-const RO_INPUTS = 'input[data-mp],[data-pp],[data-li],[data-cf],textarea[data-step],.title-in,[data-sf],[data-us],[data-secname],[data-secvat],[data-st],[data-smd],[data-ms],[data-hsc],[data-hkk],[data-hka],#pcIn';
+const RO_INPUTS = 'input[data-mp],[data-pp],[data-li],[data-dq],[data-du],[data-dref],[data-dy],[data-dyu],[data-cf],textarea[data-step],.title-in,[data-sf],[data-us],[data-secname],[data-secvat],[data-st],[data-smd],[data-ms],[data-hsc],[data-hkk],[data-hka],#pcIn';
 function roBlocked(el){
   if(canEditAll() || !el) return false;
   const a = el.dataset.act;
@@ -52,7 +52,7 @@ window.addEventListener('pointerdown', e => { if(canEditAll()) return; const el 
 ['change','input'].forEach(ev => window.addEventListener(ev, e => { if(canEditAll()) return; const t = e.target; if(!t || !t.matches || !t.closest('#app') || !roBlocked(t)) return; e.stopImmediatePropagation(); if(t.type === 'checkbox' || t.type === 'radio') t.checked = t.defaultChecked; else if(t.tagName !== 'SELECT') t.value = t.defaultValue; if(ev === 'change') roGate(false); }, true));
 /* Dialoge, die auch über die Schnellsuche erreichbar sind */
 const _menuDialogF = menuDialog; menuDialog = function(m, pre){ if(roGate()) return _menuDialogF(m, pre); };
-const _prodDialogF = prodDialog; prodDialog = function(p){ if(roGate()) return _prodDialogF(p); };
+const _prodDialogF = prodDialog; prodDialog = function(p, pre){ if(roGate()) return _prodDialogF(p, pre); };
 const _newCardF = newCard; newCard = function(type, fromMenu){ if(!roGate()) return; _newCardF(type, fromMenu); const c = C(view.card); if(c && !fromMenu){ c.fresh = true; save(); } };
 const _specialDialogF = specialDialog; specialDialog = function(sp){ if(roGate()) return _specialDialogF(sp); };
 const _moveDlgF = moveDlg; moveDlg = function(arg){ if(roGate(canEditAll() || moveTeamOk(arg))) return _moveDlgF(arg); };

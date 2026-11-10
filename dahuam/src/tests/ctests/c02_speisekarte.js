@@ -24,7 +24,8 @@ const L = require('./lib'); const fs = require('fs');
   const rowTxt = await p.evaluate(() => { const li = document.querySelector('#impList .imp-r[data-n="12"]'); return li.innerText.replace(/\s+/g, ' '); });
   L.ok(/neu Zeile 12 Tafelspitz Hauptspeisen · Apfelkren, Schnittlauchsauce; Rösterdäpfel nur sonntags € 24,00 Datei: „24,00“/.test(rowTxt), 'Zeile der Vorschau: Zustand, Zeile, Name, Text mit Strichpunkt, gelesener Preis UND Rohwert der Zelle', rowTxt);
   L.ok(await p.evaluate(() => { const li = document.querySelector('#impList .imp-r[data-n="32"]'); return /Fehler/.test(li.querySelector('.imp-st').textContent) && /„Tagespreis“/.test(li.querySelector('.imp-raw').textContent) && !li.querySelector('.imp-x b') && getComputedStyle(li.querySelector('.imp-why')).color === getComputedStyle(li.querySelector('.imp-st')).color; }), 'Fehlerzeile: kein gelesener Preis, der Rohwert steht da, Grund in der Warnfarbe');
-  L.ok(/Kategorie „Getränke“: wird mit 20 % MwSt\. \(Getränke\) angelegt/.test(await p.evaluate(() => document.querySelector('#app .imp-gnote').textContent)), 'Vorschau kündigt an: Kategorie „Getränke“ mit 20 %');
+  /* D1: die Beispieldaten haben die Kategorie „Getränke“ schon (mit 20 %); angekündigt wird nur eine neue Getränke-Kategorie */
+  L.ok(await p.evaluate(() => !document.querySelector('#app .imp-gnote') && vatClass({section:'Getränke'}) === 'g'), 'Vorschau: die vorhandene Kategorie „Getränke“ rechnet schon mit 20 %, kein eigener Hinweis');
   // Filter
   await p.click('#app [data-act="impFilter"][data-id="fehler"]'); await p.waitForTimeout(200);
   L.ok(await p.evaluate(() => document.querySelectorAll('#impList .imp-r').length === 4 && [...document.querySelectorAll('#impList .imp-r')].every(x => x.classList.contains('st-fehler'))), 'Filter „Fehler“ zeigt die vier Zeilen');
@@ -39,7 +40,7 @@ const L = require('./lib'); const fs = require('fs');
   await L.apply(p);
   const a1 = await p.evaluate(() => ({stage:view.daten.stage, out:view.daten.out, n:S.menu.length, secs:S.settings.sections.slice(-6), sv:S.settings.secVat, imp:S.imports[0], safety:(STORE.st.safety || {}).why, toast:document.querySelector('#toast').textContent, h1:document.querySelector('#app h1').textContent}));
   L.ok(a1.stage === 'done' && a1.out.neu === cn.neu && a1.out.akt === cn.akt && a1.out.fehler === 4 && a1.n === m0.n + cn.neu, 'übernommen: neue Gerichte dazu, gleiche aktualisiert, Fehlerzeilen nicht', a1.out);
-  L.ok(a1.secs.join('|') === 'Suppen|Vorspeisen|Hauptspeisen|Desserts|Kinder|Getränke' && a1.sv['Getränke'] === 'g', 'neue Kategorien in der Reihenfolge der Datei; „Getränke“ ist Getränke-Kategorie', a1.secs);
+  L.ok(a1.secs.join('|') === 'Getränke|Suppen|Vorspeisen|Hauptspeisen|Desserts|Kinder' /* D1: „Getränke“ gibt es in den Beispieldaten schon, die neuen folgen in der Reihenfolge der Datei */ && a1.sv['Getränke'] === 'g', 'neue Kategorien in der Reihenfolge der Datei; „Getränke“ ist Getränke-Kategorie', a1.secs);
   L.ok(a1.imp.type === 'menu' && a1.imp.file === 'speisekarte.csv' && a1.imp.counts.neu === cn.neu && a1.imp.by === 'Chef' && /vor Import: Speisekarte \(speisekarte\.csv\)/.test(a1.safety), 'S.imports hat den Eintrag (Art, Datum, Zähler, Datei); Sicherheitskopie „vor Import“', a1.imp);
   L.ok(/Speisekarte übernommen/.test(a1.toast) && /Import fertig/.test(a1.h1) && await p.evaluate(() => !!document.querySelector('#app [data-act="datenUndo"]') && /Fehlerliste speichern · 5/.test(document.querySelector('#app [data-act="impErrDl"]').textContent)), 'Ergebnis-Seite mit Zusammenfassung, „Rückgängig“ und Fehlerliste', a1.toast);
   const chk = await p.evaluate(() => { const f = n => S.menu.find(m => m.name === n); const ks = f('Käsespätzle'), ku = f('Kürbiscremesuppe'), ts = f('Tafelspitz'), gc = f('Gemüsecurry'), gt = f('Grillteller'), bt = S.menu.filter(m => m.name === 'Beef Tatar'), ws = S.menu.filter(m => m.name === 'Wiener Schnitzel');
@@ -51,7 +52,7 @@ const L = require('./lib'); const fs = require('fs');
   // ---------- rückgängig ----------
   await p.click('#app [data-act="datenUndo"]'); await p.waitForTimeout(700);
   const u1 = await p.evaluate(() => ({n:S.menu.length, secs:S.settings.sections.length, imp:(S.imports || []).length, ws:S.menu.find(m => m.name === 'Wiener Schnitzel' && m.vlabel === 'vom Schwein').price, stage:view.daten && view.daten.stage, sv:S.settings.secVat['Getränke'], toast:document.querySelector('#toast').textContent}));
-  L.ok(u1.n === m0.n && u1.secs === m0.secs && u1.imp === m0.imp && u1.ws === 20.9 && u1.sv === undefined && /Rückgängig gemacht/.test(u1.toast), 'Rückgängig: Karte, Kategorien, Steuerklasse und Importliste wie vorher (eine Änderung)', u1);
+  L.ok(u1.n === m0.n && u1.secs === m0.secs && u1.imp === m0.imp && u1.ws === 20.9 && u1.sv === 'g' /* D1: Beispiel-Kategorie Getränke */ && /Rückgängig gemacht/.test(u1.toast), 'Rückgängig: Karte, Kategorien, Steuerklasse und Importliste wie vorher (eine Änderung)', u1);
   L.ok(u1.stage === 'prev' && (await L.counts(p)).neu === cn.neu, 'man steht wieder in der Vorschau und kann neu entscheiden');
   // noch einmal übernehmen, dann dieselbe Datei wieder: alles „unverändert“
   await L.apply(p); await L.openImp(p, 'menu'); await L.upload(p, L.sample('speisekarte.csv')); let c2 = await L.counts(p);
@@ -118,7 +119,7 @@ const L = require('./lib'); const fs = require('fs');
   await L.apply(p);
   const ra = await p.evaluate(() => ({n:S.menu.length, secs:S.settings.sections.join('|'), order:menuSorted().slice(0, 5).map(dishLabel).join('|'), out:view.daten.out, card:S.menu.find(m => m.name === 'Wiener Schnitzel' && m.vlabel === 'vom Schwein').card, cards:S.cards.length}));
   L.ok(ra.n === 31 && ra.secs === 'Suppen|Vorspeisen|Hauptspeisen|Desserts|Kinder|Getränke' && ra.out.weg === nb - 31, 'ersetzt: die Karte hat genau die 31 Gerichte der Datei, Kategorien in Dateireihenfolge', ra);
-  L.ok(ra.order === 'Frittatensuppe|Kürbiscremesuppe|Gulaschsuppe|Leberknödelsuppe|Beef Tatar · klein' && ra.card === keepCard && ra.cards === 15, 'Reihenfolge wie in der Datei; das gleiche Gericht behält seine Rezeptur; Rezepturen bleiben erhalten', ra.order);
+  L.ok(ra.order === 'Frittatensuppe|Kürbiscremesuppe|Gulaschsuppe|Leberknödelsuppe|Beef Tatar · klein' && ra.card === keepCard && ra.cards === 26 /* D1: 15 + 11 Schankrezepturen */, 'Reihenfolge wie in der Datei; das gleiche Gericht behält seine Rezeptur; Rezepturen bleiben erhalten', ra.order);
   for(const h of ['speisekarte', 'speisekarte/gaestekarte', 'heute', 'vorbereitung', 'team/auswertung']) await L.go(p, h);
   L.ok(p.errs.length === 0, 'nach dem Ersetzen: Karte, Gästekarte, Heute, Vorbereitung und Auswertung zeichnen ohne Fehler', p.errs.slice(0, 2));
   await L.go(p, 'einstellungen/eigene-daten');

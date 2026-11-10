@@ -52,6 +52,7 @@ function seed(){
   fixesMigrate(d);
   plusMigrate(d);
   teamMigrate(d);
+  barDemo(d); barMigrate(d);
   return d;
 }
 
@@ -81,6 +82,7 @@ function migrate(d){
   fixesMigrate(d);
   plusMigrate(d);
   teamMigrate(d);
+  barMigrate(d);
   return d;
 }
 
@@ -107,7 +109,9 @@ function photo(imgId, name, hue, cls=''){
 
 /* ---------- Lager-Logik ---------- */
 function unitOf(p){ return p ? p.unit : ''; }
-function qtyFmt(q, p){ const d = p && p.unit==='Stk' ? 0 : (Math.abs(q) < 10 ? 2 : 1); return num(q, d)+' '+unitOf(p); }
+function qtyFmt(q, p){
+  if(isDrink(p)){ const n = q / p.gebL; return Math.abs(n) >= 1 || !q ? num(n, 1) + ' ' + cntWord(p) : num(q, 2) + ' l'; }   // Getränke: in Flaschen oder Fässern, kleine Mengen in Litern
+  const d = p && p.unit==='Stk' ? 0 : (Math.abs(q) < 10 ? 2 : 1); return num(q, d)+' '+unitOf(p); }
 function stockProducts(){ return S.products.filter(p => !p.noStock); }
 function stockValue(){ return stockProducts().reduce((s,p)=>s + Math.max(0,+p.stock||0)*(+p.price||0), 0); }
 function lowStock(){ return stockProducts().filter(p => (+p.minStock||0) > 0 && (+p.stock||0) < +p.minStock); }
@@ -119,7 +123,7 @@ function addMove(type, pid, delta, note='', price=null, date=null){
 function explode(c, f, acc=new Map(), d=0){
   if(!c || d > 6) return acc;
   for(const it of c.items){ const r = refObj(it.ref); if(!r) continue; const q = (+it.qty||0)*f;
-    if(r.t==='p'){ if(r.o.noStock) continue; acc.set(r.o.id, (acc.get(r.o.id)||0) + (r.o.unit==='Stk' ? q : q/1000)); }
+    if(r.t==='p'){ if(r.o.noStock) continue; acc.set(r.o.id, (acc.get(r.o.id)||0) + (r.o.unit==='Stk' ? q : q/1000) / (1 - pourLossOf(r.o)/100)); }
     else { const y = +r.o.yieldG || totals(r.o).out; if(y) explode(r.o, q/y, acc, d+1); } }
   return acc;
 }
@@ -226,7 +230,31 @@ function prodHtml(c, n){
   return `<ul class="plist">${rows}</ul><div class="kv"><span>Wareneinsatz gesamt</span><span>${eur(t.cost*f)}</span></div>`;
 }
 
+function cardStepsPanel(c){
+  const steps = c.steps || [];
+  const stepsHtml = steps.map((s,i)=>`<li class="step">
+      <span class="step-no">${i+1}</span>
+      <div class="step-body"><textarea id="st-${i}" data-step="${i}" rows="2" aria-label="Zubereitung Schritt ${i+1}" placeholder="Was passiert in diesem Schritt?">${esc(s.t)}</textarea>
+        ${s.img && IMG[s.img] ? `<div class="step-ph"><img src="${IMG[s.img]}" alt="Schritt ${i+1}"><button type="button" class="ph-btn" data-act="stepPhoto" data-id="${i}" aria-label="Foto ändern">${ico('camera')}</button><button type="button" class="ph-btn del" data-act="stepPhotoDel" data-id="${i}" aria-label="Foto entfernen">${ico('x')}</button></div>`
+          : `<button type="button" class="btn sm ghost" data-act="stepPhoto" data-id="${i}">${ico('camera')}Foto</button>`}</div>
+      <div class="step-acts"><button type="button" class="icon-btn" data-act="stepMove" data-id="${i}:-1" ${i===0?'disabled':''} aria-label="Nach oben">${ico('up')}</button><button type="button" class="icon-btn" data-act="stepMove" data-id="${i}:1" ${i===steps.length-1?'disabled':''} aria-label="Nach unten">${ico('down')}</button><button type="button" class="icon-btn" data-act="stepDel" data-id="${i}" aria-label="Schritt löschen">${ico('trash')}</button></div>
+    </li>`).join('');
+  return `<section class="panel">
+        <div class="panel-h"><h2>Zubereitung</h2><span class="muted sm">${steps.length} Schritte</span></div>
+        <ol class="steps">${stepsHtml || '<li class="hint">Noch keine Schritte.</li>'}</ol>
+        <button type="button" class="btn" data-act="stepAdd">${ico('plus')}Schritt</button>
+      </section>`;
+}
+function cardAlgPanel(c){
+  return `<section class="panel">
+        <div class="panel-h"><h2>Allergene</h2><span class="muted sm">EU-VO 1169/2011</span></div>
+        ${(() => { const ai = algInfo({card:c.id}); const big = ai.letters.length ? `<div class="alg-big">${ai.letters.map(a=>`<span><b>${esc(a)}</b>${esc(ALG[a]||a)}</span>`).join('')}</div>` : '';
+          if(ai.state !== 'open') return big || '<p class="hint" style="margin-top:0">Keine Allergene. Alle Zutaten sind geprüft.</p>';
+          return big + `<p class="hint alg-inc" style="margin-top:${big ? '10px' : '0'}"><b>Allergene unvollständig.</b> ${ai.open.length ? `Bei ${plural(ai.open.length, 'Artikel', 'Artikeln')} fehlt die Angabe: ${ai.open.slice(0,6).map(p=>`<button type="button" class="link" data-act="pAlg" data-id="${p.id}">${esc(p.name)}</button>`).join(', ')}${ai.open.length > 6 ? ' …' : ''}.` : ''} ${esc(ai.gaps.map(g => g.charAt(0).toUpperCase() + g.slice(1) + '.').join(' '))}</p>`; })()}
+      </section>`;
+}
 function renderCard(c){
+  if(c.drink && c.type === 'dish') return renderDrinkCard(c);
   const t = totals(c);
   const per100 = c.yieldG ? t.cost / c.yieldG * 100 : 0;
   const menus = S.menu.filter(m => m.card === c.id);
@@ -249,14 +277,6 @@ function renderCard(c){
       <td class="r mono">${num(l.out,1)}</td>
       <td class="r mono">${eur(l.cost)}<span class="share" style="width:${(l.cost/sum*100).toFixed(1)}%"></span></td>
       <td><button type="button" class="icon-btn" data-act="delLine" data-id="${i}" title="Zeile entfernen" aria-label="Zeile entfernen">${ico('x')}</button></td></tr>`; }).join('');
-
-  const stepsHtml = steps.map((s,i)=>`<li class="step">
-      <span class="step-no">${i+1}</span>
-      <div class="step-body"><textarea id="st-${i}" data-step="${i}" rows="2" aria-label="Zubereitung Schritt ${i+1}" placeholder="Was passiert in diesem Schritt?">${esc(s.t)}</textarea>
-        ${s.img && IMG[s.img] ? `<div class="step-ph"><img src="${IMG[s.img]}" alt="Schritt ${i+1}"><button type="button" class="ph-btn" data-act="stepPhoto" data-id="${i}" aria-label="Foto ändern">${ico('camera')}</button><button type="button" class="ph-btn del" data-act="stepPhotoDel" data-id="${i}" aria-label="Foto entfernen">${ico('x')}</button></div>`
-          : `<button type="button" class="btn sm ghost" data-act="stepPhoto" data-id="${i}">${ico('camera')}Foto</button>`}</div>
-      <div class="step-acts"><button type="button" class="icon-btn" data-act="stepMove" data-id="${i}:-1" ${i===0?'disabled':''} aria-label="Nach oben">${ico('up')}</button><button type="button" class="icon-btn" data-act="stepMove" data-id="${i}:1" ${i===steps.length-1?'disabled':''} aria-label="Nach unten">${ico('down')}</button><button type="button" class="icon-btn" data-act="stepDel" data-id="${i}" aria-label="Schritt löschen">${ico('trash')}</button></div>
-    </li>`).join('');
 
   return `<button type="button" class="back" data-act="backCards">${ico('arrow')}Alle Rezepturen</button>
   <div class="hero">
@@ -281,7 +301,7 @@ function renderCard(c){
   <div class="grid2">
     <div class="col">
       <section class="panel"><div class="fields">
-        <label class="f">Typ<select id="cf-type" data-cf="type"><option value="dish" ${c.type==='dish'?'selected':''}>Gericht</option><option value="semi" ${c.type==='semi'?'selected':''}>Basisrezept</option></select></label>
+        <label class="f">Typ<select id="cf-type" data-cf="type"><option value="dish" ${c.type==='dish'?'selected':''}>Gericht</option><option value="semi" ${c.type==='semi'?'selected':''}>Basisrezept</option><option value="drink">Getränk</option></select></label>
         <label class="f">Kategorie<input id="cf-category" data-cf="category" list="cats" value="${esc(c.category)}"><datalist id="cats">${cats.map(x=>`<option value="${esc(x)}">`).join('')}</datalist></label>
         <label class="f">${c.type==='semi'?'Ausbeute Charge, g':'Portionsgewicht, g'}<input id="cf-yieldG" class="num-in" data-cf="yieldG" type="text" inputmode="decimal" data-msg="Ungültiges Gewicht, nicht geändert" value="${numIn(c.yieldG)}" placeholder="${num(t.out)}"></label>
       </div></section>
@@ -294,11 +314,7 @@ function renderCard(c){
         </table></div>
         <div class="panel-f"><button type="button" class="btn" data-act="addLine">${ico('plus')}Zutat</button><button type="button" class="btn" data-act="recPaste" data-id="${c.id}">Rezeptur einfügen</button><span class="hint">Netto ergibt sich aus dem Putzverlust. Eigenen Wert einfach überschreiben.</span></div>
       </section>
-      <section class="panel">
-        <div class="panel-h"><h2>Zubereitung</h2><span class="muted sm">${steps.length} Schritte</span></div>
-        <ol class="steps">${stepsHtml || '<li class="hint">Noch keine Schritte.</li>'}</ol>
-        <button type="button" class="btn" data-act="stepAdd">${ico('plus')}Schritt</button>
-      </section>
+      ${cardStepsPanel(c)}
     </div>
     <div class="col">
       ${c.type==='dish' ? `<section class="panel accent">
@@ -318,12 +334,7 @@ function renderCard(c){
         <div class="panel-h"><h2>Produktionsmenge</h2>${c.type==='dish'?`<label class="portions"><input id="portions" type="number" min="1" step="1" value="${view.portions}" aria-label="Portionen"> Portionen</label>`:'<span class="muted sm">1 Charge</span>'}</div>
         <div id="prodOut">${prodHtml(c, view.portions)}</div>
       </section>
-      <section class="panel">
-        <div class="panel-h"><h2>Allergene</h2><span class="muted sm">EU-VO 1169/2011</span></div>
-        ${(() => { const ai = algInfo({card:c.id}); const big = ai.letters.length ? `<div class="alg-big">${ai.letters.map(a=>`<span><b>${esc(a)}</b>${esc(ALG[a]||a)}</span>`).join('')}</div>` : '';
-          if(ai.state !== 'open') return big || '<p class="hint" style="margin-top:0">Keine Allergene. Alle Zutaten sind geprüft.</p>';
-          return big + `<p class="hint alg-inc" style="margin-top:${big ? '10px' : '0'}"><b>Allergene unvollständig.</b> ${ai.open.length ? `Bei ${plural(ai.open.length, 'Artikel', 'Artikeln')} fehlt die Angabe: ${ai.open.slice(0,6).map(p=>`<button type="button" class="link" data-act="pAlg" data-id="${p.id}">${esc(p.name)}</button>`).join(', ')}${ai.open.length > 6 ? ' …' : ''}.` : ''} ${esc(ai.gaps.map(g => g.charAt(0).toUpperCase() + g.slice(1) + '.').join(' '))}</p>`; })()}
-      </section>
+      ${cardAlgPanel(c)}
       ${c.type==='semi' ? `<section class="panel"><div class="panel-h"><h2>Verwendet in</h2></div>
         ${usedIn.length ? `<ul class="todo">${usedIn.map(u=>`<li><button type="button" data-act="openCard" data-id="${u.id}"><span>${esc(u.name)}</span>${ico('arrow','flip')}</button></li>`).join('')}</ul>` : '<p class="hint">Noch in keiner Rezeptur verwendet.</p>'}
       </section>` : ''}
@@ -398,7 +409,7 @@ function moveList(){
 function invView(){
   const d = S.invDraft;
   if(!d){
-    return `<p class="fact">Die Zählliste ist nach Lagerorten sortiert: einmal durch Kühlhaus, Tiefkühler und Lager gehen. Nicht gezählte Artikel bleiben unverändert.</p>
+    return `<p class="fact">Die Zählliste ist nach Lagerorten sortiert: einmal durch Kühlhaus, Tiefkühler und Lager gehen. Nicht gezählte Artikel bleiben unverändert.${stockProducts().some(isDrink) ? ' Getränke zählen Sie in vollen Flaschen oder Fässern, die angebrochene dazu in Zehnteln.' : ''}</p>
       <h2 class="sec-h">Bisherige Inventuren</h2>
       ${S.inventories.length ? `<ul class="rows inv-old">${S.inventories.map(i=>`<li class="rw"><span class="rw-lead mono">${fmtDate(i.date)}</span><span class="rw-main"><b>${i.counted} Artikel gezählt</b>${i.demo?'<small>Beispiel</small>':''}</span><span class="rw-meta mono">${eur(i.value)}</span><span class="rw-act mono ${i.diff<0?'bad-t':'good-t'}">${signedEur(i.diff)}</span></li>`).join('')}</ul>` : '<p class="hint">Noch keine abgeschlossene Inventur.</p>'}`;
   }
@@ -411,10 +422,11 @@ function invView(){
   for(const [k,l] of Object.entries(LOCS).concat([['','Ohne Lagerort']])){
     const list = items.filter(p => (LOCS[p.loc] ? p.loc : '') === k); if(!list.length) continue;
     h += `<h2 class="sec-h">${esc(l)}<small class="muted sm">${list.length} Artikel</small></h2><ul class="inv-l">
-      ${list.map(p=>{ const c = d.counts[p.id]; const has = c!==undefined && c!==''; const df = has ? c-(+p.stock||0) : 0; const cls = df<0?'bad-t':df>0?'good-t':''; return `<li id="ir-${p.id}" class="${has?'counted':''}">
-        <span class="qty inv-q"><input id="inv-${p.id}" class="num-in" type="text" inputmode="decimal" data-num="de" data-msg="Ungültige Zählmenge, nicht übernommen" data-inv="${p.id}" data-old="${has?numIn(c):''}" value="${has?numIn(c):''}" placeholder="—" aria-label="Gezählt ${esc(p.name)}"><em>${esc(p.unit)}</em></span>
+      ${list.map(p=>{ const c = d.counts[p.id]; const has = c!==undefined && c!==''; const df = has ? c-(+p.stock||0) : 0; const cls = df<0?'bad-t':df>0?'good-t':''; const bar = isDrink(p), b = bar ? barCount(p.id) : null; return `<li id="ir-${p.id}" class="${has?'counted':''}${bar?' bar':''}">
+        <span class="qty inv-q">${bar ? `<input id="inv-${p.id}" class="num-in" type="text" inputmode="decimal" data-num="self" data-invf="${p.id}" value="${b.f === '' ? '' : numIn(b.f)}" placeholder="—" aria-label="Volle ${p.geb === 'fass' ? 'Fässer' : 'Flaschen'} ${esc(p.name)}"><em>${cntWord(p)}</em>`
+          : `<input id="inv-${p.id}" class="num-in" type="text" inputmode="decimal" data-num="de" data-msg="Ungültige Zählmenge, nicht übernommen" data-inv="${p.id}" data-old="${has?numIn(c):''}" value="${has?numIn(c):''}" placeholder="—" aria-label="Gezählt ${esc(p.name)}"><em>${esc(p.unit)}</em>`}</span>
         <span class="inv-n"><b class="pn">${esc(p.name)}</b><small class="muted">Soll ${qtyFmt(+p.stock||0,p)}</small></span>
-        <span class="inv-d"><span class="mono idf ${cls}">${has?(df>0?'+':'')+qtyFmt(df,p):''}</span><span class="mono idv ${cls}">${has?eur(df*(+p.price||0)):''}</span></span></li>`; }).join('')}
+        <span class="inv-d"><span class="mono idf ${cls}">${has?(df>0?'+':'')+qtyFmt(df,p):''}</span><span class="mono idv ${cls}">${has?eur(df*(+p.price||0)):''}</span></span>${bar ? barTenths(p, b) : ''}</li>`; }).join('')}
       </ul>`;
   }
   return h;
@@ -487,6 +499,7 @@ function menuDialog(m, prefill){
     <div class="fields">
       <label class="f">Kategorie<select name="section" required>${secList().map(s=>`<option ${m.section===s?'selected':''}>${esc(s)}</option>`).join('')}</select></label>
       <label class="f">Preis inkl. MwSt., €<input name="price" class="num-in" type="text" inputmode="decimal" required value="${m.price===''?'':num2(m.price)}"></label>
+      <label class="f" id="mdVol" hidden>Ausschankmenge<span class="dk-q"><input name="vol" class="num-in" type="text" inputmode="decimal" value="${+m.vol > 0 ? volIn(+m.vol, volUnitFor(m.vol)) : ''}" autocomplete="off">${volSel('name="volU"', +m.vol > 0 ? volUnitFor(m.vol) : 'l')}</span></label>
       <label class="f">Steuersatz<select name="vat"><option value="">wie die Kategorie</option><option value="s" ${m.vat==='s'?'selected':''}>Speisen · ${num(+S.settings.vat||0,1)} %</option><option value="g" ${m.vat==='g'?'selected':''}>Getränke · ${num(+vatRate({vat:'g'})||0,1)} %</option></select></label>
     </div>
     <label class="f">Rezeptur<select name="card"><option value="">— nicht verknüpft —</option>${opts.map(c=>`<option value="${c.id}" ${m.card===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label>
@@ -502,40 +515,83 @@ function menuDialog(m, prefill){
       <label class="tog"><input type="checkbox" name="show" ${m.hidden?'':'checked'}><span></span>Auf der Gästekarte zeigen</label></div>`,
     fd => { const ar = algControlRead(fd); if(!ar){ const dt = $('#dlgForm .alg-det'); if(dt) dt.open = true; return false; }
       const sec = fd.get('section'); if(isNew || sec !== m.section) m.order = nextOrder(sec);
+      const oldTag = menuVol(m) ? volTxt(menuVol(m)) : ''; const dc = fd.get('card') ? C(fd.get('card')) : null;
+      if(fd.get('vol') != null) m.vol = +fd.get('vol') > 0 ? Math.round(+fd.get('vol') * VOL_U[fd.get('volU')] * 1000) / 1000 : '';
       if(m.img && m.img !== img) imgDel(m.img);
       if(ar.alg !== algClean(m.alg).join(' ') || ar.algNone !== !!m.algNone){ if(ar.alg || ar.algNone){ m.algAt = todayStr(); m.algBy = me().name; } else { m.algAt = ''; m.algBy = ''; } }
-      Object.assign(m, {section:sec, name:fd.get('name').trim(), desc:fd.get('desc').trim(), price:+fd.get('price'), card:fd.get('card'), img, veg:fd.get('veg')||'', top:!!fd.get('top'), hidden:!fd.get('show'), seasons: fd.getAll('sea').length===4 ? [] : fd.getAll('sea'), days: fd.getAll('day').length===7 ? [] : fd.getAll('day').map(Number), alg: ar.alg, algNone: ar.algNone, vat: fd.get('vat') || ''}); if(isNew) S.menu.push(m); },
+      Object.assign(m, {section:sec, name:fd.get('name').trim(), desc:fd.get('desc').trim(), price:+fd.get('price'), card:fd.get('card'), img, veg:fd.get('veg')||'', top:!!fd.get('top'), hidden:!fd.get('show'), seasons: fd.getAll('sea').length===4 ? [] : fd.getAll('sea'), days: fd.getAll('day').length===7 ? [] : fd.getAll('day').map(Number), alg: ar.alg, algNone: ar.algNone, vat: fd.get('vat') || (dc && dc.drink && vatClass({section:sec}) !== 'g' ? 'g' : '')}); if(isNew) S.menu.push(m); drinkAfterSave(m, isNew, oldTag); },
     {done: isNew ? ()=>`„${m.name}“ steht jetzt unter ${m.section}` : 'Gespeichert',
      del: isNew ? null : () => ask(`„${m.name}“ von der Speisekarte löschen? Die Rezeptur bleibt erhalten.`, () => { imgDel(m.img); S.menu = S.menu.filter(x=>x!==m); }),
-     after: f => { const bind = () => { $('#dlgPhoto').onclick = () => pickImage(data => { const id = uid('img'); imgPut(id, data); img = id; $('#dlgThumb').innerHTML = thumb(); }); const del = $('#dlgPhotoDel'); if(del) del.onclick = () => { img = ''; $('#dlgThumb').innerHTML = thumb(); }; }; bind(); algControlBind(f); }});
+     after: f => { const bind = () => { $('#dlgPhoto').onclick = () => pickImage(data => { const id = uid('img'); imgPut(id, data); img = id; $('#dlgThumb').innerHTML = thumb(); }); const del = $('#dlgPhotoDel'); if(del) del.onclick = () => { img = ''; $('#dlgThumb').innerHTML = thumb(); }; }; bind(); algControlBind(f);
+       /* Getränk: Menge je Glas. Leer heißt: wie in der Schankrezeptur. */
+       const volSync = () => { const c = f.elements.card.value ? C(f.elements.card.value) : null; const on = !!(c && c.drink) || vatClass({section:f.elements.section.value, vat:f.elements.vat.value}) === 'g'; const box = f.querySelector('#mdVol'); box.hidden = !on; box.querySelectorAll('input,select').forEach(i => { i.disabled = !on; }); f.elements.vol.placeholder = c && c.drink && +c.yieldG > 0 ? 'wie Rezeptur: ' + volTxt(+c.yieldG) : 'z. B. 0,5'; };
+       ['card', 'section', 'vat'].forEach(k => f.elements[k].addEventListener('change', volSync)); volSync(); }});
 }
 
-function prodDialog(p){
+function prodDialog(p, pre){
   const isNew = !p; p = p || {id:uid('p'), name:'', unit:'kg', price:'', lossCold:0, lossHot:0, alg:'', algNone:false, pieceG:'', stock:0, minStock:0, loc:'L', supplier:''};
-  const sups = [...new Set(S.products.map(x=>x.supplier).filter(Boolean))];
+  const dr = isDrink(p) || !!(isNew && pre && pre.drink); const L0 = dr && +p.gebL > 0 ? +p.gebL : 0;
+  const r2 = v => Math.round(v*100)/100;
   openDialog(isNew ? 'Neuer Artikel' : 'Artikel bearbeiten', `
     <label class="f">Bezeichnung<input name="name" required value="${esc(p.name)}"></label>
-    <div class="fields">
+    <div class="togs kind"><label class="tog"><input type="radio" name="kind" value="" ${dr?'':'checked'}><span></span>Lebensmittel</label><label class="tog"><input type="radio" name="kind" value="g" ${dr?'checked':''}><span></span>Getränk</label></div>
+    <div class="fields" data-k="food">
       <label class="f">Einheit<select name="unit">${['kg','l','Stk'].map(u=>`<option ${p.unit===u?'selected':''}>${u}</option>`).join('')}</select></label>
       <label class="f">Preis je Einheit, €<input name="price" class="num-in" type="text" inputmode="decimal" required value="${numIn(p.price)}"></label>
       <label class="f">Gewicht 1 Stk, g<input name="pieceG" class="num-in" type="text" inputmode="decimal" value="${numIn(p.pieceG)}"></label>
       <label class="f">Putzverlust, %<input name="lossCold" class="num-in" type="text" inputmode="decimal" data-max="100" value="${numIn(p.lossCold)}"></label>
       <label class="f">Garverlust, %<input name="lossHot" class="num-in" type="text" inputmode="decimal" data-max="100" value="${numIn(p.lossHot)}"></label>
     </div>
+    <div class="fields" data-k="drink">
+      <label class="f">Gebinde<select name="geb">${Object.entries(GEB).map(([k,l])=>`<option value="${k}" ${(p.geb||'fl')===k?'selected':''}>${l}</option>`).join('')}</select></label>
+      <label class="f"><span data-gl="L">Inhalt je Flasche, l</span><input name="gebL" class="num-in" type="text" inputmode="decimal" value="${L0 ? numIn(L0) : ''}" placeholder="z. B. 0,75"></label>
+      <label class="f" data-only="kiste">Flaschen je Kiste<input name="gebN" class="num-in" type="text" inputmode="numeric" value="${dr && p.geb==='kiste' ? numIn(p.gebN) : ''}" placeholder="z. B. 20"></label>
+      <label class="f"><span data-gl="P">Preis je Flasche, €</span><input name="gprice" class="num-in" type="text" inputmode="decimal" value="${dr && +p.price > 0 ? num2(gebPrice(p)) : ''}" placeholder="netto, wie auf der Rechnung"></label>
+      <label class="f"><span data-gl="F">Pfand je Flasche, €</span><input name="pfand" class="num-in" type="text" inputmode="decimal" value="${dr && +p.pfand > 0 ? num2(p.pfand) : ''}" placeholder="ohne Pfand: leer"></label>
+      <label class="f">Schankverlust, %<input name="pourLoss" class="num-in" type="text" inputmode="decimal" data-max="99" data-msg="Schankverlust: bitte 0 bis 99 % eintragen." value="${dr && +p.pourLoss > 0 ? numIn(p.pourLoss) : ''}" placeholder="z. B. 5 bei Fassbier"></label>
+      <p class="hint geb-out" id="gebOut"></p>
+    </div>
     <div class="fields">
-      <label class="f">Lagerort<select name="loc">${Object.entries(LOCS).map(([k,l])=>`<option value="${k}" ${p.loc===k?'selected':''}>${l}</option>`).join('')}</select></label>
+      <label class="f">Lagerort<select name="loc">${Object.entries(LOCS).map(([k,l])=>`<option value="${k}" ${(isNew && dr ? 'W' : p.loc)===k?'selected':''}>${l}</option>`).join('')}</select></label>
       <label class="f">Lieferant<select name="supplier"><option value="">— keiner —</option>${(S.suppliers||[]).map(s=>`<option value="${s.id}" ${p.supplier===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select></label>
       <label class="f">Artikelnummer beim Lieferanten<input name="artNo" value="${esc(p.artNo||'')}"></label>
-      <label class="f">Gebinde<input name="pack" value="${esc(p.pack||'')}" placeholder="z. B. Sack 10 kg"></label>
-      <label class="f">Inhalt Gebinde in ${esc(p.unit)}<input name="packQty" class="num-in" type="text" inputmode="decimal" value="${numIn(p.packQty||'')}"></label>
-      <label class="f">Mindestbestand<input name="minStock" class="num-in" type="text" inputmode="decimal" value="${numIn(p.minStock)}"></label>
-      ${isNew?`<label class="f">Anfangsbestand<input name="stock" class="num-in" type="text" inputmode="decimal" value="0"></label>`:''}
+      <label class="f" data-k="food">Gebinde<input name="pack" value="${esc(dr ? '' : p.pack||'')}" placeholder="z. B. Sack 10 kg"></label>
+      <label class="f" data-k="food">Inhalt Gebinde in ${esc(p.unit)}<input name="packQty" class="num-in" type="text" inputmode="decimal" value="${dr ? '' : numIn(p.packQty||'')}"></label>
+      <label class="f"><span data-gl="M">Mindestbestand</span><input name="minStock" class="num-in" type="text" inputmode="decimal" value="${numIn(L0 ? r2((+p.minStock||0)/L0) : p.minStock)}"></label>
+      ${isNew?`<label class="f"><span data-gl="A">Anfangsbestand</span><input name="stock" class="num-in" type="text" inputmode="decimal" value="0"></label>`:''}
     </div>
     ${algControlHtml(algClean(p.alg), prodAlgState(p), {note:'„Keine Allergene“ ist eine bestätigte Angabe. „Noch nicht geprüft“ bleibt auf der Karte sichtbar offen.'})}
-    <div class="togs"><label class="tog"><input type="checkbox" name="basic" ${p.basic===true?'checked':''}><span></span>Grundzutat wie Salz, Gewürze, Öl: steht nicht auf der Prep-Liste</label></div>`,
-    fd => { const ar = algControlRead(fd); if(!ar) return false; if(+fd.get('price') !== +p.price) markPrice(p, 'manuell'); Object.assign(p, {name:fd.get('name').trim(), unit:fd.get('unit'), price:+fd.get('price'), pieceG:fd.get('pieceG'), lossCold:+fd.get('lossCold')||0, lossHot:+fd.get('lossHot')||0, alg:ar.alg, algNone:ar.algNone, basic: fd.get('basic') ? true : (p.basic === true ? false : p.basic), loc:fd.get('loc'), supplier:fd.get('supplier'), artNo:fd.get('artNo').trim(), pack:fd.get('pack').trim(), packQty:+fd.get('packQty')||0, minStock:+fd.get('minStock')||0});
+    <div class="togs" data-k="food"><label class="tog"><input type="checkbox" name="basic" ${p.basic===true?'checked':''}><span></span>Grundzutat wie Salz, Gewürze, Öl: steht nicht auf der Prep-Liste</label></div>`,
+    fd => { const ar = algControlRead(fd); if(!ar) return false;
+      const common = {name:fd.get('name').trim(), alg:ar.alg, algNone:ar.algNone, loc:fd.get('loc'), supplier:fd.get('supplier'), artNo:fd.get('artNo').trim()};
+      if(fd.get('kind') === 'g'){
+        const geb = GEB[fd.get('geb')] ? fd.get('geb') : 'fl', L = +fd.get('gebL'), N = geb === 'kiste' ? Math.round(+fd.get('gebN')) : 1, gp = +fd.get('gprice') || 0;
+        if(!(L > 0)) return dlgErr('gebL', 'Bitte den Inhalt in Litern eintragen, zum Beispiel 0,75.');
+        if(geb === 'kiste' && !(N >= 1)) return dlgErr('gebN', 'Bitte eintragen, wie viele Flaschen in der Kiste sind.');
+        if(!isNew && p.unit !== 'l' && usage('p:'+p.id).length) return dlgErr('gebL', `Dieser Artikel steckt in ${plural(usage('p:'+p.id).length, 'Rezeptur', 'Rezepturen')} und wird dort in ${p.unit === 'Stk' ? 'Stück' : 'Gramm'} gerechnet. Bitte für das Getränk einen neuen Artikel anlegen.`);
+        const pq = Math.round(L*N*10000)/10000, price = Math.round(gp/pq*10000)/10000;
+        if(Math.abs(price - (+p.price||0)) > 0.00006 || isNew) markPrice(p, 'manuell');
+        Object.assign(p, common, {unit:'l', price, pieceG:'', lossCold:0, lossHot:0, geb, gebL:L, gebN:N, pack:gebLabel(geb, L, N), packQty:pq, pfand:Math.round((+fd.get('pfand')||0)*100)/100, pourLoss:+fd.get('pourLoss')||0, minStock:Math.round((+fd.get('minStock')||0)*L*1000)/1000});
+        if(isNew){ p.stock = 0; S.products.push(p); const s = (+fd.get('stock')||0)*L; if(s) addMove('in', p.id, Math.round(s*1000)/1000, 'Anfangsbestand'); }
+        return;
+      }
+      if(+fd.get('price') !== +p.price) markPrice(p, 'manuell');
+      Object.assign(p, common, {unit:fd.get('unit'), price:+fd.get('price'), pieceG:fd.get('pieceG'), lossCold:+fd.get('lossCold')||0, lossHot:+fd.get('lossHot')||0, basic: fd.get('basic') ? true : (p.basic === true ? false : p.basic), pack:fd.get('pack').trim(), packQty:+fd.get('packQty')||0, minStock:+fd.get('minStock')||0});
+      ['geb','gebL','gebN','pfand','pourLoss'].forEach(k => { delete p[k]; });
       if(isNew){ p.stock = 0; S.products.push(p); const s = +fd.get('stock')||0; if(s) addMove('in', p.id, s, 'Anfangsbestand'); } },
-    {del: isNew ? null : () => { const u = usage('p:'+p.id); if(u.length) return info('Artikel wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(c=>c.name).join(', ')}. Entfernen Sie es dort zuerst.`); ask(`Artikel „${p.name}“ löschen?`, () => { S.products = S.products.filter(x=>x!==p); }); }, after: f => algControlBind(f)});
+    {del: isNew ? null : () => { const u = usage('p:'+p.id); if(u.length) return info('Artikel wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(c=>c.name).join(', ')}. Entfernen Sie es dort zuerst.`); ask(`Artikel „${p.name}“ löschen?`, () => { S.products = S.products.filter(x=>x!==p); }); },
+     after: f => { algControlBind(f);
+      const sync = () => { const g = f.elements.kind.value === 'g'; f.dataset.kind = g ? 'drink' : 'food';
+        f.querySelectorAll('[data-k]').forEach(b => { const on = (b.dataset.k === 'drink') === g; b.hidden = !on; b.querySelectorAll('input,select').forEach(i => { i.disabled = !on; }); });
+        const geb = f.elements.geb.value, one = GEB[geb] || 'Flasche', kiste = geb === 'kiste';
+        const ko = f.querySelector('[data-only="kiste"]'); ko.hidden = !g || !kiste; ko.querySelector('input').disabled = !g || !kiste;
+        const cu = geb === 'fass' ? 'Fässer' : 'Flaschen';
+        const t = {L: geb === 'fass' ? 'Inhalt Fass, l' : 'Inhalt je Flasche, l', P:`Preis je ${one}, €`, F:`Pfand je ${one}, €`, M: g ? `Mindestbestand, ${cu}` : 'Mindestbestand', A: g ? `Anfangsbestand, ${cu}` : 'Anfangsbestand'};
+        f.querySelectorAll('[data-gl]').forEach(n => { n.textContent = t[n.dataset.gl]; });
+        const L = numParse(f.elements.gebL.value), N = kiste ? numParse(f.elements.gebN.value) : 1, gp = numParse(f.elements.gprice.value);
+        f.querySelector('#gebOut').textContent = g && L > 0 && N >= 1 && gp > 0 ? `${gebLabel(geb, L, Math.round(N))} · ${eur(gp/(L*N))} je Liter. Pfand zählt nicht zum Wareneinsatz.` : '';
+      };
+      f.oninput = e => { if(e.target.name === 'kind' && e.target.value === 'g' && isNew) f.elements.loc.value = 'W'; if(e.target.name === 'kind' || e.target.closest('[data-k="drink"]')) sync(); }; sync(); }});
 }
 
 function moveDlg(arg){
@@ -543,32 +599,33 @@ function moveDlg(arg){
   const prods = stockProducts().sort(byName);
   const title = {in:'Wareneingang buchen', out:'Entnahme buchen', waste:'Schwund buchen'}[type];
   const p0 = pid ? P(pid) : null;
+  const mu = p => mvUnit(p, type); const lbl = p => mu(p).lbl; const plbl = p => `Preis je ${p && isDrink(p) ? mu(p).word : 'Einheit'}, €`;
   openDialog(title, `
     <label class="f">Artikel<select name="pid" id="mvPid" required>${p0?'':'<option value="">— wählen —</option>'}${prods.map(p=>`<option value="${p.id}" ${p0&&p0.id===p.id?'selected':''}>${esc(p.name)} · ${qtyFmt(+p.stock||0,p)}</option>`).join('')}</select></label>
     <div class="fields">
-      <label class="f">Menge in <span id="mvUnit">${p0?esc(p0.unit):'Einheit'}</span><input name="qty" class="num-in" type="text" inputmode="decimal" required autocomplete="off" autofocus></label>
-      ${type==='in' && canEditAll()?`<label class="f">Preis je Einheit, €<input name="price" id="mvPrice" class="num-in" type="text" inputmode="decimal" autocomplete="off" value="${p0?num2(p0.price):''}"></label>`:''}
+      <label class="f"><span id="mvUnit">${esc(lbl(p0))}</span><input name="qty" class="num-in" type="text" inputmode="decimal" required autocomplete="off" autofocus></label>
+      ${type==='in' && canEditAll()?`<label class="f"><span id="mvPLbl">${esc(plbl(p0))}</span><input name="price" id="mvPrice" class="num-in" type="text" inputmode="decimal" autocomplete="off" value="${p0?num2(p0.price*mu(p0).f):''}"></label>`:''}
       <label class="f">Datum<input name="date" type="date" max="${addDays(todayStr(),1)}" value="${todayStr()}"></label>
     </div>
     ${type==='waste'?`<label class="f">Grund<select name="note">${WASTE.map(w=>`<option>${w}</option>`).join('')}</select></label>`:`<label class="f">${type==='in'?'Lieferschein / Notiz':'Notiz'}<input name="note" placeholder="${type==='in'?'z. B. Lieferschein 2240':'z. B. für Mise en place'}"></label>`}
     ${type==='in' && canEditAll()?`<div class="togs"><label class="tog"><input type="checkbox" name="upd" checked><span></span>Preis in die Kalkulation übernehmen (gleitender Durchschnitt)</label></div>`:''}
     <div id="mvWarn"></div>`,
-    (fd, f) => { const p = P(fd.get('pid')); const q = +fd.get('qty'); if(!p) return false;
+    (fd, f) => { const p = P(fd.get('pid')); if(!p) return false; const u = mu(p); const n = +fd.get('qty'); const q = Math.round(n*u.f*1000)/1000;
       if(!(q > 0)) return dlgErr('qty', 'Bitte eine Menge größer als 0 eingeben.');
       if(dateTooFar(fd.get('date'))) return dlgErr('date', 'Das Datum liegt in der Zukunft. Buchungen sind höchstens für morgen möglich.');
-      const date = fd.get('date') ? new Date(fd.get('date')+'T12:00:00').toISOString() : null;
-      if(type==='in'){ const old = p.price; const pr = fd.get('price')==='' || fd.get('price') == null ? p.price : +fd.get('price'); if(fd.get('upd') && pr !== p.price){ const s0 = Math.max(0, +p.stock||0); p.price = Math.round((s0*p.price + q*pr)/(s0+q)*100)/100; } addMove('in', p.id, q, fd.get('note'), pr, date); if(old !== p.price) S.moves[0].prevPrice = old; }
+      const date = fd.get('date') ? new Date(fd.get('date')+'T12:00:00').toISOString() : null; let pfTxt = '';
+      if(type==='in'){ const old = p.price; const pr = fd.get('price')==='' || fd.get('price') == null ? p.price : +fd.get('price')/u.f; if(fd.get('upd') && Math.abs(pr - p.price) > 1e-9){ const s0 = Math.max(0, +p.stock||0); p.price = prRound(p, (s0*p.price + q*pr)/(s0+q)); } addMove('in', p.id, q, fd.get('note'), pr, date); if(old !== p.price) S.moves[0].prevPrice = old;
+        const pf = isDrink(p) && p.supplier ? Math.round(n*(+p.pfand||0)*100)/100 : 0; if(pf > 0){ S.moves[0].lg = lgAdd(p.supplier, pf, `${p.name}: ${num(n,2)} × ${u.word}`, date).id; pfTxt = ` · Pfand ${eur(pf)} beim Leergut vermerkt`; } }
       else { const st = +p.stock||0; const key = p.id+':'+q;
         if(q > st + 1e-9 && f.dataset.force !== key){
           $('#mvWarn').innerHTML = `<div class="warn-box dlg-warn" role="alert">${ico('spark')}<span><b>Mehr als der Bestand.</b> Im Lager sind ${esc(qtyFmt(st,p))}, gebucht würden ${esc(qtyFmt(q,p))}. Der Bestand ginge auf ${esc(qtyFmt(st-q,p))}. Bitte Menge prüfen oder zuerst den Wareneingang buchen.</span><button type="button" class="btn sm" id="mvForce">Trotzdem buchen</button></div>`;
           $('#mvForce').onclick = () => { f.dataset.force = key; f.requestSubmit(); };
           return false; }
         addMove(type, p.id, -q, fd.get('note'), null, date); }
-      moveDlg.last = `${MOVE[type]}: ${p.name} ${type==='in'?'+':'−'}${qtyFmt(q,p)}` + (type==='in' ? ` · Ø-Preis ${eur(p.price)}` : (+p.stock||0) < 0 ? ` · Bestand jetzt ${qtyFmt(+p.stock||0,p)}` : ''); },
-    {ok:'Buchen', done:()=>moveDlg.last, after: f => { const s = f.querySelector('#mvPid'); const clr = () => { $('#mvWarn').innerHTML = ''; delete f.dataset.force; }; s.onchange = () => { const p = P(s.value); f.querySelector('#mvUnit').textContent = p ? p.unit : 'Einheit'; const pr = f.querySelector('#mvPrice'); if(pr && p) pr.value = num2(p.price); clr(); }; f.elements.qty.addEventListener('input', clr); }});
+      moveDlg.last = `${MOVE[type]}: ${p.name} ${type==='in'?'+':'−'}${qtyFmt(q,p)}` + (type==='in' ? ` · Ø-Preis ${eur(p.price*priceUnit(p).f)}${isDrink(p) ? ' je ' + priceUnit(p).word : ''}${pfTxt}` : (+p.stock||0) < 0 ? ` · Bestand jetzt ${qtyFmt(+p.stock||0,p)}` : ''); },
+    {ok:'Buchen', done:()=>moveDlg.last, after: f => { const s = f.querySelector('#mvPid'); const clr = () => { $('#mvWarn').innerHTML = ''; delete f.dataset.force; }; s.onchange = () => { const p = P(s.value); f.querySelector('#mvUnit').textContent = lbl(p); const pl = f.querySelector('#mvPLbl'); if(pl) pl.textContent = plbl(p); const pr = f.querySelector('#mvPrice'); if(pr && p) pr.value = num2(p.price*mu(p).f); clr(); }; f.elements.qty.addEventListener('input', clr); }});
 }
 
-/* Verkaufsbuchung: eine Buchung = eine Einheit (S.saleGroups[grp]), Storno macht alles rückgängig */
 const DEMO_SALES_OPT = ['Beispielverkäufe löschen (empfohlen)', 'Beispielverkäufe behalten'];
 function demoSalesDays(){ const real = S.salesReal || {}; return Object.keys(S.salesDays||{}).filter(d => !real[d]); }
 function demoSalesText(n){ return `Es sind noch ${plural(n,'Tag','Tage')} mit erfundenen Beispielverkäufen gespeichert. Echte und erfundene Zahlen sollten nicht gemischt werden.`; }
@@ -587,7 +644,7 @@ function salesDlg(){
     (fd, f) => { const acc = new Map(); let n = 0; const dk = fd.get('date') || todayStr();
       if(dateTooFar(dk)) return dlgErr('date', 'Das Datum liegt in der Zukunft. Buchungen sind höchstens für morgen möglich.');
       const date = new Date(dk+'T20:00:00').toISOString(); const sold = [];
-      items.forEach(m => { const q = Math.max(0, Math.floor(+fd.get('s_'+m.id)||0)); if(q>0){ n += q; explode(C(m.card), q, acc); sold.push([m, q]); } });
+      items.forEach(m => { const q = Math.max(0, Math.floor(+fd.get('s_'+m.id)||0)); if(q>0){ n += q; explode(C(m.card), q*menuFactor(m), acc); sold.push([m, q]); } });
       if(!n){ $('#salesWarn').innerHTML = `<p class="f-err" role="alert">Noch keine Portionen eingetragen. Bitte bei mindestens einem Gericht die Menge erhöhen.</p>`; return false; }
       const short = [...acc.entries()].map(([pid,q]) => ({p:P(pid), q:Math.round(q*1000)/1000})).filter(x => x.p && x.q > (+x.p.stock||0) + 1e-9);
       const key = dk+'|'+sold.map(([m,q])=>m.id+':'+q).join(',');
@@ -609,7 +666,7 @@ function salesDlg(){
     }});
 }
 /* Storno: Einzelbuchung oder ganze Verkaufsbuchung */
-function undoMove(m){ const p = P(m.pid); if(p) p.stock = Math.round(((+p.stock||0) - m.qty)*1000)/1000; if(p && m.prevPrice != null) p.price = m.prevPrice; S.moves = S.moves.filter(x=>x!==m); }
+function undoMove(m){ const p = P(m.pid); if(m.lg) lgRemove(m.lg); if(p) p.stock = Math.round(((+p.stock||0) - m.qty)*1000)/1000; if(p && m.prevPrice != null) p.price = m.prevPrice; S.moves = S.moves.filter(x=>x!==m); }
 function undoSaleGroup(grp){
   const ms = S.moves.filter(m => m.grp === grp); ms.forEach(undoMove);
   const g = (S.saleGroups||{})[grp];
@@ -621,7 +678,9 @@ function undoSaleGroup(grp){
 }
 
 function newCard(type, fromMenu){
-  const c = {id:uid(type==='semi'?'semi':'dish'), no:S.settings.nextNo++, name: fromMenu ? fromMenu.name : (type==='semi'?'Neues Basisrezept':'Neues Gericht'), type, category: fromMenu ? fromMenu.section : (type==='semi'?'Basisrezepte':''), yieldG:'', img:'', steps:[{t:'',img:''}], items:[{ref:'',qty:'',net:''}]};
+  const drink = type === 'drink' || !!(fromMenu && type === 'dish' && vatClass(fromMenu) === 'g'); if(drink) type = 'dish';   // Schankrezeptur: rechnet wie ein Gericht, Eingabe in cl/ml/l
+  const c = {id:uid(type==='semi'?'semi':'dish'), no:S.settings.nextNo++, name: fromMenu ? fromMenu.name : (type==='semi'?'Neues Basisrezept':drink?'Neues Getränk':'Neues Gericht'), type, category: fromMenu ? fromMenu.section : (type==='semi'?'Basisrezepte':drink?drinkSection():''), yieldG: drink && fromMenu && +fromMenu.vol > 0 ? +fromMenu.vol : '', img:'', steps: drink ? [] : [{t:'',img:''}], items:[{ref:'',qty:'',net:''}]};
+  if(drink) c.drink = true;
   S.cards.push(c); if(fromMenu) fromMenu.card = c.id;
   go('cards', c.id); save(); toast('Rezeptur angelegt');
 }
@@ -631,8 +690,8 @@ function printCard(id){
   $('#print').innerHTML = `
     <div class="meta"><span>${esc(S.settings.name)}</span><span>Datum: ${new Date().toLocaleDateString('de-AT')}</span></div>
     <h1>Rezeptur Nr. ${c.no||''}</h1>
-    <div><b>${esc(c.name)}</b> · ${c.type==='semi'?'Basisrezept':'Gericht'} · ${esc(c.category||'')}</div>
-    <div>Ausbeute: ${num(c.yieldG||t.out)} g ${c.type==='semi'?'(Charge)':'(1 Portion)'}</div>
+    <div><b>${esc(c.name)}</b> · ${c.type==='semi'?'Basisrezept':c.drink?'Getränk':'Gericht'} · ${esc(c.category||'')}</div>
+    <div>${c.drink ? (+c.yieldG > 0 ? 'Ausschankmenge: ' + volTxt(+c.yieldG) : 'Schankrezeptur') : `Ausbeute: ${num(c.yieldG||t.out)} g ${c.type==='semi'?'(Charge)':'(1 Portion)'}`}</div>
     ${c.img&&IMG[c.img]?`<img class="pr-ph" src="${IMG[c.img]}" alt="">`:''}
     <table><thead><tr><th>Nr.</th><th>Zutat</th><th class="r">Brutto</th><th>Einh.</th><th class="r">Netto, g</th><th class="r">Fertig, g</th><th class="r">Betrag, €</th></tr></thead>
     <tbody>${c.items.map((it,i)=>{const l=t.lines[i];return `<tr><td>${i+1}</td><td>${esc(l.name)}</td><td class="r">${num(+it.qty,2)}</td><td>${l.unit}</td><td class="r">${num(l.net,1)}</td><td class="r">${num(l.out,1)}</td><td class="r">${num(l.cost,2)}</td></tr>`}).join('')}</tbody>
@@ -743,8 +802,8 @@ document.addEventListener('click', e => {
     case 'newMenu': menuDialog(); break;
     case 'editMenu': menuDialog(S.menu.find(m=>m.id===id)); break;
     case 'photoMenu': setPhoto(S.menu.find(m=>m.id===id)); break;
-    case 'toMenu': { const cc = C(id); const t = totals(cc); const sec = secList().includes(cc.category) ? cc.category : secList().includes(SEC_MAP[cc.category]) ? SEC_MAP[cc.category] : secList()[0]; const rec = t.cost/(S.settings.target/100)*(1+vatRate({section:sec})/100);
-      menuDialog(null, {name:cc.name, section:sec, card:cc.id, price: Math.max(0.9, Math.ceil(rec) - 0.1).toFixed(2)}); break; }
+    case 'toMenu': { const cc = C(id); const t = totals(cc); const sec = secList().includes(cc.category) ? cc.category : secList().includes(SEC_MAP[cc.category]) ? SEC_MAP[cc.category] : secList()[0]; const dv = cc.drink && vatClass({section:sec}) !== 'g' ? 'g' : ''; const rec = t.cost/(S.settings.target/100)*(1+vatRate({section:sec, vat:dv})/100);
+      menuDialog(null, {name:cc.name, section:cc.drink && secList().includes(drinkSection()) && !secList().includes(cc.category) ? drinkSection() : sec, card:cc.id, vat:dv, price: +Math.max(0.9, Math.ceil(rec) - 0.1).toFixed(2)}); break; }
     case 'openCard': go('cards', id); break;
     case 'backCards': go('cards'); break;
     case 'newCardFor': newCard('dish', S.menu.find(m=>m.id===id)); break;
@@ -773,6 +832,7 @@ document.addEventListener('click', e => {
       if(m.grp){ const g = (S.saleGroups||{})[m.grp] || {}; const k = S.moves.filter(x=>x.grp===m.grp).length;
         ask(`${g.n ? `Verkaufsbuchung vom ${fmtDate(m.date)} (${plural(g.n,'Portion','Portionen')})` : `Sammelbuchung vom ${fmtDate(m.date)}`} komplett stornieren? ${plural(k,'Artikel wird','Artikel werden')} zurück ins Lager gebucht${g.rows && g.rows.length ? `, ${eur(g.gross)} Umsatz werden aus der Auswertung entfernt` : g.n ? '' : '; der Umsatz in der Auswertung bleibt unverändert'}.`, () => { undoSaleGroup(m.grp); }, 'Stornieren'); break; }
       ask(`Buchung stornieren? ${MOVE[m.type]} ${p?p.name:''} ${qtyFmt(m.qty,p)} wird rückgängig gemacht.`, () => { undoMove(m); }, 'Stornieren'); break; }
+    case 'invT': { const [pid, k] = id.split(':'); barTenth(pid, +k); break; }
     case 'invStart': S.invDraft = {date:new Date().toISOString(), counts:{}}; save(); render(); toast('Inventur gestartet'); break;
     case 'invCancel': ask('Laufende Inventur verwerfen? Die gezählten Mengen gehen verloren.', () => { S.invDraft = null; }, 'Verwerfen'); break;
     case 'invFinish': { const d = S.invDraft; const items = stockProducts().filter(p => d.counts[p.id]!==undefined && d.counts[p.id]!=='' && +d.counts[p.id] >= 0);
@@ -802,6 +862,7 @@ document.addEventListener('input', e => {
   if(t.id === 'portions'){ view.portions = Math.max(1, +t.value||1); $('#prodOut').innerHTML = prodHtml(C(view.card), view.portions); }
   if(t.id === 'palIn') palFilter(t.value);
   if(t.dataset.inv){ const v = t.value.trim()==='' ? '' : numParse(t.value); const ok = v === '' || (isFinite(v) && v >= 0); t.classList.toggle('bad-in', !ok); if(ok){ S.invDraft.counts[t.dataset.inv] = v; t.dataset.old = t.value; save(); invUpdate(t.dataset.inv); } }
+  if(t.dataset.invf){ barInput(t); }
   if(t.dataset.step != null && t.closest('#app')){ const c = C(view.card); c.steps[+t.dataset.step].t = t.value; save(); autosize(t); }
   if(t.classList.contains('title-in')) autosize(t);
   if(t.dataset.gs){ S.settings.guest[t.dataset.gs] = t.value; save(); $('.guest-prev').innerHTML = guestHtml(); }
@@ -817,7 +878,7 @@ document.addEventListener('keydown', e => {
     else if(e.key === 'Enter'){ e.preventDefault(); const x = palItems[palSel]; palClose(); x && x.run(); }
     return;
   }
-  if(e.key === 'Enter' && e.target.matches('input[data-inv]')){ e.preventDefault(); const all = [...document.querySelectorAll('input[data-inv]')]; const n = all[all.indexOf(e.target)+1]; n ? (n.focus(), n.select()) : e.target.blur(); return; }
+  if(e.key === 'Enter' && e.target.matches('input[data-inv],input[data-invf]')){ e.preventDefault(); const all = [...document.querySelectorAll('input[data-inv],input[data-invf]')]; const n = all[all.indexOf(e.target)+1]; n ? (n.focus(), n.select()) : e.target.blur(); return; }
   if(e.key === 'Enter' && e.target.matches('input[data-li],input[data-pp],input[data-cf],textarea.title-in,input[data-secname]')){ e.preventDefault(); e.target.blur(); }
   if(e.key === '/' && !e.target.closest('input,textarea,select')){ e.preventDefault(); palOpen(); }
 });
@@ -825,10 +886,10 @@ document.addEventListener('keydown', e => {
 document.addEventListener('change', e => {
   const t = e.target, c = view.card ? C(view.card) : null;
   if(t.id === 'imgFile'){ const f = t.files[0]; if(!f) return; resizeImage(f).then(d => { pickCb && pickCb(d); pickCb = null; }, () => info('Foto nicht lesbar', 'Bitte ein JPG- oder PNG-Bild wählen.')); return; }
-  if(t.dataset.cf && c){ const f = t.dataset.cf; c[f] = f==='yieldG' ? (t.value===''?'':+t.value) : t.value; save(); softRender(); toast('Gespeichert'); return; }
+  if(t.dataset.cf && c){ const f = t.dataset.cf; if(f === 'type'){ c.drink = t.value === 'drink'; c.type = t.value === 'semi' ? 'semi' : 'dish'; } else c[f] = f==='yieldG' ? (t.value===''?'':+t.value) : t.value; save(); softRender(); toast('Gespeichert'); return; }
   if(t.dataset.li != null && c){ const it = c.items[+t.dataset.li]; const f = t.dataset.lf; it[f] = f==='ref' ? t.value : (t.value===''?'':+t.value); if(f==='ref') it.net = ''; save(); softRender(); return; }
   if(t.dataset.step != null && t.closest('#app')){ toast('Gespeichert'); return; }
-  if(t.dataset.pp){ const p = P(t.dataset.pp); const old = +p[t.dataset.pf]; p[t.dataset.pf] = Math.max(0, +t.value || 0); save(); softRender(); if(t.dataset.pf==='price' && old !== p.price) toast(`${p.name}: ${eur(old)} → ${eur(p.price)} · ${usage('p:'+p.id).length} Rezepturen neu berechnet`); return; }
+  if(t.dataset.pp){ const p = P(t.dataset.pp); const u = priceUnit(p); const pf = t.dataset.pf; const old = +p[pf]; const v = Math.max(0, +t.value || 0); p[pf] = pf === 'price' ? prRound(p, v / u.f) : v; save(); softRender(); if(pf==='price' && old !== p.price) toast(`${p.name}: ${eur(old*u.f)} → ${eur(p.price*u.f)}${u.f !== 1 ? ' je ' + u.word : ''} · ${usage('p:'+p.id).length} Rezepturen neu berechnet`); return; }
   if(t.dataset.sf){ const f = t.dataset.sf; S.settings[f] = f==='name' ? t.value : f==='target' ? Math.min(100, Math.max(1, +t.value || 28)) : Math.min(100, Math.max(0, +t.value || 0)); if(f!=='name') t.value = S.settings[f]; save(); toast('Gespeichert'); return; }
   if(t.dataset.gf){ S.settings.guest[t.dataset.gf] = t.checked; save(); $('.guest-prev').innerHTML = guestHtml(); return; }
   if(t.dataset.secname != null){ const i = +t.dataset.secname, old = S.settings.sections[i], nv = t.value.trim(); if(!nv || nv===old){ t.value = old; return; }

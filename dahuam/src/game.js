@@ -123,8 +123,8 @@ function pcStep(kind){
     if(raw === '') kind = 'ok'; // leer = Richtwert stimmt (steht so unter dem Feld)
     else { const v = numParse(raw);
       if(!isFinite(v) || v <= 0){ pc.sure = null; return stay(v === 0 ? 'Ein Preis von 0 ist nicht möglich. Bitte den Einkaufspreis eintippen oder „Richtwert stimmt“ wählen.' : 'Das ist kein gültiger Preis. Bitte eine Zahl eintippen, zum Beispiel 12,50.'); }
-      val = Math.round(v*100)/100; const ref = +p.price;
-      if(ref > 0 && (val > ref*5 || val < ref/5) && pc.sure !== val){ pc.sure = val; return stay(`Wirklich ${eur(val)} je ${esc(p.unit)}? Der Richtwert ist ${eur(ref)}. <button type="button" class="btn sm" data-act="pcSave">Ja, übernehmen</button>`); } }
+      const pu = priceUnit(p); val = Math.round(v*100)/100; const ref = +p.price*pu.f;
+      if(ref > 0 && (val > ref*5 || val < ref/5) && pc.sure !== val){ pc.sure = val; return stay(`Wirklich ${eur(val)} je ${esc(pu.word)}? Der Richtwert ist ${eur(ref)}. <button type="button" class="btn sm" data-act="pcSave">Ja, übernehmen</button>`); } }
   }
   if(kind === 'ok' && !(+p.price > 0)) return stay('Dieser Artikel hat noch keinen Preis. Bitte den Einkaufspreis eintippen oder überspringen.');
   pc.msg = ''; pc.sure = null;
@@ -133,11 +133,11 @@ function pcStep(kind){
   else {
     const before = dishesUsing(p.id).map(x => ({name:dishLabel(x.m), a:x.k.fc}));
     const old = +p.price;
-    if(kind === 'save') p.price = val;
+    const pu = priceUnit(p); if(kind === 'save') p.price = prRound(p, val / pu.f);
     markPrice(p, kind === 'save' ? 'Preis-Check' : 'bestätigt');
     if(kind === 'save') pc.saved++; else pc.confirmed++;
     const after = dishesUsing(p.id).map(x => x.k.fc);
-    pc.last = {name:p.name, unit:p.unit, old, nw:+p.price, changed: kind==='save' && Math.abs(old-p.price) > 0.004, dishes: before.map((b,i)=>({name:b.name, a:b.a, b:after[i]})).filter(d=>d.a!=null).sort((x,y)=>Math.abs(y.b-y.a)-Math.abs(x.b-x.a)).slice(0,3)};
+    pc.last = {name:p.name, unit:pu.word, old:old*pu.f, nw:+p.price*pu.f, changed: kind==='save' && Math.abs(old-p.price)*pu.f > 0.004, dishes: before.map((b,i)=>({name:b.name, a:b.a, b:after[i]})).filter(d=>d.a!=null).sort((x,y)=>Math.abs(y.b-y.a)-Math.abs(x.b-x.a)).slice(0,3)};
     save();
   }
   pc.i++; render();
@@ -173,13 +173,13 @@ function renderPriceCheck(){
   }
   const p = P(pc.q[i]); if(!p){ pc.i++; return renderPriceCheck(); }
   const uses = dishesUsing(p.id); const semis = usage('p:'+p.id).filter(c=>c.type==='semi');
-  const unitTxt = p.unit === 'Stk' ? 'Stück' : p.unit === 'l' ? 'Liter' : 'Kilogramm';
+  const pu = priceUnit(p); const unitTxt = isDrink(p) ? p.pack : p.unit === 'Stk' ? 'Stück' : p.unit === 'l' ? 'Liter' : 'Kilogramm';
   return head + prog + `<section class="pc-card" data-key="${p.id}">
     <div class="pc-sup">${ico('truck')}<span>${esc(supName(p))}${p.artNo?` · Art.-Nr. ${esc(p.artNo)}`:''}${p.pack?` · ${esc(p.pack)}`:''}</span><span class="pc-count">Nr. ${i+1}</span></div>
     <h2 class="pc-name">${esc(p.name)}</h2>
     <div class="pc-grid">
-      <div class="pc-ex ${+p.price > 0 ? '' : 'none'}"><small>${+p.price > 0 ? 'Richtwert' : 'Preis fehlt'}</small><b>${+p.price > 0 ? eur(p.price) : '—'}</b><span>je ${esc(unitTxt)}${p.unit==='Stk'&&p.pieceG?` · ${num(p.pieceG)} g`:''} · exkl. MwSt.</span></div>
-      <label class="pc-in"><span>Ihr Einkaufspreis je ${esc(p.unit)}</span><span class="pc-field"><em>€</em><input id="pcIn" class="num-in" type="text" inputmode="decimal" data-num="self" placeholder="${+p.price > 0 ? num2(p.price) : '0,00'}" autocomplete="off" aria-describedby="pcMsg"></span><small>${+p.price > 0 ? 'Netto, wie auf der Rechnung. Leer lassen, wenn der Richtwert stimmt.' : 'Netto, wie auf der Rechnung. Für diesen Artikel gibt es noch keinen Preis.'}</small><span class="pc-msg" id="pcMsg" role="alert" ${pc.msg?'':'hidden'}>${pc.msg||''}</span></label>
+      <div class="pc-ex ${+p.price > 0 ? '' : 'none'}"><small>${+p.price > 0 ? 'Richtwert' : 'Preis fehlt'}</small><b>${+p.price > 0 ? eur(p.price*pu.f) : '—'}</b><span>je ${esc(unitTxt)}${p.unit==='Stk'&&p.pieceG?` · ${num(p.pieceG)} g`:''} · exkl. MwSt.</span></div>
+      <label class="pc-in"><span>Ihr Einkaufspreis je ${esc(pu.word)}</span><span class="pc-field"><em>€</em><input id="pcIn" class="num-in" type="text" inputmode="decimal" data-num="self" placeholder="${+p.price > 0 ? num2(p.price*pu.f) : '0,00'}" autocomplete="off" aria-describedby="pcMsg"></span><small>${+p.price > 0 ? 'Netto, wie auf der Rechnung. Leer lassen, wenn der Richtwert stimmt.' : 'Netto, wie auf der Rechnung. Für diesen Artikel gibt es noch keinen Preis.'}</small><span class="pc-msg" id="pcMsg" role="alert" ${pc.msg?'':'hidden'}>${pc.msg||''}</span></label>
     </div>
     <div class="pc-uses">${uses.length || semis.length ? `<b>Steckt in:</b> ${uses.slice(0,6).map(x=>`<span>${esc(dishLabel(x.m))} <em class="${fcClass(x.k.fc)}">${num(x.k.fc,1)} %</em></span>`).join('')}${semis.map(c=>`<span>${esc(c.name)} <em>Basisrezept</em></span>`).join('')}${uses.length>6?`<span class="muted">+${uses.length-6} weitere</span>`:''}` : '<span class="muted">Noch in keiner Rezeptur verwendet.</span>'}</div>
     <p class="pc-alg ${prodAlgState(p)}">Allergene: ${prodAlgState(p) === 'has' ? `<b>${esc(algClean(p.alg).join(' '))}</b>` : prodAlgState(p) === 'none' ? 'keine (bestätigt)' : '<b>nicht gepflegt</b>'} · <button type="button" class="link" data-act="pcAlg" data-id="${p.id}">${prodAlgState(p) === 'open' ? 'eintragen' : 'ändern'}</button></p>

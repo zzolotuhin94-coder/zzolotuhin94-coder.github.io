@@ -55,7 +55,7 @@ H('garverlust','Garverlust','Was beim Garen verloren geht, weil Wasser und Fett 
 H('brutto_netto_g','Brutto, netto, fertig','Brutto ist die Ware, wie sie geliefert wird. Netto ist sie geputzt. Fertig ist sie gegart am Teller.',1);
 H('mindestbestand','Mindestbestand','So viel soll immer im Haus sein. Liegt der Bestand darunter, schlägt die App eine Bestellung vor.',1);
 H('annahmeschluss','Annahmeschluss','Bis zu dieser Uhrzeit nimmt der Lieferant Bestellungen an. Wer später bestellt, bekommt die Ware erst am nächsten Liefertag.',1);
-H('gebinde','Gebinde','Die Packung, in der der Lieferant verkauft: Kiste, Sack, Karton. Beispiel: 1 Sack Mehl = 25 kg.',1);
+H('gebinde','Gebinde','Die Packung, in der der Lieferant verkauft: Kiste, Sack, Karton, bei Getränken Flasche, Fass oder Kiste. Beispiel: 1 Sack Mehl = 25 kg.',1);
 H('bestelltag','Bestelltag und Liefertag','Am Bestelltag nimmt der Lieferant Bestellungen an. Am Liefertag bringt er die Ware. Beides steht beim Lieferanten.',1);
 H('mindestbestellwert','Mindestbestellwert','Unter diesem Betrag liefert der Lieferant nicht oder verlangt einen Zuschlag.',1);
 H('bestellvorschlag','Bestellvorschlag','Die App rechnet aus, was unter dem Mindestbestand liegt, und schlägt die Menge vor. Sie können jede Zahl ändern.',1);
@@ -155,6 +155,18 @@ H('inv_start','Inventur starten','Beginnt eine neue Zählung. Sie können unterb
 H('inv_fertig','Inventur abschließen','Setzt den Bestand auf Ihre gezählten Mengen. Die Differenz wird gespeichert.');
 H('inv_weg','Inventur verwerfen','Wirft die laufende Zählung weg. Der Bestand bleibt, wie er war.');
 H('inv_feld','Gezählte Menge','Tragen Sie ein, was wirklich da ist. Leer lassen heißt: nicht gezählt.');
+H('inv_voll','Volle Flaschen','Zählen Sie die vollen Flaschen oder Fässer. Die angebrochene tippen Sie daneben in Zehnteln an.');
+H('inv_offen','Angebrochen','Wie voll ist die offene Flasche oder das Fass im Anstich? 0,3 heißt: knapp ein Drittel ist noch drin. Noch einmal tippen nimmt die Angabe zurück.');
+H('schankrezeptur','Schankrezeptur','Was in ein Glas kommt: Artikel und Menge in cl, ml oder Liter. Daraus rechnet die App, was das Getränk kostet.',1);
+H('schankverlust','Schankverlust','Was beim Zapfen und Einschenken verloren geht: Schaum, Reste im Fass, Kostproben. Sie tragen den Anteil beim Artikel ein, zum Beispiel 5 % bei Fassbier. Die App rechnet ihn in jedes Glas ein.',1);
+H('ausschankmenge','Ausschankmenge','Wie viel ins Glas kommt, zum Beispiel 0,5 l. Die Menge steht auf der Gästekarte beim Preis.',1);
+H('groesse','Weitere Größe','Dasselbe Getränk in einer anderen Menge, zum Beispiel 0,3 l. Sie tragen nur Menge und Preis ein, die Kosten rechnet die App aus derselben Schankrezeptur.');
+H('dk_artikel','Artikel im Ausschank','Fügt eine Zeile hinzu: ein Artikel und die Menge, die ins Glas kommt.');
+H('pfand','Pfand','Geld für Flasche, Kiste oder Fass, das Sie mit dem Leergut zurückbekommen. Es zählt nie zum Wareneinsatz.',1);
+H('leergut','Leergut zurückgeben','Tragen Sie ein, wie viele Kisten oder Fässer zurückgehen. Die App zieht das Pfand vom offenen Betrag bei diesem Lieferanten ab.');
+H('leergut_stand','Pfand beim Lieferanten','So viel Pfand haben Sie bezahlt und noch nicht zurückbekommen. Beim Wareneingang kommt das Pfand dazu, bei der Rückgabe geht es weg.');
+H('neu_schank','Neue Schankrezeptur','Legt ein Getränk an: Bier vom Fass, ein Achtel Wein, ein Spritzer, ein Cocktail.');
+H('f_getraenke','Getränke','Zeigt nur die Getränke: in den Rezepten die Schankrezepturen, bei den Preisen die Artikel mit Flasche, Fass oder Kiste.');
 
 /* Einkauf */
 H('best_neu','Neue Bestellung','Lieferant wählen. Die App schlägt vor, was unter dem Mindestbestand liegt.');
@@ -174,7 +186,7 @@ H('r_temp','Temperatur','Bei Kühlware die gemessene Temperatur bei der Übernah
 
 /* Artikel */
 H('prod_neu','Neuer Artikel','Legt eine neue Zutat an: Name, Einheit, Einkaufspreis, Lieferant.');
-H('prod_preis','Einkaufspreis','Was Sie dem Lieferanten zahlen, ohne Steuer, je kg, Liter oder Stück. Eintippen und Enter drücken.');
+H('prod_preis','Einkaufspreis','Was Sie dem Lieferanten zahlen, ohne Steuer, je kg, Liter oder Stück. Bei Getränken je Flasche, Fass oder Kiste, wie es auf der Rechnung steht. Eintippen und Enter drücken.');
 H('prod_ok','Richtwert bestätigen','Der Richtwert stimmt ungefähr? Dann bestätigen. Er gilt ab jetzt als Ihr Preis.');
 H('prod_alle_ok','Alle bestätigen','Bestätigt alle Richtwerte, die gerade in der Liste stehen. Nur tippen, wenn Sie die Preise angesehen haben.');
 H('prod_import','Preisliste importieren','Lädt eine Preisliste vom Lieferanten als Datei. Die App zeigt vorher, was sich ändert.');
@@ -224,6 +236,7 @@ const HELP_SEL = [
   ['#app [data-act="rAll"]','r_alles'],['#app input[data-rp]','r_preis'],['#app [data-act="rBook"]','r_buchen'],['#rTemp','r_temp'],['#app select[data-rs]','r_status'],['#rNo','lieferschein'],
   ['#app [data-act="newProd"]','prod_neu'],['#app input[data-pp]','prod_preis'],['#app [data-act="pConfirm"]','prod_ok'],['#app [data-act="pConfirmAll"]','prod_alle_ok'],['#app [data-act="plImport"]','prod_import'],['#app [data-act="pcStart"]','pc_start'],['#app [data-act="pcOk"]','pc_ok'],['#app [data-act="pcSkip"]','pc_skip'],['#pcIn','pc_feld'],['#app [data-act="pFilter"][data-id="demo"]','richtwert'],
   ['#app .rp-period [data-act="rpUnit"],#app [data-act="rpStep"]','rp_zeitraum'],['#app [data-act="rpCmp"]','rp_vergleich'],['#app [data-act="rpFile"]','rp_datei'],['#app [data-act="rpSample"]','rp_beispiel'],['#app [data-act="rpAnalyse"]','rp_pruefen'],['#app [data-act="rpCsv"]','rp_csv'],['#app [data-act="rpPrint"]','rp_bericht'],['#app [data-act="rpTab"][data-id="import"]','kassendatei'],['#app [data-act="rpTab"][data-id="map"]','zuordnung'],
+  ['#app input[data-invf]','inv_voll'],['#app .inv-t','inv_offen'],['#app [data-act="newCard"][data-id="drink"]','neu_schank'],['#app [data-act="ctype"][data-id="drink"],#app [data-act="pFilter"][data-id="drink"]','f_getraenke'],['#app [data-act="drinkLine"]','dk_artikel'],['#app [data-act="drinkSize"]','groesse'],['#dk-y','ausschankmenge'],['#app input[data-dq]','schankrezeptur'],['#app .dk-loss','schankverlust'],['#app [data-act="lgReturn"]','leergut'],['#app .lg-v','leergut_stand'],['#app .pf-row','pfand'],
   ['#app [data-act="export"]','s_sicherung'],['#app [data-act="importPick"]','s_laden'],['#app [data-act="reset"]','s_reset'],['#app [data-act="userSwitch"]','s_rolle'],['#s-target','ziel_we'],['#s-vat','mwst'],
 ];
 /* Tabellenköpfe und Kennzahlen: nach ihrem Text */
@@ -231,7 +244,7 @@ const HELP_TXT = {
   'we':'wareneinsatz','wareneinsatz':'wareneinsatz','ø wareneinsatz':'we_pct','we %':'we_pct','we gesamt':'wareneinsatz','wareneinsatz pro portion':'wareneinsatz','wareneinsatz je gericht':'we_pct',
   'rohertrag':'rohertrag','rohertrag exkl. mwst.':'rohertrag','größter rohertrag':'rohertrag','aufschlagsfaktor':'aufschlag','putzverlust':'putzverlust','garverlust':'garverlust',
   'mindest':'mindestbestand','unter mindestbestand':'mindestbestand','lagerwert':'lagerwert','lagerort':'lagerort','füllstand':'fuellstand','soll':'soll_ist','ist gezählt':'soll_ist','differenz':'differenz','differenz letzte inventur':'differenz',
-  'saison':'saison','allergene':'allergene','preis €':'prod_preis','stand':'prod_stand','= einheit':'gebinde','gebinde':'gebinde','annahmeschluss':'annahmeschluss','mindestbestellwert':'mindestbestellwert',
+  'saison':'saison','allergene':'allergene','preis €':'prod_preis','stand':'prod_stand','= einheit':'gebinde','gebinde':'gebinde','ausschank':'schankrezeptur','leergut':'leergut_stand','pfand':'pfand','annahmeschluss':'annahmeschluss','mindestbestellwert':'mindestbestellwert',
   'umsatz netto':'umsatz','umsatz brutto':'mwst','portionen':'portionen','anteil':'rp_anteil','δ menge':'rp_delta','kostenstruktur':'kostenstruktur','preis-simulator':'preissim','produktionsmenge':'produktionsmenge',
   'in %':'we_pct','heute noch bestellen':'annahmeschluss','kalkuliert':'rezeptur','preis lt. rechnung':'r_preis','geliefert':'wareneingang','pro 100 g':'wareneinsatz','richtwert':'richtwert','zubereitung':'schritt','typ':'r_typ','kategorie':'kategorie',
 };

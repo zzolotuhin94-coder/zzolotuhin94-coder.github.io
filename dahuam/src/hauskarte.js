@@ -67,10 +67,11 @@ const HS_ILL = {
   teller:'<circle cx="50" cy="52" r="26"/><circle cx="50" cy="52" r="19"/><path d="M16,26v52 M12,26v12a4,4 0 0 0 8,0v-12 M16,26v12"/><path d="M84,26v52 M84,26c-6,8-6,20 0,26"/><path d="M38,52c3-6 9-9 12-9s9 3 12 9" stroke-opacity=".5"/>',
   burger:'<path d="M22,46a28,20 0 0 1 56,0z"/><path d="M38,36l3-2 M48,32l3-1 M58,36l3 1 M44,40l3 0 M54,40l3-1 M34,42l2-1 M64,42l2 1"/><path d="M20,50q5,5 10,0t10,0t10,0t10,0t10,0t10,0"/><rect x="22" y="54" width="56" height="8" rx="4"/><path d="M22,66h56v4a8,8 0 0 1-8,8h-40a8,8 0 0 1-8-8z"/>',
   schmarrn:'<circle cx="52" cy="54" r="27"/><path d="M26,50h-18 M26,58h-18 M8,50v8"/><path d="M38,44l10-3 3 9-10 3z M54,40l9 2-2 9-9-2z M40,60l9-1 2 8-9 1z M56,58l8 3-4 8-7-3z M63,48l7 1 0 7-7-1z"/><circle cx="35" cy="37" r=".9"/><circle cx="46" cy="33" r=".9"/><circle cx="60" cy="31" r=".9"/><circle cx="70" cy="38" r=".9"/><circle cx="74" cy="60" r=".9"/><circle cx="33" cy="68" r=".9"/><circle cx="52" cy="72" r=".9"/>',
+  glas:'<path d="M26,20h26c0,18-4,29-13,29s-13-11-13-29z"/><path d="M39,49v25 M28,76h22"/><path d="M28,33h22" stroke-opacity=".6"/><path d="M60,42h22v35a3,3 0 0 1-3,3h-16a3,3 0 0 1-3-3z"/><path d="M82,50h5a5,5 0 0 1 5,5v10a5,5 0 0 1-5,5h-5"/><path d="M58,42c-1-5 4-8 8-6 2-4 9-4 11 0 4-2 8 1 7 6"/><path d="M67,52v19 M75,52v19" stroke-opacity=".6"/>',
   krake:'<path d="M32,24a14,14 0 0 1 28,0v28h-28z"/><path d="M34,52c-2,10-8,14-12,22 M40,52c-1,10-4,16-6,24 M46,52c0,10 0,16 0,24 M52,52c1,10 4,16 6,24 M58,52c2,10 8,14 12,22"/><circle cx="40" cy="30" r="1.6" fill="currentColor" stroke="none"/><circle cx="52" cy="30" r="1.6" fill="currentColor" stroke="none"/><path d="M41,38q5,4 10,0"/><path d="M70,64h22l-3,16h-16z"/><path d="M75,64l4-14 M81,64l1-14 M87,64l-2-13"/>',
 };
 const HS_ILL_FOR = [[/flamm/i,'flammkuchen'],[/teil|fondue/i,'fondue'],[/supp|vorsp/i,'suppe'],[/salat|bowl/i,'salat'],[/rösti|roesti/i,'roesti'],[/burger|pasta/i,'burger'],[/süß|suess|dessert|nachsp/i,'schmarrn'],[/kind/i,'krake']];
-function hsIll(name, size, color, sw){ const k = (HS_ILL_FOR.find(([re]) => re.test(name)) || [,'teller'])[1]; return hsSvg(HS_ILL[k], '0 0 100 100', size, size, color, sw || 1.5); }
+function hsIll(name, size, color, sw){ const k = (HS_ILL_FOR.find(([re]) => re.test(name)) || [, (S.settings.secVat || {})[name] === 'g' || secLooksDrink(name) ? 'glas' : 'teller'])[1]; return hsSvg(HS_ILL[k], '0 0 100 100', size, size, color, sw || 1.5); }
 const HS_GLYPH = {
   snow:'<path d="M12,2v20 M3.3,7l17.4,10 M3.3,17l17.4-10 M12,2l-2.5,2.5 M12,2l2.5,2.5 M12,22l-2.5-2.5 M12,22l2.5-2.5 M3.3,7l3.4-.9 M3.3,7l.9,3.4 M20.7,17l-3.4,.9 M20.7,17l-.9-3.4 M3.3,17l3.4,.9 M3.3,17l.9-3.4 M20.7,7l-3.4-.9 M20.7,7l-.9,3.4"/>',
   fir:'<path d="M12,3v18 M12,7l-4,4 M12,7l4,4 M12,11l-5,5 M12,11l5,5 M12,15l-6,6 M12,15l6,6"/>',
@@ -191,12 +192,13 @@ function hsInfo(e){
   const m = e.head, vars = e.vars, multi = vars.length > 1 || !!(m.group && m.vlabel);
   const ai = algOfVars(vars), alg = ai.letters.concat(ai.open ? [ALG_MARK] : []);
   const veg = vars.every(v => v.veg === 'vg') ? 'vg' : vars.every(v => v.veg === 'v' || v.veg === 'vg') ? 'v' : '';
+  const drink = vars.some(v => guestVol(v));   // Getränke: die Menge steht bei jedem Preis
   return {name:m.name, desc:[m.desc, hkDays(m)].filter(Boolean).join(' · '), alg, veg, top:vars.some(v => v.top), seasonal:vars.some(v => v.seasons && v.seasons.length),
-    prices: multi ? vars.map(v => [v.vlabel || v.name, v.price]) : [['', m.price]], section:m.section};
+    prices: drink ? vars.map(v => [guestVol(v) || v.vlabel || (multi ? v.name : ''), v.price]) : multi ? vars.map(v => [v.vlabel || v.name, v.price]) : [['', m.price]], drink, section:m.section};
 }
 function hsVeg(v){ return v === 'vg' ? '<span class="hs-veg">VEGAN</span>' : v === 'v' ? '<span class="hs-veg">VEG</span>' : ''; }
 function hsAlg(a, used){ if(!a.length) return ''; a.forEach(x => used.add(x)); return `<span class="hs-al">${a.join(' ')}</span>`; }
-function hsPrices(d){ const f = ([l, p]) => `<span class="hs-p">${l ? `<small>${esc(l)}</small>` : ''}${+p ? hkPrice(p) : ''}</span>`; return d.prices.length === 1 ? f(d.prices[0]) : `<span class="hs-ps">${d.prices.map(f).join('')}</span>`; }
+function hsPrices(d){ const f = ([l, p]) => `<span class="hs-p">${l ? `<small>${esc(l)}</small>` : ''}${+p ? hkPrice(p) : ''}</span>`; return d.prices.length === 1 ? f(d.prices[0]) : `<span class="hs-ps${d.drink ? ' dr' : ''}">${d.prices.map(f).join('')}</span>`; }
 function hsDish(d, x){
   const gl = d.seasonal ? `<span class="hs-gl">${hsGl(x.t.gl[0], 12, x.paper ? x.t.ink : x.t.ac)}</span>` : '';
   const al = hsAlg(d.alg, x.used);

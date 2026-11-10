@@ -6,7 +6,7 @@ const L = require('./lib');
   await p.click('#app [data-act="invStart"]'); await p.waitForTimeout(300);
   const m = await p.evaluate(() => { const rows = [...document.querySelectorAll('#app .inv-l li')]; const bad = {wide:[], cut:[], order:[], small:[], perRow:[]};
     const tops = new Map();
-    rows.forEach(li => { const r = li.getBoundingClientRect(); const inp = li.querySelector('input[data-inv]'); const nm = li.querySelector('.inv-n b'); const ir = inp.getBoundingClientRect(), nr = nm.getBoundingClientRect(); const id = li.id;
+    rows.forEach(li => { const r = li.getBoundingClientRect(); const inp = li.querySelector('input[data-inv],input[data-invf]'); /* D1: Getränke haben das Feld „volle Flaschen“ */ const nm = li.querySelector('.inv-n b'); const ir = inp.getBoundingClientRect(), nr = nm.getBoundingClientRect(); const id = li.id;
       if(r.left < 0 || r.right > 390.5 || ir.left < 0 || ir.right > 390.5 || nr.right > 390.5) bad.wide.push(id);
       const cs = getComputedStyle(nm); if(nm.scrollWidth > nm.clientWidth + 1 || cs.textOverflow === 'ellipsis' || cs.whiteSpace === 'nowrap') bad.cut.push(id);
       if(!(ir.left < nr.left && li.querySelector('.inv-q').compareDocumentPosition(li.querySelector('.inv-n')) & 4)) bad.order.push(id);

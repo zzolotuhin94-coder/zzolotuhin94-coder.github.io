@@ -108,7 +108,11 @@ function impDays(raw){ const s = String(raw || '').trim().toLowerCase(); if(!s |
 function impUnit(raw){ const s = String(raw || '').trim().toLowerCase().replace(/\.$/, ''); if(!s) return {u:'', empty:true};
   if(/^(kg|kilo|kilogramm)$/.test(s)) return {u:'kg'}; if(/^(l|lt|ltr|liter)$/.test(s)) return {u:'l'}; if(/^(stk|stück|stueck|st|stck|pc|pce|pcs|x)$/.test(s)) return {u:'Stk'};
   if(/^(g|gr|gramm|ml|dl|cl)$/.test(s)) return {u:'', small:s};
-  return {u:'Stk', other:String(raw).trim()}; }
+  const geb = /^(fl|flasche|flaschen|bottle|btl)$/.test(s) ? 'fl' : /^(fass|fässer|faesser|keg)$/.test(s) ? 'fass' : /^(kiste|kisten|kasten|kästen|träger|traeger)$/.test(s) ? 'kiste' : '';
+  return {u:'Stk', other:String(raw).trim(), geb}; }
+/* Inhalt eines Getränke-Gebindes: „0,75 l“, „70 cl“, „30 l“, „20×0,5 l“, „24 x 0,33“ → {L je Flasche/Fass, N Flaschen} */
+function impDrinkPack(text, geb){ const s = String(text || '').toLowerCase().replace(/,/g, '.'); const m = s.match(/(?:(\d+)\s*[x×*]\s*)?(\d+(?:\.\d+)?)\s*(l|lt|ltr|liter|cl|ml)?(?![a-z0-9])/); if(!m || (!m[3] && !m[1] && !/^\s*\d+(\.\d+)?\s*$/.test(s))) return null;
+  let L = +m[2]; if(m[3] === 'cl') L /= 100; else if(m[3] === 'ml') L /= 1000; const N = m[1] ? +m[1] : 1; if(!(L > 0) || !(N >= 1) || L > 1000) return null; if(geb === 'kiste' && !m[1]) return null; return {L:Math.round(L * 10000) / 10000, N: geb === 'kiste' ? N : 1, tot: geb === 'kiste' ? 1 : N}; }
 /* „Sack 10 kg“, „Karton 6×1 l“, „10x250 g“, „Tray 30 Stk“ → Inhalt in der Einheit des Artikels */
 function impPack(text, unit){ const s = String(text || '').toLowerCase().replace(/,/g, '.'); const m = s.match(/(?:(\d+(?:\.\d+)?)\s*[x×*]\s*)?(\d+(?:\.\d+)?)\s*(kg|g|l|ml|cl|stk|stück|st|fl|flaschen?|dosen?)\b/); if(!m) return 0;
   let q = (m[1] ? +m[1] : 1) * +m[2]; const u = m[3];
@@ -248,6 +252,8 @@ const IMP_PROD_FIELDS = [
   {k:'loc', label:'Lagerort', syn:['lagerort','lager','ort','lagerplatz']},
   {k:'minStock', label:'Mindestbestand', syn:['mindestbestand','meldebestand','minbestand','mindestmenge','min']},
   {k:'stock', label:'Anfangsbestand', syn:['anfangsbestand','bestand','lagerbestand','istbestand','menge']},
+  {k:'pfand', label:'Pfand', syn:['pfand','pfandbetrag','flaschenpfand','kistenpfand','fasspfand','einsatz','pfandjegebinde']},
+  {k:'pourLoss', label:'Schankverlust, %', syn:['schankverlust','schankverlustprozent','zapfverlust','ausschankverlust']},
 ];
 /* sicherer Treffer: gleiche Artikelnummer oder gleicher Name (auch ohne Klammerzusatz). Sonst nur ein Vorschlag. */
 function impProdMatch(name, art, pool){
@@ -273,15 +279,22 @@ function impProdAnalyse(d){
     const data = {name};
     const u = impUnit(impCell(r, map, 'unit'));
     if(u.small){ fail(`Einheit „${impCell(r, map, 'unit')}“: bitte den Preis je kg oder je Liter angeben`); continue; }
-    if(u.other) it.notes.push(`Einheit „${u.other}“ wird als Stück geführt`);
-    if(!u.empty) data.unit = u.u;
-    if(rawPrice !== ''){ const pr = impNum(rawPrice); if(!isFinite(pr)){ fail(`Preis nicht lesbar: „${rawPrice}“`); continue; } if(pr < 0){ fail(`Preis ist negativ: „${rawPrice}“`); continue; } data.price = Math.round(pr * 10000) / 10000; it.price = data.price; if(pr > 500) it.notes.push('Preis ungewöhnlich hoch, bitte prüfen'); }
+    /* Getränk: Einheit Flasche, Fass oder Kiste (Preis je Gebinde) oder Einheit l mit Gebinde „Flasche 0,7 l“, „Fass 30 l“, „Kiste 20×0,5 l“ (Preis je Liter) */
+    const packRaw = impHas(map, 'pack') ? impCell(r, map, 'pack') : '', pqRaw = impHas(map, 'packQty') ? impCell(r, map, 'packQty') : '';
+    const gWord = u.u === 'l' && /^(flaschen?|fl\.?|fass|kisten?|kasten)(\s|$)/i.test(packRaw) ? (/^fass/i.test(packRaw) ? 'fass' : /^k/i.test(packRaw) ? 'kiste' : 'fl') : '';
+    const gk = u.geb || gWord; const dv = gk ? (impDrinkPack(packRaw.replace(/^[^\d]*/, ''), gk) || (pqRaw && gk !== 'kiste' && (gk === 'fass' ? impNum(pqRaw) >= 5 : impNum(pqRaw) <= 3) ? impDrinkPack(pqRaw, gk) : null)) : null;   /* nur die Zahl: bei der Flasche bis 3 (Liter), beim Fass ab 5 */
+    if(dv){ data.geb = gk; data.gebL = dv.L; data.gebN = dv.N; data.unit = 'l'; }
+    else { if(u.other) it.notes.push(`Einheit „${u.other}“ wird als Stück geführt` + (u.geb ? ` (für ein Getränk bei „Gebinde“ den Inhalt angeben, zum Beispiel ${u.geb === 'kiste' ? '„20×0,5 l“' : u.geb === 'fass' ? '„30 l“' : '„0,75 l“'})` : '')); if(!u.empty) data.unit = u.u; }
+    if(rawPrice !== ''){ const pr = impNum(rawPrice); if(!isFinite(pr)){ fail(`Preis nicht lesbar: „${rawPrice}“`); continue; } if(pr < 0){ fail(`Preis ist negativ: „${rawPrice}“`); continue; } data.price = Math.round(pr * 10000) / 10000; it.price = data.price; if(pr > 500) it.notes.push('Preis ungewöhnlich hoch, bitte prüfen'); if(dv && u.geb){ data.gprice = data.price; data.price = Math.round(pr / (dv.L * dv.N) * 10000) / 10000; } }
     if(art) data.artNo = art;
     const pg = qty(it, 'pieceG', 'Stückgewicht'); if(pg != null) data.pieceG = pg;
     const lc = pct(it, 'lossCold', 'Putzverlust'); if(lc != null) data.lossCold = lc; const lh = pct(it, 'lossHot', 'Garverlust'); if(lh != null) data.lossHot = lh;
-    const ms = qty(it, 'minStock', 'Mindestbestand'); if(ms != null) data.minStock = ms; const st = qty(it, 'stock', 'Anfangsbestand'); if(st != null) data.stock = st;
-    if(impHas(map, 'pack') && impCell(r, map, 'pack')) data.pack = impCell(r, map, 'pack');
-    const pq = qty(it, 'packQty', 'Gebindegröße'); if(pq != null) data.packQty = pq;
+    const cf = dv && u.geb ? dv.L : 1;   /* Bestände bei Einheit Flasche/Fass/Kiste: in Flaschen bzw. Fässern */
+    const ms = qty(it, 'minStock', 'Mindestbestand'); if(ms != null) data.minStock = Math.round(ms * cf * 1000) / 1000; const st = qty(it, 'stock', 'Anfangsbestand'); if(st != null) data.stock = Math.round(st * cf * 1000) / 1000;
+    if(dv){ data.pack = gebLabel(gk, dv.L, dv.N); data.packQty = Math.round(dv.L * dv.N * 10000) / 10000; }
+    else { if(packRaw) data.pack = packRaw; const pq = qty(it, 'packQty', 'Gebindegröße'); if(pq != null) data.packQty = pq; }
+    { const pf = qty(it, 'pfand', 'Pfand'); if(pf != null){ if(dv) data.pfand = Math.round(pf * 100) / 100; else if(pf > 0) it.notes.push('Pfand gibt es nur bei Getränken mit Gebinde (Flasche, Fass, Kiste): nicht übernommen'); }
+      const pl = pct(it, 'pourLoss', 'Schankverlust'); if(pl != null){ if(dv) data.pourLoss = pl; else if(pl > 0) it.notes.push('Schankverlust gibt es nur bei Getränken: nicht übernommen'); } }
     if(impHas(map, 'loc')){ const l = impLoc(impCell(r, map, 'loc')); if(l.bad) it.notes.push(`Lagerort „${impCell(r, map, 'loc')}“ nicht erkannt: Trockenlager`); if(l.v) data.loc = l.v; }
     if(impHas(map, 'alg')){ const a = impAlg(impCell(r, map, 'alg')); if(a.bad) it.notes.push(`Allergen „${a.bad.join(', ')}“ unbekannt: Angabe nicht übernommen`); else if(a.state !== 'open'){ data.alg = a.alg; data.algNone = a.state === 'none'; } }
     const supName0 = impCell(r, map, 'supplier'); if(supName0){ const sp = impSupMatch(supName0); data.supName = supName0; if(sp) data.supplier = sp.id; else { const k = normName(supName0); if(!sups.has(k)) sups.set(k, supName0); data.supNew = k; } }
@@ -294,7 +307,7 @@ function impProdAnalyse(d){
     if(ex && data.unit && data.unit !== ex.unit){ fail(`Einheit ${data.unit} passt nicht zum vorhandenen Artikel „${ex.name}“ (${ex.unit}). Rezepturen rechnen in ${ex.unit}.`); continue; }
     if(data.pack && data.packQty == null){ const q = impPack(data.pack, unit); if(q){ data.packQty = q; data.packAuto = true; } }
     it.data = data; it.unit = unit;
-    it.sub = [`je ${unit}${unit === 'Stk' && data.pieceG ? ' · ' + num(data.pieceG) + ' g' : ''}`, data.supName ? data.supName + (data.supNew ? ' (neuer Lieferant)' : '') : '', data.artNo ? 'Nr. ' + data.artNo : '', data.pack ? data.pack + (data.packQty ? ` = ${num(data.packQty, 3)} ${unit}` : '') : '', data.alg ? 'Allergene ' + data.alg : data.algNone ? 'keine Allergene' : ''].filter(Boolean).join(' · ');
+    it.sub = [dv ? `${data.pack}${data.price != null ? ' · ' + eur(data.price) + ' je Liter' : ''}${data.pfand ? ' · Pfand ' + eur(data.pfand) : ''}${data.pourLoss ? ' · Schankverlust ' + num(data.pourLoss, 1) + ' %' : ''}` : `je ${unit}${unit === 'Stk' && data.pieceG ? ' · ' + num(data.pieceG) + ' g' : ''}`, data.supName ? data.supName + (data.supNew ? ' (neuer Lieferant)' : '') : '', data.artNo ? 'Nr. ' + data.artNo : '', data.pack && !dv ? data.pack + (data.packQty ? ` = ${num(data.packQty, 3)} ${unit}` : '') : '', data.alg ? 'Allergene ' + data.alg : data.algNone ? 'keine Allergene' : ''].filter(Boolean).join(' · ');
     if(ex){ const ch = impProdDiff(ex, data); it.st = ch.length ? 'akt' : 'gleich'; if(ch.length) it.why = (mt.exact ? '' : `„${ex.name}“: `) + ch.join(' · '); if(data.stock != null) it.notes.push('Bestand vorhandener Artikel ändert nur die Inventur'); }
     else if(data.price == null) it.notes.push('ohne Preis: erscheint im Preis-Check als „Preis fehlt“');
   }
@@ -312,6 +325,9 @@ function impProdDiff(p, x){
   if(x.alg != null && (x.alg !== algClean(p.alg).join(' ') || !!x.algNone !== (prodAlgState(p) === 'none'))) ch.push('Allergene ' + (x.alg || 'keine'));
   if(x.loc && x.loc !== p.loc) ch.push('Lagerort ' + LOCS[x.loc]);
   if(x.minStock != null && +x.minStock !== +(p.minStock || 0)) ch.push('Mindestbestand');
+  if(x.geb && (x.geb !== p.geb || +x.gebL !== +p.gebL || +x.gebN !== +(p.gebN || 1)) && !ch.includes('Gebinde')) ch.push('Gebinde');
+  if(x.pfand != null && +x.pfand !== +(p.pfand || 0)) ch.push(`Pfand ${eur(x.pfand)}`);
+  if(x.pourLoss != null && +x.pourLoss !== +(p.pourLoss || 0)) ch.push(`Schankverlust ${num(x.pourLoss, 1)} %`);
   return ch;
 }
 function supNew(name){ return {id:uid('sup'), name, cat:'gross', channel:'email', contact:'', phone:'', whatsapp:'', email:'', shopUrl:'', customerNo:'', orderDays:[], cutoff:'12:00', deliveryDays:[], minOrder:0, freight:0, note:'', prefix:'', active:true}; }
@@ -328,6 +344,7 @@ function impProdApply(res, d){
     if(sid) p.supplier = sid; if(x.artNo) p.artNo = x.artNo; if(x.pieceG != null) p.pieceG = x.pieceG; if(x.pack) p.pack = x.pack; if(x.packQty != null) p.packQty = x.packQty;
     if(x.lossCold != null) p.lossCold = x.lossCold; if(x.lossHot != null) p.lossHot = x.lossHot; if(x.loc) p.loc = x.loc; if(x.minStock != null) p.minStock = x.minStock;
     if(x.alg != null){ p.alg = x.alg; p.algNone = !!x.algNone; }
+    if(x.geb){ p.geb = x.geb; p.gebL = x.gebL; p.gebN = x.gebN; if(isNew && !x.loc) p.loc = 'W'; } if(x.pfand != null && isDrink(p)) p.pfand = x.pfand; if(x.pourLoss != null && isDrink(p)) p.pourLoss = x.pourLoss;
     if(isNew && x.stock) addMove('in', p.id, x.stock, 'Anfangsbestand (Import)');
   }
   return out;
@@ -379,7 +396,7 @@ function recFind(name, semis){
   return null;
 }
 function recSteps(text){ const s = String(text || '').trim(); if(!s) return []; const parts = s.split(/\r?\n+|\s+(?=\d{1,2}[.)]\s)/).map(x => x.replace(/^\d{1,2}[.)]\s*/, '').trim()).filter(Boolean); return parts; }
-function recType(raw){ const s = String(raw || '').trim().toLowerCase(); if(!s) return ''; if(/basis|^br$|halbfert|semi|kompon|vorbereit|grund|fond|sauce$/.test(s)) return 'semi'; if(/gericht|dish|speise|teller|portion/.test(s)) return 'dish'; return '?'; }
+function recType(raw){ const s = String(raw || '').trim().toLowerCase(); if(!s) return ''; if(/getr[äa]nk|schank|drink|cocktail/.test(s)) return 'drink'; if(/basis|^br$|halbfert|semi|kompon|vorbereit|grund|fond|sauce$/.test(s)) return 'semi'; if(/gericht|dish|speise|teller|portion/.test(s)) return 'dish'; return '?'; }
 function impRecAnalyse(d){
   let map = d.map; const rows = d.rows; const notes = [];
   if(!impHas(map, 'rec')) throw new Error('Es fehlt die Spalte „Rezeptur“. Bitte unten zuordnen.');
@@ -411,12 +428,12 @@ function impRecAnalyse(d){
   // Typ, Ausbeute, Verknüpfung
   const semis = [];
   order.forEach(rc => { const t = recType(rc.typeRaw); const exCard = S.cards.find(c => normName(c.name) === rc.key);
-    rc.type = t === 'semi' || t === 'dish' ? t : exCard ? exCard.type : 'dish'; if(t === '?') rc.notes.push(`Typ „${rc.typeRaw}“ nicht erkannt: ${rc.type === 'semi' ? 'Basisrezept' : 'Gericht'}`);
+    rc.type = t === 'drink' ? 'dish' : t === 'semi' || t === 'dish' ? t : exCard ? exCard.type : 'dish'; rc.drink = t === 'drink' || (t !== 'semi' && t !== 'dish' && !!(exCard && exCard.drink)); if(t === '?') rc.notes.push(`Typ „${rc.typeRaw}“ nicht erkannt: ${rc.type === 'semi' ? 'Basisrezept' : 'Gericht'}`);
     rc.ex = S.cards.find(c => normName(c.name) === rc.key && c.type === rc.type) || null;
     if(rc.type === 'semi') semis.push(rc); });
   const unmatched = new Map();
   order.forEach(rc => {
-    if(rc.yieldRaw){ const m = String(rc.yieldRaw).toLowerCase().replace(',', '.').match(/^([\d.\s]+)\s*(kg|g|l|ml)?$/); const v = m ? impNum(m[1]) : NaN; if(isFinite(v) && v > 0) rc.yield = v * (m[2] === 'kg' || m[2] === 'l' ? 1000 : 1); else rc.notes.push(`Ausbeute „${rc.yieldRaw}“ nicht lesbar`); }
+    if(rc.yieldRaw){ const m = String(rc.yieldRaw).toLowerCase().replace(',', '.').match(/^([\d.\s]+)\s*(kg|g|l|ml|cl)?$/); const v = m ? impNum(m[1]) : NaN; if(isFinite(v) && v > 0) rc.yield = v * (m[2] === 'kg' || m[2] === 'l' || (rc.drink && !m[2] && v <= 5) ? 1000 : m[2] === 'cl' ? 10 : 1); else rc.notes.push(`Ausbeute „${rc.yieldRaw}“ nicht lesbar`); }
     const div = rc.type === 'dish' && rc.portions > 1 ? rc.portions : 1; if(div > 1) rc.notes.push(`für ${num(rc.portions)} Portionen geschrieben: Mengen durch ${num(rc.portions)} geteilt`);
     if(rc.type === 'semi' && rc.yield == null && rc.portions && rc.portionG) rc.yield = rc.portions * rc.portionG;
     rc.yieldG = rc.type === 'semi' ? (rc.yield != null ? rc.yield : '') : (rc.portionG != null ? rc.portionG : (rc.yield != null && div === 1 ? rc.yield : ''));
@@ -481,7 +498,8 @@ function impRecApply(res, d){
   // erst die Karten anlegen (Basisrezepte zuerst), dann die Zeilen: so stimmen Verweise in beide Richtungen
   todo.sort((a, b) => (a.type === 'semi' ? 0 : 1) - (b.type === 'semi' ? 0 : 1)).forEach(rc => {
     let c = rc.ex; const linkIds = rc.type === 'dish' && rc.link ? rc.link.split(',').filter(Boolean) : []; const m0 = linkIds.length ? S.menu.find(m => m.id === linkIds[0]) : null;
-    if(!c){ c = {id:uid(rc.type === 'semi' ? 'semi' : 'dish'), no:S.settings.nextNo++, name:rc.name, type:rc.type, category:rc.cat || (rc.type === 'semi' ? 'Basisrezepte' : m0 ? m0.section : ''), yieldG:'', img:'', steps:[], items:[]}; S.cards.push(c); out.neu++; } else out.akt++;
+    if(!c){ c = {id:uid(rc.type === 'semi' ? 'semi' : 'dish'), no:S.settings.nextNo++, name:rc.name, type:rc.type, category:rc.cat || (rc.type === 'semi' ? 'Basisrezepte' : m0 ? m0.section : rc.drink ? drinkSection() : ''), yieldG:'', img:'', steps:[], items:[]}; S.cards.push(c); out.neu++; } else out.akt++;
+    if(rc.drink && c.type === 'dish') c.drink = true;
     if(rc.cat) c.category = rc.cat; if(rc.yieldG !== '') c.yieldG = rc.yieldG; if(rc.steps.length) c.steps = rc.steps.map(t => ({t, img:''})); delete c.fresh;
     cardOf.set(rc.key, c);
   });
@@ -540,12 +558,15 @@ const IMP_TPL = {
     ['Getränke','Mineralwasser 0,33 l','','','3,40','vegan','','keine','',''],
   ]]]},
   prod:{file:'Vorlage-Artikel', sheets:[['Artikel', [
-    ['Artikel','Einheit','Stückgewicht','Preis netto','Lieferant','Artikelnummer','Gebinde','Gebindegröße','Putzverlust','Garverlust','Allergene','Lagerort','Mindestbestand','Anfangsbestand'],
-    ['Schweinsschnitzel','kg','','9,80','Metzgerei Muster','MM-1001','Vakuum 5 kg','5','4','15','keine','Kühlhaus','8','10'],
-    ['Mehl glatt','kg','','0,89','Großhandel Muster','4401','Sack 10 kg','10','0','0','A','Trockenlager','15','20'],
-    ['Ei M','Stk','60','0,27','Hof Muster','','Tray 30 Stk','30','12','0','C','Kühlhaus','90','180'],
-    ['Schlagobers 36 %','l','','4,40','Molkerei Muster','7712','Karton 6×1 l','','0','0','G','Kühlhaus','6','12'],
-    ['Zwiebel','kg','','1,15','Gemüsehof Muster','','Sack 10 kg','10','12','0','keine','Gemüselager','10','20'],
+    ['Artikel','Einheit','Stückgewicht','Preis netto','Lieferant','Artikelnummer','Gebinde','Gebindegröße','Putzverlust','Garverlust','Allergene','Lagerort','Mindestbestand','Anfangsbestand','Pfand','Schankverlust'],
+    ['Schweinsschnitzel','kg','','9,80','Metzgerei Muster','MM-1001','Vakuum 5 kg','5','4','15','keine','Kühlhaus','8','10','',''],
+    ['Mehl glatt','kg','','0,89','Großhandel Muster','4401','Sack 10 kg','10','0','0','A','Trockenlager','15','20','',''],
+    ['Ei M','Stk','60','0,27','Hof Muster','','Tray 30 Stk','30','12','0','C','Kühlhaus','90','180','',''],
+    ['Schlagobers 36 %','l','','4,40','Molkerei Muster','7712','Karton 6×1 l','','0','0','G','Kühlhaus','6','12','',''],
+    ['Zwiebel','kg','','1,15','Gemüsehof Muster','','Sack 10 kg','10','12','0','keine','Gemüselager','10','20','',''],
+    ['Märzen vom Fass','Fass','','87,00','Getränke Muster','GM-30','30 l','','','','A','Bar','2','2','30,00','5'],
+    ['Weißbier 0,5 l','Kiste','','19,00','Getränke Muster','GM-52','20×0,5 l','','','','A','Bar','20','40','4,50',''],
+    ['Grüner Veltliner 0,75 l','Flasche','','6,40','Weinhandel Muster','','0,75 l','','','','O','Bar','6','12','',''],
   ]]]},
   rec:{file:'Vorlage-Rezepturen', sheets:[['Zutaten', [
     ['Rezeptur','Typ','Zutat','Menge','Einheit','Ausbeute','Portionsgewicht','Gericht auf der Karte'],
@@ -584,9 +605,9 @@ const IMPS = {
   menu:{title:'Speisekarte importieren', short:'Speisekarte', one:'Gericht', many:'Gerichte', fields:IMP_MENU_FIELDS, analyse:impMenuAnalyse, apply:impMenuApply,
     intro:'Eine Zeile je Gericht. Pflicht sind <b>Gericht</b> und <b>Preis</b> (inkl. MwSt.). Dazu, wenn vorhanden: Kategorie, Beschreibung, Variante, vegetarisch/vegan, Saison, Allergene (Buchstaben A–R oder „keine“), Empfehlung, Wochentage.'},
   prod:{title:'Artikel & Preise importieren', short:'Artikel & Preise', one:'Artikel', many:'Artikel', fields:IMP_PROD_FIELDS, analyse:impProdAnalyse, apply:impProdApply,
-    intro:'Eine Zeile je Artikel. Pflicht ist <b>Artikel</b>. Dazu, wenn vorhanden: Einheit (kg, l, Stk), Stückgewicht, Preis netto je Einheit, Lieferant, Artikelnummer, Gebinde und Gebindegröße, Putzverlust, Garverlust, Allergene, Lagerort, Mindestbestand, Anfangsbestand.'},
+    intro:'Eine Zeile je Artikel. Pflicht ist <b>Artikel</b>. Dazu, wenn vorhanden: Einheit (kg, l, Stk), Stückgewicht, Preis netto je Einheit, Lieferant, Artikelnummer, Gebinde und Gebindegröße, Putzverlust, Garverlust, Allergene, Lagerort, Mindestbestand, Anfangsbestand. Getränke: Einheit <b>Flasche</b>, <b>Fass</b> oder <b>Kiste</b>, bei Gebinde der Inhalt („0,75 l“, „30 l“, „20×0,5 l“), der Preis je Flasche, Fass oder Kiste; dazu Pfand und Schankverlust.'},
   rec:{title:'Rezepturen importieren', short:'Rezepturen', one:'Rezeptur', many:'Rezepturen', fields:IMP_REC_FIELDS, analyse:impRecAnalyse, apply:impRecApply,
-    intro:'Eine Zeile je Zutat: <b>Rezeptur</b>, <b>Zutat</b>, <b>Menge</b>, Einheit (g, kg, ml, l, Stk, EL, TL, Prise). Dazu, wenn vorhanden: Typ (Gericht oder Basisrezept), Ausbeute, Portionen, Portionsgewicht, Schritt, Gericht auf der Karte.'},
+    intro:'Eine Zeile je Zutat: <b>Rezeptur</b>, <b>Zutat</b>, <b>Menge</b>, Einheit (g, kg, ml, cl, l, Stk, EL, TL, Prise). Dazu, wenn vorhanden: Typ (Gericht, Basisrezept oder Getränk), Ausbeute, Portionen, Portionsgewicht, Schritt, Gericht auf der Karte.'},
   team:{title:'Team importieren', short:'Team', one:'Person', many:'Personen', fields:IMP_TEAM_FIELDS, analyse:impTeamAnalyse, apply:impTeamApply,
     intro:'Eine Zeile je Person: <b>Name</b>, Bereich (Küche, Service, Bar, Abwasch), Wochenstunden.'},
 };
@@ -665,7 +686,7 @@ function impRecHtml(it, d){
     const q = l.st === 'ok' ? `<b class="mono">${num(l.qty, 2)} ${tu}</b>` : '';
     const ask = (l.ask || d.dec['q:' + l.n] != null) && l.st !== 'skip' ? `<label class="imp-q">in ${tu}<input class="num-in" type="text" inputmode="decimal" data-impq="${l.n}" value="${d.dec['q:' + l.n] != null ? numIn(d.dec['q:' + l.n]) : ''}" placeholder="${l.st === 'ok' ? numIn(Math.round(l.qty * 100) / 100) : '—'}" aria-label="Menge ${esc(l.name)} in ${tu}"></label>` : '';
     return `<li class="imp-l ${l.st}"><span class="imp-ln"><b>${esc(l.qtyRaw)} ${esc(l.unitRaw)}</b> ${esc(l.name)}${info ? `<small>${info}</small>` : ''}${l.msg ? `<small class="imp-why">${esc(l.msg)}</small>` : ''}</span><span class="imp-lq">${q}${ask}</span></li>`; };
-  const meta = [rc.type === 'semi' ? 'Basisrezept' : 'Gericht', plural(rc.lines.length, 'Zutat', 'Zutaten'), rc.steps.length ? plural(rc.steps.length, 'Schritt', 'Schritte') : '', rc.yieldG !== '' ? (rc.type === 'semi' ? 'Ausbeute ' : 'Portion ') + num(rc.yieldG) + ' g' : ''].filter(Boolean).join(' · ');
+  const meta = [rc.type === 'semi' ? 'Basisrezept' : rc.drink ? 'Getränk' : 'Gericht', plural(rc.lines.length, 'Zutat', 'Zutaten'), rc.steps.length ? plural(rc.steps.length, 'Schritt', 'Schritte') : '', rc.yieldG !== '' ? (rc.drink ? 'Ausschank ' + volTxt(rc.yieldG) : (rc.type === 'semi' ? 'Ausbeute ' : 'Portion ') + num(rc.yieldG) + ' g') : ''].filter(Boolean).join(' · ');
   return `<li class="imp-r imp-rec st-${it.st}" data-n="${it.n}"><span class="imp-st">${IMP_ST[it.st]}<small>Zeile ${it.n}</small></span>
     <div class="imp-m"><b>${esc(rc.name)}</b><small>${esc(meta)}</small>${it.why ? `<small class="imp-why">${esc(it.why)}</small>` : ''}${(it.notes || []).map(n => `<small class="imp-note">${esc(n)}</small>`).join('')}
       ${rc.type === 'dish' && it.st !== 'fehler' ? `<label class="imp-ctl">Gericht auf der Karte${rc.linkAuto ? ' (gleicher Name)' : ''}<select class="sm-sel" data-impdec="${rc.lk}">${menuOpts(rc.link || '')}</select></label>` : ''}

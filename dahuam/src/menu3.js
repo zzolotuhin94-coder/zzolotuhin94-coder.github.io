@@ -17,7 +17,8 @@ view.wk = {tab:'all', filters:[]};
 function wkGroupsFor(items){
   const known = new Set(WK_GROUPS.flatMap(g=>g[2]));
   const extra = secList().filter(s => !known.has(s) && items.some(m=>m.section===s));
-  const gs = WK_GROUPS.map(g => [...g]); if(extra.length) gs.splice(4, 0, ['mehr','Weitere',extra]);
+  const sv = S.settings.secVat || {}; const dr = extra.filter(s => sv[s] === 'g'), rest = extra.filter(s => sv[s] !== 'g');
+  const gs = WK_GROUPS.map(g => [...g]); if(rest.length) gs.splice(4, 0, ['mehr','Weitere',rest]); if(dr.length) gs.push(['getraenke','Getränke',dr]);
   return gs.filter(g => g[2].some(s => items.some(m=>m.section===s)));
 }
 function wkPass(m){
@@ -35,10 +36,12 @@ function wkDish(e, used){
   const ai = algOfVars(vars), alg = ai.letters; alg.forEach(a=>used.add(a)); if(ai.open) used.add(ALG_MARK);
   const veg = vars.every(v=>v.veg==='vg') ? 'vg' : vars.every(v=>v.veg==='v'||v.veg==='vg') ? 'v' : '';
   const desc = [m.desc, hkDays(m)].filter(Boolean).join(' · ');
+  const drink = vars.some(v => guestVol(v));   // Getränke: Menge bei jedem Preis, mehrere Größen in einer Zeile
+  const dp = v => `<span class="wk-p">${guestVol(v) || v.vlabel ? `<small>${esc(guestVol(v) || v.vlabel)}</small>` : ''}${+v.price?wkPrice(v.price):''}</span>`;
   return `<article class="wk-dish ${vars.some(v=>v.top)?'sig':''}">
-    <div class="wk-l1"><h4 class="wk-n">${esc(m.name)}${veg?`<i class="wk-veg" title="${veg==='vg'?'vegan':'vegetarisch'}">${veg==='vg'?'VG':'V'}</i>`:''}</h4>${multi?'':`<span class="wk-p">${+m.price?wkPrice(m.price):''}</span>`}</div>
+    <div class="wk-l1"><h4 class="wk-n">${esc(m.name)}${veg?`<i class="wk-veg" title="${veg==='vg'?'vegan':'vegetarisch'}">${veg==='vg'?'VG':'V'}</i>`:''}</h4>${drink ? `<span class="wk-ps">${vars.map(dp).join('')}</span>` : multi?'':`<span class="wk-p">${+m.price?wkPrice(m.price):''}</span>`}</div>
     ${desc ? `<p class="wk-d">${esc(desc)}</p>` : ''}
-    ${multi ? `<div class="wk-vars">${vars.map(v=>`<div class="wk-var"><span>${esc(v.vlabel||v.name)}</span><span class="wk-p">${wkPrice(v.price)}</span></div>`).join('')}</div>` : ''}
+    ${multi && !drink ? `<div class="wk-vars">${vars.map(v=>`<div class="wk-var"><span>${esc(v.vlabel||v.name)}</span><span class="wk-p">${wkPrice(v.price)}</span></div>`).join('')}</div>` : ''}
     ${alg.length || ai.open ? `<div class="wk-a" title="${esc(alg.map(a=>ALG[a]).join(', ') + (ai.open ? (alg.length ? ' · ' : '') + 'Angabe unvollständig' : ''))}">Allergene ${alg.concat(ai.open ? [ALG_MARK] : []).join(' ')}</div>` : ''}
     ${vars.some(v=>v.top) ? '<div class="wk-sig">Empfehlung des Hauses</div>' : ''}
   </article>`;

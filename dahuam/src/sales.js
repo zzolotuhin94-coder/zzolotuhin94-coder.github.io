@@ -115,7 +115,7 @@ function importApply(res, {replace=true, stock=false}={}){
   for(const [day, mp] of Object.entries(days)){
     const rows = [...mp.entries()].map(([mid,[q,g]]) => [mid, Math.round(q*1000)/1000, Math.round(g*100)/100]);
     if(replace || !S.salesDays[day]) S.salesDays[day] = rows; else { const cur = new Map(S.salesDays[day].map(r=>[r[0],r])); rows.forEach(r => { const c = cur.get(r[0]); if(c){ c[1] += r[1]; c[2] += r[2]; } else cur.set(r[0], r); }); S.salesDays[day] = [...cur.values()]; }
-    n++; rows.forEach(([mid,q]) => { portions += q; if(stock){ const m = S.menu.find(x=>x.id===mid); const c = m && m.card && C(m.card); if(c) explode(c, q, acc); } });
+    n++; rows.forEach(([mid,q]) => { portions += q; if(stock){ const m = S.menu.find(x=>x.id===mid); const c = m && m.card && C(m.card); if(c) explode(c, q*menuFactor(m), acc); } });
   }
   Object.keys(days).forEach(d => markRealDay(d));
   if(stock && acc.size){ const grp = uid('sb'); acc.forEach((q,pid) => { const before = S.moves.length; addMove('sale', pid, -Math.round(q*1000)/1000, 'Kassen-Import'); if(S.moves.length > before) S.moves[0].grp = grp; }); S.saleGroups = S.saleGroups || {}; S.saleGroups[grp] = {day:null, n:Math.round(portions), rows:null, gross:0, imp:true}; }

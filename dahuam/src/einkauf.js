@@ -123,7 +123,7 @@ function orderText(o){
 function mailHref(o){ const sp = SUP(o.supplier); return `mailto:${encodeURIComponent(sp.email)}?subject=${encodeURIComponent(`Bestellung ${o.no} – ${S.settings.name}`)}&body=${encodeURIComponent(orderText(o))}`; }
 function waHref(o){ const sp = SUP(o.supplier); return `https://wa.me/${String(sp.whatsapp||sp.phone).replace(/\D/g,'').replace(/^00/,'')}?text=${encodeURIComponent(orderText(o))}`; }
 function receiveIn(p, units, unitPrice, note, date){
-  const old = p.price; const chef = canEditAll(); /* das Team bucht die Menge; Einkaufspreise ändert nur der Chef */ if(chef && unitPrice && Math.abs(unitPrice - p.price) > 0.0001){ const s0 = Math.max(0, +p.stock||0); p.price = Math.round((s0*p.price + units*unitPrice)/(s0+units)*100)/100; }
+  const old = p.price; const chef = canEditAll(); /* das Team bucht die Menge; Einkaufspreise ändert nur der Chef */ if(chef && unitPrice && Math.abs(unitPrice - p.price) > 0.0001){ const s0 = Math.max(0, +p.stock||0); p.price = prRound(p, (s0*p.price + units*unitPrice)/(s0+units)); }
   addMove('in', p.id, units, note, unitPrice || p.price, date); if(chef && unitPrice) markPrice(p, 'Wareneingang'); if(old !== p.price) S.moves[0].prevPrice = old;
 }
 
@@ -169,7 +169,7 @@ function orderList(){
 
 /* ---------- Bestellung bearbeiten / senden / empfangen ---------- */
 function orderEditor(o){
-  const sp = SUP(o.supplier); const tot = orderTotal(o); const editable = o.status === 'draft';
+  const sp = SUP(o.supplier); const tot = orderTotal(o); const editable = o.status === 'draft'; const pf = orderPfand(o), pfD = o.receipt ? orderPfand(o, true) : 0;
   const recv = view.recv === o.id && ['sent','confirmed'].includes(o.status);
   const block = sendBlockReason(o);
   const hasCold = o.lines.some(l => P(l.pid)?.loc === 'K' || P(l.pid)?.loc === 'T');
@@ -207,7 +207,7 @@ function orderEditor(o){
       <section class="panel flush"><div class="panel-h pad"><h2>Positionen</h2><span class="muted sm">${o.lines.length}</span></div>
         <div class="tbl-wrap"><table class="otab"><thead><tr><th>Artikel</th><th class="r">Menge</th><th class="r">= Einheit</th><th class="r">Preis</th><th class="r">Summe</th>${o.receipt?'<th class="r">Geliefert</th><th class="r">Rechnungspreis</th>':''}<th></th></tr></thead>
         <tbody>${rows || '<tr><td colspan="6" class="muted">Noch keine Positionen.</td></tr>'}</tbody>
-        <tfoot><tr><td colspan="4">${o.receipt ? 'Summe bestellt, exkl. MwSt.' : 'Summe exkl. MwSt.'}</td><td class="r mono" data-l="${o.receipt ? 'Summe bestellt' : 'Summe'}">${eur(tot)}</td>${o.receipt?`<td class="r muted tf-l">geliefert</td><td class="r mono" data-l="Summe geliefert">${eur(deliveredTotal(o))}</td>`:''}<td class="ol-x"></td></tr></tfoot></table></div>
+        <tfoot><tr><td colspan="4">${o.receipt ? 'Summe bestellt, exkl. MwSt.' : 'Summe exkl. MwSt.'}</td><td class="r mono" data-l="${o.receipt ? 'Summe bestellt' : 'Summe'}">${eur(tot)}</td>${o.receipt?`<td class="r muted tf-l">geliefert</td><td class="r mono" data-l="Summe geliefert">${eur(deliveredTotal(o))}</td>`:''}<td class="ol-x"></td></tr>${pf > 0 || pfD > 0 ? `<tr class="pf-row"><td colspan="4">Pfand, kommt mit dem Leergut zurück</td><td class="r mono" data-l="Pfand">${eur(pf)}</td>${o.receipt?`<td class="r muted tf-l">geliefert</td><td class="r mono" data-l="Pfand geliefert">${eur(pfD)}</td>`:''}<td class="ol-x"></td></tr>` : ''}</tfoot></table></div>
         ${editable ? `<div class="panel-f"><select id="olAdd" class="sm-sel" aria-label="Artikel hinzufügen"><option value="">+ Artikel von ${esc(sp.name)} …</option>${addable.map(p=>`<option value="${p.id}">${esc(p.name)}${p.pack?' ('+esc(p.pack)+')':''}</option>`).join('')}</select><button type="button" class="btn sm" data-act="olSuggest" data-id="${o.id}">Vorschlag laden</button></div>` : ''}
       </section>
       ${o.complaint ? `<section class="panel"><div class="panel-h"><h2>Reklamation</h2><select data-cst="${o.id}" class="sm-sel">${Object.entries(CSTAT).map(([k,l])=>`<option value="${k}" ${o.complaint.status===k?'selected':''}>${l}</option>`).join('')}</select></div>
@@ -220,11 +220,11 @@ function orderEditor(o){
         <div class="panel-h"><h2>${editable?'Senden':'Status'}</h2></div>
         ${editable ? `<label class="f">Gewünschte Lieferung<select data-od="${o.id}">${[...new Set([o.deliveryDate, ...deliveryOptions(sp)])].sort().map(d=>`<option value="${d}" ${o.deliveryDate===d?'selected':''}>${dayLabel(d)}</option>`).join('')}</select></label>
           <label class="f">Bemerkung an den Lieferanten<input data-on="${o.id}" value="${esc(o.note)}" placeholder="z. B. Leergut 3 Kisten mitnehmen"></label>
-          <div class="kv"><span>Summe</span><span>${eur(tot)}</span><span>Mindestbestellwert</span><span class="${below?'bad-t':''}">${sp.minOrder ? eur(sp.minOrder) + (below ? '' : ' · erreicht') : 'keiner'}</span><span>Annahmeschluss</span><span>${esc(sp.cutoff)} Uhr</span></div>
+          <div class="kv"><span>${pf > 0 ? 'Ware' : 'Summe'}</span><span>${eur(tot)}</span>${pf > 0 ? `<span>Pfand</span><span>${eur(pf)}</span>` : ''}<span>Mindestbestellwert</span><span class="${below?'bad-t':''}">${sp.minOrder ? eur(sp.minOrder) + (below ? '' : ' · erreicht') : 'keiner'}</span><span>Annahmeschluss</span><span>${esc(sp.cutoff)} Uhr</span></div>
           ${below ? `<p class="hint bad-t">Noch ${eur(sp.minOrder-tot)} bis zum Mindestbestellwert.</p>` : ''}
           ${sendBtns()}
           <details class="alg-det"><summary>Bestelltext ansehen</summary><pre class="otext">${esc(orderText(o))}</pre></details>`
-        : `<div class="kv"><span>Lieferung</span><span>${dayLabel(o.deliveryDate)}</span><span>Summe bestellt</span><span>${eur(tot)}</span>${o.receipt?`<span>Summe geliefert</span><span>${eur(deliveredTotal(o))}</span><span>Lieferschein</span><span>${esc(o.receipt.noteNo||'—')}</span><span>Geprüft von</span><span>${esc(userName(o.receipt.checkedBy))}</span>${o.receipt.temp?`<span>Temperatur</span><span>${esc(o.receipt.temp)}</span>`:''}`:''}${o.confirmedNote?`<span>Bestätigung</span><span>${esc(o.confirmedNote)}</span>`:''}</div>
+        : `<div class="kv"><span>Lieferung</span><span>${dayLabel(o.deliveryDate)}</span><span>${pf > 0 ? 'Ware bestellt' : 'Summe bestellt'}</span><span>${eur(tot)}</span>${pf > 0 && !o.receipt ? `<span>Pfand</span><span>${eur(pf)}</span>` : ''}${o.receipt?`<span>${pfD > 0 ? 'Ware geliefert' : 'Summe geliefert'}</span><span>${eur(deliveredTotal(o))}</span>${pfD > 0 ? `<span>Pfand</span><span>${eur(pfD)}</span>` : ''}<span>Lieferschein</span><span>${esc(o.receipt.noteNo||'—')}</span><span>Geprüft von</span><span>${esc(userName(o.receipt.checkedBy))}</span>${o.receipt.temp?`<span>Temperatur</span><span>${esc(o.receipt.temp)}</span>`:''}`:''}${o.confirmedNote?`<span>Bestätigung</span><span>${esc(o.confirmedNote)}</span>`:''}</div>
           <div class="row-btns" style="margin-top:12px">
             ${o.status==='sent'?`<button type="button" class="btn" data-act="ordConfirm" data-id="${o.id}">Bestätigung erhalten</button>`:''}
             ${['sent','confirmed'].includes(o.status)?`<button type="button" class="btn primary" data-act="ordRecv" data-id="${o.id}">${ico('truck')}Wareneingang prüfen</button><button type="button" class="btn" data-act="ordDelay" data-id="${o.id}">Lieferung verschoben</button>`:''}
@@ -254,7 +254,7 @@ function receiveForm(o, hasCold){
       <div class="f">Foto Lieferschein<div class="row-btns">${o.receiptDraft?.photo && IMG[o.receiptDraft.photo] ? `<img class="ls-th" src="${IMG[o.receiptDraft.photo]}" alt="">` : ''}<button type="button" class="btn sm" data-act="rPhoto" data-id="${o.id}">${ico('camera')}${o.receiptDraft?.photo?'Ändern':'Aufnehmen'}</button></div></div>
       <span class="sp"></span><button type="button" class="btn" data-act="rCancel">Abbrechen</button><button type="button" class="btn primary" data-act="rBook" data-id="${o.id}">Einbuchen</button>
     </div>
-    <p class="hint pad-x pad-b">Leeres Feld „Geliefert“ heißt: wie bestellt. Preisabweichungen über 3 % werden markiert, der Einkaufspreis wird als gleitender Durchschnitt übernommen. Bei Abweichungen entsteht automatisch eine Reklamation.</p>
+    <p class="hint pad-x pad-b">Leeres Feld „Geliefert“ heißt: wie bestellt. Preisabweichungen über 3 % werden markiert, der Einkaufspreis wird als gleitender Durchschnitt übernommen. Bei Abweichungen entsteht automatisch eine Reklamation.${orderPfand(o) > 0 ? ' Das Pfand der gelieferten Gebinde wird beim Leergut des Lieferanten vermerkt.' : ''}</p>
   </section>`;
 }
 
@@ -267,9 +267,10 @@ function supplierView(){
     <div class="kv"><span>Bestellen</span><span>${DAYS.filter(([i])=>sp.orderDays.includes(i)).map(([,l])=>l).join(' ')} bis ${esc(sp.cutoff)}</span><span>Lieferung</span><span>${DAYS.filter(([i])=>sp.deliveryDays.includes(i)).map(([,l])=>l).join(' ')}</span><span>Mindestwert</span><span>${eur(sp.minOrder)}</span><span>Einkauf diesen Monat</span><span>${eur(spend)}</span></div>
     <div class="row-btns"><button type="button" class="btn sm" data-act="supEdit" data-id="${sp.id}">${ico('edit')}Bearbeiten</button><button type="button" class="btn sm" data-act="ordNew" data-id="${sp.id}">${ico('cart')}Bestellen</button></div>
   </article>`; }).join('')}</div>
+  ${lgSection()}
   <h2 class="sec-h">Preisentwicklung</h2>
   <section class="panel flush"><div class="tbl-wrap"><table class="otab"><thead><tr><th>Artikel</th><th>Lieferant</th><th class="r">Aktuell</th><th class="r">Vorher</th><th class="r">Änderung</th></tr></thead><tbody>
-  ${S.products.map(p=>{ const h = priceHistory(p.id); const prev = movesByDate().find(m=>m.pid===p.id && m.prevPrice!=null)?.prevPrice ?? (h[1]); if(prev==null || Math.abs(prev - p.price) < 0.005) return ''; const ch = (p.price/prev-1)*100; return `<tr><td><b class="pn">${esc(p.name)}</b></td><td class="muted">${esc(supName(p))}</td><td class="r mono">${eur(p.price)}</td><td class="r mono muted">${eur(prev)}</td><td class="r mono ${ch>3?'bad-t':ch<0?'good-t':''}">${ch>0?'+':''}${num(ch,1)} %</td></tr>`; }).join('') || '<tr><td colspan="5" class="muted">Noch keine Preisänderungen erfasst.</td></tr>'}
+  ${S.products.map(p=>{ const h = priceHistory(p.id); const prev = movesByDate().find(m=>m.pid===p.id && m.prevPrice!=null)?.prevPrice ?? (h[1]); if(prev==null || Math.abs(prev - p.price) < 0.005) return ''; const ch = (p.price/prev-1)*100; return `<tr><td><b class="pn">${esc(p.name)}</b></td><td class="muted">${esc(supName(p))}</td><td class="r mono">${eur(p.price*priceUnit(p).f)}</td><td class="r mono muted">${eur(prev*priceUnit(p).f)}</td><td class="r mono ${ch>3?'bad-t':ch<0?'good-t':''}">${ch>0?'+':''}${num(ch,1)} %</td></tr>`; }).join('') || '<tr><td colspan="5" class="muted">Noch keine Preisänderungen erfasst.</td></tr>'}
   </tbody></table></div></section>`;
 }
 function supplierDialog(sp){
@@ -332,10 +333,12 @@ document.addEventListener('click', e => {
         if(p && l.delivered > 0) receiveIn(p, l.delivered*l.f, l.invPrice/l.f, `${o.no}${r.noteNo?' · '+r.noteNo:''}`, date);
         if(l.ls !== 'ok') diffs.push(`${p?p.name:'?'}: ${LSTAT[l.ls]} (bestellt ${num(l.n,2)} × ${l.ou}, geliefert ${num(l.delivered,2)})`);
         if(l.price && (l.invPrice/l.price-1)*100 > 3) priceUp.push(`${p?p.name:'?'}: ${eur(l.price)} → ${eur(l.invPrice)}`); });
+      o.lines.forEach(l => { l.pf = linePfand(l); }); const pfSum = orderPfand(o, true);
       o.receipt = {date, noteNo:r.noteNo, temp:r.temp, photo:r.photo||'', checkedBy:me().id}; delete o.receiptDraft;
+      if(pfSum > 0){ o.receipt.pfand = pfSum; lgAdd(o.supplier, pfSum, `Lieferung ${o.no}`, date).order = o.id; }
       if(diffs.length || priceUp.length){ o.status = 'complaint'; o.complaint = {status:'open', text:`Sehr geehrte Damen und Herren,\n\nbei der Lieferung zu ${o.no}${r.noteNo?' (Lieferschein '+r.noteNo+')':''} vom ${fmtDate(date)} gab es folgende Abweichungen:\n${[...diffs, ...priceUp.map(x=>'Preis abweichend: '+x)].map(x=>'• '+x).join('\n')}\n\nBitte um Gutschrift bzw. Nachlieferung.\n\nDanke und freundliche Grüße`}; }
       else o.status = 'delivered';
-      view.recv = null; save(); render(); toast(o.status==='complaint' ? `Eingebucht · ${diffs.length + priceUp.length} Abweichungen, Reklamation vorbereitet` : `Eingebucht · ${o.lines.length} Positionen, alles in Ordnung`); break; }
+      view.recv = null; save(); render(); toast((o.status==='complaint' ? `Eingebucht · ${diffs.length + priceUp.length} Abweichungen, Reklamation vorbereitet` : `Eingebucht · ${o.lines.length} Positionen, alles in Ordnung`) + (pfSum > 0 ? ` · Pfand ${eur(pfSum)} beim Leergut vermerkt` : '')); break; }
     case 'cCopy': { const o = ORD(id); navigator.clipboard?.writeText(o.complaint.text).then(()=>toast('Reklamation kopiert'), ()=>{}); break; }
     case 'supEdit': supplierDialog(id ? SUP(id) : null); break;
     case 'userSwitch': S.settings.currentUser = id; save(); render(); toast(`Angemeldet als ${whoLabel(me())}`); break;

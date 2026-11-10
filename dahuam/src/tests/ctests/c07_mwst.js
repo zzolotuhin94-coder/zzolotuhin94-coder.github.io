@@ -2,6 +2,9 @@
 const L = require('./lib'); const fs = require('fs');
 const near = (a, b, e = 1e-9) => Math.abs(a - b) < e;
 (async () => { const b = await L.launch(); const {p} = await L.open(b, {vp:{width:1440, height:900}});
+  // D1: die Beispieldaten bringen eigene Getränke mit (Kategorie „Getränke“, Fassbier mit Schankverlust). Dieser Test rechnet den zweiten Steuersatz
+  // mit einem eigenen Bier von Hand, deshalb beginnt er ohne die Beispiel-Getränke und mit dem Bier zu 2,90 €/l ohne Schankverlust.
+  await p.evaluate(() => { S.menu = S.menu.filter(m => m.section !== 'Getränke'); S.cards = S.cards.filter(c => !c.drink); S.settings.sections = S.settings.sections.filter(s => s !== 'Getränke'); delete S.settings.secVat['Getränke']; const b = P('bier'); b.price = 2.9; b.pourLoss = 0; save(); render(); });
   // ---------- Grundzustand ----------
   const s0 = await p.evaluate(() => ({vat:S.settings.vat, vd:S.settings.vatDrinks, sv:JSON.stringify(S.settings.secVat), all10:S.menu.every(m => vatRate(m) === 10 && vatClass(m) === 's'), vatOf:typeof vatOf, sch:(() => { const m = S.menu.find(x => x.card === 'dish_schnitzel_pork'); const k = menuCalc(m); return [m.price, k.netPrice, k.cost, k.fc, k.margin]; })()}));
   L.ok(s0.vat === 10 && s0.vd === 20 && s0.sv === '{}' && s0.all10 && s0.vatOf === 'undefined', 'Speisen 10 %, Getränke 20 %; alle Beispiel-Kategorien sind Speisen; den alten Namens-Vergleich (vatOf) gibt es nicht mehr', s0);
