@@ -150,10 +150,14 @@ ui = sub(ui, [
   ("  fixesMigrate(d);\n  return d;", "  fixesMigrate(d);\n  guideMigrate(d);\n  return d;"),
   ("pcheck:renderPriceCheck, labor:renderLabor}[view.tab];", "pcheck:renderPriceCheck, labor:renderLabor, begriffe:renderBegriffe, stempel:renderStempel}[view.tab];"),
 ], 'guide')
+ui = sub(ui, [
+  ("  guideMigrate(d);\n  return d;", "  guideMigrate(d);\n  plusMigrate(d);\n  return d;"),
+  ("begriffe:renderBegriffe, stempel:renderStempel}[view.tab];", "begriffe:renderBegriffe, stempel:renderStempel, vorb:renderVorb}[view.tab];"),
+], 'plus')
 
 start = '/* ---------- Start ---------- */'
 a, b = ui.split(start)
-season = R('season.js') + '\n' + R('season2.js') + '\n' + R('season3.js') + '\n' + R('einkauf.js') + '\n' + R('menu2.js') + '\n' + R('cloud.js') + '\n' + R('ui3.js') + '\n' + R('sales.js') + '\n' + R('report.js') + '\n' + R('menu3.js') + '\n' + R('prices.js') + '\n' + R('game.js') + '\n' + R('drag.js') + '\n' + R('labor.js') + '\n' + R('polish.js') + '\n' + R('pdf.js') + '\n' + R('hauskarte.js') + '\n' + R('fixes.js') + '\n' + R('guide_txt.js') + '\n' + R('guide.js') + '\n' + R('guide_game.js')
+season = R('season.js') + '\n' + R('season2.js') + '\n' + R('season3.js') + '\n' + R('einkauf.js') + '\n' + R('menu2.js') + '\n' + R('cloud.js') + '\n' + R('ui3.js') + '\n' + R('sales.js') + '\n' + R('report.js') + '\n' + R('menu3.js') + '\n' + R('prices.js') + '\n' + R('game.js') + '\n' + R('drag.js') + '\n' + R('labor.js') + '\n' + R('polish.js') + '\n' + R('pdf.js') + '\n' + R('hauskarte.js') + '\n' + R('fixes.js') + '\n' + R('guide_txt.js') + '\n' + R('guide.js') + '\n' + R('guide_game.js') + '\n' + R('vorbereitung.js')
 js = core + '\n' + a + '\n' + season + '\n' + start + b
 
 shell = R('shell_final.html')
@@ -161,7 +165,7 @@ shell = sub(shell, [
   ('family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Bricolage+Grotesque',
    'family=Barlow+Condensed:wght@300;400;500;600;700&family=PT+Sans:wght@400;700&family=Saira+Condensed:wght@300;400&family=Roboto+Condensed:wght@400;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Schibsted+Grotesk:wght@500;600&family=Bricolage+Grotesque'),
   ('<div class="side-foot"><span>Restobar | Café</span>', '<span id="cloudChip" class="cloud-chip off" hidden></span>\n    <div class="side-foot"><button type="button" class="whoami" data-tab="setup" id="whoami"></button>'),
-  ('#print{display:none}', R('season.css') + R('einkauf.css') + R('menu2.css') + R('ui3.css') + R('intro.css') + R('intro2.css') + R('report.css') + R('menu3.css') + R('prices.css') + R('game.css') + R('drag.css') + R('labor.css') + R('polish.css') + R('hauskarte.css') + R('fixes.css') + R('guide.css') + '.m-only{display:none}@media (max-width:900px){.m-only{display:flex}}' + '\n.dish-main:focus-visible,.rc:focus-visible{outline-offset:-3px}\n.title-in{hyphens:auto;-webkit-hyphens:auto}\n#print{display:none}'),
+  ('#print{display:none}', R('season.css') + R('einkauf.css') + R('menu2.css') + R('ui3.css') + R('intro.css') + R('intro2.css') + R('report.css') + R('menu3.css') + R('prices.css') + R('game.css') + R('drag.css') + R('labor.css') + R('polish.css') + R('hauskarte.css') + R('fixes.css') + R('guide.css') + R('plus.css') + '.m-only{display:none}@media (max-width:900px){.m-only{display:flex}}' + '\n.dish-main:focus-visible,.rc:focus-visible{outline-offset:-3px}\n.title-in{hyphens:auto;-webkit-hyphens:auto}\n#print{display:none}'),
 ], 'shell')
 shell = shell.replace('<body>\n', '<body>\n' + R('intro.html'), 1)
 js = js.replace("${!FRAMED && sp.mode==='tageskarte'?", "${sp.mode==='tageskarte'?").replace("Tabelle (CSV)</button>${FRAMED?'':`", "Tabelle (CSV)</button>${false?'':`")
