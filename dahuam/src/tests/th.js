@@ -30,9 +30,9 @@ console.log('copy applied',await ev(()=>[document.querySelector('.hs-prev .hs-we
 await p.reload();await p.waitForTimeout(900);console.log('copy persisted',await ev(()=>[hsCopy('welcome'),hsCopy('sec','Rösti'),hsCopy('sec','Klassiker')]));
 // Stilwechsel + Merker
 await ev(()=>{view.mtab='guest';go('menu')});await p.waitForTimeout(500);
-await p.click('[data-act=gStyle][data-id=web]');await p.waitForTimeout(400);console.log('web',await ev(()=>[S.settings.guestStyle,S.settings.guestStylePick,!!document.querySelector('.wk-paper'),!!document.querySelector('.hs-sheet'),!!document.querySelector('[data-hsc]')]));
-await p.reload();await p.waitForTimeout(900);console.log('web kept after reload',await ev(()=>hsStyle()));
-await ev(()=>{view.mtab='guest';go('menu')});await p.waitForTimeout(400);await p.click('[data-act=gStyle][data-id=book]');await p.waitForTimeout(400);console.log('book',await ev(()=>[hsStyle(),!!document.querySelector('.hk-paper')]));
+await p.click('[data-act=gStyle][data-id=schlicht]');await p.waitForTimeout(400);console.log('schlicht',await ev(()=>[S.settings.guestStyle,!!document.querySelector('.wk-paper'),!!document.querySelector('.hs-sheet'),!!document.querySelector('[data-hsc]')]));
+await p.reload();await p.waitForTimeout(900);console.log('schlicht kept after reload',await ev(()=>hsStyle()));
+await ev(()=>{view.mtab='guest';go('menu')});await p.waitForTimeout(400);console.log('styles offered',await ev(()=>[...document.querySelectorAll('[data-act=gStyle]')].map(b=>b.textContent).join(' | ')));
 await p.click('[data-act=gStyle][data-id=haus]');await p.waitForTimeout(600);console.log('haus again',await ev(()=>[hsStyle(),document.querySelectorAll('.hs-sheet').length]));
 // Migration: alte Daten mit 'web' ohne Merker
 await ev(()=>{S.settings.guestStyle='web';delete S.settings.guestStylePick;delete S.settings.menuCopy;save()});await p.reload();await p.waitForTimeout(900);console.log('migrated',await ev(()=>[S.settings.guestStyle,hsStyle(),JSON.stringify(S.settings.menuCopy)]));

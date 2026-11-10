@@ -17,7 +17,7 @@ const L = require('./lib'); const fs = require('fs'); const path = require('path
   L.ok(await p.evaluate(() => S.settings.name === 'Offline-Test' && S.menu.length > 50 && !!document.querySelector('#app h1')), 'ohne Netz neu laden: App startet mit den Daten (früher: ERR_INTERNET_DISCONNECTED)');
   for(const t of await p.evaluate(() => TABS.map(t => t[0]))){ await p.evaluate(t => go(t), t); await p.waitForTimeout(60); }
   await p.evaluate(() => { view.mtab = 'guest'; go('menu'); }); await p.waitForTimeout(800);
-  for(const st of ['web', 'book', 'haus']){ await p.click(`[data-act="gStyle"][data-id="${st}"]`); await p.waitForTimeout(700); }
+  for(const st of ['schlicht', 'haus']){ await p.click(`[data-act="gStyle"][data-id="${st}"]`); await p.waitForTimeout(700); }
   await p.evaluate(() => { printOrder = printOrder; const el = document.createElement('pre'); el.style.font = "12pt 'JetBrains Mono',monospace"; el.textContent = 'Bestellung'; document.body.appendChild(el); }); await p.waitForTimeout(400);
   const fonts = await p.evaluate(async () => { await document.fonts.ready; const st = {}; for(const f of document.fonts){ const k = f.family.replace(/"/g, ''); st[k] = st[k] || new Set(); st[k].add(f.status); } return Object.fromEntries(Object.entries(st).map(([k, v]) => [k, [...v].join('/')])); });
   const need = ['Figtree', 'Barlow Condensed', 'Fraunces', 'Caveat', 'PT Sans', 'Roboto Condensed', 'Saira Condensed', 'Schibsted Grotesk', 'Source Serif 4', 'JetBrains Mono'];

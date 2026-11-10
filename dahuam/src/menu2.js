@@ -92,27 +92,7 @@ function hkSpecial(sp, used, page){
   </section>`;
 }
 
-/* ---------- Karten ---------- */
-guestHtml = function(seasonKey, dateStr){
-  dateStr = dateStr || todayStr();
-  const k = seasonKey || seasonFor(dateStr) || 'winter';
-  const s = S.settings.seasons[k];
-  const kidsSep = S.settings.kidsSheet !== false;
-  const items = guestItems(k, dateStr);
-  const used = new Set();
-  const inserts = specialsFor(dateStr).filter(sp => sp.mode !== 'tageskarte');
-  const secs = secList().filter(sec => items.some(m=>m.section===sec) && !(kidsSep && sec==='Für Kinder'));
-  let body = inserts.map(sp => hkSpecial(sp, used)).join('');
-  for(const sec of secs){
-    const list = items.filter(m=>m.section===sec);
-    body += `<section class="hk-sec" data-sec="${esc(sec)}"><h3 class="hk-h">${esc(sec)}</h3>${hkEntries(list).map(e=>hkDish(e, used)).join('')}</section>`;
-  }
-  const cover = s.cover && IMG[s.cover] ? `<figure class="hk-cover"><img src="${IMG[s.cover]}" alt=""></figure>` : '';
-  const index = secs.length > 3 ? `<nav class="hk-index" aria-label="Abschnitte">${secs.map(x=>`<button type="button" data-act="hkJump" data-id="${esc(x)}">${esc(x)}</button>`).join('')}</nav>` : '';
-  return `<div class="hk-paper" style="--hk-a:${esc(s.accent || HK_ACCENT[k])}">${hkHead(k, dateStr)}${cover}${index}
-    <div class="hk-cols">${body || '<p class="hk-empty">Noch keine sichtbaren Gerichte in dieser Saison.</p>'}</div>
-    ${hkLegend(used, k)}</div>`;
-};
+/* ---------- Beiblätter: Kinderkarte und Tageskarte ---------- */
 function kidsHtml(k, dateStr){
   const items = guestItems(k, dateStr).filter(m=>m.section==='Für Kinder'); if(!items.length) return '';
   const used = new Set(); const s = S.settings.seasons[k];
@@ -120,12 +100,12 @@ function kidsHtml(k, dateStr){
     <h2 class="hk-sheet-title">Für unsere kleinen Gäste</h2>
     <div class="hk-cols one">${hkEntries(items).map(e=>hkDish(e, used, {noSig:true})).join('')}</div>${hkLegend(used, k)}</div>`;
 }
-tageskarteHtml = function(sp, k){
+function tageskarteHtml(sp, k){
   k = k || seasonFor(sp.from) || 'winter'; const s = S.settings.seasons[k]; const used = new Set();
   return `<div class="hk-paper hk-tk" style="--hk-a:${esc(s.accent || HK_ACCENT[k])}">${hkHead(k, sp.from, 'Tageskarte')}
     ${hkSpecial(sp, used, true)}${hkLegend(used, k)}</div>`;
-};
-guestPrevHtml = function(){
+}
+function guestPrevHtml(){
   const date = view.gdate || todayStr(); const k = curSeasonKey();
   const wdn = new Date(date+'T12:00:00').getDay();
   const closed = (S.settings.closed||[]).includes(wdn) ? `<div class="g-closed">${ico('spark')}${DAYNAME[wdn]} ist Ruhetag. So sähe die Karte trotzdem aus.</div>` : '';
@@ -134,14 +114,14 @@ guestPrevHtml = function(){
   return closed + guestHtml(k, date)
     + tks.map(sp=>`<div class="tk-label">Tageskarte, liegt bei · ${esc(sp.name)}</div>${tageskarteHtml(sp, k)}`).join('')
     + (kids ? `<div class="tk-label">Kinderkarte, eigenes Blatt</div>${kids}` : '');
-};
+}
 
 /* ---------- Werkzeuge ---------- */
-renderGuest = function(){
+function renderGuest(){
   const date = view.gdate || (view.gdate = todayStr());
   const auto = seasonFor(date); const k = view.gseason || auto || 'winter'; const s = S.settings.seasons[k];
   const sps = specialsFor(date);
-  const miss = guestItems(k, date).filter(m=>!hasAlg(m)).length + sps.reduce((n,sp)=>n+sp.items.filter(it=>!hasAlg(it)).length,0);
+  const miss = guestItems(k, date).filter(m=>!hasAlg(m)).length; const missSp = sps.reduce((n,sp)=>n+sp.items.filter(it=>!hasAlg(it)).length,0); const missAll = noAlgCount();
   const accent = s.accent || HK_ACCENT[k];
   return `<div class="guest-wrap">
     <aside class="guest-tools">
@@ -150,8 +130,9 @@ renderGuest = function(){
         <label class="f">Datum<input id="gdate" type="date" value="${date}"></label>
         <div class="chips-row tight"><button type="button" class="chip ${date===todayStr()?'on':''}" data-act="gdate" data-id="${todayStr()}">Heute</button><button type="button" class="chip" data-act="gdate" data-id="${addDays(todayStr(),1)}">Morgen</button>${S.specials.filter(sp=>spStatus(sp)[0]!=='past').slice(0,3).map(sp=>`<button type="button" class="chip" data-act="gdate" data-id="${sp.from}">${esc(sp.name)}</button>`).join('')}</div>
         <p class="hint">${auto ? `Am ${fmtDate(date+'T12:00:00')} gilt die <b>${esc(S.settings.seasons[auto].title)}</b>` : 'An diesem Datum gilt keine Saisonkarte'}${sps.length ? ` und ${sps.length===1?'die Aktion':'die Aktionen'} <b>${sps.map(x=>esc(x.name)).join(', ')}</b>.` : '.'}</p>
-        ${miss ? `<div class="warn-box">${ico('spark')}<span><b>${miss} Gerichte ohne Allergenangabe.</b> In Österreich Pflicht: Rezeptur verknüpfen oder Allergene eintragen.</span><button type="button" class="btn sm" data-act="goMenu" data-id="noalg">Anzeigen</button></div>` : '<div class="ok-box">Alle Gerichte haben Allergenangaben.</div>'}
+        ${missAll || missSp ? `<p class="hint alg-miss"><b>${plural(missAll, 'Gericht', 'Gerichte')} ohne Allergenangabe</b>${missAll !== miss ? `, ${miss} davon auf dieser Karte. Die anderen sind ausgeblendet oder gerade nicht in Saison` : ''}${missSp ? `. Dazu ${missSp} in der Aktion` : ''}. In Österreich Pflicht. <button type="button" class="link" data-act="goMenu" data-id="noalg">Anzeigen</button></p>` : ''}
       </section>
+      <!--gstyle-->
       <section class="panel">
         <div class="panel-h"><h2>Saison</h2>${view.gseason?`<button type="button" class="link sm-link" data-act="gseason" data-id="">nach Datum</button>`:''}</div>
         ${seg('gseason', k, SEASONS.map(([sk,sl])=>[sk,sl]))}
@@ -172,7 +153,7 @@ renderGuest = function(){
     </aside>
     <div class="guest-prev">${guestPrevHtml()}</div>
   </div>`;
-};
+}
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if(!el) return;
   if(el.dataset.act === 'hkAccent'){ const s = S.settings.seasons[curSeasonKey()]; s.accent = el.dataset.id; s.pal = {...s.pal, accent:el.dataset.id}; save(); render(); }

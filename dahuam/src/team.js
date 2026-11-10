@@ -122,7 +122,7 @@ function tmDemo(d){
   const t = d.team; const today = isoDate(new Date()); const closed = (d.settings && d.settings.closed) || [];
   const users = (d.settings && d.settings.users) || []; const uid0 = r => { const u = users.find(x => x.role === r); return u ? u.id : ''; };
   const P = (id, name, area, target, color, user) => ({id, name, area, target, color, active:true, user:user || '', demo:true});
-  t.people = [P('tp_anna','Anna','kueche',40,0,uid0('chef')), P('tp_lukas','Lukas','kueche',40,1), P('tp_magdalena','Magdalena','service',38.5,2), P('tp_theresa','Theresa','service',30,3), P('tp_hannes','Hannes','bar',38.5,4,uid0('bar')), P('tp_florian','Florian','abwasch',20,5,uid0('staff'))];
+  t.people = [P('tp_anna','Anna','kueche',40,0,uid0('chef')), P('tp_lukas','Lukas','kueche',40,1), P('tp_magdalena','Magdalena','service',38.5,2), P('tp_theresa','Theresa','service',30,3), P('tp_hannes','Hannes','bar',38.5,4), P('tp_florian','Florian','abwasch',20,5,uid0('team'))];
   const F = [['08:00','16:00']], Sp = [['15:00','23:00']], T = [['10:00','14:00'],['17:30','22:00']];
   // je Person: Wochentag (0 = Montag) → Zeiten
   const plan = {
@@ -197,7 +197,7 @@ function teamMigrate(d){
   if(!obj(c.runs)) c.runs = {};
   const cutR = dAdd(today, -CK_KEEP_RUNS);
   Object.keys(c.runs).forEach(D => { if(!TM_DATE.test(D) || D < cutR || !obj(c.runs[D])){ delete c.runs[D]; return; } Object.keys(c.runs[D]).forEach(k => { const r = c.runs[D][k]; if(!obj(r) || !obj(r.items)) delete c.runs[D][k]; }); if(!Object.keys(c.runs[D]).length) delete c.runs[D]; });
-  // Demodaten: Beispiel-Team dazu, solange noch die Demo läuft und es noch kein Team gab
+  // Beispieldaten: Beispiel-Team dazu, solange noch die Beispieldaten laufen und es noch kein Team gab
   if(fresh && d.demo){ try { tmDemo(d); } catch(e){ console.warn('Team-Beispiel:', e); } }
   return d;
 }
@@ -285,14 +285,12 @@ function tmMonthStats(ym){
 function tmSnap(){ return JSON.stringify({shifts:S.team.shifts, abs:S.team.abs}); }
 function tmRestore(snap){ const o = JSON.parse(snap); S.team.shifts = o.shifts; S.team.abs = o.abs; save(); render(); }
 function tmUndoToast(msg, snap){ toast(msg, {action:() => { tmRestore(snap); toast('Rückgängig gemacht'); }}); }
-function tmCountAct(W){ try { const n = tmWeekCount(W, s => !s.demo); const a = gdActs(); if(n > (+a.plan || 0)){ a.plan = n; gdStampCheck(); } } catch(e){} }
 function tmSetWeek(W, list){
   // list: [[Wochentag 0–6, {pid, parts, area, note}], …] ersetzt alle Dienste der Woche
   const st = tmS(); let add = 0, skip = 0;
   for(let i = 0; i < 7; i++) delete st.shifts[dAdd(W, i)];
   list.forEach(([i, s]) => { const p = tmPerson(s.pid); const D = dAdd(W, i); if(!p || !p.active || tmAbsOf(s.pid, D)){ skip++; return; }
     (st.shifts[D] = st.shifts[D] || []).push({id:uid('ts'), pid:s.pid, parts:s.parts.map(x => [x[0], x[1]]), area:TM_AREA[s.area] ? s.area : p.area, note:s.note || ''}); add++; });
-  tmCountAct(W);
   return {add, skip};
 }
 function tmWeekList(W){ const out = []; for(let i = 0; i < 7; i++) tmShifts(dAdd(W, i)).forEach(s => out.push([i, s])); return out; }
@@ -353,7 +351,6 @@ function tmView(){
   if(!TM_DATE.test(v.w || '')) v.w = tmMonday(t); else v.w = tmMonday(v.w);
   if(!TM_DATE.test(v.day || '') || v.day < v.w || v.day > dAdd(v.w, 6)) v.day = t >= v.w && t <= dAdd(v.w, 6) ? t : v.w;
   if(!/^\d{4}-\d{2}$/.test(v.month || '')) v.month = dAdd(v.w, 3).slice(0, 7);
-  if(isSimple() && v.mode === 'month') v.mode = 'week';
   return v;
 }
 function tmHintMap(hints){ const m = new Map(); hints.forEach(h => { const k = h.pid + '|' + (h.D || ''); m.set(k, (m.get(k) || []).concat(h.txt)); }); return m; }
@@ -403,7 +400,7 @@ function tmDayView(W, D, ppl, hm, ro){
     <h2 class="day-h tm-dh">${esc(dLong)}<span>${tmClosed(D) ? 'Ruhetag' : ''}</span></h2>
     <ul class="tm-dl">${rows}</ul>
     <p class="tm-dstaff" data-help="tm_besetzung">${tmStaffHtml(D, W) || (tmClosed(D) ? '<span>Ruhetag, niemand eingeteilt</span>' : '<span>Noch niemand eingeteilt</span>')}</p>
-    ${dh.length && !isSimple() ? `<ul class="tm-dhints">${dh.map(([k, tx]) => `<li><i class="tm-mk" aria-hidden="true"></i><span><b>${esc((tmPerson(k.split('|')[0]) || {name:'?'}).name)}</b> ${esc(tx.join('; '))}</span></li>`).join('')}</ul><p class="hint">Hinweis, keine Rechtsprüfung.</p>` : ''}
+    ${dh.length ? `<ul class="tm-dhints">${dh.map(([k, tx]) => `<li><i class="tm-mk" aria-hidden="true"></i><span><b>${esc((tmPerson(k.split('|')[0]) || {name:'?'}).name)}</b> ${esc(tx.join('; '))}</span></li>`).join('')}</ul><p class="hint">Hinweis, keine Rechtsprüfung.</p>` : ''}
   </div>`;
 }
 function tmHintsHtml(hints){
@@ -420,30 +417,30 @@ function tmMonthHtml(ym){
     <p class="hint">Stunden ${tmS().settings.breakPaid ? 'mit bezahlter Pause' : `ohne unbezahlte Pause (${num(tmS().settings.breakMin)} Min. bei Diensten über ${tmH(tmS().settings.breakAfter)} Std.)`}. „Soll ca.“ ist das Wochensoll, umgerechnet auf die ${new Date(y, m, 0).getDate()} Tage des Monats. Keine Lohnabrechnung.</p>`;
 }
 function renderDienst(){
-  const st = tmS(); const v = tmView(); const W = v.w; const ro = !canEditAll(); const simple = isSimple(); const phone = tmPhone(); const t = todayStr();
-  const meP = tmMePerson(); const month = v.mode === 'month' && !simple;
+  const st = tmS(); const v = tmView(); const W = v.w; const ro = !canEditAll(); const phone = tmPhone(); const t = todayStr();
+  const meP = tmMePerson(); const month = v.mode === 'month';
   const title = month ? `${MONTHS[+v.month.slice(5) - 1]} ${v.month.slice(0, 4)}` : `KW ${tmKw(W)}`;
   const sub = month ? 'Stunden je Person im Monat' : `KW ${tmKw(W)} · ${tmRangeTxt(W)}`;
-  const head = (btns) => `<div class="page-h"><div><h1>Dienstplan</h1>${phone && !month ? (st.demo ? '<p class="sub">Beispiel-Team, Namen sind erfunden</p>' : '') : `<p class="sub">${esc(sub)}${st.demo ? ' · <span class="pl-demo">Beispiel-Team, Namen sind erfunden</span>' : ''}</p>`}</div>${btns ? `<div class="row-btns">${btns}</div>` : ''}</div>`;
+  const head = (btns) => `<div class="page-h"><div><h1>Team & Zahlen</h1>${phone && !month ? (st.demo ? '<p class="sub">Beispiel-Team, Namen sind erfunden</p>' : '') : `<p class="sub">${esc(sub)}${st.demo ? ' · Beispiel-Team, Namen sind erfunden' : ''}</p>`}</div>${btns ? `<div class="row-btns">${btns}</div>` : ''}</div>${teamTabs()}`;
   if(!st.people.length) return head('') + `<section class="panel empty tm-none">Noch kein Team. Legen Sie zuerst die Leute an, dann tragen Sie die Dienste ein.${ro ? '' : `<div class="row-btns" style="justify-content:center;margin-top:12px"><button type="button" class="btn primary" data-act="tmTeam">${ico('plus')}Team anlegen</button></div>`}</section>`;
   const isCur = month ? v.month === t.slice(0, 7) : W === tmMonday(t);
   const nav = `<div class="tm-nav"><button type="button" class="icon-btn" data-act="tmPrev" aria-label="${month ? 'Voriger Monat' : 'Vorige Woche'}">${ico('arrow')}</button><span class="tm-kw" aria-live="polite"><b>${title}</b>${month ? '' : `<small>${tmDm(W)}–${tmDm(dAdd(W, 6))}</small>`}</span><button type="button" class="icon-btn" data-act="tmNext" aria-label="${month ? 'Nächster Monat' : 'Nächste Woche'}">${ico('arrow', 'flip')}</button><button type="button" class="btn sm tm-now" data-act="tmToday" ${isCur ? 'disabled' : ''}>${month ? 'Dieser Monat' : 'Diese Woche'}</button></div>`;
-  const modes = phone ? [['day','Tag'],['week','Woche']].concat(simple ? [] : [['month','Monat']]) : simple ? [] : [['week','Woche'],['month','Monat']];
-  const cur = month ? 'month' : phone ? v.pm : 'week';
+  const modes = phone && !month ? [['day','Tag'],['week','Woche']] : [];
+  const cur = v.pm;
   const seg = modes.length ? `<div class="seg tm-modes" role="group" aria-label="Ansicht">${modes.map(([k, l]) => `<button type="button" class="${cur === k ? 'on' : ''}" data-act="tmMode" data-id="${k}" aria-pressed="${cur === k}">${l}</button>`).join('')}</div>` : '';
   const mine = month ? '' : `<button type="button" class="chip tm-mine ${v.mine ? 'on' : ''}" data-act="tmMine" aria-pressed="${!!v.mine}">Mein Dienst</button>`;
-  const tools = month || ro || simple || phone ? '' : `<span class="tm-tools"><button type="button" class="link" data-act="tmCopyPrev">Vorwoche kopieren</button><button type="button" class="link" data-act="tmPatterns">Wochenvorlagen</button></span>`;
-  const bar = `<div class="tm-bar">${nav}${seg}${mine}<span class="sp"></span>${tools}</div>`;
-  const btns = `${ro ? '' : `<button type="button" class="btn" data-act="tmTeam">Team verwalten</button>`}<button type="button" class="btn" data-act="tmText">Text kopieren</button><button type="button" class="btn primary" data-pdf="tmPrint">${ico('download')}Woche als PDF</button>`;
-  if(month) return head(phone ? '' : btns) + bar + tmMonthHtml(v.month) + (phone ? `<div class="tm-acts">${btns}</div>` : '');
+  const bar = `<div class="tm-bar">${nav}${seg}${mine}</div>`;
+  const btns = month ? '' : `<button type="button" class="btn" data-act="tmText">Text kopieren</button><button type="button" class="btn primary" data-pdf="tmPrint">${ico('download')}Als PDF speichern</button>`;
+  const more = moreOpts('dienst', month ? `<button type="button" class="btn sm" data-act="tmMode" data-id="week">Zurück zur Woche</button>` : `${ro ? '' : `<button type="button" class="btn sm" data-act="tmTeam">Team verwalten</button><button type="button" class="btn sm" data-act="tmCopyPrev">Vorwoche kopieren</button><button type="button" class="btn sm" data-act="tmPatterns">Wochenvorlagen</button>`}<button type="button" class="btn sm" data-act="tmMode" data-id="month">Stunden im Monat</button>`);
+  if(month) return head('') + bar + tmMonthHtml(v.month) + more;
   let ppl = tmRowPeople(W); let mineNote = '';
   if(v.mine){ if(meP) ppl = ppl.filter(p => p.id === meP.id); else { v.mine = false; } }
   if(v.mine && meP){ const n = tmWeekCount(W, s => s.pid === meP.id); mineNote = `<p class="tm-mine-n">${n ? `${esc(meP.name)}: ${plural(n, 'Dienst', 'Dienste')}, ${tmH(tmWeekHours(meP.id, W))} Std. in dieser Woche.` : `${esc(meP.name)}: in dieser Woche kein Dienst.`}</p>`; }
   const hints = tmHints(W).filter(h => !v.mine || (meP && h.pid === meP.id)); const hm = tmHintMap(hints);
   const body = phone ? (v.pm === 'week' ? tmWeekMini(W, ppl, hm, ro) : tmDayView(W, v.day, ppl, hm, ro)) : tmWeekTable(W, ppl, hm, ro);
-  const roNote = ro ? `<p class="hint tm-ro">Den Plan ändern Küchenchef und Inhaber. ${meP ? 'Einen Frei-Wunsch tragen Sie selbst ein: Tippen Sie in Ihrer Zeile auf das Plus.' : 'Tippen Sie auf „Mein Dienst“ und wählen Sie Ihren Namen, dann können Sie Frei-Wünsche eintragen.'}</p>` : '';
-  const acts = phone ? `<div class="tm-acts">${btns}${ro || simple ? '' : '<button type="button" class="btn" data-act="tmCopyPrev">Vorwoche kopieren</button><button type="button" class="btn" data-act="tmPatterns">Wochenvorlagen</button>'}</div>` : '';
-  return head(phone ? '' : btns) + bar + mineNote + body + roNote + (simple || (phone && v.pm === 'day') ? '' : tmHintsHtml(hints)) + acts;
+  const roNote = ro ? `<p class="hint tm-ro">Den Plan ändert der Chef. ${meP ? 'Einen Frei-Wunsch tragen Sie selbst ein: Tippen Sie in Ihrer Zeile auf das Plus.' : 'Tippen Sie auf „Mein Dienst“ und wählen Sie Ihren Namen, dann können Sie Frei-Wünsche eintragen.'}</p>` : '';
+  const acts = phone ? `<div class="tm-acts">${btns}</div>` : '';
+  return head(phone ? '' : btns) + bar + mineNote + body + roNote + (phone && v.pm === 'day' ? '' : tmHintsHtml(hints)) + acts + more;
 }
 
 /* ---------- Dialoge Dienstplan ---------- */
@@ -476,7 +473,7 @@ function tmSumTxt(parts){
 function tmShiftDlg(pid, D, sid){
   const st = tmS(); const p = tmPerson(pid); if(!p) return;
   if(!canEditAll()){ tmWishDlg(pid, D); return; }
-  const cur = sid ? tmShifts(D).find(s => s.id === sid) : null; const ab = tmAbsOf(pid, D); const simple = isSimple();
+  const cur = sid ? tmShifts(D).find(s => s.id === sid) : null; const ab = tmAbsOf(pid, D);
   const parts = cur ? cur.parts : []; const two = parts.length > 1;
   const body = `
     <div class="tm-tpl" role="group" aria-label="Vorlage wählen">${st.templates.map(t => `<button type="button" class="tm-tb" data-tmtpl="${t.id}"><b>${esc(t.name)}</b><span>${t.parts.map(x => tmPartTxt(x)).join('<br>')}</span></button>`).join('')}</div>
@@ -488,7 +485,7 @@ function tmShiftDlg(pid, D, sid){
       <label class="f">Notiz (optional)<input name="note" maxlength="60" value="${esc(cur ? cur.note : '')}" placeholder="z. B. Bankett, Putztag"></label></div>
     ${ab ? `<p class="tm-abn">${esc(p.name)} ist an diesem Tag eingetragen als: <b>${TM_ABS[ab.t]}</b>${ab.note ? ` (${esc(ab.note)})` : ''}.</p>` : ''}
     ${cur ? '' : `<div class="tm-or"><span>Kein Dienst, sondern:</span>${Object.entries(TM_ABS).map(([k, l]) => `<button type="button" class="btn sm" data-tmabs="${k}">${l}</button>`).join('')}</div>`}
-    ${simple ? '' : `<button type="button" class="link tm-tpl-edit" data-tmtpledit="1">Dienst-Vorlagen ändern</button>`}`;
+    <button type="button" class="link tm-tpl-edit" data-tmtpledit="1">Dienst-Vorlagen ändern</button>`;
   tmDialog(`${p.name} · ${tmDayTxt(D)}`, body, (fd, f) => {
     const r = tmPartsFromForm(f); if(r.err) return dlgErr(r.el, r.err);
     // Überschneidung mit einem anderen Dienst derselben Person an diesem Tag
@@ -499,7 +496,6 @@ function tmShiftDlg(pid, D, sid){
     const snap = tmSnap(); const data = {parts:r.parts, area:fd.get('area'), note:String(fd.get('note') || '').trim()};
     if(cur){ Object.assign(cur, data); delete cur.demo; }
     else (st.shifts[D] = st.shifts[D] || []).push({id:uid('ts'), pid, ...data});
-    tmCountAct(tmMonday(D));
     setTimeout(() => tmUndoToast(cur ? 'Dienst geändert' : `Dienst eingetragen: ${p.name}, ${tmDayTxt(D)}`, snap), 0);
   }, {toast:false, ok: cur ? 'Speichern' : 'Eintragen',
     del: cur ? () => { const snap = tmSnap(); st.shifts[D] = st.shifts[D].filter(s => s.id !== cur.id); if(!st.shifts[D].length) delete st.shifts[D]; save(); render(); tmUndoToast('Dienst gelöscht', snap); } : null,
@@ -517,7 +513,7 @@ function tmShiftDlg(pid, D, sid){
       };
     }});
 }
-/* Abwesenheit ansehen, ändern, entfernen (Küchenchef und Inhaber) */
+/* Abwesenheit ansehen, ändern, entfernen (Chef) */
 function tmAbsDlg(pid, D){
   const st = tmS(); const p = tmPerson(pid); const ab = tmAbsOf(pid, D); if(!p) return;
   if(!canEditAll()){ tmWishDlg(pid, D); return; }
@@ -531,11 +527,11 @@ function tmAbsDlg(pid, D){
 function tmWishDlg(pid, D){
   const st = tmS(); const meP = tmMePerson();
   if(!meP){ tmWhoDlg(p => { if(p.id === pid) tmWishDlg(pid, D); }); return; }
-  if(meP.id !== pid){ toast('Sie können nur Ihren eigenen Frei-Wunsch eintragen. Den Plan ändern Küchenchef und Inhaber.'); return; }
+  if(meP.id !== pid){ toast('Sie können nur Ihren eigenen Frei-Wunsch eintragen. Den Plan ändert der Chef.'); return; }
   const ab = tmAbsOf(pid, D);
-  if(ab && ab.t !== 'wunsch'){ info(`${meP.name} · ${tmDayTxt(D)}`, `Für diesen Tag ist „${TM_ABS[ab.t]}“ eingetragen. Das ändern Küchenchef oder Inhaber.`); return; }
+  if(ab && ab.t !== 'wunsch'){ info(`${meP.name} · ${tmDayTxt(D)}`, `Für diesen Tag ist „${TM_ABS[ab.t]}“ eingetragen. Das ändert der Chef.`); return; }
   const has = tmShiftsOf(pid, D).length;
-  tmDialog(`Frei-Wunsch · ${tmDayTxt(D)}`, `<p class="dlg-p">Sie können an diesem Tag nicht arbeiten? Der Wunsch steht dann im Dienstplan. ${has ? 'Sie sind an diesem Tag schon eingeteilt. Sprechen Sie bitte auch mit dem Küchenchef.' : 'Ob es klappt, entscheidet, wer den Plan macht.'}</p><label class="f">Grund (optional)<input name="note" maxlength="60" value="${esc(ab ? ab.note || '' : '')}" placeholder="z. B. Arzttermin"></label>`,
+  tmDialog(`Frei-Wunsch · ${tmDayTxt(D)}`, `<p class="dlg-p">Sie können an diesem Tag nicht arbeiten? Der Wunsch steht dann im Dienstplan. ${has ? 'Sie sind an diesem Tag schon eingeteilt. Sprechen Sie bitte auch mit dem Chef.' : 'Ob es klappt, entscheidet, wer den Plan macht.'}</p><label class="f">Grund (optional)<input name="note" maxlength="60" value="${esc(ab ? ab.note || '' : '')}" placeholder="z. B. Arzttermin"></label>`,
     fd => { const snap = tmSnap(); (st.abs[D] = st.abs[D] || {})[pid] = {t:'wunsch', note:String(fd.get('note') || '').trim(), by:meP.name}; setTimeout(() => tmUndoToast(`Frei-Wunsch für ${tmDayTxt(D)} eingetragen`, snap), 0); },
     {toast:false, ok: ab ? 'Speichern' : 'Wunsch eintragen', del: ab ? () => { const snap = tmSnap(); delete st.abs[D][pid]; if(!Object.keys(st.abs[D]).length) delete st.abs[D]; save(); render(); tmUndoToast('Frei-Wunsch entfernt', snap); } : null});
 }
@@ -630,7 +626,6 @@ function ckSet(D, tp, it, rec){
   run.n = tp.items.length; delete run.demo;
   if(!Object.keys(run.items).length){ delete day[tp.id]; if(!Object.keys(day).length) delete c.runs[D]; }
   const after = ckProg(tp, D).full;
-  if(after && !before){ try { gdAct('chk'); } catch(e){} }
   save(); return after && !before;
 }
 function ckRec(extra){ return Object.assign({b:tmWhoName(), a:tmNowHm()}, extra || {}); }
@@ -650,7 +645,7 @@ function ckProgHtml(pr){ return `<span class="ck-bar" aria-hidden="true"><i styl
 function ckStateTxt(pr){ return pr.full ? 'fertig' : pr.over ? (pr.started ? 'nicht fertig geworden' : 'nicht gemacht') : pr.started ? 'läuft' : 'offen'; }
 function ckOverviewHtml(D){
   const due = ckDue(D); const c = ckS(); const dLong = dParse(D).toLocaleDateString('de-AT', {weekday:'long', day:'numeric', month:'long'});
-  if(!c.templates.filter(t => t.active && !t.deleted).length) return `<section class="panel empty">Noch keine Liste. ${canEditAll() ? 'Legen Sie unter „Vorlagen“ eine an.' : 'Küchenchef oder Inhaber legen die Listen an.'}</section>`;
+  if(!c.templates.filter(t => t.active && !t.deleted).length) return `<section class="panel empty">Noch keine Liste. ${canEditAll() ? 'Legen Sie unter „Vorlagen“ eine an.' : 'Der Chef legt die Listen an.'}</section>`;
   if(!due.length) return `<section class="pl-closed ck-none"><h2>Heute ist keine Liste fällig</h2><p>${esc(dLong)}${tmClosed(D) ? ' ist Ruhetag, und im Dienstplan ist niemand eingeteilt.' : '.'} Wochenlisten erscheinen an ihrem Wochentag.</p></section>`;
   return `<ul class="ck-lists">${due.map(tp => { const pr = ckProg(tp, D);
     return `<li><button type="button" class="ck-l ${pr.full ? 'done' : ''}" data-act="ckOpen" data-id="${tp.id}"><span class="ck-ln"><b>${esc(tp.name)}</b><small>${pr.full ? `fertig${pr.last ? ` · ${esc(pr.last.b)}, ${pr.last.a} Uhr` : ''}` : pr.started ? `zuletzt ${esc(pr.last.b)}, ${pr.last.a} Uhr` : tp.when === 'weekly' ? `jede Woche am ${DAYNAME[tp.wd]}` : 'noch nicht begonnen'}${pr.out ? ` · <span class="bad-t">${pr.out} ${pr.out === 1 ? 'Wert' : 'Werte'} außerhalb</span>` : ''}</small></span>
@@ -678,7 +673,7 @@ function ckHistDetail(D){
     // erledigte Punkte in der Reihenfolge der Liste, dazu Punkte, die es in der Liste nicht mehr gibt
     const ids = tp.items.map(i => i.id).concat(Object.keys(run.items).filter(id => !tp.items.some(i => i.id === id)));
     return `<div class="ck-hd"><h3>${esc(tp.name)}<span>${pr.done} von ${pr.total} · ${ckStateTxt(pr)}</span></h3><ul>${ids.map(id => { const r = run.items[id]; const it = tp.items.find(i => i.id === id) || (tp.old || []).find(i => i.id === id);
-      return `<li class="${r ? 'on' : 'miss'} ${r && r.out ? 'out' : ''}"><span class="ck-hs" aria-hidden="true">${r ? ico('check') : ''}</span><span class="ck-ht">${esc(ckItemLabel(tp, id))}${r && r.note ? `<small>${esc(r.note)}</small>` : ''}</span>${it && it.val ? `<span class="ck-hv">${it.val && !isSimple() ? ckSpark(tp, it, D) : ''}<b>${r && r.v != null ? `${ckVal(r.v)} ${esc(it.val.unit || '')}` : '–'}</b></span>` : ''}<span class="ck-hw">${r ? `${esc(r.b)} · ${r.a}` : pr.over ? 'offen geblieben' : 'offen'}</span></li>`; }).join('')}</ul></div>`; }).join('');
+      return `<li class="${r ? 'on' : 'miss'} ${r && r.out ? 'out' : ''}"><span class="ck-hs" aria-hidden="true">${r ? ico('check') : ''}</span><span class="ck-ht">${esc(ckItemLabel(tp, id))}${r && r.note ? `<small>${esc(r.note)}</small>` : ''}</span>${it && it.val ? `<span class="ck-hv">${it.val ? ckSpark(tp, it, D) : ''}<b>${r && r.v != null ? `${ckVal(r.v)} ${esc(it.val.unit || '')}` : '–'}</b></span>` : ''}<span class="ck-hw">${r ? `${esc(r.b)} · ${r.a}` : pr.over ? 'offen geblieben' : 'offen'}</span></li>`; }).join('')}</ul></div>`; }).join('');
 }
 function ckHistHtml(){
   const days = ckHistDays(14); const c = ckS(); const today = ckToday();
@@ -691,7 +686,7 @@ function ckHistHtml(){
     return `<li class="ck-hr ${open ? 'open' : ''} ${tmClosed(D) ? 'closed' : ''}"><button type="button" class="ck-hb" data-act="ckHist" data-id="${D}" aria-expanded="${open}"><span class="ck-hday"><b>${D === today ? 'Heute' : tmDayTxt(D)}</b>${!due.length ? `<small>${tmClosed(D) ? 'Ruhetag' : 'nichts fällig'}</small>` : ''}</span><span class="ck-hcs" style="--n:${tps.length}">${cells}</span></button>${open ? `<div class="ck-hdw">${ckHistDetail(D)}</div>` : ''}</li>`; }).join('');
   return `<div class="ck-hhead"><span class="ck-hday"></span><span class="ck-hcs" style="--n:${tps.length}">${tps.map(tp => `<span>${esc(tp.name)}</span>`).join('')}</span></div>
     <ul class="ck-hist">${rows}</ul>
-    <div class="ck-hpdf"><label class="f">Monat<select data-ckmonth="1" aria-label="Monat für das PDF">${months.map(m => `<option value="${m}" ${m === mSel ? 'selected' : ''}>${MONTHS[+m.slice(5) - 1]} ${m.slice(0, 4)}</option>`).join('')}</select></label><button type="button" class="btn" data-pdf="ckPrint">${ico('download')}Verlauf als PDF</button></div>`;
+    <div class="ck-hpdf"><label class="f">Monat<select data-ckmonth="1" aria-label="Monat für das PDF">${months.map(m => `<option value="${m}" ${m === mSel ? 'selected' : ''}>${MONTHS[+m.slice(5) - 1]} ${m.slice(0, 4)}</option>`).join('')}</select></label><button type="button" class="btn" data-pdf="ckPrint">${ico('download')}Als PDF speichern</button></div>`;
 }
 function ckTplListHtml(){
   const c = ckS(); const list = c.templates.filter(t => !t.deleted);
@@ -701,12 +696,12 @@ function ckTplListHtml(){
     <p class="hint ck-tph">Die Listen sind Vorschläge für eine kleine Küche. Passen Sie sie an Ihren Betrieb an. Sie ersetzen keine behördlich verlangten Aufzeichnungen.</p>`;
 }
 function renderCheckl(){
-  const c = ckS(); const v = view.ck || (view.ck = {tab:'heute'}); const D = ckToday(); const ro = !canEditAll(); const simple = isSimple();
-  if(v.tab === 'vorlagen' && (ro || simple)) v.tab = 'heute';
+  const c = ckS(); const v = view.ck || (view.ck = {tab:'heute'}); const D = ckToday(); const ro = !canEditAll();
+  if(v.tab === 'vorlagen' && ro) v.tab = 'heute';
   if(v.run){ const tp = ckTpl(v.run); if(tp && ckDue(D).includes(tp)) return ckRunHtml(tp, D); v.run = null; }
   const due = ckDue(D); const nDone = due.filter(tp => ckProg(tp, D).full).length; const dLong = dParse(D).toLocaleDateString('de-AT', {weekday:'long', day:'numeric', month:'long'});
   const sub = v.tab === 'verlauf' ? 'Die letzten 14 Tage. Tippen Sie auf einen Tag.' : v.tab === 'vorlagen' ? 'Was auf den Listen steht und wann sie fällig sind.' : `${dLong}${due.length ? ` · ${nDone} von ${due.length} ${due.length === 1 ? 'Liste' : 'Listen'} fertig` : ''}`;
-  const tabs = [['heute','Heute'],['verlauf','Verlauf']].concat(ro || simple ? [] : [['vorlagen','Vorlagen']]);
+  const tabs = [['heute','Heute'],['verlauf','Verlauf']].concat(ro ? [] : [['vorlagen','Vorlagen']]);
   return `<div class="page-h"><div><h1>Checklisten</h1><p class="sub">${esc(sub)}</p></div></div>
     <div class="toolbar ck-tabs"><div class="seg" role="tablist">${tabs.map(([k, l]) => `<button type="button" role="tab" aria-selected="${v.tab === k}" class="${v.tab === k ? 'on' : ''}" data-act="ckTab" data-id="${k}">${l}</button>`).join('')}</div></div>
     ${v.tab === 'verlauf' ? ckHistHtml() : v.tab === 'vorlagen' ? ckTplListHtml() : ckOverviewHtml(D)}`;
@@ -721,7 +716,7 @@ function ckValueInput(inp){
   if(old && Math.abs(old.v - v) < 1e-9) { inp.value = ckVal(old.v); return; }
   const fin = rec => { const full = ckSet(D, tp, it, rec); render(); if(full) toast(`${tp.name}: alles erledigt`); };
   if(ckInRange(it.val, v)){ fin(ckRec({v})); return; }
-  tmDialog('Wert außerhalb des Bereichs', `<p class="dlg-p"><b>${esc(it.t)}: ${ckVal(v)} ${esc(it.val.unit || '')}</b><br>Erlaubt sind ${esc(ckRangeTxt(it.val))}. Was haben Sie getan?</p><label class="f">Kurze Notiz<input name="note" maxlength="120" placeholder="z. B. Tür war offen, Küchenchef informiert" autocomplete="off"></label>`,
+  tmDialog('Wert außerhalb des Bereichs', `<p class="dlg-p"><b>${esc(it.t)}: ${ckVal(v)} ${esc(it.val.unit || '')}</b><br>Erlaubt sind ${esc(ckRangeTxt(it.val))}. Was haben Sie getan?</p><label class="f">Kurze Notiz<input name="note" maxlength="120" placeholder="z. B. Tür war offen, Chef informiert" autocomplete="off"></label>`,
     (fd, f) => { const note = String(fd.get('note') || '').trim(); if(note.length < 3) return dlgErr(f.elements.note, 'Bitte kurz notieren, was getan wurde.'); setTimeout(() => { const full = ckSet(D, tp, it, ckRec({v, out:1, note})); render(); toast(full ? `${tp.name}: alles erledigt` : 'Wert mit Notiz gespeichert'); }, 0); },
     {ok:'Mit Notiz speichern', toast:false});
   $('#dlg').addEventListener('close', () => { if(!ckRun(D, tp.id) || !(ckRun(D, tp.id).items[it.id] && Math.abs(ckRun(D, tp.id).items[it.id].v - v) < 1e-9)) setTimeout(() => { if(view.tab === 'checkl') render(); }, 60); }, {once:true});
@@ -807,14 +802,14 @@ function tmDashHtml(){
 const _renderDashTeam = renderDash;
 renderDash = function(){
   let h = _renderDashTeam();
-  try { const block = tmDashHtml(); if(block){ const i = h.indexOf('<div class="tiles">'); if(i >= 0) h = h.slice(0, i) + block + h.slice(i); } } catch(err){ console.warn('Team:', err); }
+  try { const block = tmDashHtml(); if(block){ const i = h.indexOf('<!--dash-extra-->'); if(i >= 0) h = h.slice(0, i) + block + h.slice(i); } } catch(err){ console.warn('Team:', err); }
   return h;
 };
 
 /* =====================================================================
    Bedienung
    ===================================================================== */
-function tmShiftMove(dir){ const v = tmView(); if(v.mode === 'month' && !isSimple()){ const [y, m] = v.month.split('-').map(Number); v.month = isoDate(new Date(y, m - 1 + dir, 1, 12)).slice(0, 7); v.w = tmMonday(v.month + '-15'); v.day = null; } else { v.w = dAdd(v.w, 7 * dir); v.day = dAdd(v.day, 7 * dir); v.month = null; } }
+function tmShiftMove(dir){ const v = tmView(); if(v.mode === 'month'){ const [y, m] = v.month.split('-').map(Number); v.month = isoDate(new Date(y, m - 1 + dir, 1, 12)).slice(0, 7); v.w = tmMonday(v.month + '-15'); v.day = null; } else { v.w = dAdd(v.w, 7 * dir); v.day = dAdd(v.day, 7 * dir); v.month = null; } }
 function tmDayMove(dir){ const v = tmView(); v.day = dAdd(v.day, dir); v.w = tmMonday(v.day); v.month = null; render(); }
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if(!el) return; const a = el.dataset.act, id = el.dataset.id || '';
@@ -863,12 +858,6 @@ if(TM_MQ.addEventListener) TM_MQ.addEventListener('change', tmMqChange); else if
    ===================================================================== */
 ICO.dienst = '<rect x="3.500" y="5" width="17" height="15" rx="2"/><path d="M8 3v4M16 3v4M3.500 10h17"/><path d="M7.500 14h4M12.500 17h4"/>';
 ICO.checkl = '<path d="M9 4.500h6M8 3h8v3H8z"/><path d="M8 4.500H6a1.500 1.500 0 0 0-1.500 1.500v13.500A1.500 1.500 0 0 0 6 21h12a1.500 1.500 0 0 0 1.500-1.500V6A1.500 1.500 0 0 0 18 4.500h-2"/><path d="M8.500 11.200l1.500 1.500 2.600-2.900M8.500 16.200l1.500 1.500 2.600-2.900M15 12h1.500M15 17h1.500"/>';
-TABS.push(['dienst','Dienstplan','Dienstplan'], ['checkl','Checklisten','Checklisten']);
-(() => { const i = NAV_GROUPS.findIndex(g => g[1].includes('setup')); NAV_GROUPS.splice(i < 0 ? NAV_GROUPS.length : i, 0, ['Team', ['dienst','checkl']]); })();
-NAV_DESC.dienst = 'Wer wann arbeitet: der Wochenplan für das ganze Team.';
-NAV_DESC.checkl = 'Listen zum Abhaken beim Aufsperren, Zusperren und Putzen.';
-
-H('nav_dienst','Dienstplan', NAV_DESC.dienst);
 H('nav_checkl','Checklisten', NAV_DESC.checkl);
 H('dienstplan','Dienstplan','Der Plan für eine Woche: wer an welchem Tag von wann bis wann arbeitet. Jede Person hat eine Zeile, jeder Tag eine Spalte.',1);
 H('teildienst','Teildienst','Ein Dienst mit einer langen Pause in der Mitte, zum Beispiel 10 bis 14 Uhr und 17:30 bis 22 Uhr. Die App rechnet nur die zwei Teile als Arbeitszeit.',1);
@@ -887,49 +876,20 @@ H('tm_mein','Mein Dienst','Zeigt nur Ihre eigene Zeile. Beim ersten Mal wählen 
 H('tm_kopieren','Vorwoche kopieren','Übernimmt alle Dienste der Woche davor in diese Woche. Wer abwesend ist, wird ausgelassen. Mit „Rückgängig“ nehmen Sie es zurück.');
 H('tm_wochenvorlage','Wochenvorlagen','Ein ganzer Wochenplan unter einem Namen, zum Beispiel „Hochsaison“. Einmal speichern, dann in jeder Woche mit einem Tipp anwenden.');
 H('tm_text','Text kopieren','Der Plan der Woche als einfacher Text, Tag für Tag. Zum Einfügen in WhatsApp oder eine andere Nachricht.');
-H('tm_pdf','Woche als PDF','Der Wochenplan auf einer Seite im Querformat, groß genug zum Aufhängen in der Küche.');
+H('tm_pdf','Als PDF speichern','Der Wochenplan auf einer Seite im Querformat, groß genug zum Aufhängen in der Küche.');
 H('tm_team','Team verwalten','Hier legen Sie die Leute an: Name, Bereich und Soll-Stunden je Woche. Auch die Pausenregel stellen Sie hier ein.');
 H('tm_monat','Monat','Zeigt die Stunden je Person für einen ganzen Monat und vergleicht sie mit dem Soll. Das ist ein Überblick, keine Lohnabrechnung.');
 H('ck_liste','Liste öffnen','Tippen Sie auf eine Liste, um sie abzuhaken. Rechts steht, wie viele Punkte schon erledigt sind.');
 H('ck_haken','Abhaken','Ein Tipp setzt das Häkchen mit Ihrem Namen und der Uhrzeit. Noch ein Tipp nimmt es wieder weg.');
 H('ck_wert','Wert eintragen','Tippen Sie die abgelesene Zahl ein, zum Beispiel 3,5. Ein Minus davor geht auch, etwa beim Tiefkühler.');
 H('ck_verlauf','Verlauf','Die letzten 14 Tage: welche Liste fertig wurde und welche nicht. Ein Tipp auf einen Tag zeigt, wer was wann abgehakt hat.');
-H('ck_vorlagen','Listen ändern','Hier ändern Küchenchef und Inhaber die Listen: Punkte dazu, weg oder in andere Reihenfolge. Die Vorschläge sind zum Anpassen da.');
+H('ck_vorlagen','Listen ändern','Hier ändert der Chef die Listen: Punkte dazu, weg oder in andere Reihenfolge. Die Vorschläge sind zum Anpassen da.');
 H('ck_pdf','Verlauf als PDF','Alle Listen eines Monats als Datei: wer wann abgehakt hat und welche Werte eingetragen wurden.');
 HELP_SEL.unshift(
-  ['.nav-i[data-tab="dienst"],.m-only [data-tab="dienst"]','nav_dienst'], ['.nav-i[data-tab="checkl"],.m-only [data-tab="checkl"]','nav_checkl'],
   ['#app .tm-nav','tm_woche'], ['#app .tm-t td[data-act="tmAdd"],#app .tm-plus','tm_zelle'], ['#app .tm-sh','tm_dienst'], ['#app .tm-ab','tm_abw'], ['#app .tm-hints','tm_hinweise'],
   ['#app .tm-mine','tm_mein'], ['#app [data-act="tmCopyPrev"]','tm_kopieren'], ['#app [data-act="tmPatterns"]','tm_wochenvorlage'], ['#app [data-act="tmText"]','tm_text'], ['#app [data-pdf="tmPrint"]','tm_pdf'], ['#app [data-act="tmTeam"]','tm_team'],
   ['#app [data-act="tmMode"][data-id="month"],#app .tm-month','tm_monat'], ['#app .tm-days button,#app .tm-mb','tm_woche'], ['#app .tm-dash-who','dienstplan'], ['#app .ck-dash','checkliste'],
   ['#app .ck-l','ck_liste'], ['#app .ck-c','ck_haken'], ['#app .ck-i.val','ck_wert'], ['#app .ck-sticky','checkliste'], ['#app [data-act="ckTab"][data-id="verlauf"],#app .ck-hb','ck_verlauf'], ['#app [data-act="ckTab"][data-id="vorlagen"],#app .ck-tpls li','ck_vorlagen'], ['#app [data-pdf="ckPrint"]','ck_pdf'], ['#app .ck-spark','messwert']);
-
-TOURS.dienst = {id:'dienst', name:'Dienstplan', steps:[
-  {t:'Die Woche', sel:'#app .tm-nav', x:'Oben steht die Kalenderwoche. Mit den Pfeilen blättern Sie, „Diese Woche“ bringt Sie zurück zu heute.'},
-  {t:'Dienst eintragen', sel:['#app .tm-t tbody td', '#app .tm-dl .tm-plus', '#app .tm-mini tbody td', '#app .tm-none'], x:'Jede Person hat eine Zeile. Tippen Sie auf das Feld eines Tages und wählen Sie eine Vorlage wie „Früh“ oder tragen Sie eigene Zeiten ein.'},
-  {t:'Ändern und Abwesenheit', sel:['#app .tm-sh', '#app .tm-ab'], x:'Ein Tipp auf einen Dienst öffnet ihn zum Ändern oder Löschen. Urlaub, Krank und „Kann nicht“ tragen Sie im selben Fenster ein.'},
-  {t:'Stunden und Besetzung', sel:['#app .tm-t tfoot', '#app .tm-dstaff', '#app .tm-mini tfoot'], x:'Bei jedem Namen stehen die Stunden der Woche. Unten sehen Sie, wie viele Leute je Bereich da sind und ob Küche oder Service fehlen.'},
-  {t:'Aushängen und verschicken', sel:'#app [data-pdf="tmPrint"]', x:'„Woche als PDF“ macht eine Seite zum Aufhängen. „Text kopieren“ gibt den Plan als Text für WhatsApp.'},
-]};
-TOURS.checkl = {id:'checkl', name:'Checklisten', steps:[
-  {t:'Die Listen von heute', sel:['#app .ck-lists', '#app .ck-items', '#app .ck-none', '#app .ck-hist', '#app .ck-tpls'], x:'Jeden Tag gibt es frische Listen: Öffnen und Schließen für Küche und Service, einmal in der Woche den Wochenputz. Am Ruhetag nur, wenn jemand eingeteilt ist.'},
-  {t:'Abhaken', sel:['#app .ck-l', '#app .ck-c'], x:'Tippen Sie auf eine Liste und dann auf jeden erledigten Punkt. Die App schreibt Ihren Namen und die Uhrzeit dazu.'},
-  {t:'Werte eintragen', sel:['#app .ck-i.val', '#app .ck-l'], x:'Manche Punkte brauchen eine Zahl, zum Beispiel die Temperatur im Kühlhaus. Liegt sie außerhalb des Bereichs, bittet die App um eine kurze Notiz.'},
-  {t:'Verlauf', sel:'#app [data-act="ckTab"][data-id="verlauf"]', x:'Im Verlauf sehen Sie die letzten 14 Tage: was fertig wurde, wer es gemacht hat und welche Werte eingetragen sind. Einen Monat gibt es auch als PDF.'},
-  {t:'Listen anpassen', when:() => canEditAll() && !isSimple(), sel:'#app [data-act="ckTab"][data-id="vorlagen"]', x:'Die Listen sind Vorschläge. Unter „Vorlagen“ ändern Sie Punkte, Reihenfolge und Messwerte, bis sie zu Ihrem Betrieb passen.'},
-]};
-
-GD_ACT_NUMS.push('plan', 'chk', 'dpdf');
-(() => {
-  const at = id => { const i = MISSIONS.findIndex(m => m.id === id); return i < 0 ? MISSIONS.length : i + 1; };
-  MISSIONS.splice(at('prep3'), 0,
-    {id:'plan5', tier:1, ico:'dienst', edit:1, t:'Erste Woche planen', short:'Erste Woche', goal:5, n:() => gdActs().plan, wozu:'Fünf Dienste in einer Woche eintragen. Dann weiß jeder, wann er dran ist.', go:() => { const v = tmView(); v.mode = 'week'; go('dienst'); setTimeout(() => tourStart('dienst'), 120); }},
-    {id:'check1', tier:1, ico:'checkl', t:'Erste Checkliste abschließen', short:'Erste Checkliste', goal:1, n:() => gdActs().chk, wozu:'Eine Liste ganz abhaken. So wird beim Auf- und Zusperren nichts vergessen.', go:() => { view.ck.tab = 'heute'; view.ck.run = null; go('checkl'); setTimeout(() => tourStart('checkl'), 120); }});
-  MISSIONS.splice(at('kasse'), 0,
-    {id:'dienstpdf', tier:2, ico:'download', t:'Wochenplan als PDF', short:'Plan als PDF', goal:1, n:() => gdActs().dpdf, wozu:'Eine Seite zum Aufhängen in der Küche.', go:() => { const v = tmView(); v.mode = 'week'; go('dienst'); setTimeout(() => { const b = $('#app [data-pdf="tmPrint"]'); if(b) b.scrollIntoView({block:'center'}); }, 150); }});
-  MS_LEVELS[MS_LEVELS.length - 1][0] = MISSIONS.length;
-})();
-const _saveFileTeam = saveFile;
-saveFile = async function(name, data){ const ok = await _saveFileTeam(name, data); try { if(ok && /^Dienstplan-.*\.pdf$/i.test(name)) gdAct('dpdf'); } catch(e){} return ok; };
 
 const _palDataTeam = palData;
 palData = function(){
@@ -942,12 +902,6 @@ palData = function(){
   return a;
 };
 
-/* Handy: die neuen Bereiche stehen unter „Mehr“ */
-const _renderSetupTeam = renderSetup;
-renderSetup = function(){
-  const h = _renderSetupTeam(); const add = `<button type="button" class="btn" data-tab="dienst">${ico('dienst')}Dienstplan</button><button type="button" class="btn" data-tab="checkl">${ico('checkl')}Checklisten</button>`;
-  return h.replace(/(<div class="row-btns m-only"[^>]*>)/, '$1' + add);
-};
 /* Wer den Bereich verlässt, kommt beim nächsten Mal wieder zur Übersicht der Listen */
 const _goTeam = go;
 go = function(tab, card){ if(tab !== 'checkl' && view.ck) view.ck.run = null; return _goTeam(tab, card === undefined ? null : card); };

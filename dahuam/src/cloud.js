@@ -46,7 +46,7 @@ async function cloudLogin(url, anon, email, pw){
   if(!r.ok){ let m = ''; try { const j = await r.json(); m = j.error_description || j.msg || j.message || ''; } catch(e){} if(m.includes('Invalid login') || r.status === 400) throw new Error('E-Mail oder Passwort falsch.'); const er = new Error(m || 'Anmeldung fehlgeschlagen'); er.status = r.status; throw er; }
   const j = await r.json(); CL.session = {access_token:j.access_token, refresh_token:j.refresh_token, expires_at:j.expires_at || (Date.now()/1000 + (j.expires_in||3600)), user:j.user};
   const ms = await rpc('my_memberships', {});
-  if(!ms || !ms.length) throw new Error('Dieses Konto ist noch keinem Betrieb zugeordnet. Bitte den Inhaber, Sie zum Team hinzuzufügen.');
+  if(!ms || !ms.length) throw new Error('Dieses Konto ist noch keinem Betrieb zugeordnet. Bitten Sie den Chef, Sie zum Team hinzuzufügen.');
   const m = ms[0]; CL.rid = m.restaurant_id; CL.rname = m.restaurant_name; CL.member = {name:m.name, role:m.role}; CL.version = 0; clSave();
 }
 function cloudLogout(){ CL = {}; clSave(); baseSet(null); clearInterval(pollTimer); setCloud('off'); render(); }
@@ -177,57 +177,7 @@ const _save = save; save = function(){ _save(); if(cloudReady()) schedulePush();
 window.addEventListener('online', () => cloudReady() && cloudPoll());
 document.addEventListener('visibilitychange', () => { if(!document.hidden) cloudPoll(); });
 
-/* ---------- Einstellungen (neu, mit Team, Einkauf und Cloud) ---------- */
-renderSetup = function(){
-  const n = Object.keys(IMG).length, s = S.settings, u = me();
-  const cloud = cloudReady();
-  return `<div class="page-h"><div><div class="eyebrow">Betrieb, Team & Daten</div><h1>Einstellungen</h1></div></div>
-  <div class="row-btns m-only" style="margin-bottom:14px"><button type="button" class="btn" data-tab="report">${ico('report')}Auswertung</button><button type="button" class="btn" data-tab="products">${ico('products')}Produkte & Preise</button><button type="button" class="btn" data-tab="labor">${ico('labor')}Rezept-Labor</button></div>
-  <div class="setup-grid">
-    <section class="panel"><div class="panel-h"><h2>Kalkulation</h2></div><div class="fields">
-      <label class="f">Name des Betriebs<input id="s-name" data-sf="name" value="${esc(s.name)}"></label>
-      <label class="f">MwSt. Speisen, %<input id="s-vat" class="num-in" data-sf="vat" data-num="req de" data-max="100" data-msg="MwSt. muss zwischen 0 und 100 liegen, nicht geändert" type="text" inputmode="decimal" value="${numIn(s.vat)}"></label>
-      <label class="f">Ziel-Wareneinsatz, %<input id="s-target" class="num-in" data-sf="target" data-num="req de" data-min="1" data-max="100" data-msg="Ziel-Wareneinsatz muss zwischen 1 und 100 liegen, nicht geändert" type="text" inputmode="decimal" value="${numIn(s.target)}"></label>
-    </div><p class="hint">In Österreich gilt für Speisen der ermäßigte Steuersatz von 10 %. Der Wareneinsatz wird vom Preis exkl. MwSt. berechnet.</p></section>
-    <section class="panel"><div class="panel-h"><h2>Einkauf</h2></div><div class="fields two">
-      <label class="f">Lieferadresse<input data-us="addr" data-k="address" value="${esc(s.address)}"></label>
-      <label class="f">Hinweis für Fahrer<input data-us="addr" data-k="deliveryNote" value="${esc(s.deliveryNote)}"></label>
-      <label class="f">Telefon für Rückfragen<input data-us="addr" data-k="phone" value="${esc(s.phone)}"></label>
-      <label class="f">Antwort-E-Mail<input data-us="addr" data-k="email" type="email" value="${esc(s.email)}"></label>
-      <label class="f">Freigabe ab €<input id="s-limit" class="num-in" data-us="limit" data-num="req de" data-msg="Ungültiger Betrag, nicht geändert" type="text" inputmode="decimal" value="${numIn(s.orderLimit)}"></label>
-    </div><p class="hint">Bestellungen über diesem Betrag muss der Inhaber freigeben. Die Bar bestellt Getränke und Wein, der Küchenchef alles andere.</p></section>
-    <section class="panel"><div class="panel-h"><h2>Wer arbeitet gerade?</h2><span class="muted sm">${esc(whoLabel(u))}</span></div>
-      ${cloud ? `<p class="hint">Mit der Cloud verbunden: Name und Rolle kommen aus Ihrem Konto. Neue Mitarbeiter fügt der Inhaber im Cloud-Projekt hinzu (siehe Anleitung).</p>`
-      : `<div class="who">${s.users.map(x=>`<button type="button" class="who-b ${s.currentUser===x.id?'on':''}" data-act="userSwitch" data-id="${x.id}" aria-pressed="${s.currentUser===x.id}"><b>${esc(x.name)}</b>${x.name===ROLES[x.role]?'':`<small>${ROLES[x.role]}</small>`}<small class="who-can">${{owner:'darf alles', chef:'Küche, Karte, Preise', bar:'Getränke bestellen', staff:'ansehen, Lager buchen'}[x.role]||''}</small></button>`).join('')}</div>
-        <p class="hint">Ohne Cloud ist das eine Auswahl auf diesem Gerät, ohne Passwort. Mit der Cloud meldet sich jeder mit eigenem Konto an.</p>`}
-    </section>
-    <section class="panel ${cloud?'':'accent'}"><div class="panel-h"><h2>Cloud & Team</h2>${cloud?`<span class="cloud-chip ${cloudState}">${{ok:'synchron',busy:'speichert …',offline:'offline',err:'Fehler',off:''}[cloudState]}</span>`:''}</div>
-      ${FRAMED ? `<p class="hint">Die Cloud funktioniert in der installierten Version der App auf Ihrer Website. In dieser Vorschau ist sie abgeschaltet.</p>`
-      : cloud ? `<div class="kv"><span>Betrieb</span><span>${esc(CL.rname)}</span><span>Angemeldet</span><span>${esc(whoLabel(CL.member))}</span><span>Konto</span><span>${esc(CL.email)}</span><span>Stand</span><span>${{ok:'alles übertragen', busy:'wird übertragen …', offline:'kein Internet', err:'nicht übertragen'}[cloudState]||'—'}</span></div>
-          ${cloudMsg?`<p class="hint">${esc(cloudMsg)}</p>`:''}
-          <div class="row-btns" style="margin-top:12px"><button type="button" class="btn" data-act="cloudSync">Jetzt abgleichen</button><button type="button" class="btn danger" data-act="cloudOut">Abmelden</button></div>`
-      : `<p class="hint" style="margin-top:0">Mit der Cloud sehen Küche, Bar und Büro auf allen Geräten dieselben Daten und Fotos, und Bestellungen gehen mit einem Klick per E-Mail raus. Sie brauchen dafür ein eigenes Cloud-Projekt; Adresse und Schlüssel stehen in der Einrichtungs-Anleitung (Ordner <b>dahuam/cloud</b>) oder kommen von der Person, die es eingerichtet hat.</p>
-          <form id="cloudForm" class="cloud-form" novalidate>
-            <label class="f">Adresse des Cloud-Projekts<input name="url" type="url" required inputmode="url" autocomplete="off" placeholder="https://…" value="${esc(CL.url||'')}"></label>
-            <label class="f">Schlüssel des Projekts<input name="anon" required autocomplete="off" placeholder="lange Zeichenfolge aus der Anleitung" value="${esc(CL.anon||'')}"></label>
-            <label class="f">Ihre E-Mail<input name="email" type="email" required autocomplete="username" value="${esc(CL.email||'')}"></label>
-            <label class="f">Passwort<input name="pw" type="password" required autocomplete="current-password"></label>
-            <div class="row-btns"><button type="submit" class="btn primary">Verbinden</button></div>
-            <p class="hint bad-t" id="cloudErr" role="alert"></p>
-          </form>`}
-    </section>
-    <section class="panel"><div class="panel-h"><h2>Startanimation</h2></div>
-      <label class="f">Beim Öffnen der App<select data-intro="1">${[['candle','Kerzenschein'],['plate','Teller wie auf der Website'],['off','Keine']].map(([k,l])=>`<option value="${k}" ${(()=>{ try { return (localStorage.getItem(KEY+'_intro')||'candle')===k; } catch(e){ return k==='candle'; } })()?'selected':''}>${l}</option>`).join('')}</select></label>
-      <div class="row-btns" style="margin-top:10px"><button type="button" class="btn sm" data-act="introNow">Jetzt ansehen</button></div><p class="hint">Erscheint einmal pro Sitzung und lässt sich mit einem Tipp überspringen.</p></section>
-    <section class="panel"><div class="panel-h"><h2>Daten</h2><span class="muted sm">${n} Fotos gespeichert</span></div>
-      <p class="hint">${cloud ? 'Die Daten liegen in der Cloud und zusätzlich auf diesem Gerät. Eine Sicherung als Datei schadet trotzdem nicht.' : 'Daten und Fotos werden nur in diesem Browser gespeichert. Erstellen Sie regelmäßig eine Sicherung.'}</p>
-      <div class="row-btns wrap" style="margin-top:12px"><button type="button" class="btn" data-act="export">Sicherung erstellen</button>
-        <button type="button" class="btn" data-act="importPick">Sicherung laden</button><input id="importFile" type="file" accept="application/json,.json" hidden>
-        <button type="button" class="btn danger" data-act="reset">Demodaten wiederherstellen</button></div>
-      ${(() => { const sf = safetyGet(); return sf ? `<div class="safety"><span><b>Sicherheitskopie vom ${fmtDate(sf.at)}</b><small class="muted">${esc(sf.why||'')} · ${plural(+sf.nMenu||0,'Gericht','Gerichte')}, ${plural(+sf.nCards||0,'Rezeptur','Rezepturen')}</small></span><span class="row-btns"><button type="button" class="btn sm" data-act="safetyRestore">Letzte Daten wiederherstellen</button><button type="button" class="btn sm" data-act="safetyDl">Als Datei speichern</button></span></div>` : ''; })()}
-    </section>
-  </div>`;
-};
+/* ---------- Cloud verbinden (das Formular steht in den Einstellungen, nav.js) ---------- */
 document.addEventListener('submit', async e => {
   if(e.target.id !== 'cloudForm') return; e.preventDefault();
   const f = e.target, btn = f.querySelector('button[type=submit]'), err = $('#cloudErr');
@@ -244,6 +194,3 @@ document.addEventListener('click', async e => {
   if(el.dataset.act === 'cloudOut') ask('Von der Cloud abmelden? Die Daten bleiben auf diesem Gerät.', () => cloudLogout(), 'Abmelden');
   if(el.dataset.act === 'ordCloudSend'){ const o = ORD(el.dataset.id); el.disabled = true; el.textContent = 'Sende …'; try { await cloudSendOrder(o); } catch(x){ el.disabled = false; el.textContent = 'Jetzt per E-Mail senden'; info('Senden fehlgeschlagen', cloudErrText(x) + ' Die Bestellung ist nicht gesendet. Nutzen Sie „E-Mail öffnen“ oder versuchen Sie es später noch einmal.'); } }
 });
-
-document.addEventListener('change', e => { const t = e.target; if(t.dataset.intro){ try { localStorage.setItem(KEY+'_intro', t.value); } catch(x){} toast('Startanimation: '+t.options[t.selectedIndex].text); } });
-document.addEventListener('click', e => { const el = e.target.closest('[data-act="introNow"]'); if(el){ try { sessionStorage.removeItem('dahuam202_intro'); } catch(x){} location.reload(); } });

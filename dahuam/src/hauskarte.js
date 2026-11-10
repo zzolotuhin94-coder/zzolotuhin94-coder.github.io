@@ -38,10 +38,15 @@ function hsCopy(key, sec){
   if(key === 'claim') return c.claim != null ? c.claim : WK_QUOTE;
   return c[key] != null ? c[key] : HS_COPY[key];
 }
-function hsStyle(){ const s = S.settings; return s.guestStylePick ? (s.guestStyle || 'haus') : 'haus'; }
+/* Zwei Stile: „haus“ (Hauskarte) und „schlicht“ (wenig Farbe, gut für den Bürodrucker) */
+function hsStyle(){ return S.settings.guestStyle === 'schlicht' ? 'schlicht' : 'haus'; }
 function hausMigrate(d){
   const s = d.settings; if(!s) return d;
-  if(!s.guestStylePick && (!s.guestStyle || s.guestStyle === 'web')) s.guestStyle = 'haus';
+  // frühere Stile 'web' und 'book' werden „Schlicht“, wenn sie bewusst gewählt waren; sonst gilt die Hauskarte
+  s.guestStyle = s.guestStyle === 'schlicht' || (s.guestStylePick && (s.guestStyle === 'web' || s.guestStyle === 'book')) ? 'schlicht' : 'haus';
+  delete s.guestStylePick;
+  // Layout, Schriftpaar und Ornament je Saison gab es nur im alten Stil 'book'
+  Object.values(s.seasons || {}).forEach(x => { if(x && typeof x === 'object'){ delete x.layout; delete x.fd; delete x.fb; delete x.orn; } });
   if(!s.menuCopy || typeof s.menuCopy !== 'object') s.menuCopy = {};
   if(!s.menuCopy.sec || typeof s.menuCopy.sec !== 'object') s.menuCopy.sec = {};
   return d;
@@ -453,9 +458,8 @@ function hsCopyPanel(){
 const _renderGuestHs = renderGuest;
 renderGuest = function(){
   let html = _renderGuestHs(); const st = hsStyle();
-  const old = seg('gStyle', S.settings.guestStyle || 'web', [['web','Wie die Website'],['book','Buchsatz']]);
-  const hint = st === 'haus' ? `„${HS_NAME}“: Schiefer, Gold und Kreidetafel auf fertigen A4-Blättern. Die Blätter füllen sich aus Ihren Daten.` : '„Wie die Website“ nutzt Rahmen, Reiter und Schriften von dahuam202.at.';
-  html = html.replace(old, seg('gStyle', st, [['haus', HS_NAME],['web','Wie die Website'],['book','Buchsatz']])).replace('<p class="hint">„Wie die Website“ nutzt Rahmen, Reiter und Schriften von dahuam202.at.</p>', `<p class="hint">${hint}</p>`);
+  const hint = st === 'haus' ? `„${HS_NAME}“: Schiefer, Gold und Kreidetafel auf fertigen A4-Blättern.` : '„Schlicht“: helles Papier, wenig Farbe. Gut für den Bürodrucker.';
+  html = html.replace('<!--gstyle-->', `<section class="panel"><div class="panel-h"><h2>Gestaltung</h2></div>${seg('gStyle', st, [['haus', HS_NAME],['schlicht','Schlicht']])}<p class="hint">${hint}</p></section>`);
   if(st === 'haus'){
     html = html.replace(/<\/aside>\s*<div class="guest-prev">/, hsCopyPanel() + '</aside><div class="guest-prev">');
     html = html.replace(/<div class="togs"><label class="tog"><input type="checkbox" data-hkk="1"[\s\S]*?<\/div>/, '').replace('Schrift, Raster und Papier bleiben in jeder Saison gleich. So erkennt man immer dasselbe Haus.', 'Schiefer, Gold und Schriften bleiben in jeder Saison gleich. Die Standardfarbe der Saison ist auf den Schiefer abgestimmt; wählen Sie eine andere, färbt sie Saisonzeichen und Kinderseite.').replace('Fotos einzelner Gerichte erscheinen bewusst nicht in der Karte: Sie verschieben die Zeilen. Ein ruhiges Titelbild genügt.', 'Ein eigenes Titelbild wird in Gold-Schiefer-Tönen ins Titelblatt geblendet. Ohne Bild zeichnet die Karte den Bergkamm.');
@@ -465,7 +469,7 @@ renderGuest = function(){
 let _hsT = 0;
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if(!el) return;
-  if(el.dataset.act === 'gStyle'){ S.settings.guestStylePick = true; }
+  if(el.dataset.act === 'gStyle'){ S.settings.guestStyle = el.dataset.id === 'schlicht' ? 'schlicht' : 'haus'; save(); render(); }
   if(el.dataset.act === 'hsZoom'){ view.hsBig = el.dataset.id === 'one'; refreshGuest(); }
   if(el.dataset.act === 'hsCopyReset'){ ask('Alle Texte der Hauskarte auf die Standardtexte zurücksetzen?', () => { S.settings.menuCopy = {sec:{}}; save(); render(); }, 'Zurücksetzen'); }
 }, true);

@@ -9,7 +9,7 @@ const L = require('./lib'); const fs = require('fs');
     const GARBAGE = '{"settings":{"name":"Mein Lokal"},"products":[{"id":"p1","na';
     const c = await L.ctx(b); await setLs(c, GARBAGE); const p = await L.page(c); const r = await rec(p);
     L.ok(r && /beschädigt/.test(r.h) && r.S === null, 'kaputter Stand → Wiederherstellungs-Seite statt Demodaten', r);
-    L.ok(r && ['Datei wählen', 'Mit Demodaten starten', 'Leer starten', 'Als Datei speichern'].every(x => r.btns.includes(x)), 'Auswahl: Sicherung laden, Demodaten, leer, Rohdaten speichern', r && r.btns);
+    L.ok(r && ['Datei wählen', 'Mit Beispieldaten starten', 'Leer starten', 'Als Datei speichern'].every(x => r.btns.includes(x)), 'Auswahl: Sicherung laden, Beispieldaten, leer, Rohdaten speichern', r && r.btns);
     L.ok(await p.evaluate(g => localStorage.getItem(KEY) === g, GARBAGE), 'der Rohstand im localStorage ist unberührt');
     const x = await idbRaw(p); L.ok(!x.meta && x.keys === 0 && x.corrupt && x.corrupt.raw === GARBAGE, 'nichts überschrieben; Rohstand zusätzlich in IndexedDB aufgehoben');
     await p.evaluate(() => { save(); window.dispatchEvent(new Event('pagehide')); }); await p.waitForTimeout(200); L.ok(!(await idbRaw(p)).meta, 'solange nicht entschieden ist, schreibt die App nichts');

@@ -23,14 +23,14 @@ await p.screenshot({path:'r-map.png',fullPage:true});
 // map Hüttenteller -> Bauernrösti, Gutschein ignore
 await ev(()=>{const k=Object.keys(S.salesUnmapped).find(k=>/hutten/.test(k));const m=S.menu.find(x=>x.name==='Bauernrösti');applyMapping(k,m.id);const g=Object.keys(S.salesUnmapped).find(k=>/gutschein/.test(k)||/9001/.test(k));if(g)applyMapping(g,'-');save();render();});
 console.log('rösti on day',await ev(()=>JSON.stringify(S.salesDays['2026-11-09'].find(r=>S.menu.find(m=>m.id===r[0]).name==='Bauernrösti'))),'unmapped left',await ev(()=>Object.keys(S.salesUnmapped).length));
-await ev(()=>{view.rp.tab='sales';view.rp.unit='day';view.rp.ref='2026-11-09';view.rp.cmp='off';render()});await p.waitForTimeout(200);console.log('day total',await ev(()=>{const r=report('2026-11-09','2026-11-09');return r.qty+' / '+r.gross.toFixed(2)}));
+await ev(()=>{view.rp.tab='sales';view.rp.unit='custom';view.rp.from='2026-11-09';view.rp.to='2026-11-09';view.rp.cmp='off';render()});await p.waitForTimeout(200);console.log('day total',await ev(()=>{const r=report('2026-11-09','2026-11-09');return r.qty+' / '+r.gross.toFixed(2)}));
 // guest menu web style
-await ev(()=>{view.mtab='guest';view.gdate='2027-01-20';view.gseason=null;go('menu')});await p.waitForTimeout(500);
+await ev(()=>{S.settings.guestStyle='schlicht';view.mtab='guest';view.gdate='2027-01-20';view.gseason=null;go('menu')});await p.waitForTimeout(500);
 await (await p.$('.wk-paper')).screenshot({path:'w-all.png'});
 await p.click('[data-act=wkTab][data-id=haupt]');await p.waitForTimeout(200);await (await p.$('.wk-paper')).screenshot({path:'w-haupt.png'});
 await p.click('[data-act=wkFilter][data-id=v]');await p.waitForTimeout(200);console.log('veg count',await p.textContent('.wk-fcount'));
 await (await p.$('.wk-paper')).screenshot({path:'w-veg.png'});
 await p.screenshot({path:'w-tools.png'});
-const m=await b.newPage({viewport:{width:390,height:844},deviceScaleFactor:2});m.on('pageerror',e=>errs.push('m '+e.message));await m.goto(F);await m.waitForTimeout(900);await m.evaluate(()=>{S.settings.guestStyle='web';S.settings.guestStylePick=true;});
+const m=await b.newPage({viewport:{width:390,height:844},deviceScaleFactor:2});m.on('pageerror',e=>errs.push('m '+e.message));await m.goto(F);await m.waitForTimeout(900);await m.evaluate(()=>{S.settings.guestStyle='schlicht';});
 for(const [n,fn] of [['report',()=>{view.rp.unit='month';view.rp.ref='2026-02-15';go('report')}],['guest',()=>{view.mtab='guest';view.gdate='2027-01-20';go('menu');document.querySelector('.wk-paper').scrollIntoView()}]]){await m.evaluate(fn);await m.waitForTimeout(400);console.log('m',n,await m.evaluate(()=>document.documentElement.scrollWidth));await m.screenshot({path:'rm-'+n+'.png'});}
 console.log('errors',errs);await b.close();})();

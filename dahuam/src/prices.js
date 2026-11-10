@@ -5,36 +5,6 @@ function pricesMigrate(d){ (d.products||[]).forEach(p => { if(p.priceDemo === un
 function markPrice(p, src){ p.priceDemo = false; p.priceDate = todayStr(); p.priceSrc = src; }
 function demoPriceLines(c, d=0, acc=new Set()){ if(!c || d > 6) return acc; c.items.forEach(it => { const r = refObj(it.ref); if(!r) return; if(r.t === 'p'){ if(r.o.priceDemo && !r.o.noStock && +r.o.price) acc.add(r.o.id); } else demoPriceLines(r.o, d+1, acc); }); return acc; }
 
-renderProducts = function(){
-  const q = view.pq.trim().toLowerCase(); const f = view.pf || 'all';
-  const all = S.products.filter(p => !p.noStock);
-  const nDemo = all.filter(p=>p.priceDemo).length;
-  const list = all.filter(p => (!q || (p.name+' '+supName(p)+' '+(p.artNo||'')).toLowerCase().includes(q)) && (f==='all' || (f==='demo' ? p.priceDemo : !p.priceDemo))).sort(byName);
-  const chip = (k,l,n) => `<button type="button" class="chip ${f===k?'on':''}" data-act="pFilter" data-id="${k}">${l}<small>${n}</small></button>`;
-  return `<div class="page-h"><div><div class="eyebrow">${all.length} Produkte · Preise je Einheit exkl. MwSt.</div><h1>Produkte</h1></div>
-    <div class="row-btns"><button type="button" class="btn" data-act="plImport">${ico('copy')}Preisliste importieren</button><button type="button" class="btn primary" data-act="newProd">${ico('plus')}Produkt</button></div></div>
-  <div class="toolbar"><label class="search">${ico('search')}<input id="pq" type="search" placeholder="Produkt, Lieferant oder Artikelnummer" value="${esc(view.pq)}" autocomplete="off"></label>${seg('pFilter', f, [['all','Alle',all.length],['demo','Richtwerte',nDemo],['ok','Bestätigt',all.length-nDemo]])}<span class="sp"></span>${nDemo ? `<button type="button" class="btn sm" data-act="pConfirmAll" data-id="${f}">Angezeigte Richtwerte bestätigen</button>` : ''}</div>
-  <div class="lt-wrap"><table class="lt"><thead><tr><th>Produkt</th><th class="hide-m">Lieferant</th><th class="r">Preis €</th><th>Stand</th><th class="r hide-m">Putzverlust</th><th class="r hide-m">Garverlust</th><th class="hide-m">Allergene</th><th class="r hide-m">Rezepturen</th><th></th></tr></thead><tbody>
-  ${list.map(p => { const u = usage('p:'+p.id).length; return `<tr class="row" data-act="editProd" data-id="${p.id}">
-    <td><div class="lt-n"><span><b>${esc(p.name)}</b><small>${p.unit==='Stk'&&p.pieceG?`je Stk · ${num(p.pieceG)} g`:`je ${esc(p.unit)}`}${p.artNo?' · Nr. '+esc(p.artNo):''}${p.pack?' · '+esc(p.pack):''}</small></span></div></td>
-    <td class="hide-m lt-muted">${esc(supName(p))}</td>
-    <td class="r"><input class="lt-price num-in" id="pp-${p.id}" type="text" inputmode="decimal" data-num="req price" data-pp="${p.id}" data-pf="price" value="${num2(p.price)}" aria-label="Preis ${esc(p.name)}"></td>
-    <td>${p.priceDemo ? '<span class="st-ref" title="Beispielpreis, noch nicht bestätigt">Richtwert</span>' : `<span class="lt-muted sm">${p.priceDate?fmtDate(p.priceDate+'T12:00:00'):'bestätigt'}${p.priceSrc?' · '+esc(p.priceSrc):''}</span>`}</td>
-    <td class="r hide-m">${num(+p.lossCold||0,1)} %</td><td class="r hide-m">${num(+p.lossHot||0,1)} %</td>
-    <td class="hide-m">${chips(new Set(algList(p.alg)))}</td><td class="r hide-m">${u}</td>
-    <td><div class="lt-acts">${p.priceDemo?`<button type="button" class="btn sm" data-act="pConfirm" data-id="${p.id}" title="Preis stimmt">Stimmt</button>`:''}<button type="button" class="icon-btn" data-act="editProd" data-id="${p.id}" aria-label="Bearbeiten">${ico('edit')}</button></div></td></tr>`; }).join('') || '<tr><td colspan="9" class="lt-muted">Nichts gefunden.</td></tr>'}
-  </tbody></table></div>
-  `;
-};
-
-/* Hinweis in der Rezeptur */
-const _renderCardP = renderCard;
-renderCard = function(c){
-  const h = _renderCardP(c); const ids = [...demoPriceLines(c)]; if(!ids.length || typeof pcStart === 'function') return h;
-  const names = ids.map(id => P(id)?.name).filter(Boolean);
-  const box = `<div class="warn-box" style="margin:-6px 0 18px">${ico('spark')}<span><b>Wareneinsatz geschätzt:</b> ${names.length} ${names.length===1?'Zutat hat':'Zutaten haben'} noch einen Richtwert-Preis (${esc(names.slice(0,6).join(', '))}${names.length>6?' …':''}). Mit Ihren Einkaufspreisen wird die Zahl genau.</span><button type="button" class="btn sm" data-act="pFix" data-id="${ids.join(',')}">Preise eintragen</button></div>`;
-  return h.replace('<div class="grid2">', box + '<div class="grid2">');
-};
 function priceFixDialog(ids){
   const ps = ids.map(P).filter(Boolean);
   openDialog('Einkaufspreise eintragen', `<p class="dlg-p">Preis je Einheit ohne MwSt., wie auf Rechnung oder Preisliste. Leer lassen, wenn unbekannt.</p>

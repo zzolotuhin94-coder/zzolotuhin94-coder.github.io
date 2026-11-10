@@ -64,22 +64,16 @@ async function exportPdf(filename){
 const _nativePrint = window.print ? window.print.bind(window) : null;
 window.print = function(){ if(PDF_NAME || FRAMED || !_nativePrint){ const n = PDF_NAME || pdfFileName('DAHUAM202'); PDF_NAME = null; exportPdf(n); } else _nativePrint(); };
 
-function pdfBtn(act, id, label){ return `<button type="button" class="btn" data-pdf="${act}" ${id?`data-id="${esc(id)}"`:''}>${ico('download')}${label||'PDF'}</button>`; }
 ICO.download = ICO.download || '<path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/>';
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-pdf]'); if(!b) return; e.preventDefault(); e.stopPropagation();
   const a = b.dataset.pdf, id = b.dataset.id;
   if(a === 'printMenu'){ const k = typeof curSeasonKey === 'function' ? curSeasonKey() : ''; PDF_NAME = pdfFileName(`Speisekarte-${S.settings.name.split(' ')[0]}-${k ? seasonName(k) : ''}-${view.gdate || todayStr()}`); printMenu(); }
+  if(a === 'rpPrint'){ const r = rpRange(view.rp); PDF_NAME = pdfFileName(`Auswertung-${r.from}-${r.to}`); rpPrint(); }
   if(a === 'printCard'){ const c = C(id); PDF_NAME = pdfFileName('Rezeptur-' + (c ? c.name : id)); printCard(id); }
   if(a === 'printSpecial'){ const sp = S.specials.find(x => x.id === id); PDF_NAME = pdfFileName('Tageskarte-' + (sp ? sp.name : '')); $('#print').innerHTML = tageskarteHtml(sp); document.body.classList.add('print-menu'); window.print(); }
 }, true);
 
-/* Knöpfe einblenden */
-const _renderMenuPdf = renderMenu;
-renderMenu = function(){ let h = _renderMenuPdf();
-  if(view.mtab === 'guest'){ const btns = pdfBtn('printMenu', '', 'Als PDF speichern') + (FRAMED ? '' : `<button type="button" class="btn" data-act="printMenu">${ico('print')}Drucken</button>`);
-    h = h.replace(/<button type="button" class="btn" data-act="printMenu">[\s\S]*?<\/button>/, '');
-    h = h.replace('<div class="row-btns">', '<div class="row-btns">' + btns); }
-  return h; };
+/* Rezeptur: Knopf „Als PDF speichern“ */
 const _renderCardPdf = renderCard;
 renderCard = function(c){ let h = _renderCardPdf(c); if(!/data-pdf="printCard"/.test(h)){ const m = h.match(/<button[^>]*data-act="printCard"[^>]*>[\s\S]*?<\/button>/); const b = `<button type="button" class="icon-btn lg" data-pdf="printCard" data-id="${c.id}" title="Rezeptur als PDF speichern" aria-label="Rezeptur als PDF speichern">${ico('download')}</button>`; h = m ? h.replace(m[0], (FRAMED ? '' : m[0]) + b) : h.replace(/<button type="button" class="icon-btn lg" data-act="dupCard"/, b + '<button type="button" class="icon-btn lg" data-act="dupCard"'); } return h; };

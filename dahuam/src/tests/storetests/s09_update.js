@@ -4,7 +4,7 @@ const SRC = process.env.SITE || '/home/user/zzolotuhin94-coder.github.io/dahuam/
 const MIME = {html:'text/html; charset=utf-8', js:'text/javascript', json:'application/json', webmanifest:'application/manifest+json', png:'image/png', svg:'image/svg+xml', webp:'image/webp', woff2:'font/woff2', md:'text/plain'};
 (async () => {
   const html1 = fs.readFileSync(SRC + 'index.html', 'utf8'), sw1 = fs.readFileSync(SRC + 'sw.js', 'utf8'); const B1 = /APP_BUILD = '([0-9a-f]+)'/.exec(html1)[1]; const B2 = 'ffff' + B1.slice(4);
-  const mk = (s, mark) => s.split(B1).join(B2).replace("const NEWER_MSG", "window.__V2 = '" + mark + "'; const NEWER_MSG");
+  const mk = (s, mark) => s.split(B1).join(B2).replace("const APP_VERSION", "window.__V2 = '" + mark + "'; const APP_VERSION");
   const html2 = mk(html1, 'zwei'), sw2 = sw1.split(B1).join(B2);
   const cur = {html:html1, sw:sw1}; const hits = [];
   const srv = http.createServer((q, s) => { const u = decodeURIComponent(q.url.split('?')[0]); hits.push(u);

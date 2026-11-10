@@ -1,12 +1,10 @@
 /* =====================================================================
    Auswertung: Verkäufe nach Zeitraum, Kassen-Import, Zuordnung
    ===================================================================== */
-TABS.splice(TABS.findIndex(t=>t[0]==='setup'), 0, ['report','Auswertung','Zahlen']);
 ICO.report = '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>';
-NAV_GROUPS.splice(3, 0, ['Zahlen',['report']]);
-const UNITS = [['day','Tag'],['week','Woche'],['month','Monat'],['quarter','Quartal'],['half','Halbjahr'],['year','Jahr'],['season','Saison'],['custom','Von–Bis']];
+const UNITS = [['week','Woche'],['month','Monat'],['season','Saison'],['year','Jahr'],['custom','Von–Bis']];
 const MONTHS = ['Jänner','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-view.rp = {unit:'month', ref:isoDate(new Date()), from:'', to:'', cmp:'year', tab:'sales', chip:'all', grouped:true};
+view.rp = {unit:'month', ref:isoDate(new Date()), from:'', to:'', cmp:'off', tab:'sales', chip:'all', grouped:true};
 const RSORT = {col:'gross', dir:-1, flip:0, def:1};
 
 function isoWeek(s){ const d = dParse(s); const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); const day = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - day); const y = t.getUTCFullYear(); const w = Math.ceil(((t - Date.UTC(y,0,1))/864e5 + 1)/7); return [y, w]; }
@@ -22,12 +20,9 @@ function seasonRange(ref){
 function rpRange(rp){
   const r = rp.ref, d = dParse(r), y = d.getFullYear(), m = d.getMonth();
   const mo = (yy,mm) => isoDate(new Date(yy,mm,1,12)), last = (yy,mm) => isoDate(new Date(yy,mm+1,0,12));
-  switch(rp.unit){
-    case 'day': return {from:r, to:r, label:d.toLocaleDateString('de-AT',{weekday:'long', day:'numeric', month:'long', year:'numeric'})};
+  switch(UNITS.some(u => u[0] === rp.unit) ? rp.unit : 'month'){
     case 'week': { const off = (d.getDay()+6)%7; const f = dAdd(r,-off), t = dAdd(f,6); const [wy,wn] = isoWeek(r); return {from:f, to:t, label:`KW ${wn} · ${fmtShort(f)}–${fmtShort(t)}${t.slice(0,4)}`}; }
     case 'month': return {from:mo(y,m), to:last(y,m), label:`${MONTHS[m]} ${y}`};
-    case 'quarter': { const q = Math.floor(m/3); return {from:mo(y,q*3), to:last(y,q*3+2), label:`${q+1}. Quartal ${y}`}; }
-    case 'half': { const h = m < 6 ? 0 : 1; return {from:mo(y,h*6), to:last(y,h*6+5), label:`${h+1}. Halbjahr ${y}`}; }
     case 'year': return {from:`${y}-01-01`, to:`${y}-12-31`, label:`Jahr ${y}`};
     case 'season': return seasonRange(r);
     case 'custom': { const f = rp.from || dAdd(isoDate(new Date()),-29), t = rp.to || isoDate(new Date()); return {from:f<=t?f:t, to:f<=t?t:f, label:`${fmtDate(f+'T12:00:00')} – ${fmtDate(t+'T12:00:00')}`}; }
@@ -35,9 +30,8 @@ function rpRange(rp){
 }
 function rpStep(dir){
   const rp = view.rp, d = dParse(rp.ref);
-  if(rp.unit==='day') rp.ref = dAdd(rp.ref, dir);
-  else if(rp.unit==='week') rp.ref = dAdd(rp.ref, 7*dir);
-  else if(['month','quarter','half'].includes(rp.unit)){ const n = {month:1, quarter:3, half:6}[rp.unit]; rp.ref = isoDate(new Date(d.getFullYear(), d.getMonth()+n*dir, 1, 12)); }
+  if(rp.unit==='week') rp.ref = dAdd(rp.ref, 7*dir);
+  else if(rp.unit==='month') rp.ref = isoDate(new Date(d.getFullYear(), d.getMonth()+dir, 1, 12));
   else if(rp.unit==='year') rp.ref = `${d.getFullYear()+dir}-06-15`;
   else if(rp.unit==='season'){ const r = seasonRange(rp.ref); rp.ref = dir < 0 ? dAdd(r.from,-1) : dAdd(r.to, 1); let g = 0; while(g++ < 400 && seasonRange(rp.ref).from === r.from) rp.ref = dAdd(rp.ref, dir); if(dir > 0 && rp.ref.slice(5) > S.settings.seasons.sommer.to && rp.ref.slice(5) < S.settings.seasons.winter.from) rp.ref = `${rp.ref.slice(0,4)}-${S.settings.seasons.winter.from}`; }
   else if(rp.unit==='custom'){ const r = rpRange(rp); const n = dDiff(r.from, r.to)+1; rp.from = dAdd(r.from, n*dir); rp.to = dAdd(r.to, n*dir); }
@@ -46,10 +40,10 @@ function cmpRange(rp, r, today){
   if(rp.cmp === 'off') return null;
   let c;
   if(rp.cmp === 'prev'){
-    if(['month','quarter','half','year','season'].includes(rp.unit)){ const p = {...rp}; const keep = view.rp; view.rp = p; try { rpStep(-1); } finally { view.rp = keep; } const pr = rpRange(p); c = {from:pr.from, to:pr.to}; }
+    if(['month','year','season'].includes(rp.unit)){ const p = {...rp}; const keep = view.rp; view.rp = p; try { rpStep(-1); } finally { view.rp = keep; } const pr = rpRange(p); c = {from:pr.from, to:pr.to}; }
     else { const n = dDiff(r.from, r.to)+1; c = {from:dAdd(r.from,-n), to:dAdd(r.from,-1)}; }
   }
-  else if(rp.unit === 'day' || rp.unit === 'week') c = {from:dAdd(r.from,-364), to:dAdd(r.to,-364)};
+  else if(rp.unit === 'week') c = {from:dAdd(r.from,-364), to:dAdd(r.to,-364)};
   else { const sh = s => { let t = `${+s.slice(0,4)-1}${s.slice(4)}`; if(t.slice(5)==='02-29') t = t.slice(0,8)+'28'; return t; }; c = {from:sh(r.from), to:sh(r.to)}; }
   // läuft der Zeitraum noch, wird nur dieselbe Anzahl Tage ab Beginn verglichen
   today = today || isoDate(new Date());
@@ -75,13 +69,34 @@ function dPill(dv, inverse){ if(dv == null || !isFinite(dv)) return '<span class
 
 /* ---------- Ansicht ---------- */
 function renderReport(){
-  const rp = view.rp; const t = view.rp.tab;
-  const head = `<div class="page-h"><div><div class="eyebrow">${Object.keys(S.salesDays||{}).length} Verkaufstage gespeichert${S.salesDemo?' · Demodaten':''}</div><h1>Auswertung</h1></div>
-    <div class="row-btns">${t==='sales' ? `<button type="button" class="btn" data-act="rpCsv">${ico('copy')}Tabelle (CSV)</button>${FRAMED?'':`<button type="button" class="btn" data-act="rpPrint">${ico('print')}Bericht drucken / PDF</button>`}` : ''}${t==='import' ? '' : `<button type="button" class="btn primary" data-act="rpTab" data-id="import">${ico('plus')}Kasse importieren</button>`}</div></div>
-  <div class="toolbar">${seg('rpTab', t, [['sales','Verkäufe'],['import','Kasse importieren'],['map','Zuordnung', Object.keys(S.salesUnmapped||{}).length || null]])}</div>`;
+  const rp = view.rp; if(!['sales','import','map'].includes(rp.tab)) rp.tab = 'sales'; const t = rp.tab; const nUn = Object.keys(S.salesUnmapped||{}).length;
+  const head = `<div class="page-h"><div><h1>Team & Zahlen</h1></div>
+    <div class="row-btns">${t==='import' ? '' : `<button type="button" class="btn primary" data-act="rpTab" data-id="import">${ico('plus')}Kasse importieren</button>`}</div></div>
+  ${teamTabs()}
+  ${t === 'sales' && !nUn ? '' : `<div class="toolbar">${seg('rpTab', t, [['sales','Verkäufe'],['import','Kasse importieren'],['map','Zuordnung', nUn || null]])}</div>`}`;
   if(t === 'import') return head + importView();
   if(t === 'map') return head + mapView();
   return head + salesView();
+}
+/* Schwund im Zeitraum: je Artikel Menge und Wert zum Preis der Buchung */
+function wasteReport(from, to){
+  const by = new Map(); let total = 0;
+  for(const m of S.moves){ if(m.type !== 'waste') continue; const d = String(m.date).slice(0,10); const day = d.length === 10 && String(m.date).length > 10 ? isoDate(new Date(m.date)) : d; if(day < from || day > to) continue;
+    const q = Math.abs(+m.qty || 0), v = q * (+m.price || 0); const p = P(m.pid); const key = m.pid;
+    const x = by.get(key) || {pid:m.pid, p, name: p ? p.name : 'gelöschter Artikel', qty:0, value:0, n:0, notes:new Set()};
+    x.qty += q; x.value += v; x.n++; if(m.note) x.notes.add(String(m.note).split(' · ')[0]); by.set(key, x); total += v; }
+  return {rows:[...by.values()].sort((a,b) => b.value - a.value), total};
+}
+function wasteOnly(from, to){ return wasteReport(from, to).rows.length ? wasteBlock(from, to, {net:0}) : ''; }
+function wasteBlock(from, to, cur){
+  const w = wasteReport(from, to);
+  if(!w.rows.length) return `<section class="panel rp-waste"><div class="panel-h"><h2>Schwund</h2></div><p class="hint" style="margin-top:0">In diesem Zeitraum ist kein Schwund gebucht. Unter Ware › Bestand schreiben Sie mit „Schwund buchen“ auf, was verdorben oder verkocht ist.</p></section>`;
+  const top = w.rows.slice(0, 12), rest = w.rows.slice(12);
+  return `<section class="panel rp-waste"><div class="panel-h"><h2>Schwund</h2><span class="muted sm">${eur(w.total)}${cur.net ? ` · ${num(w.total/cur.net*100, 1)} % vom Umsatz netto` : ''}</span></div>
+    <div class="lt-wrap"><table class="lt"><thead><tr><th>Artikel</th><th class="r">Menge</th><th class="r">Wert</th><th class="hide-m">Grund</th></tr></thead><tbody>
+    ${top.map(x => `<tr><td><b>${esc(x.name)}</b></td><td class="r">${qtyFmt(x.qty, x.p)}</td><td class="r">${eur(x.value)}</td><td class="hide-m lt-muted">${esc([...x.notes].join(', '))}</td></tr>`).join('')}
+    ${rest.length ? `<tr><td class="lt-muted">${rest.length} weitere</td><td></td><td class="r">${eur(rest.reduce((a,x) => a + x.value, 0))}</td><td class="hide-m"></td></tr>` : ''}
+    </tbody><tfoot><tr><td>Summe</td><td></td><td class="r">${eur(w.total)}</td><td class="hide-m"></td></tr></tfoot></table></div></section>`;
 }
 function salesView(){
   const rp = view.rp; const today = isoDate(new Date()); let r = rpRange(rp);
@@ -97,30 +112,24 @@ function salesView(){
       <button type="button" class="icon-btn lg" data-act="rpStep" data-id="-1" aria-label="Zurück">${ico('arrow')}</button>
       <div class="rp-label"><b>${esc(r.label)}</b><small>${fmtDate(r.from+'T12:00:00')} – ${fmtDate(r.to+'T12:00:00')}${r.to > today && r.from <= today ? ' · bis heute' : ''}${rp.jumped ? ' · letzter Zeitraum mit Verkäufen' : ''} · ${cur.openDays} ${cur.openDays===1?"Verkaufstag":"Verkaufstage"}</small></div>
       <button type="button" class="icon-btn lg" data-act="rpStep" data-id="1" aria-label="Weiter">${ico('arrow','flip')}</button>
-      <button type="button" class="btn sm" data-act="rpToday">Aktuell</button>
-      <span class="sp"></span><span class="muted sm">Vergleich</span>${seg('rpCmp', rp.cmp, [['off','Aus'],['prev','Vorperiode'],['year','Vorjahr']])}</div>
+      <button type="button" class="btn sm" data-act="rpToday">Aktuell</button></div>
   </section>`;
-  if(S.salesDemo) h += `<div class="note" style="display:flex">${ico('spark')}<span>Demodaten: erfundene Verkäufe der letzten 14 Monate, damit Sie die Auswertung ausprobieren können. Beim ersten echten Kassen-Import werden sie entfernt.</span></div>`;
-  if(unm.length) h += `<div class="warn-box" style="margin-bottom:14px">${ico('spark')}<span><b>${unm.length} Kassenartikel nicht zugeordnet</b>${unmG?` · ${eur(unmG)} Umsatz in diesem Zeitraum fehlen in der Auswertung`:''}.</span><button type="button" class="btn sm" data-act="rpTab" data-id="map">Zuordnen</button></div>`;
-  if(!cur.openDays) return h + `<section class="panel empty">Für diesen Zeitraum gibt es keine Verkäufe. Importieren Sie die Artikelumsätze aus Ihrer Kasse.<div class="row-btns" style="justify-content:center;margin-top:12px"><button type="button" class="btn primary" data-act="rpTab" data-id="import">Kasse importieren</button></div></section>`;
-  const tile = (l, v, dv, sub, inv) => `<div class="tile"><div><div class="t-l">${l}</div><div class="t-v">${v}</div><div class="t-s">${cmp ? dPill(dv, inv)+' ' : ''}${sub||''}</div></div></div>`;
-  h += `<div class="tiles">
-    ${tile('Umsatz netto', eur(cur.net), cmp && delta(cur.net, cmp.net), `brutto ${eur(cur.gross)}`)}
-    ${tile('Portionen', num(cur.qty), cmp && delta(cur.qty, cmp.qty))}
-    ${tile('Ø pro Verkaufstag', eur(cur.openDays ? cur.net/cur.openDays : 0), cmp && delta(cur.net/cur.openDays, cmp.openDays ? cmp.net/cmp.openDays : 0), 'netto')}
-    ${tile('Wareneinsatz', cur.fc!=null ? num(cur.fc,1)+' %' : '—', cmp && cmp.fc!=null && cur.fc!=null ? (cur.fc - cmp.fc)/cmp.fc*100 : null, `für ${num(cur.cover,0)} % des Umsatzes`, true)}
-    ${tile('Rohertrag', eur(cur.rg), cmp && delta(cur.rg, cmp.rg), 'Gerichte mit Rezeptur')}
-  </div>
-  ${cr ? `<p class="hint rp-cmpnote">Vergleich mit ${cmpLabel}</p>` : ''}
+  const more = moreOpts('report', `<span class="f inl">Vergleich${seg('rpCmp', rp.cmp, [['off','Aus'],['prev','Vorperiode'],['year','Vorjahr']])}</span><button type="button" class="btn sm" data-pdf="rpPrint">${ico('download')}Als PDF speichern</button>${FRAMED ? '' : `<button type="button" class="btn sm" data-act="rpPrint">${ico('print')}Drucken</button>`}<button type="button" class="btn sm" data-act="rpCsv">Als CSV speichern</button>`);
+  if(unm.length) h += `<p class="fact"><b>${unm.length} Kassenartikel nicht zugeordnet</b>${unmG?` · ${eur(unmG)} Umsatz in diesem Zeitraum fehlen hier`:''}. <button type="button" class="link" data-act="rpTab" data-id="map">Zuordnen</button></p>`;
+  if(!cur.openDays) return h + wasteOnly(r.from, to) + `<section class="panel empty">Für diesen Zeitraum gibt es keine Verkäufe. Importieren Sie die Artikelumsätze aus Ihrer Kasse.<div class="row-btns" style="justify-content:center;margin-top:12px"><button type="button" class="btn primary" data-act="rpTab" data-id="import">Kasse importieren</button></div></section>`;
+  const dp = (dv, inv) => cmp ? ' ' + dPill(dv, inv) : '';
+  h += `<p class="rp-sum">Umsatz netto <b>${eur(cur.net)}</b>${dp(delta(cur.net, cmp && cmp.net))}, mit Steuer ${eur(cur.gross)} · <b>${num(cur.qty)}</b> Portionen${dp(delta(cur.qty, cmp && cmp.qty))} · im Schnitt <b>${eur(cur.openDays ? cur.net/cur.openDays : 0)}</b> je Verkaufstag · Wareneinsatz <b>${cur.fc!=null ? num(cur.fc,1)+' %' : '—'}</b>${dp(cmp && cmp.fc!=null && cur.fc!=null ? (cur.fc - cmp.fc)/cmp.fc*100 : null, true)} · Rohertrag <b>${eur(cur.rg)}</b>${dp(delta(cur.rg, cmp && cmp.rg))}${S.salesDemo ? ' · Beispielverkäufe, bis zum ersten Import aus Ihrer Kasse' : ''}</p>
+  ${cr ? `<p class="hint rp-cmpnote" style="margin:-8px 0 14px">Vergleich mit ${cmpLabel}</p>` : ''}
   <section class="panel"><div class="panel-h"><h2>Umsatz im Zeitverlauf</h2><span class="legend">${cmp?'<i class="lg-c"></i>Vergleich':''}<i class="lg-b"></i>Umsatz netto</span></div>${chartSvg(r.from, to, cur, cr, cmp)}</section>
   ${itemTable(cur, cmp)}
+  <div class="rp-grid">${topFlop(cur, 'q', 'Renner und Ladenhüter', 'nach Portionen')}${topFlop(cur, 'rg', 'Größter Rohertrag', 'nach Euro')}</div>
   <div class="rp-grid">
-    <section class="panel"><div class="panel-h"><h2>Menü-Matrix</h2><span class="muted sm">Beliebtheit × Rohertrag je Portion</span></div>${matrixSvg(cur)}</section>
+    ${wasteBlock(r.from, to, cur)}
     <section class="panel"><div class="panel-h"><h2>Wochentage</h2><span class="muted sm">Ø Umsatz netto je Verkaufstag</span></div>${weekdaySvg(cur)}</section>
   </div>
-  <div class="rp-grid">${topFlop(cur, 'q', 'Meistverkauft')}${topFlop(cur, 'rg', 'Größter Rohertrag')}</div>
   ${specialsBlock(r.from, to, cur)}
   ${dDiff(r.from, to) > 62 ? monthTable(r.from, to) : ''}
+  ${more}
   <p class="hint">Interne Auswertung. Maßgeblich für Steuer und Buchhaltung sind die Daten der Registrierkasse (RKSV/DEP). Netto: Speisen 10 %, Getränke 20 % MwSt.</p>`;
   return h;
 }
@@ -172,29 +181,10 @@ function itemTable(cur, cmp){
   const chipB = (k,l,n) => `<button type="button" class="chip ${chip===k?'on':''}" data-act="rpChip" data-id="${k}">${l}${n!=null?`<small>${n}</small>`:''}</button>`;
   return `<h2 class="sec-h">Artikel</h2>
   <div class="toolbar">${chipB('all','Alle',cur.rows.length)}${chipB('norec','Ohne Rezeptur',cur.rows.filter(r=>r.we==null).length)}${chipB('unsold','Ohne Verkauf')}<span class="sp"></span><label class="tog"><input type="checkbox" data-rpg="1" ${view.rp.grouped?'checked':''}><span></span>Nach Kategorie gruppieren</label></div>
-  <div class="lt-wrap"><table class="lt rp-items"><thead><tr>${th('name','Gericht','')}${th('q','Menge')}${th('share','Anteil','r hide-m c-x1')}${th('gross','Umsatz brutto','r hide-m c-x2')}${th('net','Umsatz netto','r rp-net')}${th('avg','Ø Preis','r hide-m c-x1')}${th('we','WE gesamt','r hide-m')}${th('fc','WE %')}${th('rg','Rohertrag','r hide-m')}${cq?th('d','Δ Menge','r rp-dq'):''}</tr></thead>
+  <div class="lt-wrap"><table class="lt rp-items"><thead><tr>${th('name','Gericht','')}${th('q','Menge')}${th('share','Anteil','r hide-m c-x1')}${th('gross','Umsatz brutto','r hide-m c-x2')}${th('net','Umsatz netto','r rp-net')}${th('avg','Ø Preis','r hide-m c-x1')}${th('we','Wareneinsatz','r hide-m')}${th('fc','in %')}${th('rg','Rohertrag','r hide-m')}${cq?th('d','Δ Menge','r rp-dq'):''}</tr></thead>
   <tbody>${body}</tbody>
   <tfoot><tr><td>Summe</td><td class="r">${num(cur.qty)}</td><td class="hide-m c-x1"></td><td class="r hide-m c-x2">${eur(cur.gross)}</td><td class="r rp-net">${eur(cur.net)}</td><td class="hide-m c-x1"></td><td class="r hide-m">${eur(cur.we)}</td><td class="r">${cur.fc!=null?num(cur.fc,1)+' %':'—'}</td><td class="r hide-m">${eur(cur.rg)}</td>${cq?'<td class="rp-dq"></td>':''}</tr></tfoot></table></div>
   <p class="hint">Wareneinsatz-Abdeckung: ${num(cur.cover,0)} % des Umsatzes (Gerichte mit Rezeptur). Spaltenkopf antippen zum Sortieren.</p>`;
-}
-function matrixSvg(cur){
-  const pts = cur.rows.filter(r => r.cpp != null && r.q >= 10 && r.m);
-  if(pts.length < 3) return '<p class="hint">Für die Matrix braucht es mindestens drei Gerichte mit Rezeptur und je 10 verkauften Portionen.</p>';
-  const tq = pts.reduce((a,r)=>a+r.q,0); const popT = .7 * tq / pts.length;
-  const mT = pts.reduce((a,r)=>a + (r.n/r.q - r.cpp)*r.q, 0) / tq;
-  const W = 520, H = 320, L = 44, B = 30, T = 12, R = 12;
-  const xm = Math.max(...pts.map(r=>r.q))*1.08, ym = Math.max(...pts.map(r=>r.n/r.q - r.cpp))*1.12;
-  const X = v => L + (W-L-R)*v/xm, Y = v => T + (H-T-B)*(1 - v/ym);
-  const quad = r => { const hp = r.q >= popT, hm = (r.n/r.q - r.cpp) >= mT; return hp && hm ? 'star' : hp ? 'horse' : hm ? 'puzzle' : 'dog'; };
-  const lab = {star:'Renner', horse:'Brotgericht', puzzle:'Rätsel', dog:'Verlierer'}, tip = {star:'halten', horse:'Preis oder Rezeptur prüfen', puzzle:'besser platzieren', dog:'streichen?'};
-  let s = `<svg class="rp-matrix" viewBox="0 0 ${W} ${H}" role="img" aria-label="Menü-Matrix">
-    <line x1="${X(popT)}" x2="${X(popT)}" y1="${T}" y2="${H-B}" class="th"/><line x1="${L}" x2="${W-R}" y1="${Y(mT)}" y2="${Y(mT)}" class="th"/>
-    <text x="${W-R-4}" y="${T+12}" class="ql" text-anchor="end">Renner</text><text x="${L+4}" y="${T+12}" class="ql">Rätsel</text><text x="${W-R-4}" y="${H-B-6}" class="ql" text-anchor="end">Brotgerichte</text><text x="${L+4}" y="${H-B-6}" class="ql">Verlierer</text>
-    <text x="${(L+W-R)/2}" y="${H-6}" class="ax" text-anchor="middle">Verkaufte Portionen</text><text x="12" y="${(T+H-B)/2}" class="ax" text-anchor="middle" transform="rotate(-90 12 ${(T+H-B)/2})">Rohertrag je Portion</text>`;
-  pts.forEach(r => { const mg = r.n/r.q - r.cpp; s += `<g class="pt ${quad(r)}" data-act="openCard" data-id="${r.m.card}"><circle cx="${X(r.q)}" cy="${Y(mg)}" r="6"/>${(() => { const sh = dishShort(r.m, 26); const right = X(r.q) + 9 + sh.length*5.6 > W - R; return `<text x="${right ? X(r.q)-9 : X(r.q)+9}" y="${Y(mg)+4}" ${right ? 'text-anchor="end"' : ''}>${esc(sh)}</text>`; })()}<title>${esc(r.name)}: ${num(r.q)} Portionen, ${eur(mg)} Rohertrag je Portion</title></g>`; });
-  s += '</svg>';
-  const groups = ['star','horse','puzzle','dog'].map(k => { const l = pts.filter(r=>quad(r)===k); return `<li><b>${lab[k]}</b> <span class="muted">· ${tip[k]}</span><br><span class="sm">${l.map(r=>esc(dishLabel(r.m))).join(', ') || '—'}</span></li>`; }).join('');
-  return s + `<ul class="rp-quads">${groups}</ul><p class="hint">Nur Gerichte mit Rezeptur und mindestens 10 Portionen. Grenze Beliebtheit: 70 % des Durchschnitts, Grenze Rohertrag: gewichteter Durchschnitt (${eur(mT)}).</p>`;
 }
 function weekdaySvg(cur){
   const sum = Array(7).fill(0), cnt = Array(7).fill(0);
@@ -206,11 +196,11 @@ function weekdaySvg(cur){
   avg.forEach((v,i) => { const hh = (H-B-T)*v/max; const closed = !cnt[i]; s += closed ? `<rect x="${i*bw+bw*.18}" y="${H-B-14}" width="${bw*.64}" height="14" class="hatch"/><text x="${i*bw+bw/2}" y="${H-B-20}" class="ax" text-anchor="middle">Ruhetag</text>` : `<rect x="${i*bw+bw*.18}" y="${H-B-hh}" width="${bw*.64}" height="${hh}" class="bar"><title>${names[i]}: Ø ${eur(v)} an ${cnt[i]} Tagen</title></rect><text x="${i*bw+bw/2}" y="${H-B-hh-6}" class="ax" text-anchor="middle">${v>=1000?num(v/1000,1)+' k':num(v)}</text>`; s += `<text x="${i*bw+bw/2}" y="${H-8}" class="ax" text-anchor="middle">${names[i]}</text>`; });
   return s + '</svg>';
 }
-function topFlop(cur, k, title){
+function topFlop(cur, k, title, by){
   const list = cur.rows.filter(r => k === 'q' || r.rg != null).sort((a,b)=>(b[k]||0)-(a[k]||0));
   const top = list.slice(0,10), flop = list.slice(-5).reverse();
   const li = r => `<li><span>${esc(r.name)}</span><b class="mono">${k==='q' ? num(r.q) : eur(r.rg)}</b></li>`;
-  return `<section class="panel"><div class="panel-h"><h2>${title}</h2><span class="muted sm">Top 10 · schwächste 5</span></div><ol class="rp-top">${top.map(li).join('')}</ol><div class="rp-flop-h">Am schwächsten</div><ol class="rp-top flop">${flop.map(li).join('')}</ol></section>`;
+  return `<section class="panel"><div class="panel-h"><h2>${title}</h2><span class="muted sm">${by} · beste 10, schwächste 5</span></div><ol class="rp-top">${top.map(li).join('')}</ol><div class="rp-flop-h">Am schwächsten</div><ol class="rp-top flop">${flop.map(li).join('')}</ol></section>`;
 }
 function specialsBlock(from, to, cur){
   const sps = (S.specials||[]).filter(sp => sp.from <= to && (sp.to||sp.from) >= from); if(!sps.length) return '';
@@ -260,7 +250,7 @@ function importView(){
       <p class="hint">Der gesetzliche RKSV-Export (DEP7) enthält nur Belegsummen je Steuersatz, keine einzelnen Gerichte. Für die Auswertung braucht es den Artikelbericht.</p></section>
     <section class="panel"><div class="panel-h"><h2>Importprotokoll</h2></div>
       ${log.length ? `<ul class="todo">${log.map(l=>`<li><div class="inv-h"><span><b>${fmtDate(l.date)}</b><small class="muted">${esc(l.by||'')}${l.stock?' · Lager abgebucht':''}</small></span><span class="r"><b class="mono">${plural(l.days,'Tag','Tage')}</b><small class="mono">${plural(l.portions,'Portion','Portionen')}</small></span></div></li>`).join('')}</ul>` : '<p class="hint">Noch kein Import.</p>'}
-      ${S.salesDemo ? `<div class="row-btns" style="margin-top:12px"><button type="button" class="btn danger sm" data-act="rpDemoDel">Demodaten löschen</button></div>` : ''}
+      ${S.salesDemo ? `<div class="row-btns" style="margin-top:12px"><button type="button" class="btn danger sm" data-act="rpDemoDel">Beispielverkäufe löschen</button></div>` : ''}
     </section>
   </div></div>`;
 }
@@ -305,10 +295,12 @@ async function readFileAsCsv(file){
   }
   return await file.text();
 }
+/* Bericht: derselbe Inhalt wie am Bildschirm, ohne Bedienelemente */
+function rpPrint(){ const rp = view.rp; const r = rpRange(rp); $('#print').innerHTML = `<div class="rp-print"><div class="meta"><span>${esc(S.settings.name)}</span><span>Erstellt ${fmtDate(new Date().toISOString())}</span></div><h1>Auswertung · ${esc(r.label)}</h1>${$('#app').innerHTML.replace(/<section class="panel rp-period">[\s\S]*?<\/section>/,'').replace(/<details class="more"[\s\S]*?<\/details>/g,'').replace(/<div class="page-h">[\s\S]*?<\/div><\/div>/,'').replace(/<div class="toolbar tabs">[\s\S]*?<\/div><\/div>/,'')}</div>`; document.body.classList.remove('print-menu'); document.body.classList.add('print-report'); window.print(); setTimeout(()=>document.body.classList.remove('print-report'), 500); }
 function rpCsvText(){
   const r = rpRange(view.rp); const to = r.to > isoDate(new Date()) ? isoDate(new Date()) : r.to; const cur = report(r.from, to);
   const f2 = n => n == null ? '' : (Math.round(n*100)/100).toFixed(2).replace('.', ',');
-  const lines = ['Gericht;Kategorie;Menge;Umsatz brutto;Umsatz netto;Ø Preis;WE gesamt;WE %;Rohertrag'];
+  const lines = ['Gericht;Kategorie;Menge;Umsatz brutto;Umsatz netto;Ø Preis;Wareneinsatz;Wareneinsatz %;Rohertrag'];
   cur.rows.sort((a,b)=>secList().indexOf(a.section)-secList().indexOf(b.section) || b.g-a.g).forEach(x => lines.push([x.name, x.section, String(x.q).replace('.',','), f2(x.g), f2(x.n), f2(x.avg), f2(x.we), x.fc!=null?f2(x.fc):'', f2(x.rg)].map(v => /[;"\n]/.test(v) ? `"${v.replace(/"/g,'""')}"` : v).join(';')));
   lines.push(['Summe','',String(cur.qty).replace('.',','), f2(cur.gross), f2(cur.net), '', f2(cur.we), cur.fc!=null?f2(cur.fc):'', f2(cur.rg)].join(';'));
   return {text:'﻿'+lines.join('\r\n'), name:`DAHUAM202_Auswertung_${r.from}_${to}.csv`};
@@ -330,7 +322,7 @@ document.addEventListener('click', async e => {
     case 'rpAnalyse': { const t = $('#rpPaste').value; view.rpPasteText = t; try { view.rpImport = analyseText(t); view.rpErr = ''; } catch(x){ view.rpImport = null; view.rpErr = x.message; } render(); break; }
     case 'rpDiscard': view.rpImport = null; render(); break;
     case 'rpImport': { const res = view.rpImport; if(!res) break; const replace = $('#rpReplace').checked, stock = $('#rpStock').checked;
-      const run = (delDemo) => { let nDemo = 0; if(delDemo) nDemo = clearDemoSales(); const out = doImport(res, replace, stock); view.rpImport = null; view.rpPasteText = ''; save(); rp.tab = Object.keys(S.salesUnmapped).length ? 'map' : 'sales'; const ds = res.lines.map(l=>l.date).sort(); if(ds.length){ rp.unit = 'custom'; rp.from = ds[0]; rp.to = ds[ds.length-1]; rp.auto = true; rp.jumped = false; } run.msg = `${plural(out.days,'Tag','Tage')}, ${plural(Math.round(out.portions),'Portion','Portionen')} importiert` + (nDemo ? ` · ${plural(nDemo,'Demo-Tag','Demo-Tage')} entfernt` : ''); };
+      const run = (delDemo) => { let nDemo = 0; if(delDemo) nDemo = clearDemoSales(); const out = doImport(res, replace, stock); view.rpImport = null; view.rpPasteText = ''; save(); rp.tab = Object.keys(S.salesUnmapped).length ? 'map' : 'sales'; const ds = res.lines.map(l=>l.date).sort(); if(ds.length){ rp.unit = 'custom'; rp.from = ds[0]; rp.to = ds[ds.length-1]; rp.auto = true; rp.jumped = false; } run.msg = `${plural(out.days,'Tag','Tage')}, ${plural(Math.round(out.portions),'Portion','Portionen')} importiert` + (nDemo ? ` · ${plural(nDemo,'Tag','Tage')} mit Beispielverkäufen entfernt` : ''); };
       const days = [...new Set(res.lines.map(l=>l.date))]; const nDemo = S.salesDemo ? demoSalesDays().length : 0; const over = replace ? days.filter(d => (S.salesReal||{})[d] && S.salesDays[d]).length : 0;
       let short = 0; if(stock){ const acc = new Map(); res.lines.forEach(l => { const mid = S.posMap[l.key] !== undefined ? S.posMap[l.key] : l.mid; const m = mid && mid !== '-' && S.menu.find(x=>x.id===mid); const c = m && m.card && C(m.card); if(c) explode(c, l.q, acc); }); acc.forEach((q,pid) => { const p = P(pid); if(p && q > (+p.stock||0) + 1e-9) short++; }); }
       if(!nDemo && !over && !short){ run(false); render(); toast(run.msg); break; }
@@ -338,11 +330,11 @@ document.addEventListener('click', async e => {
         ${short ? `<div class="warn-box dlg-warn" role="alert">${ico('spark')}<span><b>Bestand reicht nicht für ${plural(short,'Artikel','Artikel')}.</b> Beim Abbuchen gehen diese Bestände ins Minus. Fehlt ein Wareneingang?</span></div>` : ''}
         ${nDemo ? demoSalesAskHtml() : ''}`,
         fd => { run(nDemo > 0 && fd.get('demoSales') === 'del'); }, {ok: short ? 'Trotzdem buchen' : 'Importieren', done:()=>run.msg}); break; }
-    case 'rpDemoDel': { const n = demoSalesDays().length; ask(`${plural(n,'Tag','Tage')} mit Demo-Verkäufen löschen? Echte Importe und Buchungen bleiben erhalten.`, () => { clearDemoSales(); }, 'Löschen'); break; }
+    case 'rpDemoDel': { const n = demoSalesDays().length; ask(`${plural(n,'Tag','Tage')} mit Beispielverkäufen löschen? Echte Importe und Buchungen bleiben erhalten.`, () => { clearDemoSales(); }, 'Löschen'); break; }
     case 'pmapOk': { const [k, mid] = id.split(/:(?=[^:]+$)/); applyMapping(k, mid); save(); render(); toast('Zugeordnet, auch rückwirkend'); break; }
     case 'pmapDel': delete S.posMap[id]; save(); render(); break;
-    case 'rpCsv': { const {text, name} = rpCsvText(); if(!FRAMED){ const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'})); a.download = name; a.click(); toast(name+' gespeichert'); } else openDialog('Tabelle (CSV)', `<p class="dlg-p">Text kopieren und als <b>${esc(name)}</b> speichern; Excel öffnet die Datei direkt.</p><textarea class="code" readonly id="rpCsvTxt">${esc(text)}</textarea><div class="row-btns"><button type="button" class="btn" id="rpCsvCopy">${ico('copy')}Kopieren</button></div>`, null, {cancel:'Schließen', after:()=>{ $('#rpCsvCopy').onclick = () => navigator.clipboard?.writeText(text).then(()=>toast('Kopiert'), ()=>$('#rpCsvTxt').select()); }}); break; }
-    case 'rpPrint': { const r = rpRange(rp); $('#print').innerHTML = `<div class="rp-print"><div class="meta"><span>${esc(S.settings.name)}</span><span>Erstellt ${fmtDate(new Date().toISOString())}</span></div><h1>Auswertung · ${esc(r.label)}</h1>${$('#app').innerHTML.replace(/<section class="panel rp-period">[\s\S]*?<\/section>/,'')}</div>`; document.body.classList.remove('print-menu'); document.body.classList.add('print-report'); window.print(); setTimeout(()=>document.body.classList.remove('print-report'), 500); break; }
+    case 'rpCsv': { const {text, name} = rpCsvText(); if(!FRAMED){ const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'})); a.download = name; a.click(); toast(name+' gespeichert'); } else openDialog('Als CSV speichern', `<p class="dlg-p">Text kopieren und als <b>${esc(name)}</b> speichern; Excel öffnet die Datei direkt.</p><textarea class="code" readonly id="rpCsvTxt">${esc(text)}</textarea><div class="row-btns"><button type="button" class="btn" id="rpCsvCopy">${ico('copy')}Kopieren</button></div>`, null, {cancel:'Schließen', after:()=>{ $('#rpCsvCopy').onclick = () => navigator.clipboard?.writeText(text).then(()=>toast('Kopiert'), ()=>$('#rpCsvTxt').select()); }}); break; }
+    case 'rpPrint': rpPrint(); break;
   }
 });
 document.addEventListener('change', async e => {

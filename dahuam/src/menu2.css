@@ -18,19 +18,16 @@
 .hk-motto{grid-column:1/-1;margin:14px 0 0;font:italic 400 15px/1.4 var(--hk-serif);color:var(--hk-m)}
 .hk-head.small{grid-template-columns:1fr;padding-bottom:10px}
 .hk-head.small .hk-top{margin-bottom:0}
-.hk-cover{margin:18px 0 6px}
-.hk-cover img{display:block;width:100%;max-width:100%;aspect-ratio:3/1.4;object-fit:cover}
+
 /* Abschnitts-Index (nur schmal) */
-.hk-index{display:none;gap:16px;overflow-x:auto;padding:10px 0 4px;margin-bottom:4px;scrollbar-width:none}
-.hk-index button{flex:none;border:0;background:none;padding:4px 0;font:600 12px var(--hk-sans);color:var(--hk-m);cursor:pointer;border-bottom:1px solid transparent}
-.hk-index button:hover{color:var(--hk-i);border-bottom-color:var(--hk-a)}
+
 /* Raster */
 .hk-cols{columns:2;column-gap:44px;padding-top:6px}
 .hk-cols.one{columns:1;max-width:440px}
 @container (max-width:620px){.hk-cols{columns:1}.hk-index{display:flex}.hk-head{grid-template-columns:1fr}.hk-place{text-align:left;max-width:none}}
 .hk-sec{break-inside:auto;padding-top:26px}
 .hk-sec:first-child,.hk-special + .hk-sec{padding-top:18px}
-.hk-h{margin:0 0 10px;padding-bottom:5px;border-bottom:.5px solid var(--hk-a);font:600 12.5px/1.2 var(--hk-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--hk-i);break-after:avoid}
+
 .hk-sheet-title{font:600 26px/1.1 var(--hk-serif);margin:18px 0 4px}
 /* Gericht */
 .hk-dish{position:relative;break-inside:avoid;padding:6px 0 7px}
@@ -59,7 +56,7 @@
 .hk-leg span{display:block;break-inside:avoid}
 .hk-leg b{display:inline-block;min-width:14px;color:var(--hk-i)}
 .hk-fl{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.hk-empty{color:var(--hk-m)}
+
 /* Werkzeuge */
 .acc-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .acc{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 10px 5px 6px;font-size:12.5px;font-weight:600;cursor:pointer}
@@ -69,6 +66,6 @@
 @media print{
   body.print-menu #print .hk-paper{box-shadow:none;max-width:none;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   body.print-menu #print .hk-cols{columns:2}
-  body.print-menu #print .hk-index{display:none}
+  
   body.print-menu #print .hk-paper + .hk-paper{break-before:page}
 }

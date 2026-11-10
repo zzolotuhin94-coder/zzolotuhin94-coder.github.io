@@ -42,7 +42,7 @@
 .g-th-sommer .g-h span{box-shadow:inset 0 -6px 0 var(--ga);padding:0 2px}
 .g-th-sommer .g-p{font-weight:500;color:var(--gi)}
 .g-th-sommer.g-modern .g-item{border-color:var(--gr)}
-.g-th-sommer.g-modern .g-item.is-top{border-color:var(--ga);box-shadow:inset 0 3px 0 var(--ga)}
+
 /* Lärchengold (Herbst) */
 .g-th-herbst .g-title{font-style:normal;font-weight:700;letter-spacing:.02em}
 .g-th-herbst .g-h{position:relative;justify-content:flex-start;gap:10px;font:700 18px var(--gfd);letter-spacing:.08em;text-transform:none;color:var(--gi);border-top:1px solid var(--gr);padding-top:9px}
@@ -73,7 +73,7 @@
 .g-sp-saison{background:transparent;color:var(--gi);border:1.5px solid var(--ga);--sy:var(--ga)}
 .g-sp-festlich{--sy:#d8b45a;background:#1d1a16;color:#f3ead8;outline:1px solid #d8b45a;outline-offset:-6px}
 .g-sp-festlich .g-sp-title{font:italic 500 32px/1 "Cormorant Garamond",Georgia,serif;text-transform:none;letter-spacing:0}
-.g-special.is-page{background:transparent;color:inherit;outline:0;border:0;padding:0}
+
 .g-tk .g-sp-title{font-size:clamp(34px,6vw,52px);text-align:center;flex-basis:100%}
 .g-tk-festlich .g-sp-title{font-size:clamp(40px,7vw,60px)}
 .g-tk .g-sp-date{flex-basis:100%;text-align:center}
@@ -93,17 +93,10 @@
 .chips-row.tight{padding-bottom:2px;margin-bottom:0}
 .chip.sm,.chips-row.tight .chip{padding:4px 10px;font-size:12.5px}
 .fields.two{grid-template-columns:1fr 1fr}
-.presets{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.sw-preset{display:flex;align-items:center;gap:4px;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:6px 8px;cursor:pointer;font-size:12.5px;font-weight:600;text-align:left}
-.sw-preset i{width:14px;height:14px;border-radius:50%;border:1px solid rgba(0,0,0,.12);flex:none}
-.sw-preset span{margin-left:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sw-preset.on{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 25%,transparent)}
-.colors{display:flex;gap:10px;flex-wrap:wrap}
+
 .clr{display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}
 .clr input{width:34px;height:34px;padding:2px;border-radius:10px;cursor:pointer}
-.orns{display:flex;flex-wrap:wrap;gap:6px}
-.orn-b{width:40px;height:40px;border:1px solid var(--line);background:var(--surface);border-radius:10px;display:grid;place-items:center;cursor:pointer;color:var(--fg)}
-.orn-b.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
 .warn-box,.ok-box{display:flex;gap:10px;align-items:flex-start;border-radius:12px;padding:10px 12px;font-size:13px}
 .warn-box{background:var(--bad-bg);color:var(--bad)}
 .warn-box span{flex:1;color:var(--fg)}

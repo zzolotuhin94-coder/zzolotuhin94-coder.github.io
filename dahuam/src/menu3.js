@@ -77,19 +77,11 @@ function guestHtmlWeb(seasonKey, dateStr, opts={}){
       <footer class="wk-foot"><div class="wk-keys"><span><i class="wk-veg">V</i> vegetarisch</span><span><i class="wk-veg">VG</i> vegan</span><span><i class="wk-sigk"></i> Empfehlung des Hauses</span></div>${legend}<p>${esc(s.footer || 'Alle Preise in Euro inkl. MwSt.')} · Stand ${fmtDate(new Date().toISOString())}</p></footer>
     </div></div>`;
 }
-const _guestHtmlBook = guestHtml;
-guestHtml = function(k, d, opts){ return (S.settings.guestStyle || 'web') === 'web' ? guestHtmlWeb(k, d, opts) : _guestHtmlBook(k, d); };
-const _printMenu = printMenu;
-printMenu = function(){ if((S.settings.guestStyle||'web') !== 'web') return _printMenu(); const k = curSeasonKey(); $('#print').innerHTML = guestHtmlWeb(k, view.gdate || todayStr(), {print:true}); document.body.classList.add('print-menu'); window.print(); };
-const _renderGuest = renderGuest;
-renderGuest = function(){
-  const html = _renderGuest();
-  const st = S.settings.guestStyle || 'web';
-  return html.replace('<div class="panel-h"><h2>Saison</h2>', `<div class="panel-h"><h2>Gestaltung</h2></div>${seg('gStyle', st, [['web','Wie die Website'],['book','Buchsatz']])}<p class="hint">„Wie die Website“ nutzt Rahmen, Reiter und Schriften von dahuam202.at.</p></section><section class="panel"><div class="panel-h"><h2>Saison</h2>`);
-};
+/* Stil „Schlicht“ ist die Grundlage; die Hauskarte (hauskarte.js) setzt sich davor */
+function guestHtml(k, d, opts){ return guestHtmlWeb(k, d, opts); }
+function printMenu(){ const k = curSeasonKey(); $('#print').innerHTML = guestHtmlWeb(k, view.gdate || todayStr(), {print:true}); document.body.classList.add('print-menu'); window.print(); }
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if(!el) return; const id = el.dataset.id;
   if(el.dataset.act === 'wkTab'){ view.wk.tab = id; refreshGuest(); }
   if(el.dataset.act === 'wkFilter'){ const f = view.wk.filters; const i = f.indexOf(id); if(i >= 0) f.splice(i,1); else { f.push(id); if(id==='vg'){ const j = f.indexOf('v'); if(j>=0) f.splice(j,1); } if(id==='v'){ const j = f.indexOf('vg'); if(j>=0) f.splice(j,1); } } refreshGuest(); }
-  if(el.dataset.act === 'gStyle'){ S.settings.guestStyle = id; save(); render(); }
 });

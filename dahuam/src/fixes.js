@@ -18,7 +18,7 @@ function fixesMigrate(d){
   // alte Verkaufsbuchungen: Zeilen mit gleichem Zeitpunkt und gleicher Notiz gehörten zu einer Buchung
   d.moves.forEach(m => { if(m && m.type === 'sale' && !m.grp){ const g = 'sb_' + String(m.date||'').slice(0,16).replace(/\D/g,'') + '_' + String(m.note||'').length; m.grp = g; if(!d.saleGroups[g]) d.saleGroups[g] = {day:String(m.date||'').slice(0,10), n:0, rows:null, gross:0, legacy:true}; } });
   Object.keys(d.saleGroups).forEach(g => { if(!d.moves.some(m => m && m.grp === g)) delete d.saleGroups[g]; });
-  // echte Verkaufstage merken, damit Demo-Verkäufe getrennt gelöscht werden können
+  // echte Verkaufstage merken, damit Beispielverkäufe getrennt gelöscht werden können
   if(!d.salesReal || typeof d.salesReal !== 'object'){ d.salesReal = {}; if(!d.salesDemo) Object.keys(d.salesDays||{}).forEach(k => { d.salesReal[k] = 1; }); }
   if(d.salesDemo && !Object.keys(d.salesDays||{}).some(k => !d.salesReal[k])) d.salesDemo = false;
   // Inventur: keine negativen Zählmengen
@@ -28,32 +28,30 @@ function fixesMigrate(d){
   return d;
 }
 
-/* ---------- Rollen: Mitarbeiter und Bar sehen Küchendaten nur an ---------- */
-const RO_MSG = 'Nur Küchenchef/Inhaber';
-function canEditAll(){ const r = me().role; return r === 'owner' || r === 'chef'; }
-function isDrinkProduct(p){ if(!p) return false; const sp = SUP(p.supplier); return !!(sp && DRINK_CATS.includes(sp.cat)) || p.loc === 'W'; }
-function canEditProduct(p){ return canEditAll() || (me().role === 'bar' && isDrinkProduct(p)); }
+/* ---------- Rollen: Der Chef darf alles. Das Team sieht alles, hakt Checklisten und Prep-Liste ab,
+   trägt den eigenen Frei-Wunsch ein und bereitet Bestellungen vor. Alles andere ist für das Team gesperrt. ---------- */
+const RO_MSG = 'Das kann nur der Chef ändern';
+function canEditAll(){ return me().role === 'chef'; }
 function whoLabel(u){ const r = ROLES[u.role] || ''; return !r || u.name === r ? u.name : `${u.name} · ${r}`; }
-const RO_ACTS = new Set(['newMenu','editMenu','photoMenu','toMenu','newCardFor','newCard','photoCard','photoCardDel','addLine','delLine','stepAdd','stepDel','stepMove','stepPhoto','stepPhotoDel','applySim','dupCard','delCard','addSec','secMove','secDel','secSort','itemMove','itemHide','newProd','editProd','reset','importPick','safetyRestore','pConfirm','pConfirmAll','pFix','plImport','pcStart','pcFor','pcOk','pcSave','pcSkip','pcBack','tellerPick','gstyle','gStyle','glayout','gorn','palPreset','gcover','gcoverDel','gReset','newSpecial','editSpecial','dupSpecial','labTake','gameReset','hkAccent','hsCopyReset']);
-const RO_PROD_ACTS = new Set(['editProd','pConfirm']);
-const RO_INPUTS = 'input[data-mp],[data-pp],[data-li],[data-cf],textarea[data-step],.title-in,[data-sf],[data-us],[data-secname],[data-gs],[data-gf],[data-st],[data-pal],[data-sv],[data-smd],[data-ms],[data-hsc],[data-hkk],#pcIn';
+const RO_ACTS = new Set(['newMenu','editMenu','photoMenu','toMenu','newCardFor','newCard','photoCard','photoCardDel','addLine','delLine','stepAdd','stepDel','stepMove','stepPhoto','stepPhotoDel','applySim','dupCard','delCard','addSec','secMove','secDel','secSort','itemMove','itemHide','newProd','editProd','reset','importPick','safetyRestore','pConfirm','pConfirmAll','pFix','plImport','pcStart','pcFor','pcOk','pcSave','pcSkip','pcBack','tellerPick','gStyle','gcover','gcoverDel','newSpecial','editSpecial','dupSpecial','hkAccent','hsCopyReset','secDlg','moveDlg','sales','moveUndo','invStart','invFinish','invCancel','rBook','rAll','ordRecv','supEdit','rpImport','rpDemoDel','rpAnalyse','demoEmpty','mapSave']);
+const RO_INPUTS = 'input[data-mp],[data-pp],[data-li],[data-cf],textarea[data-step],.title-in,[data-sf],[data-us],[data-secname],[data-st],[data-smd],[data-ms],[data-hsc],[data-hkk],[data-hka],[data-inv],#pcIn';
 function roBlocked(el){
   if(canEditAll() || !el) return false;
   const a = el.dataset.act;
-  if(a){ if(!RO_ACTS.has(a)) return false; if(RO_PROD_ACTS.has(a) && canEditProduct(P(el.dataset.id))) return false; return true; }
-  if(el.matches('.sh-chip,.ti-grip,[data-pick]')) return true;
-  if(el.matches(RO_INPUTS)){ if(el.dataset.pp && canEditProduct(P(el.dataset.pp))) return false; return true; }
-  return false;
+  if(a) return RO_ACTS.has(a);
+  return el.matches('.sh-chip,.ti-grip,.lt-grip,[data-pick]') || el.matches(RO_INPUTS);
 }
-function roGate(ok){ if(ok === undefined ? canEditAll() : ok) return true; toast(RO_MSG + ' können das ändern'); return false; }
+function roGate(ok){ if(ok === undefined ? canEditAll() : ok) return true; toast(RO_MSG); return false; }
 window.addEventListener('click', e => { if(canEditAll() || document.body.classList.contains('gd-help')) return; /* Hilfe-Modus erklärt statt zu sperren */ const el = e.target.closest && e.target.closest('[data-act],.sh-chip,[data-pick]'); if(el && roBlocked(el)){ e.preventDefault(); e.stopImmediatePropagation(); roGate(false); } }, true);
-window.addEventListener('pointerdown', e => { if(canEditAll()) return; const el = e.target.closest && e.target.closest('.ti-grip,.sh-chip'); if(el){ e.stopImmediatePropagation(); } }, true);
+window.addEventListener('pointerdown', e => { if(canEditAll()) return; const el = e.target.closest && e.target.closest('.ti-grip,.sh-chip,.lt-grip'); if(el){ e.stopImmediatePropagation(); } }, true);
 ['change','input'].forEach(ev => window.addEventListener(ev, e => { if(canEditAll()) return; const t = e.target; if(!t || !t.matches || !t.closest('#app') || !roBlocked(t)) return; e.stopImmediatePropagation(); if(t.type === 'checkbox' || t.type === 'radio') t.checked = t.defaultChecked; else if(t.tagName !== 'SELECT') t.value = t.defaultValue; if(ev === 'change') roGate(false); }, true));
 /* Dialoge, die auch über die Schnellsuche erreichbar sind */
 const _menuDialogF = menuDialog; menuDialog = function(m, pre){ if(roGate()) return _menuDialogF(m, pre); };
-const _prodDialogF = prodDialog; prodDialog = function(p){ if(roGate(p ? canEditProduct(p) : canEditAll())) return _prodDialogF(p); };
+const _prodDialogF = prodDialog; prodDialog = function(p){ if(roGate()) return _prodDialogF(p); };
 const _newCardF = newCard; newCard = function(type, fromMenu){ if(!roGate()) return; _newCardF(type, fromMenu); const c = C(view.card); if(c && !fromMenu){ c.fresh = true; save(); } };
 const _specialDialogF = specialDialog; specialDialog = function(sp){ if(roGate()) return _specialDialogF(sp); };
+const _moveDlgF = moveDlg; moveDlg = function(arg){ if(roGate()) return _moveDlgF(arg); };
+const _salesDlgF = salesDlg; salesDlg = function(){ if(roGate()) return _salesDlgF(); };
 function roApply(){
   const app = $('#app'); if(!app) return; app.querySelector('.ro-note')?.remove();
   if(canEditAll()) return;
@@ -66,8 +64,7 @@ function roApply(){
   });
   app.querySelectorAll('.link-btn[data-act="addLine"],.ti-add,.shelf').forEach(el => { el.hidden = true; });
   if(!n) return;
-  const bar = me().role === 'bar';
-  const note = `<div class="ro-note" role="note">${ico('eye')}<span><b>Nur Ansicht.</b> ${bar && view.tab === 'products' ? 'Die Bar ändert Getränke und Wein; alle anderen Produkte ändern ' : 'Ändern dürfen hier '}nur Küchenchef/Inhaber${bar && view.tab === 'products' ? '' : ''}. Angemeldet: ${esc(whoLabel(me()))}.</span></div>`;
+  const note = `<div class="ro-note" role="note">${ico('eye')}<span><b>Nur ansehen.</b> Ändern kann hier der Chef. Angemeldet: ${esc(whoLabel(me()))}.</span></div>`;
   const ph = app.querySelector('.page-h, .hero'); if(ph) ph.insertAdjacentHTML(ph.classList.contains('hero') ? 'beforebegin' : 'afterend', note); else app.insertAdjacentHTML('afterbegin', note);
 }
 
@@ -113,19 +110,7 @@ document.addEventListener('change', e => { const t = e.target; if(!t.dataset || 
 document.addEventListener('change', e => {
   const t = e.target; if(!t.dataset) return;
   if(t.dataset.sf && t.dataset.sf !== 'name'){ e.stopPropagation(); const v = numParse(t.value); if(!isFinite(v)) return; S.settings[t.dataset.sf] = v; t.value = numIn(v); t.defaultValue = t.value; save(); toast('Gespeichert'); return; }
-  if(t.dataset.us === 'limit'){ e.stopPropagation(); const v = numParse(t.value); if(!isFinite(v)) return; S.settings.orderLimit = v; t.value = numIn(v); t.defaultValue = t.value; save(); toast('Freigabe-Limit gespeichert'); }
 }, true);
-
-/* ---------- Adresse: #cards/<id> hält die offene Rezeptur über ein Neuladen ---------- */
-function hashWant(){ return view.tab + (view.tab === 'cards' && view.card ? '/' + view.card : ''); }
-function hashSync(){ try { const w = hashWant(); if(decodeURIComponent(location.hash.slice(1)) !== w) history.replaceState(null, '', '#' + w); } catch(e){} }
-const _goF = go; go = function(tab, card=null){ _goF(tab, card); hashSync(); };
-fromHash = function(){
-  let h = ''; try { h = decodeURIComponent(location.hash.slice(1)); } catch(e){ h = location.hash.slice(1); }
-  const i = h.indexOf('/'); const tab = i < 0 ? h : h.slice(0, i), id = i < 0 ? '' : h.slice(i+1);
-  if(tab === 'cards' && id && C(id)){ if(view.tab !== 'cards' || view.card !== id){ view = {...view, tab:'cards', card:id, q:'', sim:null}; render(); } return; }
-  if(TABS.some(t => t[0] === tab) && (tab !== view.tab || (tab === 'cards' && view.card))){ view = {...view, tab, card:null, q:''}; render(); }
-};
 
 /* ---------- „+ Gericht“ / „+ Basisrezept“: unberührte neue Rezeptur beim Verlassen still entfernen ---------- */
 function cardPristine(c){
@@ -142,16 +127,6 @@ function pruneFreshCards(){
   lastOpenCard = open;
   if(changed) save();
 }
-
-/* ---------- Unterzeile je Unter-Reiter ---------- */
-const SUB_TEXT = {
-  menu:{guest:'Gästekarte gestalten, prüfen und als PDF speichern oder drucken.', plan:'Saisonzeiten festlegen und Aktionen planen. Die Gästekarte wechselt automatisch.', layout:'Kategorien und Reihenfolge der Karte. Mit dem Auge blenden Sie ein Gericht aus.'},
-  stock:{buchungen:'Alle Lagerbewegungen, neueste zuerst. Mit dem Pfeil machen Sie eine Buchung rückgängig.', inventur:'Zählen, Differenz sehen, Bestand übernehmen.'},
-  buy:{lieferanten:'Bestelltage, Annahmeschluss, Liefertage und Kontakt je Lieferant.'},
-  report:{import:'Artikelumsätze aus der Kasse als Datei laden. Vor dem Import sehen Sie eine Vorschau.', map:'Kassenartikel den Gerichten der App zuordnen, auch rückwirkend.'},
-};
-function subTabOf(){ return view.tab === 'menu' ? view.mtab : view.tab === 'stock' || view.tab === 'buy' ? view.stab : view.tab === 'report' ? (view.rp && view.rp.tab) : null; }
-function subTextApply(){ const sub = $('#app .page-h .sub'); const map = SUB_TEXT[view.tab]; if(!sub || !map) return; const txt = map[subTabOf()]; if(txt) sub.textContent = txt; }
 
 /* ---------- Nach jedem Zeichnen ---------- */
 function rowButtons(){
@@ -176,8 +151,7 @@ const _renderFx = render;
 render = function(){
   pruneFreshCards();
   _renderFx();
-  rowButtons(); a11yLabels(); subTextApply(); roApply(); whoApply(); tabsIntoView();
-  if(view.tab === 'cards' || location.hash.indexOf('/') > 0) hashSync();
+  rowButtons(); a11yLabels(); roApply(); whoApply(); tabsIntoView();
 };
 
 /* ---------- Schnellsuche: Treffer am Wortanfang zuerst, Bestellungen nach Nummer ---------- */
@@ -185,7 +159,7 @@ const _palDataF = palData;
 palData = function(){
   const a = _palDataF();
   (S.orders||[]).forEach(o => { const sp = SUP(o.supplier); a.push({g:'Bestellung', n:o.no, s:`${sp ? sp.name : '?'} · ${OSTAT[o.status]||o.status} · Lieferung ${fmtDate(o.deliveryDate+'T12:00:00')}`, run:()=>{ view.stab = 'bestellung'; view.order = o.id; view.recv = null; go('buy'); }}); });
-  return a.filter((x,i) => !(x.g === 'Bereich' && a.findIndex(y => y.g === 'Bereich' && y.n === x.n) !== i));
+  return a;
 };
 function palRank(x, q){
   const n = x.n.toLowerCase(); if(n === q) return 0; if(n.startsWith(q)) return 1;

@@ -22,9 +22,7 @@
 .tm-now:disabled{opacity:.45;cursor:default}
 .tm-mine{height:var(--ctl);padding:0 14px;border:1px solid var(--line-strong);background:var(--surface);cursor:pointer;font-family:inherit;border-radius:var(--r-s)}
 .tm-mine.on{border-color:var(--fg)}
-.tm-tools{display:flex;gap:20px;align-items:center}
-.tm-tools .link{font-size:13px;font-weight:500;color:var(--muted)}
-.tm-tools .link:hover{color:var(--fg)}
+
 .tm-mine-n{margin:-2px 0 12px;font-size:14px}
 .tm-empty{color:var(--muted)}
 .tm-ro{margin-top:14px;max-width:80ch}
@@ -43,7 +41,7 @@
 .tm-t tbody th,.tm-t tfoot th{padding:9px 10px 9px 0;text-align:left;font-weight:400;vertical-align:top;border-top:1px solid var(--line)}
 .tm-t td{position:relative;padding:5px 4px;vertical-align:top;border-top:1px solid var(--line);height:58px;cursor:pointer}
 .tm-t td.closed,.tm-t th.closed{background:color-mix(in srgb,var(--surface-2) 55%,transparent)}
-.tm-t thead th.closed b,.tm-t thead th.closed span{color:var(--faint)}
+.tm-t thead th.closed b,.tm-t thead th.closed span{color:var(--muted)}
 .tm-t tbody td:hover{background:color-mix(in srgb,var(--accent-soft) 60%,transparent)}
 .tm-t tr.off th b{color:var(--muted)}
 .tm-pc{display:grid;grid-template-columns:9px minmax(0,1fr) auto;gap:1px 9px;align-items:baseline}
@@ -253,9 +251,6 @@
 .tm-dash .tm-dash-who .rw-main small{white-space:normal;overflow:visible}
 .tm-dash .rw-lead .ico{color:var(--good)}
 
-/* ---------- Einfach-Modus ---------- */
-body.simple .ck-c,body.simple .ck-vl{font-size:17px}
-body.simple .tm-sh b{font-size:13.5px}
 
 /* ---------- Tablet ---------- */
 @media (max-width:1100px){
@@ -269,7 +264,7 @@ body.simple .tm-sh b{font-size:13.5px}
 @media (pointer:coarse){
   .tm-plus{opacity:.7}
   .tm-nav .icon-btn,.tm-mine{min-width:40px;min-height:40px;height:40px}
-  .tm-tools .link{min-height:40px}
+  
 }
 
 /* ---------- Handy: ein Tag je Bildschirm, Woche als schmale Übersicht ---------- */
@@ -337,8 +332,8 @@ body.simple .tm-sh b{font-size:13.5px}
   .tm-modes{flex:1}
   .tm-modes button{flex:1}
   .tm-mine{height:46px;min-height:46px}
-  .tm-tools{width:100%;gap:22px}
-  .tm-tools .link{min-height:40px}
+  
+  
   .tm-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:26px;padding-top:16px;border-top:1px solid var(--line)}
   .tm-acts .btn{min-height:44px;justify-content:center;padding:0 8px}
   .tm-acts .btn.primary{grid-column:1/-1}
@@ -458,7 +453,7 @@ body.simple .tm-sh b{font-size:13.5px}
 .side .nav-slot{min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--side-fg) 18%,transparent) transparent}
 @media (min-width:901px) and (max-height:980px){
   .side{gap:12px;padding-top:14px;padding-bottom:12px}
-  .side .nav-group{padding-top:8px;padding-bottom:2px}
+  
   .side .nav-i{padding-top:7px;padding-bottom:7px}
   .side .nav-slot{gap:1px}
 }

@@ -10,7 +10,6 @@
 const APP_SCHEMA = 2;                       // Datenformat; ohne Angabe = 1 (vor Paket A)
 const APP_VERSION = '/*APP_VERSION*/', APP_BUILD = '/*APP_BUILD*/';
 function schemaNewer(d){ return !!d && typeof d === 'object' && +d.schema > APP_SCHEMA; }
-const NEWER_MSG = 'Diese Daten stammen aus einer neueren Version der App. Bitte zuerst die App neu laden, damit sie aktuell ist, und dann noch einmal versuchen. Es wurde nichts geändert.';
 
 const STORE = (() => {
   const DBN = 'dahuam202_daten', JKEY = KEY + '_journal', LKEY = KEY + '_lease', BKEY = KEY + '_bus', RKEY = KEY + '_rev';

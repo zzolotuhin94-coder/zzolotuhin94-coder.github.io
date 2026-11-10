@@ -1,5 +1,5 @@
 /* =====================================================================
-   Verkäufe: Speicher, Kassen-Import, Demodaten, Zeitraum-Rechnung
+   Verkäufe: Speicher, Kassen-Import, Beispieldaten, Zeitraum-Rechnung
    S.salesDays = { 'YYYY-MM-DD': [[menuId, Menge, UmsatzBrutto], …] }
    S.posMap    = { 'kassen-schlüssel': menuId | '-' (ignorieren) }
    ===================================================================== */
@@ -10,7 +10,7 @@ function dAdd(s, n){ const d = dParse(s); d.setDate(d.getDate()+n); return isoDa
 function dDiff(a, b){ return Math.round((dParse(b) - dParse(a))/864e5); }
 function isOpenDemo(s){ const d = dParse(s), md = s.slice(5), w = d.getDay(); if(w === 3) return false; return !((md >= '04-20' && md <= '06-12') || (md >= '10-11' && md <= '11-30')); }
 
-// Demodaten: plausible Tagesverkäufe der letzten 14 Monate
+// Beispieldaten: plausible Tagesverkäufe der letzten 14 Monate
 function salesDemo(d){
   salesEnsure(d); if(d.salesDemoDone) return d;
   let seed = 20262; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
@@ -33,32 +33,6 @@ function salesDemo(d){
 }
 
 /* ---------- Zeiträume ---------- */
-function periodRange(key, ref){
-  const t = ref || isoDate(new Date()); const d = dParse(t); const y = d.getFullYear(), m = d.getMonth();
-  const mo = (yy, mm) => isoDate(new Date(yy, mm, 1, 12)); const lastOf = (yy, mm) => isoDate(new Date(yy, mm+1, 0, 12));
-  const wdMon = (d.getDay()+6)%7;
-  switch(key){
-    case 'today': return [t, t];
-    case 'yesterday': return [dAdd(t,-1), dAdd(t,-1)];
-    case 'week': return [dAdd(t,-wdMon), dAdd(t, 6-wdMon)];
-    case 'lastweek': return [dAdd(t,-wdMon-7), dAdd(t,-wdMon-1)];
-    case 'month': return [mo(y,m), lastOf(y,m)];
-    case 'lastmonth': return [mo(y,m-1), lastOf(y,m-1)];
-    case 'quarter': { const q = Math.floor(m/3)*3; return [mo(y,q), lastOf(y,q+2)]; }
-    case 'half': { const h = m < 6 ? 0 : 6; return [mo(y,h), lastOf(y,h+5)]; }
-    case 'year': return [`${y}-01-01`, `${y}-12-31`];
-    case 'lastyear': return [`${y-1}-01-01`, `${y-1}-12-31`];
-    case 'winter': { const ws = S.settings.seasons.winter; const sy = (t.slice(5) >= ws.from) ? y : y-1; return [`${sy}-${ws.from}`, `${sy+1}-${ws.to}`]; }
-    case 'lastwinter': { const ws = S.settings.seasons.winter; const sy = (t.slice(5) >= ws.from) ? y-1 : y-2; return [`${sy}-${ws.from}`, `${sy+1}-${ws.to}`]; }
-    case 'summer': { const ss = S.settings.seasons.sommer; const sy = t.slice(5) >= ss.from ? y : y-1; return [`${sy}-${ss.from}`, `${sy}-${ss.to}`]; }
-  }
-  return [t, t];
-}
-function compareRange(from, to, mode){
-  if(mode === 'prev'){ const n = dDiff(from, to) + 1; return [dAdd(from, -n), dAdd(from, -1)]; }
-  const sh = s => { const y = +s.slice(0,4) - 1; let r = `${y}${s.slice(4)}`; if(r.slice(5) === '02-29') r = `${y}-02-28`; return r; };
-  return [sh(from), sh(to)];
-}
 function salesAgg(from, to){
   const by = new Map(); const days = {}; let qty = 0, gross = 0, openDays = 0;
   for(const [day, rows] of Object.entries(S.salesDays || {})){
@@ -139,6 +113,6 @@ function importApply(res, {replace=true, stock=false}={}){
   Object.keys(days).forEach(d => markRealDay(d));
   if(stock && acc.size){ const grp = uid('sb'); acc.forEach((q,pid) => { const before = S.moves.length; addMove('sale', pid, -Math.round(q*1000)/1000, 'Kassen-Import'); if(S.moves.length > before) S.moves[0].grp = grp; }); S.saleGroups = S.saleGroups || {}; S.saleGroups[grp] = {day:null, n:Math.round(portions), rows:null, gross:0, imp:true}; }
   S.salesImports.unshift({date:new Date().toISOString(), days:n, portions:Math.round(portions), by:me().name, stock});
-  if(S.salesDemo){ /* echte Daten: Demodaten entfernen, damit nichts vermischt wird */ }
+  if(S.salesDemo){ /* echte Daten: Beispieldaten entfernen, damit nichts vermischt wird */ }
   return {days:n, portions};
 }

@@ -74,7 +74,7 @@ async function relRecover(r){
     ${kind === 'unreachable' || kind === 'newer' ? `<div class="row-btns"><button type="button" class="btn primary" data-rel="reload">Seite neu laden</button></div>` : ''}
     ${choice && snaps.length ? `<h2>Früheren Stand laden</h2><ul class="rel-snaps">${snaps.slice(0, 8).map(relSnapRow).join('')}</ul>` : ''}
     ${choice ? `<h2>Sicherung laden</h2><p class="hint">Eine Datei, die Sie mit „Sicherung erstellen“ gespeichert haben.</p><div class="row-btns"><button type="button" class="btn" data-rel="recFile">Datei wählen</button><input id="relFile" type="file" accept="application/json,.json" hidden></div>
-    <h2>Neu beginnen</h2><div class="row-btns"><button type="button" class="btn" data-rel="recDemo">Mit Demodaten starten</button><button type="button" class="btn" data-rel="recEmpty">Leer starten</button></div>` : ''}
+    <h2>Neu beginnen</h2><div class="row-btns"><button type="button" class="btn" data-rel="recDemo">Mit Beispieldaten starten</button><button type="button" class="btn" data-rel="recEmpty">Leer starten</button></div>` : ''}
     ${hasRaw ? `<h2>Beschädigten Stand aufheben</h2><p class="hint">Für eine spätere Prüfung. Die Datei enthält alles, was noch lesbar ist.</p><div class="row-btns"><button type="button" class="btn" data-rel="recRaw">Als Datei speichern</button></div>` : ''}
     <p class="hint" id="relRecMsg" role="status"></p></section>`;
   document.documentElement.classList.add('rel-recover'); relShow();
@@ -201,12 +201,6 @@ function relPanel(){
     <p class="hint">Die App hebt von selbst den Stand der letzten 7 Arbeitstage und je einen Stand der 4 Wochen davor auf. Beim Laden wird der jetzige Stand vorher als Sicherheitskopie abgelegt.</p>
   </section>`;
 }
-const _renderSetupRel = renderSetup;
-renderSetup = function(){
-  const h = _renderSetupRel(); const i = h.lastIndexOf('</div>');
-  if(REL.snaps === null) relSnaps(); if(REL.persist === null) relPersist(false);
-  return h.slice(0, i) + relPanel() + h.slice(i);
-};
 const _goRel = go;
 go = function(tab, card){ if(tab === 'setup' && view.tab !== 'setup'){ REL.snaps = null; REL.persist = null; } return _goRel(tab, card); };
 
@@ -252,8 +246,8 @@ async function relRecEvent(e){
   const el = t.closest && t.closest('.rel-rec [data-rel]'); if(!el) return; const a = el.dataset.rel;
   if(a === 'reload') location.reload();
   else if(a === 'snap'){ try { const d = migrate(await STORE.snapLoad(el.dataset.id)); if(!d) throw 0; relAdopt(d, 'Früherer Stand geladen'); } catch(x){ msg('Dieser Stand ist nicht lesbar. Bitte einen anderen wählen.'); } }
-  else if(a === 'recDemo') relAdopt(seed(), 'Demodaten geladen');
-  else if(a === 'recEmpty'){ let d = null; try { d = relEmptyState(); } catch(x){} if(d) relAdopt(d, 'Leerer Betrieb angelegt'); else msg('Leer starten ist gerade nicht möglich. Bitte die Demodaten wählen.'); }
+  else if(a === 'recDemo') relAdopt(seed(), 'Beispieldaten geladen');
+  else if(a === 'recEmpty'){ let d = null; try { d = relEmptyState(); } catch(x){} if(d) relAdopt(d, 'Leerer Betrieb angelegt'); else msg('Leer starten ist gerade nicht möglich. Bitte die Beispieldaten wählen.'); }
   else if(a === 'recFile') $('#relFile').click();
   else if(a === 'recRaw'){ const ok = await saveFile('dahuam202-beschaedigt-' + todayStr() + '.json', await relRawBlob()); msg(ok ? 'Gespeichert.' : 'Nicht gespeichert.'); }
 }

@@ -3,11 +3,12 @@
    ===================================================================== */
 const SUP_CATS = {fleisch:'Fleisch & Wurst', getraenke:'Getränke', wein:'Wein & Spirituosen', gross:'Großhandel', baeckerei:'Bäckerei', molkerei:'Molkerei & Käse', gemuese:'Obst, Gemüse & Eier'};
 const CHANNELS = {email:'E-Mail', whatsapp:'WhatsApp', shop:'Webshop / App', phone:'Telefon', rep:'Vertreter'};
-const ROLES = {owner:'Inhaber', chef:'Küchenchef', bar:'Bar', staff:'Mitarbeiter'};
-const OSTAT = {draft:'Entwurf', approval:'Zur Freigabe', sent:'Gesendet', confirmed:'Bestätigt', delivered:'Geliefert', complaint:'Reklamation', cancelled:'Storniert'};
+/* Zwei Rollen. „chef“ darf alles; „team“ sieht alles, hakt ab, trägt den eigenen Frei-Wunsch ein und bereitet Bestellungen vor. */
+const ROLES = {chef:'Chef', team:'Team'};
+function roleNorm(r){ return r === 'owner' || r === 'chef' ? 'chef' : 'team'; }   // frühere Rollen und Cloud-Konten: owner/chef → Chef, bar/staff → Team
+const OSTAT = {draft:'Entwurf', sent:'Gesendet', confirmed:'Bestätigt', delivered:'Geliefert', complaint:'Reklamation', cancelled:'Storniert'};
 const LSTAT = {ok:'in Ordnung', short:'zu wenig', missing:'fehlt', damaged:'beschädigt', wrong:'falscher Artikel', subst:'Ersatzartikel'};
 const CSTAT = {open:'offen', credit:'Gutschrift erhalten', closed:'erledigt'};
-const DRINK_CATS = ['getraenke','wein'];
 
 // Demo-Lieferanten (frei erfunden) laut Betriebsleitung
 const DEMO_SUP = [
@@ -35,15 +36,15 @@ const DEMO_DRINKS = [
 
 function einkaufSeed(d){
   const s = d.settings;
-  Object.assign(s, {address:'Gerlos 202, 6281 Gerlos', deliveryNote:'Anlieferung über den Hintereingang zur Küche', phone:'+43 5284 5283-11', email:'genuss@dahuam202.at', orderLimit:800, orderNo:1,
-    users:[{id:'u_owner',name:'Inhaber',role:'owner'},{id:'u_chef',name:'Küchenchef',role:'chef'},{id:'u_bar',name:'Bar',role:'bar'},{id:'u_staff',name:'Commis',role:'staff'}], currentUser:'u_chef'});
+  Object.assign(s, {address:'Gerlos 202, 6281 Gerlos', deliveryNote:'Anlieferung über den Hintereingang zur Küche', phone:'+43 5284 5283-11', email:'genuss@dahuam202.at', orderNo:1,
+    users:[{id:'u_chef',name:'Chef',role:'chef'},{id:'u_staff',name:'Team',role:'team'}], currentUser:'u_chef'});
   d.suppliers = DEMO_SUP.map(([id,name,cat,channel,c,orderDays,cutoff,deliveryDays,minOrder,pre]) => ({id,name,cat,channel,contact:c.contact||'',phone:c.phone||'',whatsapp:c.whatsapp||'',email:c.email||'',shopUrl:c.shopUrl||'',customerNo:'4'+String(1000+DEMO_SUP.findIndex(x=>x[0]===id)*37),orderDays,cutoff,deliveryDays,minOrder,freight:0,note:'',prefix:pre,active:true}));
   DEMO_DRINKS.forEach(([id,name,unit,price,alg,sup,stock,minStock,loc]) => d.products.push({id,name,unit,price,lossCold:0,lossHot:0,alg,pieceG:'',stock,minStock,loc,supplier:sup}));
   d.products.forEach(p => { if(SUP_MAP[p.supplier]) p.supplier = SUP_MAP[p.supplier]; const pk = DEMO_PACK[p.id]; p.pack = pk ? pk[0] : ''; p.packQty = pk ? pk[1] : 0; });
   const cnt = {}; d.products.forEach(p => { const sp = d.suppliers.find(x=>x.id===p.supplier); if(sp){ cnt[sp.id] = (cnt[sp.id]||0)+1; p.artNo = `${sp.prefix}-${String(100+cnt[sp.id]*7)}`; } else p.artNo = ''; });
   d.orders = [];
   const t = todayStr();
-  const mk = (sid, daysAgo, status, lines, extra={}) => { const sp = d.suppliers.find(x=>x.id===sid); const o = {id:uid('o'), no:`B-${t.slice(0,4)}-${String(s.orderNo++).padStart(4,'0')}`, supplier:sid, createdAt:daysAgoIso(daysAgo+1), createdBy:daysAgo>3?'u_owner':'u_chef', status, deliveryDate:addDays(t,-daysAgo), note:'', sentAt:daysAgoIso(daysAgo+1), sentVia:CHANNELS[sp.channel],
+  const mk = (sid, daysAgo, status, lines, extra={}) => { const sp = d.suppliers.find(x=>x.id===sid); const o = {id:uid('o'), no:`B-${t.slice(0,4)}-${String(s.orderNo++).padStart(4,'0')}`, supplier:sid, createdAt:daysAgoIso(daysAgo+1), createdBy:'u_chef', status, deliveryDate:addDays(t,-daysAgo), note:'', sentAt:daysAgoIso(daysAgo+1), sentVia:CHANNELS[sp.channel],
       lines: lines.map(([pid,n,dn,ip,ls]) => { const p = d.products.find(x=>x.id===pid); const f = p.packQty||1; return {pid, n, f, ou:p.packQty?p.pack:p.unit, price:Math.round(p.price*f*100)/100, artNo:p.artNo, delivered: dn ?? null, invPrice: ip ?? null, ls: ls || ''}; }), ...extra}; d.orders.push(o); return o; };
   mk('sup_gross', 6, 'delivered', [['flour',2,2],['sugar',1,1],['oil',1,1],['fries',3,3]], {receipt:{date:daysAgoIso(6), noteNo:'LS 88412', checkedBy:'u_chef', temp:'', photo:''}});
   mk('sup_fleisch', 5, 'delivered', [['pork',10,10],['veal',5,5,34.5],['beef_mince',6,6]], {receipt:{date:daysAgoIso(5), noteNo:'LS 2231', checkedBy:'u_chef', temp:'2,8 °C', photo:''}});
@@ -63,9 +64,20 @@ function einkaufMigrate(d){
   }
   d.products.forEach(p => { if(p.pack==null){ p.pack = ''; p.packQty = 0; } if(p.artNo==null) p.artNo = ''; });
   if(!d.orders) d.orders = [];
-  if(!s.users) s.users = [{id:'u_owner',name:'Inhaber',role:'owner'}];
-  if(!s.currentUser) s.currentUser = s.users[0].id;
-  if(s.orderLimit==null) s.orderLimit = 800; if(!s.orderNo) s.orderNo = d.orders.length+1;
+  if(!Array.isArray(s.users) || !s.users.length) s.users = [{id:'u_chef',name:'Chef',role:'chef'},{id:'u_staff',name:'Team',role:'team'}];
+  // ältere Stände: vier Rollen werden zwei; die vier Standard-Einträge werden zu „Chef“ und „Team“
+  const old4 = s.users.length === 4 && ['u_owner:Inhaber','u_chef:Küchenchef','u_bar:Bar','u_staff:Commis'].every(k => s.users.some(u => u && u.id + ':' + u.name === k));
+  const idMap = old4 ? {u_owner:'u_chef', u_bar:'u_staff'} : {};
+  if(old4) s.users = [{id:'u_chef',name:'Chef',role:'chef'},{id:'u_staff',name:'Team',role:'team'}];
+  s.users = s.users.filter(u => u && u.id); s.users.forEach(u => { u.role = roleNorm(u.role); u.name = u.name || ROLES[u.role]; });
+  if(!s.users.some(u => u.role === 'chef')) s.users.unshift({id:'u_chef',name:'Chef',role:'chef'});
+  if(idMap[s.currentUser]) s.currentUser = idMap[s.currentUser];
+  if(!s.users.some(u => u.id === s.currentUser)) s.currentUser = s.users[0].id;
+  if(old4 && d.team && Array.isArray(d.team.people)) d.team.people.forEach(p => { if(!p) return; if(p.user === 'u_owner') p.user = d.team.people.some(x => x && x.user === 'u_chef') ? '' : 'u_chef'; else if(p.user === 'u_bar') p.user = ''; });
+  if(old4) d.orders.forEach(o => { if(!o) return; ['createdBy','sentBy'].forEach(k => { if(idMap[o[k]]) o[k] = idMap[o[k]]; }); if(o.receipt && idMap[o.receipt.by]) o.receipt.by = idMap[o.receipt.by]; });
+  // Limit und Status 'approval' gibt es nicht mehr: wartende Bestellungen sind wieder Entwürfe
+  delete s.orderLimit; d.orders.forEach(o => { if(o && o.status === 'approval') o.status = 'draft'; if(o){ delete o.approvalBy; delete o.approvedBy; delete o.approved; } });
+  if(!s.orderNo) s.orderNo = d.orders.length+1;
   ['address','deliveryNote','phone','email'].forEach(k => { if(s[k]==null) s[k] = ''; });
   return d;
 }
@@ -74,7 +86,7 @@ function einkaufMigrate(d){
 const SUP = id => (S.suppliers||[]).find(x=>x.id===id);
 const ORD = id => (S.orders||[]).find(x=>x.id===id);
 function supName(p){ const s = SUP(p.supplier); return s ? s.name : (p.supplier || 'kein Lieferant'); }
-function me(){ if(typeof cloudReady==='function' && cloudReady() && CL.member) return {id:CL.session?.user?.id||'cloud', name:CL.member.name, role:CL.member.role}; return S.settings.users.find(u=>u.id===S.settings.currentUser) || {id:'?', name:'?', role:'owner'}; }
+function me(){ if(typeof cloudReady==='function' && cloudReady() && CL.member) return {id:CL.session?.user?.id||'cloud', name:CL.member.name, role:roleNorm(CL.member.role)}; return S.settings.users.find(u=>u.id===S.settings.currentUser) || {id:'?', name:'?', role:'chef'}; }
 function userName(id){ const u = (S.settings.users||[]).find(x=>x.id===id); return u ? u.name : (id && id.length > 20 ? 'Team' : id || '—'); }
 function orderTotal(o){ return o.lines.reduce((t,l)=>t + (+l.n||0)*(+l.price||0), 0); }
 function deliveredTotal(o){ return o.lines.reduce((t,l)=>t + (+(l.delivered ?? l.n)||0)*(+(l.invPrice ?? l.price)||0), 0); }
@@ -89,12 +101,11 @@ function nextDelivery(sp, orderDate){ orderDate = orderDate || nextOrderDate(sp)
 function deliveryOptions(sp){ const base = nextOrderDate(sp); const out = []; for(let i=1;i<21 && out.length<5;i++){ const d = addDays(base,i); if(sp.deliveryDays.includes(wd(d))) out.push(d); } return out; }
 function dayLabel(d){ return new Date(d+'T12:00:00').toLocaleDateString('de-AT',{weekday:'long', day:'2-digit', month:'2-digit'}); }
 function lastOrder(sid){ return S.orders.filter(o=>o.supplier===sid && o.status!=='draft' && o.status!=='cancelled').sort((a,b)=>(b.sentAt||b.createdAt).localeCompare(a.sentAt||a.createdAt))[0]; }
-function draftFor(sid){ return S.orders.find(o=>o.supplier===sid && (o.status==='draft' || o.status==='approval')); }
-function canSend(o){ const u = me(), sp = SUP(o.supplier); if(u.role==='owner') return true; if(u.role==='staff') return false; const drink = DRINK_CATS.includes(sp?.cat); if(u.role==='bar' && !drink) return false; if(u.role==='chef' && drink) return false; return orderTotal(o) <= (+S.settings.orderLimit||Infinity); }
-function sendBlockReason(o){ const u = me(), sp = SUP(o.supplier); if(u.role==='staff') return 'Mitarbeiter dürfen Bestellungen vorbereiten, aber nicht senden.'; const drink = DRINK_CATS.includes(sp?.cat); if(u.role==='bar' && !drink) return 'Die Bar bestellt nur Getränke und Wein.'; if(u.role==='chef' && drink) return 'Getränke und Wein bestellt die Bar.'; if(orderTotal(o) > +S.settings.orderLimit) return `Über dem Limit von ${eur(S.settings.orderLimit)}: Der Inhaber muss freigeben.`; return ''; }
+function draftFor(sid){ return S.orders.find(o=>o.supplier===sid && o.status==='draft'); }
+function canSend(o){ return me().role === 'chef'; }
+function sendBlockReason(o){ return canSend(o) ? '' : 'Das Team bereitet Bestellungen vor. Senden kann sie der Chef.'; }
 function statusPill(st){ return `<span class="ost ${st}">${OSTAT[st]||st}</span>`; }
 function orderNoNext(){ const n = S.settings.orderNo++; return `B-${todayStr().slice(0,4)}-${String(n).padStart(4,'0')}`; }
-function supStats(sid){ const done = S.orders.filter(o=>o.supplier===sid && o.receipt); const late = done.filter(o=>o.receipt.date.slice(0,10) > o.deliveryDate).length; const short = done.filter(o=>o.lines.some(l=>l.ls && l.ls!=='ok')).length; return {n:done.length, onTime: done.length ? Math.round((done.length-late)/done.length*100) : null, shortRate: done.length ? Math.round(short/done.length*100) : null}; }
 function priceHistory(pid){ return movesByDate().filter(m=>m.pid===pid && m.type==='in').slice(0,6).map(m=>m.price); }
 
 function newOrder(sid, fill=true){
@@ -117,13 +128,13 @@ function receiveIn(p, units, unitPrice, note, date){
 }
 
 /* ---------- Ansicht: Bestellungen-Cockpit ---------- */
-orderView = function(){
+function orderView(){
   if(view.order && ORD(view.order)) return orderEditor(ORD(view.order));
   const t = todayStr(), now = nowMin(), today = wd(t);
   const sups = (S.suppliers||[]).filter(s=>s.active);
   const todayList = sups.filter(s => s.orderDays.includes(today)).sort((a,b)=>hm(a.cutoff)-hm(b.cutoff));
   const expected = S.orders.filter(o => ['sent','confirmed'].includes(o.status) && o.deliveryDate <= addDays(t,1)).sort((a,b)=>a.deliveryDate.localeCompare(b.deliveryDate));
-  const open = S.orders.filter(o => ['draft','approval','sent','confirmed','complaint'].includes(o.status));
+  const open = S.orders.filter(o => ['draft','sent','confirmed','complaint'].includes(o.status));
   const card = sp => { const low = lowStock().filter(p=>p.supplier===sp.id); const val = low.reduce((a,p)=>a+packSuggest(p)*(p.packQty||1)*p.price,0); const st = supToday(sp); const left = st.left; const dr = draftFor(sp.id); const last = lastOrder(sp.id);
     const cls = st.state === 'sent' ? 'past done' : st.state === 'past' ? 'past' : left < 60 ? 'urgent' : left < 180 ? 'soon' : '';
     return `<article class="oc ${cls}"><div class="oc-h"><span class="tag">${esc(SUP_CATS[sp.cat]||'')}</span><span class="cd mono">${esc(st.label)}</span></div>
@@ -139,32 +150,32 @@ orderView = function(){
       ${expected.length ? `<ul class="todo">${expected.map(o=>{ const sp = SUP(o.supplier); const late = o.deliveryDate < t; return `<li><button type="button" data-act="ordRecv" data-id="${o.id}"><b class="${late?'bad-t':''}">${late?'!':o.deliveryDate===t?'heute':'morgen'}</b><span>${esc(sp.name)} · ${o.lines.length} Positionen · ${eur(orderTotal(o))}<small class="muted" style="display:block">${esc(o.no)} · ${statusPill(o.status)} ${late?'· überfällig':''}</small></span>${ico('arrow','flip')}</button></li>`; }).join('')}</ul>` : '<p class="hint">Heute und morgen kommen keine bestellten Lieferungen.</p>'}
     </section></div>
   <h2 class="sec-h">Letzte Bestellung je Lieferant</h2>
-  <div class="lo-grid">${sups.map(sp => { const o = lastOrder(sp.id); const st = supStats(sp.id); return `<article class="lo">
+  <div class="lo-grid">${sups.map(sp => { const o = lastOrder(sp.id); return `<article class="lo">
     <div class="lo-h"><b>${esc(sp.name)}</b>${o?statusPill(o.status):''}</div>
     ${o ? `<div class="muted sm">${esc(o.no)} · ${fmtDate(o.sentAt||o.createdAt)} · von ${esc(userName(o.createdBy))}</div>
-      <div class="lo-m"><span class="mono">${o.lines.length} Pos.</span><span class="mono">${o.receipt ? `<small class="tot-l">geliefert</small> ${eur(deliveredTotal(o))}` : `<small class="tot-l">bestellt</small> ${eur(orderTotal(o))}`}</span><span class="muted sm">${st.onTime!=null?`pünktlich ${st.onTime} %`:''}</span></div>
+      <div class="lo-m"><span class="mono">${o.lines.length} Pos.</span><span class="mono">${o.receipt ? `<small class="tot-l">geliefert</small> ${eur(deliveredTotal(o))}` : `<small class="tot-l">bestellt</small> ${eur(orderTotal(o))}`}</span></div>
       <div class="row-btns"><button type="button" class="btn sm" data-act="ordOpen" data-id="${o.id}">Ansehen</button><button type="button" class="btn sm" data-act="ordRe" data-id="${o.id}">Nachbestellen</button></div>` : `<p class="hint">Noch keine Bestellung.</p><div class="row-btns"><button type="button" class="btn sm" data-act="ordNew" data-id="${sp.id}">Erste Bestellung</button></div>`}
   </article>`; }).join('')}</div>
   <h2 class="sec-h">Alle Bestellungen<small class="muted sm">${open.length} offen</small></h2>
-  <div class="chips-row">${['all','open','draft','approval','sent','confirmed','delivered','complaint'].map(k=>`<button type="button" class="chip ${(view.ofilter||'open')===k?'on':''}" data-act="ofilter" data-id="${k}">${k==='all'?'Alle':k==='open'?'Offen':OSTAT[k]}<small>${k==='all'?S.orders.length:k==='open'?open.length:S.orders.filter(o=>o.status===k).length}</small></button>`).join('')}</div>
+  <div class="chips-row">${['all','open','draft','sent','confirmed','delivered','complaint'].map(k=>`<button type="button" class="chip ${(view.ofilter||'open')===k?'on':''}" data-act="ofilter" data-id="${k}">${k==='all'?'Alle':k==='open'?'Offen':OSTAT[k]}<small>${k==='all'?S.orders.length:k==='open'?open.length:S.orders.filter(o=>o.status===k).length}</small></button>`).join('')}</div>
   <section class="panel flush">${orderList()}</section>`;
-};
+}
 function orderList(){
   const f = view.ofilter || 'open';
-  const list = S.orders.filter(o => f==='all' || (f==='open' ? ['draft','approval','sent','confirmed','complaint'].includes(o.status) : o.status===f)).sort((a,b)=>(b.sentAt||b.createdAt).localeCompare(a.sentAt||a.createdAt));
+  const list = S.orders.filter(o => f==='all' || (f==='open' ? ['draft','sent','confirmed','complaint'].includes(o.status) : o.status===f)).sort((a,b)=>(b.sentAt||b.createdAt).localeCompare(a.sentAt||a.createdAt));
   return list.length ? `<ul class="olist">${list.map(o=>{ const sp = SUP(o.supplier); return `<li><button type="button" data-act="ordOpen" data-id="${o.id}">
     <span class="mono sm muted">${esc(o.no)}</span><span class="on"><b>${esc(sp?sp.name:'?')}</b><small class="muted">${o.lines.length} Positionen · Lieferung ${fmtDate(o.deliveryDate+'T12:00:00')}</small></span>${statusPill(o.status)}<span class="mono ol-tot">${o.receipt ? `<small class="tot-l">geliefert</small> ${eur(deliveredTotal(o))}` : `<small class="tot-l">bestellt</small> ${eur(orderTotal(o))}`}</span></button></li>`; }).join('')}</ul>` : '<div class="empty">Keine Bestellungen in dieser Ansicht.</div>';
 }
 
 /* ---------- Bestellung bearbeiten / senden / empfangen ---------- */
 function orderEditor(o){
-  const sp = SUP(o.supplier); const tot = orderTotal(o); const editable = ['draft','approval'].includes(o.status);
+  const sp = SUP(o.supplier); const tot = orderTotal(o); const editable = o.status === 'draft';
   const recv = view.recv === o.id && ['sent','confirmed'].includes(o.status);
   const block = sendBlockReason(o);
   const hasCold = o.lines.some(l => P(l.pid)?.loc === 'K' || P(l.pid)?.loc === 'T');
   const head = `<button type="button" class="back" data-act="ordBack">${ico('arrow')}Alle Bestellungen</button>
   <section class="panel ord-head">
-    <div><div class="eyebrow">${esc(o.no)} · ${esc(SUP_CATS[sp.cat]||'')}</div><h1 class="h-ord">${esc(sp.name)}</h1>
+    <div><h1 class="h-ord">${esc(sp.name)}</h1><div class="muted sm">${esc(o.no)} · ${esc(SUP_CATS[sp.cat]||'')}</div>
       <div class="muted sm">${CHANNELS[sp.channel]}${sp.email?' · '+esc(sp.email):''}${sp.phone?' · '+esc(sp.phone):''}${sp.customerNo?' · Kundennr. '+esc(sp.customerNo):''}</div></div>
     <div class="ord-st">${statusPill(o.status)}<span class="muted sm">erstellt ${fmtDate(o.createdAt)} von ${esc(userName(o.createdBy))}${o.sentAt?` · gesendet ${fmtDate(o.sentAt)} via ${esc(o.sentVia||'')}`:''}</span></div>
   </section>`;
@@ -179,10 +190,9 @@ function orderEditor(o){
     <td class="ol-x">${editable?`<button type="button" class="icon-btn" data-act="olDel" data-id="${i}" aria-label="Position entfernen">${ico('x')}</button>`:''}</td></tr>`; }).join('');
   const addable = supProducts(sp.id).filter(p => !o.lines.some(l=>l.pid===p.id));
   const sendBtns = () => { if(!editable) return ''; if(!o.lines.some(l=>+l.n>0)) return '<p class="hint">Fügen Sie mindestens eine Position hinzu.</p>';
-    if(block) return `<div class="warn-box">${ico('spark')}<span>${esc(block)}</span>${o.status!=='approval' && me().role!=='staff' ? `<button type="button" class="btn sm" data-act="ordApproval" data-id="${o.id}">Zur Freigabe</button>` : ''}${o.status==='approval'?'<span class="muted sm">wartet auf Freigabe</span>':''}</div>`;
+    if(block) return `<p class="hint">${esc(block)}</p>`;
     const cloud = typeof cloudReady==='function' && cloudReady() && sp.email;
     const b = [];
-    if(o.status==='approval' && me().role==='owner') b.push(`<button type="button" class="btn" data-act="ordApprove" data-id="${o.id}">Freigeben</button>`);
     if(cloud) b.push(`<button type="button" class="btn primary" data-act="ordCloudSend" data-id="${o.id}">${ico('truck')}Jetzt per E-Mail senden</button>`);
     if(sp.email) b.push(`<a class="btn ${cloud?'':'primary'}" href="${mailHref(o)}" data-act="ordOpened" data-id="${o.id}:E-Mail">${ico('menu')}E-Mail öffnen</a>`);
     if(sp.whatsapp) b.push(`<a class="btn ${!sp.email&&!cloud?'primary':''}" href="${waHref(o)}" target="_blank" rel="noopener" data-act="ordOpened" data-id="${o.id}:WhatsApp">WhatsApp öffnen</a>`);
@@ -251,11 +261,10 @@ function receiveForm(o, hasCold){
 /* ---------- Lieferanten ---------- */
 function supplierView(){
   const sups = S.suppliers || [];
-  return `<div class="layout-intro"><p class="hint" style="margin:0">Bestelltage, Annahmeschluss, Liefertage und Mindestbestellwert erfahren Sie direkt beim Lieferanten. Die App erinnert dann im Cockpit, wer heute bestellt werden muss.</p><button type="button" class="btn primary" data-act="supEdit" data-id="">${ico('plus')}Lieferant</button></div>
-  <div class="lo-grid">${sups.map(sp => { const st = supStats(sp.id); const n = S.products.filter(p=>p.supplier===sp.id).length; const spend = S.orders.filter(o=>o.supplier===sp.id && o.receipt && o.receipt.date.slice(0,7)===todayStr().slice(0,7)).reduce((a,o)=>a+deliveredTotal(o),0); return `<article class="lo ${sp.active?'':'off'}">
+  return `<div class="lo-grid">${sups.map(sp => { const n = S.products.filter(p=>p.supplier===sp.id).length; const spend = S.orders.filter(o=>o.supplier===sp.id && o.receipt && o.receipt.date.slice(0,7)===todayStr().slice(0,7)).reduce((a,o)=>a+deliveredTotal(o),0); return `<article class="lo ${sp.active?'':'off'}">
     <div class="lo-h"><b>${esc(sp.name)}</b><span class="tag">${CHANNELS[sp.channel]}</span></div>
     <div class="muted sm">${esc(SUP_CATS[sp.cat]||'')} · ${n} Artikel${sp.customerNo?' · Kd.-Nr. '+esc(sp.customerNo):''}</div>
-    <div class="kv"><span>Bestellen</span><span>${DAYS.filter(([i])=>sp.orderDays.includes(i)).map(([,l])=>l).join(' ')} bis ${esc(sp.cutoff)}</span><span>Lieferung</span><span>${DAYS.filter(([i])=>sp.deliveryDays.includes(i)).map(([,l])=>l).join(' ')}</span><span>Mindestwert</span><span>${eur(sp.minOrder)}</span><span>Pünktlich / Fehlmengen</span><span>${st.onTime!=null?st.onTime+' % / '+st.shortRate+' %':'—'}</span><span>Einkauf diesen Monat</span><span>${eur(spend)}</span></div>
+    <div class="kv"><span>Bestellen</span><span>${DAYS.filter(([i])=>sp.orderDays.includes(i)).map(([,l])=>l).join(' ')} bis ${esc(sp.cutoff)}</span><span>Lieferung</span><span>${DAYS.filter(([i])=>sp.deliveryDays.includes(i)).map(([,l])=>l).join(' ')}</span><span>Mindestwert</span><span>${eur(sp.minOrder)}</span><span>Einkauf diesen Monat</span><span>${eur(spend)}</span></div>
     <div class="row-btns"><button type="button" class="btn sm" data-act="supEdit" data-id="${sp.id}">${ico('edit')}Bearbeiten</button><button type="button" class="btn sm" data-act="ordNew" data-id="${sp.id}">${ico('cart')}Bestellen</button></div>
   </article>`; }).join('')}</div>
   <h2 class="sec-h">Preisentwicklung</h2>
@@ -304,8 +313,6 @@ document.addEventListener('click', e => {
     case 'ofilter': view.ofilter = id; render(); break;
     case 'olDel': { const o = ORD(view.order); o.lines.splice(+id,1); save(); render(); break; }
     case 'olSuggest': { const o = ORD(id); let n = 0; lowStock().filter(p=>p.supplier===o.supplier).forEach(p => { if(!o.lines.some(l=>l.pid===p.id)){ const q = packSuggest(p); if(q>0){ o.lines.push(lineFor(p,q)); n++; } } }); save(); render(); toast(n ? `${n} Artikel unter Mindestbestand ergänzt` : 'Alle Artikel unter Mindestbestand sind schon drin'); break; }
-    case 'ordApproval': { const o = ORD(id); o.status = 'approval'; o.approvalBy = me().id; save(); render(); toast('Zur Freigabe an den Inhaber'); break; }
-    case 'ordApprove': { const o = ORD(id); o.approvedBy = me().id; o.status = 'draft'; o.approved = true; save(); render(); toast('Freigegeben'); break; }
     case 'ordOpened': { const [oid, via] = id.split(':'); view.opened = oid; view.openedVia = via; setTimeout(render, 300); break; }
     case 'ordMarkSent': { const o = ORD(id); const sp = SUP(o.supplier); o.status = 'sent'; o.sentAt = new Date().toISOString(); o.sentVia = view.opened===o.id ? view.openedVia : CHANNELS[sp.channel]; o.sentBy = me().id; view.opened = null; save(); render(); toast(`${o.no} gesendet · Lieferung ${dayLabel(o.deliveryDate)}`); break; }
     case 'ordCopy': { const txt = orderText(ORD(id)); const pr = navigator.clipboard?.writeText(txt); const fb = () => openDialog('Bestelltext', `<textarea class="code" readonly id="ordTxt">${esc(txt)}</textarea>`, null, {cancel:'Schließen', after:()=>$('#ordTxt').select()}); if(pr) pr.then(()=>toast('Bestelltext kopiert'), fb); else fb(); break; }
@@ -346,7 +353,6 @@ document.addEventListener('change', e => {
   if(t.dataset.cst){ ORD(t.dataset.cst).complaint.status = t.value; if(t.value==='closed' || t.value==='credit') ORD(t.dataset.cst).status = t.value==='closed' ? 'delivered' : 'complaint'; save(); render(); toast('Reklamation: '+CSTAT[t.value]); return; }
   if(t.dataset.ctext){ ORD(t.dataset.ctext).complaint.text = t.value; save(); return; }
   if(t.id === 'rNo' || t.id === 'rTemp'){ const oo = ORD(view.recv) || o; if(!oo) return; const r = oo.receiptDraft = oo.receiptDraft || {}; r[t.id==='rNo'?'noteNo':'temp'] = t.value; save(); return; }
-  if(t.dataset.us === 'limit'){ S.settings.orderLimit = Math.max(0, +t.value||0); save(); toast('Freigabe-Limit gespeichert'); return; }
   if(t.dataset.us === 'addr'){ S.settings[t.dataset.k] = t.value; save(); return; }
 });
 

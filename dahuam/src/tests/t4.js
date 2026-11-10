@@ -36,7 +36,7 @@ await p.click('[data-act=hkAccent][data-id="#2d5c86"]');console.log('accent',awa
 // menu dialog seasons
 await ev(()=>menuDialog(S.menu.find(m=>m.name==='Caesar Salat')));await p.screenshot({path:'s-mdlg.png'});await p.click('#dlgCancel');
 // QA: click after edit
-await ev(()=>go('cards','dish_kaiser'));const n0=await ev(()=>C('dish_kaiser').items.length);
+await ev(()=>{view.more={teller:true};go('cards','dish_kaiser')});const n0=await ev(()=>C('dish_kaiser').items.length);
 await p.fill('#qty-0','125');await p.click('[data-act=addLine]');await p.waitForTimeout(200);console.log('addLine after edit',n0,'->',await ev(()=>C('dish_kaiser').items.length),'qty',await ev(()=>C('dish_kaiser').items[0].qty));
 // Tab focus
 await p.fill('#qty-1','260');await p.keyboard.press('Tab');await p.waitForTimeout(100);console.log('focus after tab',await ev(()=>document.activeElement.id));

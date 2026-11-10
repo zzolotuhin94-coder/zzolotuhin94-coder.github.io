@@ -1,11 +1,10 @@
 /* =====================================================================
    Erweiterung: Lager, Inventur, Fotos, Zubereitungsschritte, Gästekarte
    ===================================================================== */
+const SECTION_ORDER = ['Vorspeisen','Suppen','Salate & Bowls','Flammkuchen','Fondue & Hauptspeisen','Burger & Kebap','Desserts','Kindermenü'];
 const LOCS = {K:'Kühlhaus', T:'Tiefkühler', L:'Trockenlager', G:'Gemüselager', W:'Bar & Weinkeller'};
 const MOVE = {in:'Wareneingang', out:'Entnahme', waste:'Schwund', sale:'Verkauf', inv:'Inventur'};
 const WASTE = ['Verdorben / abgelaufen','Überproduktion','Zubereitungsfehler','Personalessen','Bruch','Sonstiges'];
-const SECTION_ORDER = ['Vorspeisen','Suppen','Salate & Bowls','Flammkuchen','Fondue & Hauptspeisen','Burger & Kebap','Desserts','Kindermenü'];
-const GSTYLES = [['alpin','Alpin'],['klassisch','Klassisch'],['modern','Modern']];
 
 // Demo-Lagerdaten: Bestand, Mindestbestand, Lagerort, Lieferant
 const DEMO_STOCK = {
@@ -42,11 +41,27 @@ function seed(){
   ];
   d.inventories = [{id:uid('inv'), date:daysAgo(31), counted:54, value:2386.40, diff:-42.30, demo:true}];
   d.invDraft = null;
+  seasonSeed(d);
+  einkaufSeed(d);
+  menuV2Migrate(d);
+  salesEnsure(d); if(d.demo && !d.salesDemoDone) salesDemo(d);
+  pricesMigrate(d);
+  gameMigrate(d);
+  hausMigrate(d);
+  fixesMigrate(d);
+  plusMigrate(d);
+  teamMigrate(d);
   return d;
 }
 
 function migrate(d){
-  if(!d) return null;
+  if(!d || typeof d !== 'object') return null;
+  if(!Array.isArray(d.products) || !Array.isArray(d.cards) || !Array.isArray(d.menu)) return null;
+  d.settings = Object.assign({name:'Mein Betrieb', vat:10, target:28, nextNo:d.cards.length+1}, d.settings||{});
+  if(!(+d.settings.target >= 1)) d.settings.target = 28; if(!(+d.settings.vat >= 0)) d.settings.vat = 10;
+  d.products = d.products.filter(p=>p && p.id); d.products.forEach(p=>{ p.name = p.name||p.id; p.unit = ['kg','l','Stk'].includes(p.unit)?p.unit:'kg'; p.price = +p.price||0; p.alg = p.alg||''; });
+  d.cards = d.cards.filter(c=>c && c.id); d.cards.forEach(c=>{ c.name = c.name||'Rezeptur'; c.type = c.type==='semi'?'semi':'dish'; if(!Array.isArray(c.items)) c.items = []; c.items = c.items.filter(i=>i && typeof i==='object'); if(c.steps && !Array.isArray(c.steps)) c.steps = []; });
+  d.menu = d.menu.filter(m=>m && m.id); d.menu.forEach(m=>{ m.name = m.name||'Gericht'; m.section = m.section||'Ohne Kategorie'; m.price = +m.price||0; m.desc = m.desc||''; });
   d.products.forEach(p => { if(p.stock==null){ const s = d.demo && DEMO_STOCK[p.id]; [p.stock,p.minStock,p.loc,p.supplier] = s || [0,0,'L','']; } if(p.id==='water') p.noStock = true; });
   d.cards.forEach(c => { if(!c.steps){ c.steps = splitSteps(c.method); delete c.method; } if(c.img==null) c.img=''; });
   const order = {};
@@ -54,6 +69,16 @@ function migrate(d){
   if(!d.settings.sections) d.settings.sections = [...SECTION_ORDER];
   if(!d.settings.guest) d.settings.guest = {style:'alpin', photos:true, allergens:true, desc:true, title:'Speisekarte', subtitle:'', footer:'Alle Preise in Euro inkl. MwSt.'};
   d.moves = d.moves || []; d.inventories = d.inventories || []; if(d.invDraft===undefined) d.invDraft = null;
+  seasonMigrate(d);
+  einkaufMigrate(d);
+  menuV2Migrate(d);
+  salesEnsure(d); if(d.demo && !d.salesDemoDone) salesDemo(d);
+  pricesMigrate(d);
+  gameMigrate(d);
+  hausMigrate(d);
+  fixesMigrate(d);
+  plusMigrate(d);
+  teamMigrate(d);
   return d;
 }
 
@@ -69,7 +94,7 @@ function resizeImage(file, max=1400){
     cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height); res(cv.toDataURL('image/jpeg', 0.82)); }; im.src = fr.result; }; fr.readAsDataURL(file); });
 }
 let pickCb = null;
-function pickImage(cb){ pickCb = cb; const i = $('#imgFile'); i.value = ''; i.click(); }
+function pickImage(cb){ pickCb = cb; const i = $('#imgFile'); const d = $('#dlg'); (d.open ? d : document.body).appendChild(i); i.value = ''; i.click(); }
 function setPhoto(obj, field='img'){ pickImage(data => { if(obj[field]) imgDel(obj[field]); const id = uid('img'); imgPut(id, data); obj[field] = id; save(); render(); toast('Foto gespeichert'); }); }
 function initials(n){ const w = String(n||'').replace(/[„“"'«»]/g,'').trim().split(/\s+/); return ((w[0]||'')[0]||'·').toUpperCase(); }
 function menuImg(m){ const c = m.card && C(m.card); return (m.img && IMG[m.img]) ? m.img : (c && c.img && IMG[c.img]) ? c.img : ''; }
@@ -93,7 +118,7 @@ function explode(c, f, acc=new Map(), d=0){
   if(!c || d > 6) return acc;
   for(const it of c.items){ const r = refObj(it.ref); if(!r) continue; const q = (+it.qty||0)*f;
     if(r.t==='p'){ if(r.o.noStock) continue; acc.set(r.o.id, (acc.get(r.o.id)||0) + (r.o.unit==='Stk' ? q : q/1000)); }
-    else if(r.o.yieldG) explode(r.o, q/r.o.yieldG, acc, d+1); }
+    else { const y = +r.o.yieldG || totals(r.o).out; if(y) explode(r.o, q/y, acc, d+1); } }
   return acc;
 }
 function orderSuggest(p){ const min = +p.minStock||0, s = +p.stock||0; let q = Math.max(0, min*2 - s); if(p.unit==='Stk') return Math.ceil(q); return Math.ceil(q*2)/2; }
@@ -139,8 +164,9 @@ const ICO = {
 };
 const ico = (n, cls='') => `<svg class="ico ${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICO[n]}</svg>`;
 
-const TABS = [['dash','Übersicht','Start'],['menu','Speisekarte','Karte'],['cards','Rezepturen','Rezepte'],['stock','Lager','Lager'],['products','Produkte','Produkte'],['setup','Einstellungen','Mehr']];
-view = {tab:'dash', card:null, q:'', sec:'all', ctype:'all', pq:'', sim:null, portions:20, mtab:'calc', stab:'bestand', loc:'all', mtype:'all', order:{}};
+/* Seiten der App: [Schlüssel, Titel]. Die Navigation (nav.js) fasst sie zu sieben Bereichen zusammen. */
+const TABS = [['dash','Heute'],['vorb','Vorbereitung'],['checkl','Checklisten'],['menu','Speisekarte'],['cards','Rezepte'],['stock','Ware'],['buy','Ware'],['products','Ware'],['pcheck','Preis-Check'],['dienst','Team & Zahlen'],['report','Team & Zahlen'],['setup','Einstellungen'],['einr','Einrichtung']];
+view = {tab:'dash', card:null, q:'', sec:'all', ctype:'all', pq:'', sim:null, portions:20, mtab:'calc', stab:'bestand', loc:'all', mtype:'all', order:null, more:{}};
 
 /* ---------- Bausteine ---------- */
 function ring(fc, size=46, stroke=5){
@@ -150,219 +176,37 @@ function ring(fc, size=46, stroke=5){
     <circle class="val" cx="${size/2}" cy="${size/2}" r="${r}" stroke-width="${stroke}" fill="none" stroke-linecap="round" stroke-dasharray="${(c*v).toFixed(2)} ${c.toFixed(2)}" transform="rotate(-90 ${size/2} ${size/2})"/></svg>`;
 }
 function secHue(name){ const secs = [...new Set(secList().concat(S.cards.map(c=>c.category)))]; const i = Math.max(0, secs.indexOf(name)); return (i*47 + 20) % 360; }
-function catDot(name){ return `<span class="dot" style="--h:${secHue(name)}"></span>`; }
 function toast(msg, opt){
   const t = $('#toast'); clearTimeout(toast._t); t.textContent = msg; t.classList.remove('has-act');
   if(opt && opt.action){ const b = document.createElement('button'); b.type = 'button'; b.className = 'toast-act'; b.textContent = opt.label || 'Rückgängig'; b.onclick = () => { clearTimeout(toast._t); t.classList.remove('show','has-act'); opt.action(); }; t.appendChild(b); t.classList.add('has-act'); }
   t.classList.add('show'); toast._t = setTimeout(()=>t.classList.remove('show','has-act'), (opt && opt.ms) || (opt && opt.action ? 6000 : 2200));
 }
-function demoNote(){ return S.demo ? `<div class="note">${ico('spark')}<span>Demodaten: Speisekarte und Preise von dahuam202.at. Rezepturen, Einkaufspreise und Lagerbestände sind Richtwerte, bitte durch eigene ersetzen.</span></div>` : ''; }
 function seg(name, cur, opts){ return `<div class="seg" role="tablist">${opts.map(([k,l,n])=>`<button type="button" role="tab" class="${cur===k?'on':''}" data-act="${name}" data-id="${k}">${l}${n!=null?`<small>${n}</small>`:''}</button>`).join('')}</div>`; }
-function vegBadge(v){ return v==='vg' ? '<span class="vb vg" title="Vegan">VG</span>' : v==='v' ? '<span class="vb" title="Vegetarisch">V</span>' : ''; }
 function fmtDate(iso){ return new Date(iso).toLocaleDateString('de-AT',{day:'2-digit',month:'2-digit',year:'numeric'}); }
 
 /* ---------- Rahmen ---------- */
 function render(){
-  document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === view.tab));
   const app = $('#app');
-  const fn = {dash:renderDash, menu:renderMenu, stock:renderStock, products:renderProducts, setup:renderSetup}[view.tab];
+  const fn = {dash:renderDash, menu:renderMenu, stock:renderStock, products:renderProducts, setup:renderSetup, buy:renderBuy, report:renderReport, einr:renderEinrichtung, pcheck:renderPriceCheck, vorb:renderVorb, dienst:renderDienst, checkl:renderCheckl}[view.tab];
   app.innerHTML = fn ? fn() : (view.card && C(view.card) ? renderCard(C(view.card)) : renderCards());
+  app.dataset.view = view.tab;
   app.classList.remove('enter'); void app.offsetWidth; app.classList.add('enter');
   autosize();
+  const wEl = $('#whoami'); if(wEl){ const u = me(); wEl.innerHTML = `<b>${esc(u.name)}</b><small>${ROLES[u.role]}${cloudReady()?' · Cloud':''}</small>`; }
+  pendingRender = false;
+  if(kbdSel){ const el = document.querySelector(kbdSel); kbdSel = null; if(el) el.focus({preventScroll:true}); }
 }
+let kbdSel = null, ptrDown = false, pendingRender = false;
+function softRender(){ if(ptrDown){ pendingRender = true; return; } setTimeout(() => { const id = document.activeElement && document.activeElement.id; render(); if(id){ const n = document.getElementById(id); if(n){ n.focus({preventScroll:true}); if(n.matches('input.num-in') && n.select) n.select(); } } }, 0); }
+document.addEventListener('pointerdown', () => { ptrDown = true; }, true);
+document.addEventListener('pointerup', () => { ptrDown = false; if(pendingRender) setTimeout(() => { if(pendingRender){ pendingRender = false; render(); } }, 0); }, true);
+document.addEventListener('click', e => { const b = e.target.closest('[data-act][data-id],[data-act]'); if(b && e.detail === 0 && b.closest('#app')) kbdSel = `[data-act="${b.dataset.act}"]` + (b.dataset.id!=null ? `[data-id="${CSS.escape(b.dataset.id)}"]` : ''); }, true);
 function autosize(el){ (el ? [el] : document.querySelectorAll('#app .title-in, #app [data-step]')).forEach(t => { if(t.tagName!=='TEXTAREA') return; t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }); }
-function navHtml(short){ return TABS.map(([k,l,s])=>`<button type="button" class="nav-i" data-tab="${k}">${ico(k)}<span>${short?s:l}</span></button>`).join(''); }
 
 /* ---------- Übersicht ---------- */
-function renderDash(){
-  const all = S.menu.map(m => ({m, k:menuCalc(m)}));
-  const linked = all.filter(x => x.k.cost != null).sort((a,b)=>b.k.fc-a.k.fc);
-  const avg = linked.length ? linked.reduce((s,x)=>s+x.k.fc,0)/linked.length : null;
-  const over = linked.filter(x => x.k.fc > S.settings.target);
-  const cover = S.menu.length ? linked.length/S.menu.length*100 : 0;
-  const tg = +S.settings.target;
-  const scale = Math.max(40, Math.ceil(((linked[0]?.k.fc)||0)/10)*10 + 5);
-  const low = lowStock();
-  const drv = new Map();
-  linked.forEach(x => explode(x.k.c, 1).forEach((q,pid) => { const p = P(pid); drv.set(pid, (drv.get(pid)||0) + q*(+p.price||0)); }));
-  const drvList = [...drv.entries()].sort((a,b)=>b[1]-a[1]);
-  const drvSum = drvList.reduce((s,x)=>s+x[1],0) || 1;
-  const top = drvList.slice(0,6);
-  const hour = new Date().getHours();
-  const hi = hour < 11 ? 'Guten Morgen' : hour < 17 ? 'Servus' : 'Guten Abend';
-  const lastInv = S.inventories[0];
-  return `<div class="page-h"><div><div class="eyebrow">${new Date().toLocaleDateString('de-AT',{weekday:'long', day:'numeric', month:'long'})}</div><h1>${hi}, Küche!</h1></div>
-    <div class="row-btns"><button type="button" class="btn" data-act="sales">${ico('cart')}Verkäufe buchen</button><button type="button" class="btn primary" data-act="moveDlg" data-id="in">${ico('truck')}Wareneingang</button></div></div>
-  ${demoNote()}
-  <div class="tiles">
-    <div class="tile"><div class="tile-ring">${ring(avg,58,6)}<b>${avg==null?'—':num(avg,0)+'%'}</b></div><div><div class="t-l">Ø Wareneinsatz</div><div class="t-s">Ziel ${num(tg)} %</div></div></div>
-    <div class="tile"><div><div class="t-v">${linked.length}<small>/${S.menu.length}</small></div><div class="t-l">Gerichte kalkuliert</div><div class="meter"><i style="width:${cover.toFixed(1)}%"></i></div></div></div>
-    <button type="button" class="tile click" data-act="goStock" data-id="bestand"><div><div class="t-v">${eur(stockValue())}</div><div class="t-l">Lagerwert</div><div class="t-s">${lastInv?'Inventur '+fmtDate(lastInv.date):'Noch keine Inventur'}</div></div></button>
-    <button type="button" class="tile click" data-act="goStock" data-id="bestellung"><div><div class="t-v ${low.length?'bad-t':'good-t'}">${low.length}</div><div class="t-l">unter Mindestbestand</div><div class="t-s">${low.length?'Bestellvorschlag ansehen →':'Lager ist gut gefüllt'}</div></div></button>
-  </div>
-  <div class="dash-grid">
-    <section class="panel">
-      <div class="panel-h"><h2>Wareneinsatz je Gericht</h2><span class="legend"><i class="tl"></i>Ziel ${num(tg)} %</span></div>
-      <div class="bars" style="--tg:${(tg/scale*100).toFixed(2)}%">
-        ${linked.map(({m,k})=>`<button type="button" class="bar-r" data-act="openCard" data-id="${k.c.id}" title="${esc(m.name)}">
-          <span class="bar-n">${esc(m.name)}</span>
-          <span class="bar-t"><i class="${fcClass(k.fc)}" style="width:${Math.min(100,k.fc/scale*100).toFixed(2)}%"></i></span>
-          <span class="bar-v">${num(k.fc,1)}%</span></button>`).join('') || '<div class="empty">Noch keine Gerichte kalkuliert.</div>'}
-        <div class="bar-axis"><span></span><span class="ax"><i>0 %</i><i>${num(scale/2)} %</i><i>${num(scale)} %</i></span><span></span></div>
-      </div>
-    </section>
-    <div class="stack">
-      <section class="panel">
-        <div class="panel-h"><h2>Zu erledigen</h2></div>
-        <ul class="todo">
-          <li><button type="button" data-act="goStock" data-id="bestellung"><b class="${low.length?'bad-t':''}">${low.length}</b><span>Artikel nachbestellen</span>${ico('arrow','flip')}</button></li>
-          <li><button type="button" data-act="goMenu" data-id="none"><b>${S.menu.length-linked.length}</b><span>Gerichte ohne Rezeptur</span>${ico('arrow','flip')}</button></li>
-          <li><button type="button" data-act="goMenu" data-id="over"><b class="${over.length?'bad-t':''}">${over.length}</b><span>Gerichte über ${num(tg)} % Wareneinsatz</span>${ico('arrow','flip')}</button></li>
-          <li><button type="button" data-act="goStock" data-id="inventur"><b>${S.invDraft?'…':ico('clip')}</b><span>${S.invDraft?'Laufende Inventur fortsetzen':'Inventur durchführen'}</span>${ico('arrow','flip')}</button></li>
-        </ul>
-      </section>
-      <section class="panel">
-        <div class="panel-h"><h2>Größte Kostentreiber</h2></div>
-        <div class="stackbar">${top.map(([id,v],i)=>`<i style="width:${(v/drvSum*100).toFixed(2)}%;background:var(--s${i+1})"></i>`).join('')}<i style="flex:1;background:var(--s7)"></i></div>
-        <ul class="leg">${top.map(([id,v],i)=>`<li><span class="sw" style="background:var(--s${i+1})"></span><span class="ln">${esc(P(id)?.name)}</span><span class="mono">${num(v/drvSum*100,1)} %</span></li>`).join('')}
-          <li><span class="sw" style="background:var(--s7)"></span><span class="ln muted">Übrige Produkte</span><span class="mono">${num((1-top.reduce((s,x)=>s+x[1],0)/drvSum)*100,1)} %</span></li></ul>
-        <p class="hint">Anteil am Wareneinsatz aller kalkulierten Gerichte, je eine Portion.</p>
-      </section>
-    </div>
-  </div>`;
-}
 
-/* ---------- Speisekarte ---------- */
-function renderMenu(){
-  const hidden = S.menu.filter(m=>m.hidden).length;
-  const head = `<div class="page-h"><div><div class="eyebrow">${S.menu.length} Gerichte · ${secList().length} Kategorien${hidden?` · ${hidden} ausgeblendet`:''}</div><h1>Speisekarte</h1></div>
-    <div class="row-btns">${view.mtab==='guest' && !FRAMED ? `<button type="button" class="btn" data-act="printMenu">${ico('print')}Drucken</button>` : ''}<button type="button" class="btn primary" data-act="newMenu">${ico('plus')}Gericht</button></div></div>
-  <div class="toolbar">${seg('mtab', view.mtab, [['calc','Kalkulation'],['guest','Gästekarte'],['layout','Aufbau & Reihenfolge']])}</div>`;
-  return head + (view.mtab==='guest' ? renderGuest() : view.mtab==='layout' ? renderLayout() : renderMenuCalc());
-}
 
-function renderMenuCalc(){
-  const q = view.q.trim().toLowerCase();
-  const all = menuSorted().map(m => ({m, k:menuCalc(m)}));
-  const f = view.sec;
-  const shown = all.filter(({m,k}) => (!q || (m.name+' '+m.desc+' '+m.section).toLowerCase().includes(q))
-    && (f==='all' || (f==='none' ? k.cost==null : f==='over' ? (k.fc!=null && k.fc > S.settings.target) : f==='nophoto' ? !menuImg(m) : m.section===f)));
-  const cnt = x => all.filter(x).length;
-  const chip = (k,l,n,dot) => `<button type="button" class="chip ${f===k?'on':''}" data-act="sec" data-id="${esc(k)}">${dot||''}${esc(l)}<small>${n}</small></button>`;
-  let h = `<div class="toolbar"><label class="search">${ico('search')}<input id="mq" type="search" placeholder="Gericht, Zutat oder Kategorie" value="${esc(view.q)}" autocomplete="off"></label></div>
-  <div class="chips-row">${chip('all','Alle',all.length)}${chip('over','Über Ziel',cnt(x=>x.k.fc!=null&&x.k.fc>S.settings.target))}${chip('none','Ohne Rezeptur',cnt(x=>x.k.cost==null))}${chip('nophoto','Ohne Foto',cnt(x=>!menuImg(x.m)))}<span class="sep"></span>${secList().filter(s=>all.some(x=>x.m.section===s)).map(s=>chip(s,s,cnt(x=>x.m.section===s),catDot(s))).join('')}</div>`;
-  if(!shown.length) return h + `<div class="panel empty">Keine Gerichte für diesen Filter.</div>`;
-  for(const s of secList().filter(s=>shown.some(x=>x.m.section===s))){
-    h += `<h2 class="sec-h">${catDot(s)}${esc(s)}</h2><div class="dish-grid">`;
-    for(const {m,k} of shown.filter(x=>x.m.section===s)){
-      h += `<article class="dish ${k.c?'':'nocard'} ${m.hidden?'is-hidden':''}">
-        <div class="dish-ph">${photo(menuImg(m), m.name, m.section)}
-          <button type="button" class="ph-btn" data-act="photoMenu" data-id="${m.id}" title="Foto ${menuImg(m)?'ändern':'hinzufügen'}" aria-label="Foto ${menuImg(m)?'ändern':'hinzufügen'}">${ico('camera')}</button>
-          <span class="ph-flags">${m.top?'<span class="vb top" title="Empfehlung">★</span>':''}${vegBadge(m.veg)}${m.hidden?'<span class="vb off">ausgeblendet</span>':''}</span></div>
-        <button type="button" class="dish-main" data-act="${k.c?'openCard':'newCardFor'}" data-id="${k.c?k.c.id:m.id}">
-          <span class="dish-top"><span class="dish-n">${esc(m.name)}</span><span class="price">${eur(m.price)}</span></span>
-          ${m.desc?`<span class="dish-d">${esc(m.desc)}</span>`:''}
-          <span class="dish-b">${k.c ? `<span class="fcw">${ring(k.fc,34,4)}<span><b class="mono">${pct(k.fc)}</b><small>WE ${eur(k.cost)}</small></span></span>${chips(k.t.alg)}`
-            : `<span class="add">${ico('plus')}Rezeptur anlegen</span>`}</span>
-        </button>
-        <button type="button" class="icon-btn edit" title="Gericht bearbeiten" aria-label="Gericht bearbeiten" data-act="editMenu" data-id="${m.id}">${ico('edit')}</button>
-      </article>`;
-    }
-    h += `</div>`;
-  }
-  return h;
-}
-
-function guestHtml(){
-  const g = S.settings.guest;
-  const items = menuSorted().filter(m => !m.hidden);
-  const used = new Set();
-  let body = '';
-  for(const s of secList()){
-    const list = items.filter(m=>m.section===s); if(!list.length) continue;
-    body += `<section class="g-sec"><h3 class="g-h"><span>${esc(s)}</span></h3><div class="g-list">`;
-    for(const m of list){
-      const k = menuCalc(m); const alg = k.t ? [...k.t.alg].sort() : []; alg.forEach(a=>used.add(a));
-      const img = g.photos ? menuImg(m) : '';
-      body += `<article class="g-item ${img?'has-ph':''} ${m.top?'is-top':''}">
-        ${img ? `<img class="g-ph" src="${IMG[img]}" alt="${esc(m.name)}" loading="lazy">` : ''}
-        <div class="g-txt"><div class="g-row"><span class="g-n">${esc(m.name)}${m.veg==='vg'?' <i class="g-mark" title="Vegan">VG</i>':m.veg==='v'?' <i class="g-mark" title="Vegetarisch">V</i>':''}</span><span class="lead"></span><span class="g-p">${fin(+m.price).toLocaleString('de-AT',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
-        ${m.top?`<div class="g-top">★ Empfehlung des Hauses</div>`:''}
-        ${g.desc && m.desc ? `<div class="g-d">${esc(m.desc)}</div>` : ''}
-        ${g.allergens && alg.length ? `<div class="g-a">${alg.join(' · ')}</div>` : ''}</div>
-      </article>`;
-    }
-    body += `</div></section>`;
-  }
-  const legend = g.allergens && used.size ? `<div class="g-leg">${[...used].sort().map(a=>`<span><b>${a}</b> ${esc(ALG[a])}</span>`).join('')}</div>` : '';
-  return `<div class="g-paper g-${g.style}">
-    <header class="g-head"><div class="g-mark-logo">DAHUAM<span>.</span>202</div><h2 class="g-title">${esc(g.title)}</h2>${g.subtitle?`<div class="g-sub">${esc(g.subtitle)}</div>`:''}</header>
-    ${body || '<p class="g-empty">Noch keine sichtbaren Gerichte.</p>'}
-    <footer class="g-foot"><div class="g-keys"><span><i class="g-mark">V</i> vegetarisch</span><span><i class="g-mark">VG</i> vegan</span><span>★ Empfehlung des Hauses</span></div>${legend}<p>${esc(g.footer)}</p></footer>
-  </div>`;
-}
-function renderGuest(){
-  const g = S.settings.guest;
-  const tog = (k,l) => `<label class="tog"><input type="checkbox" data-gf="${k}" ${g[k]?'checked':''}><span></span>${l}</label>`;
-  return `<div class="guest-wrap">
-    <aside class="panel guest-tools">
-      <div class="panel-h"><h2>Gestaltung</h2></div>
-      <div class="f">Stil</div>${seg('gstyle', g.style, GSTYLES)}
-      <div class="togs">${tog('photos','Fotos zeigen')}${tog('desc','Beschreibungen')}${tog('allergens','Allergene')}</div>
-      <label class="f">Titel<input id="g-title" data-gs="title" value="${esc(g.title)}"></label>
-      <label class="f">Untertitel<input id="g-sub" data-gs="subtitle" value="${esc(g.subtitle)}"></label>
-      <label class="f">Fußzeile<textarea id="g-foot" data-gs="footer" class="sm-ta">${esc(g.footer)}</textarea></label>
-      <p class="hint">Gerichte erscheinen automatisch in ihrer Kategorie. Reihenfolge und Sichtbarkeit legen Sie unter „Aufbau & Reihenfolge“ fest.</p>
-      <button type="button" class="btn" data-act="mtab" data-id="layout">${ico('up')}Reihenfolge ändern</button>
-    </aside>
-    <div class="guest-prev">${guestHtml()}</div>
-  </div>`;
-}
-
-function renderLayout(){
-  const secs = secList();
-  return `<div class="layout-intro"><p class="hint" style="margin:0">So ist Ihre Karte aufgebaut. Neue Gerichte landen automatisch in der passenden Kategorie, am Ende der Liste. Mit den Pfeilen ändern Sie die Reihenfolge, mit dem Auge blenden Sie ein Gericht auf der Gästekarte aus.</p>
-    <button type="button" class="btn" data-act="addSec">${ico('plus')}Kategorie</button></div>
-  <div class="lay">${secs.map((s,si)=>{ const items = menuSorted().filter(m=>m.section===s); return `<section class="panel lay-sec">
-    <div class="lay-h"><span class="lay-no mono">${si+1}</span>${catDot(s)}<input class="lay-name" data-secname="${si}" value="${esc(s)}" aria-label="Kategoriename"><span class="muted sm">${items.length}</span>
-      <span class="lay-acts"><button type="button" class="icon-btn" data-act="secMove" data-id="${si}:-1" ${si===0?'disabled':''} aria-label="Kategorie nach oben">${ico('up')}</button><button type="button" class="icon-btn" data-act="secMove" data-id="${si}:1" ${si===secs.length-1?'disabled':''} aria-label="Kategorie nach unten">${ico('down')}</button>
-      <button type="button" class="icon-btn" data-act="secSort" data-id="${si}" title="Nach Preis sortieren" aria-label="Nach Preis sortieren"><span class="mono" style="font-size:12px">€↑</span></button>
-      ${items.length?'':`<button type="button" class="icon-btn danger" data-act="secDel" data-id="${si}" aria-label="Kategorie löschen">${ico('trash')}</button>`}</span></div>
-    ${items.length ? `<ol class="lay-list">${items.map((m,i)=>`<li class="${m.hidden?'off':''}">${photo(menuImg(m), m.name, s, 'xs')}<span class="lay-n">${esc(m.name)}</span><span class="mono sm">${eur(m.price)}</span>
-      <button type="button" class="icon-btn" data-act="itemMove" data-id="${m.id}:-1" ${i===0?'disabled':''} aria-label="Nach oben">${ico('up')}</button><button type="button" class="icon-btn" data-act="itemMove" data-id="${m.id}:1" ${i===items.length-1?'disabled':''} aria-label="Nach unten">${ico('down')}</button>
-      <button type="button" class="icon-btn" data-act="itemHide" data-id="${m.id}" title="${m.hidden?'Auf der Gästekarte zeigen':'Auf der Gästekarte ausblenden'}" aria-label="Sichtbarkeit">${ico(m.hidden?'eyeoff':'eye')}</button></li>`).join('')}</ol>` : '<p class="hint">Leer. Ein Gericht mit dieser Kategorie erscheint hier automatisch.</p>'}
-  </section>`; }).join('')}</div>`;
-}
-
-/* ---------- Rezepturen ---------- */
-function renderCards(){
-  const q = view.q.trim().toLowerCase();
-  const list = S.cards.filter(c => (view.ctype==='all' || c.type===view.ctype) && (!q || (c.name+' '+c.category).toLowerCase().includes(q)))
-    .sort((a,b) => a.type===b.type ? byName(a,b) : (a.type==='semi'?1:-1));
-  const n = t => S.cards.filter(c=>t==='all'||c.type===t).length;
-  let h = `<div class="page-h"><div><div class="eyebrow">${n('dish')} Gerichte · ${n('semi')} Basisrezepte</div><h1>Rezepturen</h1></div>
-    <div class="row-btns"><button type="button" class="btn" data-act="newCard" data-id="semi">${ico('plus')}Basisrezept</button><button type="button" class="btn primary" data-act="newCard" data-id="dish">${ico('plus')}Gericht</button></div></div>
-  <div class="toolbar"><label class="search">${ico('search')}<input id="cq" type="search" placeholder="Rezeptur suchen" value="${esc(view.q)}" autocomplete="off"></label>
-    ${seg('ctype', view.ctype, [['all','Alle',n('all')],['dish','Gerichte',n('dish')],['semi','Basisrezepte',n('semi')]])}</div>`;
-  if(!list.length) return h + `<div class="panel empty">Keine Rezepturen gefunden. Legen Sie eine mit „Gericht“ an.</div>`;
-  h += `<div class="rc-grid">`;
-  for(const c of list){
-    const t = totals(c);
-    const per100 = c.yieldG ? t.cost / c.yieldG * 100 : 0;
-    const mk = S.menu.filter(m => m.card === c.id).map(menuCalc)[0];
-    h += `<button type="button" class="rc" data-act="openCard" data-id="${c.id}">
-      <span class="rc-ph">${photo(c.img, c.name, c.category)}${c.type==='dish' && !mk ? '<span class="vb off">nicht auf der Karte</span>' : ''}</span>
-      <span class="rc-body">
-      <span class="rc-top"><span class="tag ${c.type}">${c.type==='semi'?'Basisrezept':'Gericht'} · Nr. ${c.no||'—'}</span>${c.type==='dish'?`<span class="fcw sm">${ring(mk?mk.fc:null,28,4)}<b class="mono">${mk?pct(mk.fc):'—'}</b></span>`:''}</span>
-      <span class="rc-n">${esc(c.name)}</span>
-      <span class="rc-m">${catDot(c.category)}${esc(c.category||'ohne Kategorie')} · ${c.items.length} Zutaten · ${(c.steps||[]).length} Schritte</span>
-      <span class="rc-b"><span><b class="mono">${eur(t.cost)}</b><small>${c.type==='semi'?'pro Charge':'pro Portion'}</small></span><span><b class="mono">${eur(per100)}</b><small>pro 100 g</small></span></span>
-      </span>
-    </button>`;
-  }
-  return h + `</div>`;
-}
-
+/* ---------- Rezeptur ---------- */
 function refOptions(sel, selfId){
   const ps = [...S.products].sort(byName);
   const cs = S.cards.filter(c => c.type==='semi' && c.id!==selfId).sort(byName);
@@ -429,7 +273,6 @@ function renderCard(c){
     ${c.type==='dish' ? `<div class="hero-ring">${ring(k0?k0.fc:null,112,10)}<span><b class="mono">${k0?pct(k0.fc):'—'}</b><small>${k0?'Wareneinsatz':'nicht auf der Karte'}</small></span></div>` : ''}
     <div class="hero-acts">
       ${FRAMED ? '' : `<button type="button" class="icon-btn lg" data-act="printCard" data-id="${c.id}" title="Rezeptur drucken" aria-label="Rezeptur drucken">${ico('print')}</button>`}
-      <button type="button" class="icon-btn lg" data-act="dupCard" data-id="${c.id}" title="Duplizieren" aria-label="Duplizieren">${ico('copy')}</button>
       <button type="button" class="icon-btn lg danger" data-act="delCard" data-id="${c.id}" title="Löschen" aria-label="Löschen">${ico('trash')}</button>
     </div>
   </div>
@@ -462,7 +305,7 @@ function renderCard(c){
         <input id="sim" type="range" min="${smin}" max="${smax}" step="0.1" value="${view.sim.price}" aria-label="Verkaufspreis">
         <div class="range-l"><span>${eur(smin)}</span><span>${eur(smax)}</span></div>
         <div id="simOut">${simHtml(t.cost, +view.sim.price)}</div>
-        <p class="hint">Für ${num(S.settings.target)} % Wareneinsatz: <button type="button" class="link" data-act="simTo" data-id="${rec.toFixed(1)}">${eur(rec)}</button></p>
+        <p class="hint">Für ${num(S.settings.target)} % Wareneinsatz: <button type="button" class="link" data-act="simTo" data-id="${(Math.round(rec*10)/10).toFixed(1)}">${eur(Math.round(rec*10)/10)}</button></p>
       </section>` : ''}
       <section class="panel">
         <div class="panel-h"><h2>Kostenstruktur</h2></div>
@@ -485,42 +328,44 @@ function renderCard(c){
 }
 
 /* ---------- Lager ---------- */
+/* Ware: Bestand, Inventur, Buchungen. Der Kopf mit den sechs Reitern kommt aus nav.js (wareHead). */
 function renderStock(){
-  const low = lowStock(), last = S.inventories[0];
-  const week = S.moves.filter(m => m.type==='in' && (Date.now()-new Date(m.date))/864e5 <= 7).reduce((s,m)=>s+m.qty*m.price, 0);
-  const head = `<div class="page-h"><div><div class="eyebrow">${stockProducts().length} Artikel · ${Object.keys(LOCS).length} Lagerorte</div><h1>Lager</h1></div>
-    <div class="row-btns"><button type="button" class="btn" data-act="sales">${ico('cart')}Verkäufe buchen</button><button type="button" class="btn" data-act="moveDlg" data-id="waste">${ico('trash')}Schwund</button><button type="button" class="btn primary" data-act="moveDlg" data-id="in">${ico('truck')}Wareneingang</button></div></div>
-  ${demoNote()}
-  <div class="tiles">
-    <div class="tile"><div><div class="t-v">${eur(stockValue())}</div><div class="t-l">Lagerwert</div><div class="t-s">zu Einkaufspreisen</div></div></div>
-    <button type="button" class="tile click" data-act="stab" data-id="bestellung"><div><div class="t-v ${low.length?'bad-t':'good-t'}">${low.length}</div><div class="t-l">unter Mindestbestand</div><div class="t-s">${low.length?'Bestellvorschlag →':'Alles vorrätig'}</div></div></button>
-    <div class="tile"><div><div class="t-v">${eur(week)}</div><div class="t-l">Wareneingang 7 Tage</div><div class="t-s">${S.moves.filter(m=>m.type==='in').length} Lieferungen gesamt</div></div></div>
-    <button type="button" class="tile click" data-act="stab" data-id="inventur"><div><div class="t-v ${last&&last.diff<0?'bad-t':''}">${last?eur(last.diff):'—'}</div><div class="t-l">Differenz letzte Inventur</div><div class="t-s">${S.invDraft?'Inventur läuft →':last?fmtDate(last.date):'Noch keine Inventur'}</div></div></button>
-  </div>
-  <div class="toolbar">${seg('stab', view.stab, [['bestand','Bestand'],['buchungen','Buchungen',S.moves.length],['inventur','Inventur'],['bestellung','Bestellung',low.length]])}</div>`;
-  return head + ({bestand:stockList, buchungen:moveList, inventur:invView, bestellung:orderView}[view.stab] || stockList)();
+  if(!['bestand','inventur','buchungen'].includes(view.stab)) view.stab = 'bestand';
+  const t = view.stab; const d = S.invDraft;
+  const btn = t === 'bestand' ? `<button type="button" class="btn primary" data-act="moveDlg" data-id="waste">Schwund buchen</button>`
+    : t === 'inventur' && !d ? `<button type="button" class="btn primary" data-act="invStart">${ico('clip')}Inventur starten</button>` : '';
+  return wareHead(btn) + ({bestand:stockList, buchungen:moveList, inventur:invView}[t])();
 }
 function levelBar(p){ const s = +p.stock||0, mn = +p.minStock||0; const w = mn ? Math.min(100, s/(mn*2)*100) : 100; const cls = mn && s < mn*0.5 ? 'bad' : mn && s < mn ? 'warn' : 'good'; return `<span class="lvl"><i class="${cls}" style="width:${w.toFixed(1)}%"></i>${mn?`<em style="left:50%"></em>`:''}</span>`; }
+const STOCK_SORTS = [['','Lagerort, dann Name'],['name','Name'],['low','Unter Mindestbestand zuerst'],['value','Wert']];
 function stockList(){
   const q = view.pq.trim().toLowerCase();
-  const all = stockProducts();
-  const list = all.filter(p => (view.loc==='all' || p.loc===view.loc) && (!q || (p.name+' '+p.supplier).toLowerCase().includes(q))).sort((a,b)=> (a.loc||'').localeCompare(b.loc||'') || byName(a,b));
+  const all = stockProducts(); const low = lowStock().length; const sCol = (SORTS.stock && SORTS.stock.col) || '';
+  const val = p => Math.max(0,+p.stock||0)*(+p.price||0); const isLow = p => (+p.minStock||0) > 0 && (+p.stock||0) < +p.minStock;
+  let list = all.filter(p => (view.loc==='all' || p.loc===view.loc) && (!q || (p.name+' '+supName(p)).toLowerCase().includes(q)));
+  list = sCol === 'name' ? list.sort(byName) : sCol === 'value' ? list.sort((a,b)=>val(b)-val(a)) : sCol === 'low' ? list.sort((a,b)=>isLow(b)-isLow(a) || byName(a,b)) : list.sort((a,b)=> (a.loc||'').localeCompare(b.loc||'') || byName(a,b));
   const chip = (k,l,n) => `<button type="button" class="chip ${view.loc===k?'on':''}" data-act="loc" data-id="${k}">${l}<small>${n}</small></button>`;
-  return `<div class="toolbar"><label class="search">${ico('search')}<input id="pq" type="search" placeholder="Artikel oder Lieferant" value="${esc(view.pq)}" autocomplete="off"></label></div>
-  <div class="chips-row">${chip('all','Alle Lagerorte',all.length)}${Object.entries(LOCS).map(([k,l])=>chip(k,l,all.filter(p=>p.loc===k).length)).join('')}</div>
-  <section class="panel flush"><div class="tbl-wrap"><table class="stock">
-    <thead><tr><th>Artikel</th><th>Lagerort</th><th>Füllstand</th><th class="r">Bestand</th><th class="r">Mindest</th><th class="r">Wert</th><th></th></tr></thead>
-    <tbody>${list.map(p=>{ const low = (+p.minStock||0) && (+p.stock||0) < +p.minStock; return `<tr class="row ${low?'is-low':''}" data-act="editProd" data-id="${p.id}">
-      <td><b class="pn">${esc(p.name)}</b><small class="muted">${esc(p.supplier||'kein Lieferant')}</small></td>
-      <td><span class="tag">${esc(LOCS[p.loc]||'—')}</span></td>
+  const row = p => `<tr class="row ${isLow(p)?'is-low':''}" data-act="editProd" data-id="${p.id}">
+      <td><b class="pn">${esc(p.name)}</b><small class="muted">${esc(supName(p))}</small></td>
       <td>${levelBar(p)}</td>
       <td class="r mono ${(+p.stock||0)<0?'bad-t':''}">${qtyFmt(+p.stock||0,p)}</td>
       <td class="r mono muted">${qtyFmt(+p.minStock||0,p)}</td>
-      <td class="r mono">${eur(Math.max(0,+p.stock||0)*(+p.price||0))}</td>
+      <td class="r mono">${eur(val(p))}</td>
       <td class="nowrap"><button type="button" class="icon-btn" data-act="moveDlg" data-id="in:${p.id}" title="Wareneingang" aria-label="Wareneingang">${ico('plus')}</button><button type="button" class="icon-btn" data-act="moveDlg" data-id="out:${p.id}" title="Entnahme" aria-label="Entnahme">${ico('minus')}</button><button type="button" class="icon-btn" data-act="editProd" data-id="${p.id}" title="Artikel bearbeiten" aria-label="Artikel bearbeiten">${ico('edit')}</button></td>
-    </tr>`; }).join('') || '<tr><td colspan="7" class="muted">Nichts gefunden.</td></tr>'}</tbody>
-    <tfoot><tr><td colspan="5">Summe ${view.loc==='all'?'':esc(LOCS[view.loc])}</td><td class="r mono">${eur(list.reduce((s,p)=>s+Math.max(0,+p.stock||0)*(+p.price||0),0))}</td><td></td></tr></tfoot>
-  </table></div></section>`;
+    </tr>`;
+  // ohne Filter: nach Lagerort gruppiert, die Überschrift steht einmal, nicht in jeder Zeile
+  let body = '';
+  if(view.loc === 'all' && !sCol){ for(const [k,l] of Object.entries(LOCS).concat([['','Ohne Lagerort']])){ const part = list.filter(p => (LOCS[p.loc] ? p.loc : '') === k); if(part.length) body += `<tr class="grp"><td colspan="6">${esc(l)}<small>${part.length}</small></td></tr>` + part.map(row).join(''); } }
+  else body = list.map(row).join('');
+  return `<p class="fact">${all.length} Artikel · Lagerwert <b>${eur(stockValue())}</b>${low ? ` · <button type="button" class="link" data-act="goStock" data-id="bestellung">${low} unter Mindestbestand</button>` : ' · alles über Mindestbestand'}</p>
+  <div class="toolbar"><label class="search">${ico('search')}<input id="pq" type="search" placeholder="Artikel oder Lieferant" value="${esc(view.pq)}" autocomplete="off"></label></div>
+  <div class="chips-row">${chip('all','Alle Lagerorte',all.length)}${Object.entries(LOCS).map(([k,l])=>chip(k,l,all.filter(p=>p.loc===k).length)).join('')}</div>
+  <section class="panel flush"><div class="tbl-wrap"><table class="stock">
+    <thead><tr><th>Artikel</th><th>Füllstand</th><th class="r">Bestand</th><th class="r">Mindest</th><th class="r">Wert</th><th></th></tr></thead>
+    <tbody>${body || '<tr><td colspan="6" class="muted">Nichts gefunden.</td></tr>'}</tbody>
+    <tfoot><tr><td colspan="4">Summe ${view.loc==='all'?'':esc(LOCS[view.loc])}</td><td class="r mono">${eur(list.reduce((s,p)=>s+val(p),0))}</td><td></td></tr></tfoot>
+  </table></div></section>
+  ${moreOpts('stock', `<label class="f inl">Sortieren<select data-sel="ssort" aria-label="Sortieren">${STOCK_SORTS.map(([k,l]) => `<option value="${k}" ${sCol===k?'selected':''}>${l}</option>`).join('')}</select></label><button type="button" class="btn sm" data-act="sales">Verkäufe buchen</button><button type="button" class="btn sm" data-act="moveDlg" data-id="out">Entnahme buchen</button>`)}`;
 }
 function movesByDate(){ return S.moves.map((m,i)=>[m,i]).sort((a,b) => String(b[0].date).localeCompare(String(a[0].date)) || a[1]-b[1]).map(x=>x[0]); }
 function moveList(){
@@ -545,31 +390,28 @@ function moveList(){
   return `<div class="chips-row">${chip('all','Alle')}${Object.entries(MOVE).map(([k,l])=>chip(k,l)).join('')}</div>
   <section class="panel flush">${out.length ? `<ul class="moves">${out.join('')}</ul>` : '<div class="empty">Noch keine Buchungen.</div>'}</section>`;
 }
+/* Inventur: eine Zeile je Artikel, das Zählfeld steht vorne und ist groß, der Name bricht um statt abgeschnitten zu werden */
 function invView(){
   const d = S.invDraft;
   if(!d){
-    return `<div class="grid2"><section class="panel accent"><div class="panel-h"><h2>Neue Inventur</h2></div>
-      <p class="dlg-p">Die Zählliste ist nach Lagerorten sortiert, so gehen Sie einmal durch Kühlhaus, Tiefkühler und Lager. Tragen Sie die gezählte Menge ein; Differenzen in Menge und Euro erscheinen sofort. Nicht gezählte Artikel bleiben unverändert.</p>
-      <div class="row-btns" style="margin-top:14px"><button type="button" class="btn primary" data-act="invStart">${ico('clip')}Inventur starten</button></div></section>
-      <section class="panel"><div class="panel-h"><h2>Bisherige Inventuren</h2></div>
-      ${S.inventories.length ? `<ul class="todo">${S.inventories.map(i=>`<li><div class="inv-h"><span><b class="mono">${fmtDate(i.date)}</b><small class="muted">${i.counted} Artikel gezählt${i.demo?' · Demo':''}</small></span><span class="r"><b class="mono">${eur(i.value)}</b><small class="mono ${i.diff<0?'bad-t':'good-t'}">${signedEur(i.diff)}</small></span></div></li>`).join('')}</ul>` : '<p class="hint">Noch keine abgeschlossene Inventur.</p>'}
-      </section></div>`;
+    return `<p class="fact">Die Zählliste ist nach Lagerorten sortiert: einmal durch Kühlhaus, Tiefkühler und Lager gehen. Nicht gezählte Artikel bleiben unverändert.</p>
+      <h2 class="sec-h">Bisherige Inventuren</h2>
+      ${S.inventories.length ? `<ul class="rows inv-old">${S.inventories.map(i=>`<li class="rw"><span class="rw-lead mono">${fmtDate(i.date)}</span><span class="rw-main"><b>${i.counted} Artikel gezählt</b>${i.demo?'<small>Beispiel</small>':''}</span><span class="rw-meta mono">${eur(i.value)}</span><span class="rw-act mono ${i.diff<0?'bad-t':'good-t'}">${signedEur(i.diff)}</span></li>`).join('')}</ul>` : '<p class="hint">Noch keine abgeschlossene Inventur.</p>'}`;
   }
   const items = stockProducts().sort((a,b)=>(a.loc||'').localeCompare(b.loc||'') || byName(a,b));
   const done = items.filter(p => d.counts[p.id] !== undefined && d.counts[p.id] !== '').length;
   const diffSum = items.reduce((s,p)=>{ const c = d.counts[p.id]; return c===undefined||c==='' ? s : s + (c-(+p.stock||0))*(+p.price||0); }, 0);
-  let h = `<section class="panel inv-bar"><div><div class="eyebrow">Inventur seit ${fmtDate(d.date)}</div><b class="mono" id="invProg">${done} / ${items.length}</b> gezählt · Differenz <b class="mono ${diffSum<0?'bad-t':''}" id="invDiff">${signedEur(diffSum)}</b>
-    <div class="meter"><i id="invMeter" style="width:${(done/items.length*100).toFixed(1)}%"></i></div></div>
-    <div class="row-btns"><button type="button" class="btn" data-act="invCancel">Verwerfen</button><button type="button" class="btn primary" data-act="invFinish">Inventur abschließen</button></div></section>`;
-  for(const [k,l] of Object.entries(LOCS)){
-    const list = items.filter(p=>p.loc===k); if(!list.length) continue;
-    h += `<h2 class="sec-h">${esc(l)}<small class="muted sm">${list.length} Artikel</small></h2><section class="panel flush"><div class="tbl-wrap"><table class="inv">
-      <thead><tr><th>Artikel</th><th class="r">Soll</th><th class="r">Ist gezählt</th><th class="r">Differenz</th><th class="r">Wert</th></tr></thead><tbody>
-      ${list.map(p=>{ const c = d.counts[p.id]; const has = c!==undefined && c!==''; const df = has ? c-(+p.stock||0) : 0; return `<tr id="ir-${p.id}" class="${has?'counted':''}">
-        <td><b class="pn">${esc(p.name)}</b></td><td class="r mono muted">${qtyFmt(+p.stock||0,p)}</td>
-        <td class="r"><span class="qty"><input id="inv-${p.id}" class="num-in" type="text" inputmode="decimal" data-num="de" data-msg="Ungültige Zählmenge, nicht übernommen" data-inv="${p.id}" data-old="${has?numIn(c):''}" value="${has?numIn(c):''}" placeholder="—" aria-label="Gezählt ${esc(p.name)}"><em>${esc(p.unit)}</em></span></td>
-        <td class="r mono idf ${df<0?'bad-t':df>0?'good-t':''}">${has?(df>0?'+':'')+qtyFmt(df,p):''}</td><td class="r mono idv ${df<0?'bad-t':df>0?'good-t':''}">${has?eur(df*(+p.price||0)):''}</td></tr>`; }).join('')}
-      </tbody></table></div></section>`;
+  let h = `<section class="inv-bar" id="invBar"><div class="inv-bar-t"><span><b class="mono" id="invProg">${done} / ${items.length}</b> gezählt · Differenz <b class="mono ${diffSum<0?'bad-t':''}" id="invDiff">${signedEur(diffSum)}</b></span>
+    <span class="row-btns"><button type="button" class="btn sm" data-act="invCancel">Verwerfen</button><button type="button" class="btn sm primary" data-act="invFinish">Abschließen</button></span></div>
+    <div class="meter"><i id="invMeter" style="width:${(done/items.length*100).toFixed(1)}%"></i></div></section>`;
+  for(const [k,l] of Object.entries(LOCS).concat([['','Ohne Lagerort']])){
+    const list = items.filter(p => (LOCS[p.loc] ? p.loc : '') === k); if(!list.length) continue;
+    h += `<h2 class="sec-h">${esc(l)}<small class="muted sm">${list.length} Artikel</small></h2><ul class="inv-l">
+      ${list.map(p=>{ const c = d.counts[p.id]; const has = c!==undefined && c!==''; const df = has ? c-(+p.stock||0) : 0; const cls = df<0?'bad-t':df>0?'good-t':''; return `<li id="ir-${p.id}" class="${has?'counted':''}">
+        <span class="qty inv-q"><input id="inv-${p.id}" class="num-in" type="text" inputmode="decimal" data-num="de" data-msg="Ungültige Zählmenge, nicht übernommen" data-inv="${p.id}" data-old="${has?numIn(c):''}" value="${has?numIn(c):''}" placeholder="—" aria-label="Gezählt ${esc(p.name)}"><em>${esc(p.unit)}</em></span>
+        <span class="inv-n"><b class="pn">${esc(p.name)}</b><small class="muted">Soll ${qtyFmt(+p.stock||0,p)}</small></span>
+        <span class="inv-d"><span class="mono idf ${cls}">${has?(df>0?'+':'')+qtyFmt(df,p):''}</span><span class="mono idv ${cls}">${has?eur(df*(+p.price||0)):''}</span></span></li>`; }).join('')}
+      </ul>`;
   }
   return h;
 }
@@ -577,71 +419,16 @@ function invUpdate(pid){
   const d = S.invDraft, p = P(pid), row = $('#ir-'+pid); const c = d.counts[pid]; const has = c!==undefined && c!=='';
   const df = has ? c-(+p.stock||0) : 0; const cls = df<0?'bad-t':df>0?'good-t':'';
   row.classList.toggle('counted', has);
-  const a = row.querySelector('.idf'), b = row.querySelector('.idv'); a.className = 'r mono idf '+cls; b.className = 'r mono idv '+cls;
+  const a = row.querySelector('.idf'), b = row.querySelector('.idv'); a.className = 'mono idf '+cls; b.className = 'mono idv '+cls;
   a.textContent = has ? (df>0?'+':'')+qtyFmt(df,p) : ''; b.textContent = has ? eur(df*(+p.price||0)) : '';
   const items = stockProducts(); const done = items.filter(x => d.counts[x.id] !== undefined && d.counts[x.id] !== '').length;
   const sum = items.reduce((s,x)=>{ const v = d.counts[x.id]; return v===undefined||v==='' ? s : s + (v-(+x.stock||0))*(+x.price||0); }, 0);
   $('#invProg').textContent = `${done} / ${items.length}`; $('#invDiff').textContent = signedEur(sum); $('#invDiff').className = 'mono '+(sum<0?'bad-t':''); $('#invMeter').style.width = (done/items.length*100).toFixed(1)+'%';
 }
-function orderView(){
-  const low = lowStock();
-  if(!low.length) return `<section class="panel empty">Alle Artikel sind über dem Mindestbestand. Mindestbestände stellen Sie im Artikel ein.</section>`;
-  const groups = {}; low.forEach(p => { const s = p.supplier || 'Ohne Lieferant'; (groups[s] = groups[s] || []).push(p); });
-  return `<p class="hint" style="margin:0 0 14px">Vorschlag: auffüllen auf den doppelten Mindestbestand. Mengen anpassen, Text kopieren und per Mail oder WhatsApp senden. Kommt die Lieferung, buchen Sie sie mit einem Klick ein.</p>
-  <div class="ord-grid">${Object.entries(groups).map(([s,list])=>`<section class="panel">
-    <div class="panel-h"><h2>${ico('truck')} ${esc(s)}</h2><span class="muted sm">${list.length} Artikel</span></div>
-    <ul class="ord">${list.map(p=>{ const q = view.order[p.id] ?? orderSuggest(p); return `<li><span><b>${esc(p.name)}</b><small class="muted">Bestand ${qtyFmt(+p.stock||0,p)} · Mindest ${qtyFmt(+p.minStock||0,p)}</small></span>
-      <span class="qty"><input id="ord-${p.id}" type="number" step="any" min="0" data-ord="${p.id}" value="${q}" aria-label="Bestellmenge"><em>${esc(p.unit)}</em></span></li>`; }).join('')}</ul>
-    <div class="kv"><span>Geschätzter Einkauf</span><span>${eur(list.reduce((t,p)=>t+(view.order[p.id] ?? orderSuggest(p))*(+p.price||0),0))}</span></div>
-    <div class="row-btns" style="margin-top:12px"><button type="button" class="btn" data-act="ordCopy" data-id="${esc(s)}">${ico('copy')}Bestelltext</button><button type="button" class="btn primary" data-act="ordBook" data-id="${esc(s)}">${ico('truck')}Lieferung einbuchen</button></div>
-  </section>`).join('')}</div>`;
-}
-function orderText(s){
-  const list = lowStock().filter(p => (p.supplier||'Ohne Lieferant')===s);
-  return `Bestellung ${S.settings.name}\nLieferant: ${s}\nGewünschte Lieferung: ________\n\n${list.map(p=>`• ${p.name}: ${num(view.order[p.id] ?? orderSuggest(p),2)} ${p.unit}`).join('\n')}\n\nDanke und liebe Grüße\nKüche ${S.settings.name}`;
-}
 
 /* ---------- Produkte ---------- */
-function renderProducts(){
-  const q = view.pq.trim().toLowerCase();
-  const list = S.products.filter(p => !q || p.name.toLowerCase().includes(q)).sort(byName);
-  return `<div class="page-h"><div><div class="eyebrow">${S.products.length} Produkte · Preise exkl. MwSt.</div><h1>Produkte</h1></div>
-    <button type="button" class="btn primary" data-act="newProd">${ico('plus')}Produkt</button></div>
-  ${demoNote()}
-  <div class="toolbar"><label class="search">${ico('search')}<input id="pq" type="search" placeholder="Produkt suchen" value="${esc(view.pq)}" autocomplete="off"></label></div>
-  <section class="panel flush"><div class="tbl-wrap"><table class="prods">
-    <thead><tr><th>Produkt</th><th class="r">Preis €</th><th class="r">Putzverlust</th><th class="r">Garverlust</th><th>Allergene</th><th class="r">Rezepturen</th><th></th></tr></thead>
-    <tbody>${list.map(p=>{ const u = usage('p:'+p.id).length; return `<tr>
-      <td><b class="pn">${esc(p.name)}</b><small class="muted">${p.unit==='Stk'&&p.pieceG?`je Stk · ${num(p.pieceG)} g`:`je ${esc(p.unit)}`}${p.supplier?' · '+esc(p.supplier):''}</small></td>
-      <td class="r"><span class="qty"><input id="pp-${p.id}" type="number" step="0.01" min="0" inputmode="decimal" data-pp="${p.id}" data-pf="price" value="${esc(p.price)}" aria-label="Preis"><em>€</em></span></td>
-      <td class="r"><span class="qty"><input id="plc-${p.id}" type="number" step="any" min="0" max="100" data-pp="${p.id}" data-pf="lossCold" value="${esc(p.lossCold)}" aria-label="Putzverlust"><em>%</em></span></td>
-      <td class="r"><span class="qty"><input id="plh-${p.id}" type="number" step="any" min="0" max="100" data-pp="${p.id}" data-pf="lossHot" value="${esc(p.lossHot)}" aria-label="Garverlust"><em>%</em></span></td>
-      <td>${chips(new Set(algList(p.alg)))}</td>
-      <td class="r"><span class="cnt ${u?'':'zero'}">${u}</span></td>
-      <td><button type="button" class="icon-btn" data-act="editProd" data-id="${p.id}" title="Bearbeiten" aria-label="Produkt bearbeiten">${ico('edit')}</button></td>
-    </tr>`; }).join('') || `<tr><td colspan="7" class="muted">Nichts gefunden.</td></tr>`}</tbody>
-  </table></div></section>
-  <p class="hint">Preis ändern, und Wareneinsatz aller Rezepturen und der ganzen Speisekarte wird sofort neu berechnet.</p>`;
-}
 
 /* ---------- Einstellungen ---------- */
-function renderSetup(){
-  const n = Object.keys(IMG).length;
-  return `<div class="page-h"><div><div class="eyebrow">Betrieb & Daten</div><h1>Einstellungen</h1></div></div>
-  <div class="grid2">
-    <section class="panel"><div class="panel-h"><h2>Kalkulation</h2></div><div class="fields">
-      <label class="f">Name des Betriebs<input id="s-name" data-sf="name" value="${esc(S.settings.name)}"></label>
-      <label class="f">MwSt. Speisen, %<input id="s-vat" data-sf="vat" type="number" step="any" min="0" value="${esc(S.settings.vat)}"></label>
-      <label class="f">Ziel-Wareneinsatz, %<input id="s-target" data-sf="target" type="number" step="any" min="1" value="${esc(S.settings.target)}"></label>
-    </div><p class="hint">In Österreich gilt für Speisen der ermäßigte Steuersatz von 10 %. Der Wareneinsatz wird vom Preis exkl. MwSt. berechnet.</p></section>
-    <section class="panel"><div class="panel-h"><h2>Daten</h2><span class="muted sm">${n} Fotos gespeichert</span></div>
-      <p class="hint">Daten und Fotos werden nur in diesem Browser gespeichert. Erstellen Sie regelmäßig eine Sicherung und übertragen Sie sie per Import auf andere Geräte.</p>
-      <div class="row-btns wrap" style="margin-top:12px"><button type="button" class="btn" data-act="export">Sicherung erstellen</button>
-        <label class="btn" for="importFile">Sicherung laden</label><input id="importFile" type="file" accept="application/json,.json" hidden>
-        <button type="button" class="btn danger" data-act="reset">Demodaten wiederherstellen</button></div>
-    </section>
-  </div>`;
-}
 
 /* ---------- Dialoge ---------- */
 function openDialog(title, body, onOk, opts={}){
@@ -684,8 +471,8 @@ function ask(text, yes, ok='Löschen'){ openDialog('Bitte bestätigen', `<p clas
 function info(title, text){ openDialog(title, `<p class="dlg-p">${esc(text)}</p>`, null, {cancel:'OK'}); }
 
 function menuDialog(m, prefill){
-  const isNew = !m; m = m || {id:uid('m'), section:'', name:'', desc:'', price:'', card:'', img:'', veg:'', top:false, hidden:false, ...(prefill||{})};
-  if(isNew && !m.section && !['all','none','over','nophoto'].includes(view.sec)) m.section = view.sec;
+  const isNew = !m; m = m || {id:uid('m'), section:'', name:'', desc:'', price:'', card:'', img:'', veg:'', top:false, hidden:false, seasons:[], days:[], alg:'', ...(prefill||{})};
+  if(isNew && !m.section && secList().includes(view.sec)) m.section = view.sec;
   let img = m.img;
   const opts = S.cards.filter(c=>c.type==='dish').sort(byName);
   const thumb = () => img && IMG[img] ? `<img src="${IMG[img]}" alt="">` : `<span class="muted sm">${m.card && C(m.card)?.img ? 'Foto der Rezeptur wird verwendet' : 'Kein Foto'}</span>`;
@@ -703,11 +490,14 @@ function menuDialog(m, prefill){
       <label class="tog"><input type="radio" name="veg" value="v" ${m.veg==='v'?'checked':''}><span></span>Vegetarisch</label>
       <label class="tog"><input type="radio" name="veg" value="vg" ${m.veg==='vg'?'checked':''}><span></span>Vegan</label>
     </div>
+    <div class="f">Saison</div><div class="algs seasons">${SEASONS.map(([k,l])=>`<label class="algc"><input type="checkbox" name="sea" value="${k}" ${!m.seasons.length||m.seasons.includes(k)?'checked':''}><span>${l}</span></label>`).join('')}</div>
+    <div class="f">Wochentage</div><div class="days">${DAYS.map(([i,l])=>`<label class="algc"><input type="checkbox" name="day" value="${i}" ${!m.days.length||m.days.includes(i)?'checked':''}><span>${l}</span></label>`).join('')}</div>
+    <details class="alg-det" ${!m.card && !algList(m.alg).length ? 'open' : ''}><summary>Allergene von Hand (wenn keine Rezeptur verknüpft ist)</summary><div class="algs">${Object.entries(ALG).map(([k,v])=>`<label class="algc"><input type="checkbox" name="alg" value="${k}" ${algList(m.alg).includes(k)?'checked':''}><span><b>${k}</b>${esc(v)}</span></label>`).join('')}</div></details>
     <div class="togs"><label class="tog"><input type="checkbox" name="top" ${m.top?'checked':''}><span></span>Empfehlung des Hauses</label>
       <label class="tog"><input type="checkbox" name="show" ${m.hidden?'':'checked'}><span></span>Auf der Gästekarte zeigen</label></div>`,
     fd => { const sec = fd.get('section'); if(isNew || sec !== m.section) m.order = nextOrder(sec);
       if(m.img && m.img !== img) imgDel(m.img);
-      Object.assign(m, {section:sec, name:fd.get('name').trim(), desc:fd.get('desc').trim(), price:+fd.get('price'), card:fd.get('card'), img, veg:fd.get('veg')||'', top:!!fd.get('top'), hidden:!fd.get('show')}); if(isNew) S.menu.push(m); },
+      Object.assign(m, {section:sec, name:fd.get('name').trim(), desc:fd.get('desc').trim(), price:+fd.get('price'), card:fd.get('card'), img, veg:fd.get('veg')||'', top:!!fd.get('top'), hidden:!fd.get('show'), seasons: fd.getAll('sea').length===4 ? [] : fd.getAll('sea'), days: fd.getAll('day').length===7 ? [] : fd.getAll('day').map(Number), alg: fd.getAll('alg').join(' ')}); if(isNew) S.menu.push(m); },
     {done: isNew ? ()=>`„${m.name}“ steht jetzt unter ${m.section}` : 'Gespeichert',
      del: isNew ? null : () => ask(`„${m.name}“ von der Speisekarte löschen? Die Rezeptur bleibt erhalten.`, () => { imgDel(m.img); S.menu = S.menu.filter(x=>x!==m); }),
      after: f => { const bind = () => { $('#dlgPhoto').onclick = () => pickImage(data => { const id = uid('img'); imgPut(id, data); img = id; $('#dlgThumb').innerHTML = thumb(); }); const del = $('#dlgPhotoDel'); if(del) del.onclick = () => { img = ''; $('#dlgThumb').innerHTML = thumb(); }; }; bind(); }});
@@ -728,13 +518,17 @@ function prodDialog(p){
     </div>
     <div class="fields">
       <label class="f">Lagerort<select name="loc">${Object.entries(LOCS).map(([k,l])=>`<option value="${k}" ${p.loc===k?'selected':''}>${l}</option>`).join('')}</select></label>
-      <label class="f">Lieferant<input name="supplier" list="sups" value="${esc(p.supplier)}"><datalist id="sups">${sups.map(s=>`<option value="${esc(s)}">`).join('')}</datalist></label>
+      <label class="f">Lieferant<select name="supplier"><option value="">— keiner —</option>${(S.suppliers||[]).map(s=>`<option value="${s.id}" ${p.supplier===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select></label>
+      <label class="f">Artikelnummer beim Lieferanten<input name="artNo" value="${esc(p.artNo||'')}"></label>
+      <label class="f">Gebinde<input name="pack" value="${esc(p.pack||'')}" placeholder="z. B. Sack 10 kg"></label>
+      <label class="f">Inhalt Gebinde in ${esc(p.unit)}<input name="packQty" class="num-in" type="text" inputmode="decimal" value="${numIn(p.packQty||'')}"></label>
       <label class="f">Mindestbestand<input name="minStock" class="num-in" type="text" inputmode="decimal" value="${numIn(p.minStock)}"></label>
       ${isNew?`<label class="f">Anfangsbestand<input name="stock" class="num-in" type="text" inputmode="decimal" value="0"></label>`:''}
     </div>
     <div class="f">Allergene</div>
-    <div class="algs">${Object.entries(ALG).map(([k,v])=>`<label class="algc"><input type="checkbox" name="alg" value="${k}" ${has.has(k)?'checked':''}><span><b>${k}</b>${esc(v)}</span></label>`).join('')}</div>`,
-    fd => { Object.assign(p, {name:fd.get('name').trim(), unit:fd.get('unit'), price:+fd.get('price'), pieceG:fd.get('pieceG'), lossCold:+fd.get('lossCold')||0, lossHot:+fd.get('lossHot')||0, alg:fd.getAll('alg').join(' '), loc:fd.get('loc'), supplier:fd.get('supplier').trim(), minStock:+fd.get('minStock')||0});
+    <div class="algs">${Object.entries(ALG).map(([k,v])=>`<label class="algc"><input type="checkbox" name="alg" value="${k}" ${has.has(k)?'checked':''}><span><b>${k}</b>${esc(v)}</span></label>`).join('')}</div>
+    <div class="togs"><label class="tog"><input type="checkbox" name="basic" ${p.basic===true?'checked':''}><span></span>Grundzutat wie Salz, Gewürze, Öl: steht nicht auf der Prep-Liste</label></div>`,
+    fd => { if(+fd.get('price') !== +p.price) markPrice(p, 'manuell'); Object.assign(p, {name:fd.get('name').trim(), unit:fd.get('unit'), price:+fd.get('price'), pieceG:fd.get('pieceG'), lossCold:+fd.get('lossCold')||0, lossHot:+fd.get('lossHot')||0, alg:fd.getAll('alg').join(' '), basic: fd.get('basic') ? true : (p.basic === true ? false : p.basic), loc:fd.get('loc'), supplier:fd.get('supplier'), artNo:fd.get('artNo').trim(), pack:fd.get('pack').trim(), packQty:+fd.get('packQty')||0, minStock:+fd.get('minStock')||0});
       if(isNew){ p.stock = 0; S.products.push(p); const s = +fd.get('stock')||0; if(s) addMove('in', p.id, s, 'Anfangsbestand'); } },
     {del: isNew ? null : () => { const u = usage('p:'+p.id); if(u.length) return info('Produkt wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(c=>c.name).join(', ')}. Entfernen Sie es dort zuerst.`); ask(`Produkt „${p.name}“ löschen?`, () => { S.products = S.products.filter(x=>x!==p); }); }});
 }
@@ -770,10 +564,10 @@ function moveDlg(arg){
 }
 
 /* Verkaufsbuchung: eine Buchung = eine Einheit (S.saleGroups[grp]), Storno macht alles rückgängig */
-const DEMO_SALES_OPT = ['Demo-Verkäufe löschen (empfohlen)', 'Demo-Verkäufe behalten'];
+const DEMO_SALES_OPT = ['Beispielverkäufe löschen (empfohlen)', 'Beispielverkäufe behalten'];
 function demoSalesDays(){ const real = S.salesReal || {}; return Object.keys(S.salesDays||{}).filter(d => !real[d]); }
-function demoSalesText(n){ return `Es sind noch ${plural(n,'Tag','Tage')} mit erfundenen Demo-Verkäufen gespeichert. Echte und erfundene Zahlen sollten nicht gemischt werden.`; }
-function demoSalesAskHtml(){ const n = demoSalesDays().length; return `<fieldset class="demo-ask"><legend>Demo-Verkäufe</legend><p class="dlg-p">${demoSalesText(n)}</p><div class="togs" style="flex-direction:column;align-items:flex-start"><label class="tog"><input type="radio" name="demoSales" value="del" required><span></span>${DEMO_SALES_OPT[0]}</label><label class="tog"><input type="radio" name="demoSales" value="keep" required><span></span>${DEMO_SALES_OPT[1]}</label></div></fieldset>`; }
+function demoSalesText(n){ return `Es sind noch ${plural(n,'Tag','Tage')} mit erfundenen Beispielverkäufen gespeichert. Echte und erfundene Zahlen sollten nicht gemischt werden.`; }
+function demoSalesAskHtml(){ const n = demoSalesDays().length; return `<fieldset class="demo-ask"><legend>Beispielverkäufe</legend><p class="dlg-p">${demoSalesText(n)}</p><div class="togs" style="flex-direction:column;align-items:flex-start"><label class="tog"><input type="radio" name="demoSales" value="del" required><span></span>${DEMO_SALES_OPT[0]}</label><label class="tog"><input type="radio" name="demoSales" value="keep" required><span></span>${DEMO_SALES_OPT[1]}</label></div></fieldset>`; }
 function clearDemoSales(){ const ds = demoSalesDays(); ds.forEach(d => { delete S.salesDays[d]; }); S.salesDemo = false; return ds.length; }
 function markRealDay(d){ S.salesReal = S.salesReal || {}; S.salesReal[d] = 1; }
 function salesDlg(){
@@ -840,10 +634,9 @@ function printCard(id){
     <tfoot><tr><td></td><td>Summe</td><td class="r">${num(t.gross)}</td><td></td><td class="r">${num(t.net)}</td><td class="r">${num(t.out)}</td><td class="r">${num(t.cost,2)}</td></tr></tfoot></table>
     <h2>Zubereitung</h2><ol class="pr-steps">${(c.steps||[]).map(s=>`<li>${esc(s.t)}${s.img&&IMG[s.img]?`<br><img src="${IMG[s.img]}" alt="">`:''}</li>`).join('')}</ol>
     <p><b>Allergene:</b> ${[...t.alg].sort().map(a=>`${a} (${ALG[a]||''})`).join(', ') || 'keine'}</p>
-    <div class="sign"><span>Küchenchef ____________</span><span>Kalkulation ____________</span></div>`;
+    <div class="sign"><span>Küche ____________</span><span>Kalkulation ____________</span></div>`;
   document.body.classList.remove('print-menu'); window.print();
 }
-function printMenu(){ $('#print').innerHTML = guestHtml(); document.body.classList.add('print-menu'); window.print(); }
 
 function backupName(){ return 'dahuam202-kueche-'+todayStr()+'.json'; }
 function exportData(){
@@ -857,7 +650,6 @@ function exportData(){
   $('#copyBtn').onclick = () => { const txt = json(); const fb = () => { let ta = $('#expTxt'); if(!ta){ ta = document.createElement('textarea'); ta.id = 'expTxt'; ta.className = 'code'; ta.readOnly = true; ta.setAttribute('aria-label','Sicherung als Text'); $('#expMsg').insertAdjacentElement('afterend', ta); } ta.value = txt; ta.select(); toast('Text markiert, mit Strg+C kopieren'); }; const pr = navigator.clipboard?.writeText(txt); if(pr) pr.then(()=>toast('Kopiert'), fb); else fb(); };
 }
 /* Sicherheitskopie vor dem Überschreiben aller Daten (ohne Fotos; die bleiben im Browser gespeichert) */
-const SAFETY_KEY = KEY + '_safety';
 /* liegt seit Paket A in IndexedDB; safetyGet() liefert nur Datum, Anlass und Zähler, die Daten kommen über STORE.safetyData() */
 function safetyStore(why){ return STORE.safetyStore(why); }
 function safetyGet(){ return STORE.st.safety; }
@@ -874,17 +666,25 @@ async function safetyRestore(){ const sf = safetyGet(); if(!sf) return; let d = 
 /* ---------- Schnellsuche ---------- */
 let palSel = 0, palItems = [];
 function palData(){
+  const sec = (n, s, run) => ({g:'Bereich', n, s, run});
   return [
-    ...TABS.map(([k,l])=>({g:'Bereich', n:l, s:'', run:()=>go(k)})),
-    {g:'Bereich', n:'Gästekarte ansehen', s:'Speisekarte', run:()=>{ view.mtab='guest'; go('menu'); }},
-    {g:'Bereich', n:'Inventur', s:'Lager', run:()=>{ view.stab='inventur'; go('stock'); }},
-    {g:'Bereich', n:'Bestellvorschlag', s:'Lager', run:()=>{ view.stab='bestellung'; go('stock'); }},
-    {g:'Aktion', n:'Wareneingang buchen', s:'', run:()=>moveDlg('in')},
+    sec('Heute', NAV_DESC.dash, ()=>go('dash')), sec('Vorbereitung', NAV_DESC.vorb, ()=>go('vorb')), sec('Checklisten', NAV_DESC.checkl, ()=>go('checkl')),
+    sec('Speisekarte', NAV_DESC.menu, ()=>{ view.mtab='calc'; go('menu'); }),
+    sec('Gästekarte', 'Speisekarte: ansehen, gestalten, als PDF speichern', ()=>{ view.mtab='guest'; go('menu'); }),
+    sec('Saison & Aktionen', 'Speisekarte', ()=>{ view.mtab='plan'; go('menu'); }),
+    sec('Rezepte', NAV_DESC.cards, ()=>go('cards')),
+    ...WARE_TABS.map(w => sec(w[1], w[0] === 'bestand' ? 'Ware: ' + NAV_DESC.ware : 'Ware', ()=>wareGo(w[0]))),
+    sec('Dienstplan', 'Team & Zahlen', ()=>go('dienst')), sec('Auswertung', 'Team & Zahlen: was verkauft wurde', ()=>{ view.rp.tab='sales'; go('report'); }),
+    sec('Einstellungen', NAV_DESC.setup, ()=>go('setup')), sec('Einrichtung', 'Sechs Schritte, bis der Betrieb in der App steht', ()=>go('einr')),
+    {g:'Aktion', n:'Neue Aktion / Spezialität', s:'', run:()=>specialDialog()},
+    ...(S.suppliers||[]).map(sp=>({g:'Bestellen', n:sp.name, s:CHANNELS[sp.channel], run:()=>{ const o = newOrder(sp.id); save(); view.stab='bestellung'; view.order=o.id; go('buy'); }})),
+    {g:'Aktion', n:'Lieferung ohne Bestellung buchen', s:'Wareneingang', run:()=>moveDlg('in')},
     {g:'Aktion', n:'Verkäufe buchen', s:'', run:()=>salesDlg()},
     {g:'Aktion', n:'Schwund buchen', s:'', run:()=>moveDlg('waste')},
     {g:'Aktion', n:'Neues Gericht auf die Speisekarte', s:'', run:()=>menuDialog()},
     {g:'Aktion', n:'Neue Rezeptur anlegen', s:'', run:()=>newCard('dish')},
     {g:'Aktion', n:'Neues Produkt anlegen', s:'', run:()=>prodDialog()},
+    {g:'Aktion', n:'Preis-Check starten', s:'Richtwerte durch Ihre Preise ersetzen', run:()=>pcStart()},
     ...S.menu.map(m=>({g:'Speisekarte', n:dishLabel(m), s:eur(m.price)+' · '+m.section, run:()=> m.card ? go('cards', m.card) : menuDialog(m)})),
     ...S.cards.map(c=>({g:'Rezeptur', n:c.name, s:(c.type==='semi'?'Basisrezept':'Gericht')+' · Nr. '+c.no, run:()=>go('cards', c.id)})),
     ...S.products.map(p=>({g:'Produkt', n:p.name, s:p.noStock?eur(p.price):qtyFmt(+p.stock||0,p)+' auf Lager', run:()=>prodDialog(p)})),
@@ -905,10 +705,10 @@ function palDraw(){
 
 /* ---------- Navigation ---------- */
 function go(tab, card=null){
-  view = {...view, tab, card, q: tab===view.tab ? view.q : ''};
+  tab = tabResolve(tab);
+  view = {...view, tab, card, q: tab===view.tab ? view.q : '', pq: tab===view.tab ? view.pq : ''};
   if(card) view.sim = null;
-  try { if(location.hash.slice(1) !== tab) history.replaceState(null, '', '#'+tab); } catch(e){}
-  render(); window.scrollTo({top:0});
+  render(); hashSync(); window.scrollTo({top:0});
 }
 function setTheme(t){ document.documentElement.dataset.theme = t; try { localStorage.setItem(KEY+'_theme', t); } catch(e){} themeIcon(); }
 function themeIcon(){ const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme==='dark' : matchMedia('(prefers-color-scheme: dark)').matches; document.querySelectorAll('[data-act=theme]').forEach(b => { b.innerHTML = ico(dark?'sun':'moon'); b.title = dark ? 'Helles Design' : 'Dunkles Design'; }); return dark; }
@@ -916,7 +716,7 @@ function themeIcon(){ const dark = document.documentElement.dataset.theme ? docu
 /* ---------- Ereignisse ---------- */
 document.addEventListener('click', e => {
   const tab = e.target.closest('[data-tab]');
-  if(tab){ go(tab.dataset.tab); return; }
+  if(tab){ navGo(tab.dataset.tab); return; }
   const pi = e.target.closest('[data-pal]');
   if(pi){ const x = palItems[+pi.dataset.pal]; palClose(); x && x.run(); return; }
   if(e.target.id === 'pal'){ palClose(); return; }
@@ -931,14 +731,14 @@ document.addEventListener('click', e => {
     case 'goStock': view.stab = id; go('stock'); break;
     case 'sec': view.sec = id; render(); break;
     case 'mtab': view.mtab = id; render(); break;
-    case 'stab': view.stab = id; render(); break;
+    case 'stab': view.stab = id; view.order = null; view.recv = null; render(); break;
     case 'loc': view.loc = id; render(); break;
     case 'mtype': view.mtype = id; render(); break;
     case 'gstyle': S.settings.guest.style = id; save(); render(); break;
     case 'newMenu': menuDialog(); break;
     case 'editMenu': menuDialog(S.menu.find(m=>m.id===id)); break;
     case 'photoMenu': setPhoto(S.menu.find(m=>m.id===id)); break;
-    case 'toMenu': { const cc = C(id); const t = totals(cc); const rec = t.cost/(S.settings.target/100)*(1+S.settings.vat/100); const sec = secList().includes(cc.category) ? cc.category : secList()[0];
+    case 'toMenu': { const cc = C(id); const t = totals(cc); const rec = t.cost/(S.settings.target/100)*(1+S.settings.vat/100); const sec = secList().includes(cc.category) ? cc.category : secList().includes(SEC_MAP[cc.category]) ? SEC_MAP[cc.category] : secList()[0];
       menuDialog(null, {name:cc.name, section:sec, card:cc.id, price: Math.max(0.9, Math.ceil(rec) - 0.1).toFixed(2)}); break; }
     case 'openCard': go('cards', id); break;
     case 'backCards': go('cards'); break;
@@ -961,11 +761,6 @@ document.addEventListener('click', e => {
       ask(`Rezeptur „${src.name}“ löschen? Die Gerichte bleiben auf der Speisekarte, aber ohne Rezeptur.`, () => { imgDel(src.img); (src.steps||[]).forEach(s=>imgDel(s.img)); S.cards = S.cards.filter(x=>x.id!==id); S.menu.forEach(m=>{ if(m.card===id) m.card=''; }); view.card = null; }); break; }
     case 'printCard': printCard(id); break;
     case 'printMenu': printMenu(); break;
-    case 'addSec': { let n = 'Neue Kategorie', i = 2; while(secList().includes(n)) n = 'Neue Kategorie '+i++; S.settings.sections.push(n); save(); render(); setTimeout(()=>{ const inp = document.querySelector(`[data-secname="${S.settings.sections.length-1}"]`); inp?.focus(); inp?.select(); },0); break; }
-    case 'secMove': { const [i,d] = id.split(':').map(Number); const s = S.settings.sections; [s[i], s[i+d]] = [s[i+d], s[i]]; save(); render(); break; }
-    case 'secDel': S.settings.sections.splice(+id,1); save(); render(); toast('Kategorie gelöscht'); break;
-    case 'secSort': { const s = secList()[+id]; S.menu.filter(m=>m.section===s).sort((a,b)=>a.price-b.price).forEach((m,i)=>m.order=i); save(); render(); toast(`${s}: nach Preis sortiert`); break; }
-    case 'itemMove': { const [mid,d] = id.split(':'); moveItem(mid, +d); save(); render(); break; }
     case 'itemHide': { const m = S.menu.find(x=>x.id===id); m.hidden = !m.hidden; save(); render(); toast(m.hidden ? `„${m.name}“ ausgeblendet` : `„${m.name}“ wird angezeigt`); break; }
     case 'moveDlg': moveDlg(id); break;
     case 'sales': salesDlg(); break;
@@ -981,14 +776,10 @@ document.addEventListener('click', e => {
       ask(`Inventur mit ${items.length} gezählten Artikeln abschließen? Differenz: ${signedEur(diff)}${diff < -0.005 ? ' (Fehlbestand)' : diff > 0.005 ? ' (Mehrbestand)' : ''}. Die Bestände werden auf die gezählten Mengen gesetzt.`, () => {
         items.forEach(p => { const df = d.counts[p.id]-(+p.stock||0); if(Math.abs(df) > 1e-9) addMove('inv', p.id, Math.round(df*1000)/1000, 'Inventurdifferenz'); });
         S.inventories.unshift({id:uid('inv'), date:new Date().toISOString(), counted:items.length, value:stockValue(), diff}); S.invDraft = null; }, 'Abschließen'); break; }
-    case 'ordCopy': { const txt = orderText(id); const pr = navigator.clipboard?.writeText(txt); const fb = () => openDialog('Bestelltext', `<textarea class="code" readonly id="ordTxt">${esc(txt)}</textarea>`, null, {cancel:'Schließen', after:()=>$('#ordTxt').select()});
-      if(pr) pr.then(()=>toast('Bestelltext kopiert'), fb); else fb(); break; }
-    case 'ordBook': { const list = lowStock().filter(p => (p.supplier||'Ohne Lieferant')===id);
-      ask(`Lieferung von ${id} mit ${list.length} Artikeln einbuchen?`, () => { list.forEach(p => { const q = +(view.order[p.id] ?? orderSuggest(p)); if(q>0) addMove('in', p.id, q, 'Lieferung laut Bestellung'); delete view.order[p.id]; }); }, 'Einbuchen'); break; }
     case 'newProd': prodDialog(); break;
     case 'editProd': prodDialog(P(id)); break;
     case 'export': exportData(); break;
-    case 'reset': ask('Alle Daten durch die Demodaten ersetzen? Ihre Änderungen und Lagerbuchungen gehen verloren. Fotos bleiben gespeichert.', () => { safetyStore('vor „Demodaten wiederherstellen“'); S = seed(); }, 'Ersetzen'); break;
+    case 'reset': ask('Alle Daten durch die Beispieldaten ersetzen? Ihre Änderungen und Lagerbuchungen gehen verloren. Fotos bleiben gespeichert. Vorher legt die App eine Sicherheitskopie an.', () => { safetyStore('vor „Beispieldaten wiederherstellen“'); S = seed(); }, 'Ersetzen'); break;
   }
 });
 
@@ -1012,6 +803,7 @@ document.addEventListener('input', e => {
 });
 
 document.addEventListener('keydown', e => {
+  if($('#dlg').open && $('#pal').hidden) { if(e.key === 'Enter' && e.target.matches('input[data-li],input[data-pp],input[data-cf],textarea.title-in,input[data-secname]')) {} if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='k') e.preventDefault(); return; }
   if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k'){ e.preventDefault(); $('#pal').hidden ? palOpen() : palClose(); return; }
   if(!$('#pal').hidden){
     if(e.key === 'Escape'){ palClose(); }
@@ -1021,23 +813,22 @@ document.addEventListener('keydown', e => {
     return;
   }
   if(e.key === 'Enter' && e.target.matches('input[data-inv]')){ e.preventDefault(); const all = [...document.querySelectorAll('input[data-inv]')]; const n = all[all.indexOf(e.target)+1]; n ? (n.focus(), n.select()) : e.target.blur(); return; }
-  if(e.key === 'Enter' && e.target.matches('input[data-li],input[data-pp],input[data-cf],textarea.title-in,input[data-secname],input[data-ord]')){ e.preventDefault(); e.target.blur(); }
+  if(e.key === 'Enter' && e.target.matches('input[data-li],input[data-pp],input[data-cf],textarea.title-in,input[data-secname]')){ e.preventDefault(); e.target.blur(); }
   if(e.key === '/' && !e.target.closest('input,textarea,select')){ e.preventDefault(); palOpen(); }
 });
 
 document.addEventListener('change', e => {
   const t = e.target, c = view.card ? C(view.card) : null;
   if(t.id === 'imgFile'){ const f = t.files[0]; if(!f) return; resizeImage(f).then(d => { pickCb && pickCb(d); pickCb = null; }, () => info('Foto nicht lesbar', 'Bitte ein JPG- oder PNG-Bild wählen.')); return; }
-  if(t.dataset.cf && c){ const f = t.dataset.cf; c[f] = f==='yieldG' ? (t.value===''?'':+t.value) : t.value; save(); render(); toast('Gespeichert'); return; }
-  if(t.dataset.li != null && c){ const it = c.items[+t.dataset.li]; const f = t.dataset.lf; it[f] = f==='ref' ? t.value : (t.value===''?'':+t.value); if(f==='ref') it.net = ''; save(); render(); return; }
+  if(t.dataset.cf && c){ const f = t.dataset.cf; c[f] = f==='yieldG' ? (t.value===''?'':+t.value) : t.value; save(); softRender(); toast('Gespeichert'); return; }
+  if(t.dataset.li != null && c){ const it = c.items[+t.dataset.li]; const f = t.dataset.lf; it[f] = f==='ref' ? t.value : (t.value===''?'':+t.value); if(f==='ref') it.net = ''; save(); softRender(); return; }
   if(t.dataset.step != null && t.closest('#app')){ toast('Gespeichert'); return; }
-  if(t.dataset.pp){ const p = P(t.dataset.pp); const old = +p[t.dataset.pf]; p[t.dataset.pf] = +t.value || 0; save(); render(); if(t.dataset.pf==='price' && old !== p.price) toast(`${p.name}: ${eur(old)} → ${eur(p.price)} · ${usage('p:'+p.id).length} Rezepturen neu berechnet`); return; }
-  if(t.dataset.sf){ const f = t.dataset.sf; S.settings[f] = f==='name' ? t.value : (+t.value || 0); save(); toast('Gespeichert'); return; }
+  if(t.dataset.pp){ const p = P(t.dataset.pp); const old = +p[t.dataset.pf]; p[t.dataset.pf] = Math.max(0, +t.value || 0); save(); softRender(); if(t.dataset.pf==='price' && old !== p.price) toast(`${p.name}: ${eur(old)} → ${eur(p.price)} · ${usage('p:'+p.id).length} Rezepturen neu berechnet`); return; }
+  if(t.dataset.sf){ const f = t.dataset.sf; S.settings[f] = f==='name' ? t.value : f==='target' ? Math.min(100, Math.max(1, +t.value || 28)) : Math.min(100, Math.max(0, +t.value || 0)); if(f!=='name') t.value = S.settings[f]; save(); toast('Gespeichert'); return; }
   if(t.dataset.gf){ S.settings.guest[t.dataset.gf] = t.checked; save(); $('.guest-prev').innerHTML = guestHtml(); return; }
   if(t.dataset.secname != null){ const i = +t.dataset.secname, old = S.settings.sections[i], nv = t.value.trim(); if(!nv || nv===old){ t.value = old; return; }
     if(S.settings.sections.includes(nv)){ t.value = old; toast('Diese Kategorie gibt es schon'); return; }
     S.settings.sections[i] = nv; S.menu.forEach(m=>{ if(m.section===old) m.section = nv; }); S.cards.forEach(x=>{ if(x.category===old) x.category = nv; }); if(view.sec===old) view.sec = nv; save(); render(); toast('Kategorie umbenannt'); return; }
-  if(t.dataset.ord){ view.order[t.dataset.ord] = Math.max(0, +t.value||0); render(); return; }
   if(t.id === 'importFile' && t.files[0]){
     const r = new FileReader(); const fname = t.files[0].name;
     r.onload = () => { let d; try { d = JSON.parse(r.result); if(!d || typeof d !== 'object' || !Array.isArray(d.products) || !Array.isArray(d.cards) || !Array.isArray(d.menu)) throw 0; } catch(err){ info('Laden fehlgeschlagen', 'Die Datei ist keine Sicherung dieser App. Wählen Sie eine .json-Datei, die mit „Sicherung erstellen“ gespeichert wurde.'); return; }
@@ -1054,10 +845,9 @@ document.querySelectorAll('.nav-slot').forEach(n => n.innerHTML = navHtml(n.clos
 themeIcon();
 matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', themeIcon);
 window.addEventListener('hashchange', fromHash);
-fromHash(); render();
-imgLoadAll().then(() => { if(Object.keys(IMG).length) render(); });
+try { fromHash(); render(); } catch(err){ console.error(err); REL.renderFail = err; }
+imgLoadAll().then(() => { REL.imgReady = true; if(!S || REL.recover) return; if(Object.keys(IMG).length) render(); cloudStart(); });
 }
-function fromHash(){ const h = location.hash.slice(1); if(TABS.some(t=>t[0]===h) && h !== view.tab){ view = {...view, tab:h, card:null, q:''}; render(); } }
 try { const th = localStorage.getItem(KEY+'_theme'); if(th) document.documentElement.dataset.theme = th; } catch(e){}
 /* Daten kommen aus IndexedDB: erst laden, dann zeichnen (siehe store.js und reliab.js) */
 BOOT_P.then(relStart, e => relStart({status:'corrupt', kind:'read', error:String(e)}));

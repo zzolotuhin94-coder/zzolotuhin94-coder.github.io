@@ -14,6 +14,8 @@ function plusMigrate(d){
   // alte Tage aufräumen: Korrekturen und Häkchen sind nach drei Wochen nichts mehr wert
   const cut = dAdd(isoDate(new Date()), -21);
   ['ov','fac','chk'].forEach(k => Object.keys(p[k]).forEach(day => { if(!/^\d{4}-\d{2}-\d{2}$/.test(day) || day < cut) delete p[k][day]; }));
+  // Beispieldaten: Salz, Gewürze, Öl sind Grundzutaten und stehen nicht auf der Prep-Liste
+  if(d.demo) (d.products || []).forEach(x => { if(x && x.basic === undefined && PL_BASIC.includes(x.id)) x.basic = true; });
   return d;
 }
 function planState(){ if(!S.plan || !S.plan.ov || !S.plan.chk || !S.plan.fac) plusMigrate(S); return S.plan; }
@@ -47,16 +49,16 @@ function plG(g){ return g >= 1000 ? num(g/1000, 2) + ' kg' : num(Math.round(g)) 
 
 /* ---------- Navigation ---------- */
 ICO.vorb = '<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M8 3v4M16 3v4M3.500 10h17M8.500 15.200l2.300 2.300 4.700-5"/>';
-TABS.push(['vorb','Vorbereitung','Prep']);
-(() => { const gS = NAV_GROUPS.find(g => g[1].includes('dash')); if(gS) gS[1].splice(gS[1].indexOf('dash') + 1, 0, 'vorb'); })();
-NAV_DESC.vorb = 'Was morgen bestellt wird und was Sie dafür vorbereiten müssen.';
-view.pl = {off:0, all:false};
+view.pl = {off:0, all:false, allIng:false};
 const PL_WD = ['So','Mo','Di','Mi','Do','Fr','Sa'];
 const PL_FACS = [[0.7,'ruhig −30 %'],[1,'normal'],[1.3,'volles Haus +30 %']];
 const PL_PICK = 8;       // so viele gleiche Wochentage zählen höchstens
 const PL_DECAY = 0.8;    // jede ältere Woche zählt um ein Fünftel weniger
 const PL_TOP = 12;       // so viele Gerichte zeigt die Prognose, der Rest klappt auf
 const PL_BACK = 430;     // so viele Tage zurück wird gesucht
+const PL_MINOR = 0.2;    // unter 200 g oder 200 ml am Tag ist es eine Kleinmenge (Salz, Gewürze): steht nicht auf der Prep-Liste
+const PL_BASIC = ['salt','pepper','oil','sugar','icing','cinnamon','paprika','caraway','starch','water'];   // Beispieldaten: Grundzutaten
+function plMinor(x){ if(x.st === 'miss') return false; const p = x.p; if(p.basic === true) return true; if(p.basic === false) return false; return p.unit !== 'Stk' && x.need < PL_MINOR; }
 
 /* =====================================================================
    Prognose
@@ -158,8 +160,8 @@ function vbPlan(D){
       return {sid, sp, list, od, dl, late: !!dl && dl > D, drafted: list.every(x => x.drafted >= x.miss - 0.0005), draft: sp ? draftFor(sid) : null}; }).sort((a,b) => (a.sp ? 0 : 1) - (b.sp ? 0 : 1) || (a.od || '').localeCompare(b.od || '') || hm(a.sp && a.sp.cutoff) - hm(b.sp && b.sp.cutoff));
     // Prep-Liste: Vorkochen, dann je Lagerort
     const groups = [];
-    if(ex.batches.length) groups.push({k:'b', t:'Vorkochen', items:ex.batches.map(b => ({key:'b:' + b.c.id, name:b.c.name, qty:`${num(b.n)} ${b.n === 1 ? 'Charge' : 'Chargen'} à ${plG(b.y)}`, sub:`gebraucht ${plG(b.need)}`}))});
-    Object.entries(LOCS).concat([['', 'Ohne Lagerort']]).forEach(([k, t]) => { const l = prods.filter(x => (LOCS[x.p.loc] ? x.p.loc : '') === k); if(l.length) groups.push({k:'l:' + k, t, items:l.map(x => ({key:'p:' + x.p.id, name:x.p.name, qty:plQty(x.need, x.p), sub: x.st === 'miss' ? `fehlt ${plQty(x.miss, x.p)}` : '', bad: x.st === 'miss'}))}); });
+    if(ex.batches.length) groups.push({k:'b', t:'Vorkochen', items:ex.batches.map(b => ({key:'b:' + b.c.id, card:b.c.id, name:b.c.name, qty:`${num(b.n)} ${b.n === 1 ? 'Charge' : 'Chargen'} à ${plG(b.y)}`, sub:`gebraucht ${plG(b.need)}${b.n * b.y - b.need > 1 ? ` · bleibt ${plG(b.n * b.y - b.need)} übrig` : ''}`}))});
+    Object.entries(LOCS).concat([['', 'Ohne Lagerort']]).forEach(([k, t]) => { const l = prods.filter(x => (LOCS[x.p.loc] ? x.p.loc : '') === k); if(l.length) groups.push({k:'l:' + k, t, items:l.map(x => ({key:'p:' + x.p.id, name:x.p.name, qty:plQty(x.need, x.p), sub: x.st === 'miss' ? `fehlt ${plQty(x.miss, x.p)}` : '', bad: x.st === 'miss', minor: plMinor(x)}))}); });
     return {D, fc, fac, dishes, total, noCard, batches:ex.batches, prods, sups, groups, nMiss: prods.filter(x => x.st === 'miss').length};
   });
 }
@@ -176,7 +178,6 @@ function vbToDraft(sid, D){
    Ansicht
    ===================================================================== */
 function vbDay(){ return dAdd(todayStr(), Math.max(0, Math.min(6, +view.pl.off || 0))); }
-function vbDayName(off, d){ return off === 0 ? 'Heute' : off === 1 ? 'Morgen' : DAYNAME[dParse(d).getDay()]; }
 function vbBasisHtml(pl){
   const fc = pl.fc; const dn = DAYNAME[fc.w]; const out = [];
   if(fc.mode === 'wd'){
@@ -185,10 +186,9 @@ function vbBasisHtml(pl){
     if(fc.trend.used && Math.abs(fc.trend.f - 1) >= 0.005) out.push(`Die letzten 7 Öffnungstage liefen ${num(Math.abs(fc.trend.T - 1) * 100, 0)} % ${fc.trend.T > 1 ? 'besser' : 'schwächer'} als die 7 davor, darum ${fc.trend.f > 1 ? '+' : '−'}${num(Math.abs(fc.trend.f - 1) * 100, 0)} %.`);
   } else if(fc.mode === 'avg') out.push(`Zu wenig Verlauf: Es gibt erst ${fc.same === 0 ? 'keinen' : fc.same === 1 ? 'einen' : fc.same} ${dn}${fc.same === 1 ? '' : fc.same === 0 ? '' : 'e'} mit Verkäufen, es braucht drei. Die Prognose ist darum der einfache Durchschnitt der letzten ${fc.pick.length} Verkaufstage.`);
   const t = todayStr(); if(fc.lastDay && dDiff(fc.lastDay, t) > 10) out.push(`Seit dem ${fmtDate(fc.lastDay + 'T12:00:00')} sind keine Verkäufe gespeichert.`);
-  if(!isSimple()){ const bt = vbBacktest();
-    if(bt.n >= 3 && bt.mae != null) out.push(`<span data-help="rueckblick">Rückblick: In den letzten 4 Wochen (${bt.n} Verkaufstage) lag die Prognose je Gericht im Schnitt ± ${num(bt.mae, 1)} Portionen daneben${bt.pct != null ? `, bei der Tagesmenge ± ${num(bt.pct, 0)} %` : ''}.</span>`);
-    else out.push('Für einen Rückblick auf die Treffsicherheit gibt es noch zu wenige Verkaufstage.'); }
-  if(S.salesDemo) out.push('<span class="pl-demo">Beispieldaten – Zahlen sind noch nicht Ihre.</span>');
+  const bt = vbBacktest();
+  if(bt.n >= 3 && bt.mae != null) out.push(`<span data-help="rueckblick">Rückblick: In den letzten 4 Wochen (${bt.n} Verkaufstage) lag die Prognose je Gericht im Schnitt ± ${num(bt.mae, 1)} Portionen daneben${bt.pct != null ? `, bei der Tagesmenge ± ${num(bt.pct, 0)} %` : ''}.</span>`);
+  else out.push('Für einen Rückblick auf die Treffsicherheit gibt es noch zu wenige Verkaufstage.');
   return out.join(' ');
 }
 function vbFcRow(x, ro){
@@ -198,38 +198,43 @@ function vbFcRow(x, ro){
     <span class="pl-r">${range}${x.ov ? `<button type="button" class="link pl-reset" data-act="plOvReset" data-id="${esc(x.key)}" ${ro ? 'disabled' : ''}>zurück</button>` : ''}</span>
     <input class="num-in pl-in" inputmode="numeric" data-num="self" data-plov="${esc(x.key)}" value="${num(x.q)}" ${ro ? 'disabled' : ''} aria-label="Portionen ${esc(x.name)}"></li>`;
 }
-function vbFcHtml(pl, ro){
+function vbFcHtml(pl, ro, facSeg){
   const keep = x => x.ov || x.flag === 'aktion'; let nTop = 0; const big = [], small = [];
   pl.dishes.forEach(x => { if(keep(x) || (x.q > 0 && nTop < PL_TOP)){ big.push(x); if(!keep(x)) nTop++; } else small.push(x); });
   const smallQ = small.reduce((a,x) => a + x.q, 0);
   return `<section class="pl-sec pl-fc"><h2 class="day-h">Prognose<span>${num(pl.total)} Portionen. Die Zahl können Sie überschreiben.</span></h2>
+    <div class="pl-facrow"><span class="muted">Wie wird der Tag?</span>${facSeg}</div>
     <ul class="vb-list">${big.map(x => vbFcRow(x, ro)).join('') || '<li class="pl-none">Für diesen Tag erwartet die Prognose nichts.</li>'}</ul>
     ${small.length ? `<button type="button" class="link pl-more" data-act="plAll" aria-expanded="${!!view.pl.all}">${view.pl.all ? 'Weniger anzeigen' : `${small.length} weitere ${small.length === 1 ? 'Gericht' : 'Gerichte'} anzeigen, zusammen ${num(smallQ)} ${smallQ === 1 ? 'Portion' : 'Portionen'}`}</button>${view.pl.all ? `<ul class="vb-list">${small.map(x => vbFcRow(x, ro)).join('')}</ul>` : ''}` : ''}
   </section>`;
 }
 function vbMiseHtml(pl){
   const D = pl.D; const nOk = pl.prods.filter(x => x.st === 'ok').length, nCome = pl.prods.filter(x => x.st === 'coming').length;
-  const bat = pl.batches.length ? `<h3 class="pl-h3">Basisrezepte vorkochen</h3><ul class="vb-list pl-bat">${pl.batches.map(b => `<li class="pl-row"><span class="pl-n"><b>${esc(b.c.name)}</b><small>gebraucht ${plG(b.need)}${b.n * b.y - b.need > 1 ? ` · bleibt ${plG(b.n * b.y - b.need)} übrig` : ''}</small></span><span class="pl-bq" data-help="charge"><b>${num(b.n)} ${b.n === 1 ? 'Charge' : 'Chargen'}</b><small>à ${plG(b.y)}</small></span><button type="button" class="btn sm" data-act="openCard" data-id="${b.c.id}">Rezeptur</button></li>`).join('')}</ul>` : '';
   const sups = pl.sups.map(g => { const sp = g.sp;
     const when = sp ? `Bestellen bis ${g.od === todayStr() ? 'heute' : PL_WD[dParse(g.od).getDay()] + ' ' + plShortDate(g.od)} ${esc(sp.cutoff)} Uhr · Lieferung ${PL_WD[dParse(g.dl).getDay()]} ${plShortDate(g.dl)}${g.late ? ` · <span class="bad-t">zu spät für ${D === todayStr() ? 'heute' : PL_WD[dParse(D).getDay()] + ' ' + plShortDate(D)}</span>` : ''}` : 'Kein Lieferant hinterlegt';
     const act = !sp ? '' : g.drafted ? `<button type="button" class="btn sm" data-act="ordOpen" data-id="${g.draft ? g.draft.id : ''}">Entwurf ${g.draft ? esc(g.draft.no) : ''} öffnen</button>` : `<button type="button" class="btn sm" data-act="plDraft" data-id="${esc(g.sid)}">In Bestellung legen</button>`;
     return `<div class="pl-sup"><div class="pl-sup-h"><span><b>${sp ? esc(sp.name) : 'Ohne Lieferant'}</b><small>${when}</small></span>${act}</div>
       <ul class="pl-miss">${g.list.map(x => `<li><span class="pl-n"><b>${esc(x.p.name)}</b><small>braucht ${plQty(x.need, x.p)} · im Lager ${plQty(x.stock, x.p)}${x.coming ? ` · kommt ${plQty(x.coming, x.p)}` : ''}</small></span><span class="pl-mq"><b>fehlt ${plQty(x.miss, x.p)}</b><small>${sp ? `bestellen: ${x.p.packQty ? `${num(x.packs)} × ${esc(x.p.pack)}` : `${num(x.packs, 1)} ${esc(x.p.unit)}`}${x.drafted >= x.miss - 0.0005 ? ' · im Entwurf' : ''}` : ''}</small></span></li>`).join('')}</ul></div>`; }).join('');
   const okList = pl.prods.filter(x => x.st !== 'miss');
-  const ing = pl.prods.length ? `<h3 class="pl-h3">Zutaten gegen das Lager</h3>
-    <p class="pl-ing-sum">${num(pl.prods.length)} ${pl.prods.length === 1 ? 'Zutat' : 'Zutaten'} gebraucht: ${num(nOk)} ${nOk === 1 ? 'reicht' : 'reichen'}${nCome ? `, ${num(nCome)} ${nCome === 1 ? 'reicht' : 'reichen'} mit der bestellten Lieferung` : ''}${pl.nMiss ? `, <b>${num(pl.nMiss)} ${pl.nMiss === 1 ? 'fehlt' : 'fehlen'}</b>` : ''}.</p>
+  const ing = pl.prods.length ? `<p class="pl-ing-sum">${num(pl.prods.length)} ${pl.prods.length === 1 ? 'Zutat' : 'Zutaten'} gebraucht: ${num(nOk)} ${nOk === 1 ? 'reicht' : 'reichen'}${nCome ? `, ${num(nCome)} ${nCome === 1 ? 'reicht' : 'reichen'} mit der bestellten Lieferung` : ''}${pl.nMiss ? `, <b>${num(pl.nMiss)} ${pl.nMiss === 1 ? 'fehlt' : 'fehlen'}</b>` : ''}.</p>
     ${sups}
     ${okList.length ? `<details class="pl-ok" data-open="plok" ${view.pl.okOpen ? 'open' : ''}><summary>${num(okList.length)} ${okList.length === 1 ? 'Zutat reicht' : 'Zutaten reichen'}</summary><ul class="pl-okl">${okList.map(x => `<li><span>${esc(x.p.name)}</span><span>${plQty(x.need, x.p)}</span><span class="muted">${x.st === 'coming' ? `Lager ${plQty(x.stock, x.p)} + Lieferung` : `Lager ${plQty(x.stock, x.p)}`}</span></li>`).join('')}</ul></details>` : ''}
     <p class="hint">Gerechnet mit dem Lagerstand von jetzt. Was bis dahin noch verkauft wird, ist nicht abgezogen. Basisrezepte zählen in ganzen Chargen, Reste von gestern kennt die App nicht.</p>` : '';
   const none = pl.noCard.length ? `<p class="hint pl-nocard">${pl.noCard.length === 1 ? 'Ein Gericht' : pl.noCard.length + ' Gerichte'} mit ${num(pl.noCard.reduce((a,x) => a + x.q, 0))} Portionen ${pl.noCard.length === 1 ? 'hat' : 'haben'} keine Rezeptur und ${pl.noCard.length === 1 ? 'fehlt' : 'fehlen'} darum hier: ${pl.noCard.slice(0, 4).map(x => esc(x.name)).join(', ')}${pl.noCard.length > 4 ? ' und weitere' : ''}.</p>` : '';
-  return `<section class="pl-sec pl-mise"><h2 class="day-h">Mise en place<span>aus den Rezepturen gerechnet</span></h2>
-    ${bat || ing ? bat + ing : '<p class="pl-empty">Für die erwarteten Gerichte gibt es noch keine Rezepturen. Darum lässt sich nichts ausrechnen.</p>'}${none}</section>`;
+  return `<section class="pl-sec pl-mise"><h2 class="day-h">Reicht die Ware?<span>aus den Rezepturen gerechnet</span></h2>
+    ${ing ? ing : '<p class="pl-empty">Für die erwarteten Gerichte gibt es noch keine Rezepturen. Darum lässt sich nichts ausrechnen.</p>'}${none}</section>`;
 }
 function vbPrepHtml(pl){
-  const st = planState(); const chk = st.chk[pl.D] || {}; const all = pl.groups.reduce((a,g) => a + g.items.length, 0); const done = pl.groups.reduce((a,g) => a + g.items.filter(i => chk[i.key]).length, 0);
-  if(!all) return `<section class="pl-sec pl-prep" id="plPrep"><h2 class="day-h">Prep-Liste</h2><p class="pl-empty">Noch leer. Die Liste füllt sich, sobald die erwarteten Gerichte eine Rezeptur haben.</p></section>`;
+  const st = planState(); const chk = st.chk[pl.D] || {}; const showAll = !!view.pl.allIng;
+  const vis = i => showAll || !i.minor || chk[i.key];
+  const groups = pl.groups.map(g => ({...g, items:g.items.filter(vis)})).filter(g => g.items.length);
+  const nMinor = pl.groups.reduce((a,g) => a + g.items.filter(i => i.minor).length, 0);
+  const all = groups.reduce((a,g) => a + g.items.length, 0); const done = groups.reduce((a,g) => a + g.items.filter(i => chk[i.key]).length, 0);
+  if(!all && !nMinor) return `<section class="pl-sec pl-prep" id="plPrep"><h2 class="day-h">Prep-Liste</h2><p class="pl-empty">Noch leer. Die Liste füllt sich, sobald die erwarteten Gerichte eine Rezeptur haben.</p></section>`;
+  const item = i => `<li><button type="button" role="checkbox" aria-checked="${chk[i.key] ? 'true' : 'false'}" class="pl-c ${chk[i.key] ? 'on' : ''}" data-act="plChk" data-id="${esc(i.key)}"><i aria-hidden="true">${ico('check')}</i><span class="pl-c-n">${esc(i.name)}${i.sub ? `<small class="${i.bad ? 'bad-t' : ''}">${esc(i.sub)}</small>` : ''}</span><b>${esc(i.qty)}</b></button>${i.card ? `<button type="button" class="link pl-rz" data-act="openCard" data-id="${i.card}">Rezeptur</button>` : ''}</li>`;
   return `<section class="pl-sec pl-prep" id="plPrep"><h2 class="day-h">Prep-Liste<span id="plProg">${done} von ${all} erledigt</span>${done ? `<button type="button" class="link pl-clear" data-act="plChkClear">Häkchen löschen</button>` : ''}</h2>
-    <div class="pl-groups">${pl.groups.map(g => `<div class="pl-grp"><h3 class="pl-h3">${esc(g.t)}</h3><ul class="pl-chk">${g.items.map(i => `<li><button type="button" role="checkbox" aria-checked="${chk[i.key] ? 'true' : 'false'}" class="pl-c ${chk[i.key] ? 'on' : ''}" data-act="plChk" data-id="${esc(i.key)}"><i aria-hidden="true">${ico('check')}</i><span class="pl-c-n">${esc(i.name)}${i.sub ? `<small class="${i.bad ? 'bad-t' : ''}">${esc(i.sub)}</small>` : ''}</span><b>${esc(i.qty)}</b></button></li>`).join('')}</ul></div>`).join('')}</div></section>`;
+    <div class="pl-groups">${groups.map(g => `<div class="pl-grp ${g.k === 'b' ? 'vk' : ''}"><h3 class="pl-h3">${esc(g.t)}</h3><ul class="pl-chk">${g.items.map(item).join('')}</ul></div>`).join('')}</div>
+    ${nMinor ? `<button type="button" class="link pl-alling" data-act="plAllIng" aria-expanded="${showAll}">${showAll ? 'Nur Hauptzutaten zeigen' : `Alle Zutaten zeigen · ${nMinor} ${nMinor === 1 ? 'Kleinmenge' : 'Kleinmengen'} wie Salz, Gewürze, Öl`}</button>` : ''}</section>`;
 }
 function renderVorb(){
   const ix = plIdx(); const t = todayStr(); const off = Math.max(0, Math.min(6, +view.pl.off || 0)); const D = dAdd(t, off);
@@ -239,14 +244,14 @@ function renderVorb(){
   const dLong = dParse(D).toLocaleDateString('de-AT', {weekday:'long', day:'numeric', month:'long'});
   const fc = vbForecast(D);
   if(fc.closed) return head('Was brauche ich heute, was morgen?') + days + `<section class="pl-closed"><h2>Ruhetag – keine Vorbereitung</h2><p>${esc(dLong)} ist Ruhetag. Wählen Sie oben einen anderen Tag.</p></section>`;
-  const pl = vbPlan(D); const ro = !canEditAll(); const simple = isSimple(); const sk = fc.sea && S.settings.seasons[fc.sea] ? S.settings.seasons[fc.sea].title : '';
+  const pl = vbPlan(D); const ro = !canEditAll(); const sk = fc.sea && S.settings.seasons[fc.sea] ? S.settings.seasons[fc.sea].title : '';
   const live = specialsFor(D);
   const facSeg = `<div class="seg pl-fac" role="group" aria-label="Wie wird der Tag?">${PL_FACS.map(([f, l]) => `<button type="button" class="${Math.abs(pl.fac - f) < 0.001 ? 'on' : ''}" data-act="plFac" data-id="${f}" aria-pressed="${Math.abs(pl.fac - f) < 0.001}">${l}</button>`).join('')}</div>`;
-  return head(`${esc(dLong)}${sk ? ' · ' + esc(sk) : ''}${live.length ? ' · Aktion: ' + live.map(s => esc(s.name)).join(', ') : ''}`, `<button type="button" class="btn primary" data-pdf="plPrint">${ico('download')}Prep-Liste als PDF</button>`)
+  return head(`${esc(dLong)}${sk ? ' · ' + esc(sk) : ''}${live.length ? ' · Aktion: ' + live.map(s => esc(s.name)).join(', ') : ''} · ${num(pl.total)} Portionen erwartet${pl.fac !== 1 ? `, ${pl.fac > 1 ? 'volles Haus' : 'ruhiger Tag'} eingerechnet` : ''}`, `<button type="button" class="btn primary" data-pdf="plPrint">${ico('download')}Als PDF speichern</button>`)
     + days
-    + `<div class="pl-top"><div class="pl-tot"><b>${num(pl.total)}</b><span>Portionen erwartet${pl.fac !== 1 ? `, ${pl.fac > 1 ? 'volles Haus' : 'ruhiger Tag'} eingerechnet` : ''}</span></div>${facSeg}</div>
-      <p class="pl-basis">${vbBasisHtml(pl)}</p>`
-    + (simple ? vbFcHtml(pl, ro) + vbPrepHtml(pl) : `<div class="pl-grid">${vbFcHtml(pl, ro)}${vbMiseHtml(pl)}</div>` + vbPrepHtml(pl));
+    + vbPrepHtml(pl)
+    + `<div class="pl-grid">${vbFcHtml(pl, ro, facSeg)}${vbMiseHtml(pl)}</div>`
+    + `<details class="more pl-how" data-more="plhow" ${(view.more || {}).plhow ? 'open' : ''}><summary>Wie die Prognose rechnet</summary><p class="pl-basis">${vbBasisHtml(pl)}</p></details>`;
 }
 
 /* ---------- Druck / PDF ---------- */
@@ -255,7 +260,7 @@ function vbPrintHtml(D){
   const dishes = pl.dishes.filter(x => x.q > 0);
   return `<div class="pl-print"><div class="meta"><span>${esc(S.settings.name)}</span><span>Erstellt ${fmtDate(new Date().toISOString())}</span></div>
     <h1>Prep-Liste · ${esc(dLong)}</h1><p class="pp-sub">${num(pl.total)} Portionen erwartet${pl.fac !== 1 ? ` (${pl.fac > 1 ? 'volles Haus' : 'ruhiger Tag'})` : ''}. Prognose aus den Verkäufen, geschätzt.</p>
-    ${pl.groups.map(g => `<h2>${esc(g.t)}</h2><ul class="pp-l">${g.items.map(i => `<li><i></i><span>${esc(i.name)}${i.sub ? ` <small>${esc(i.sub)}</small>` : ''}</span><b>${esc(i.qty)}</b></li>`).join('')}</ul>`).join('')}
+    ${pl.groups.map(g => ({...g, items:g.items.filter(i => !i.minor || view.pl.allIng)})).filter(g => g.items.length).map(g => `<h2>${esc(g.t)}</h2><ul class="pp-l">${g.items.map(i => `<li><i></i><span>${esc(i.name)}${i.sub ? ` <small>${esc(i.sub)}</small>` : ''}</span><b>${esc(i.qty)}</b></li>`).join('')}</ul>`).join('')}
     <h2>Erwartete Portionen</h2><ul class="pp-l pp-d">${dishes.map(x => `<li><span>${esc(x.name)}</span><b>${num(x.q)}</b></li>`).join('')}</ul></div>`;
 }
 function vbPrint(){
@@ -274,7 +279,7 @@ renderDash = function(){
     const pl = vbPlan(D); const top = pl.dishes.filter(x => x.q > 0).slice(0, 3).map(x => `${esc(dishShort(x.m || {name:x.name}, 22))} ${num(x.q)}`).join(' · ');
     const meta = [pl.batches.length ? `${pl.batches.length} ${pl.batches.length === 1 ? 'Basisrezept' : 'Basisrezepte'} vorkochen` : '', pl.nMiss ? `<span class="bad-t">${pl.nMiss} ${pl.nMiss === 1 ? 'Zutat fehlt' : 'Zutaten fehlen'}</span>` : pl.prods.length ? 'Zutaten reichen' : ''].filter(Boolean).join(' · ');
     const block = daySec('Vorbereitung', off ? 'Prognose für morgen' : 'Prognose für heute', dayRow(`≈ ${num(pl.total)}`, 'Portionen erwartet', top, meta, `<button type="button" class="btn sm" data-act="plGo" data-id="${off}">Vorbereitung</button>`)).replace('<section class="day-sec">', '<section class="day-sec pl-dash">');
-    const i = h.indexOf('<div class="tiles">'); if(i >= 0) h = h.slice(0, i) + block + h.slice(i);
+    const i = h.indexOf('<!--dash-extra-->'); if(i >= 0) h = h.slice(0, i) + block + h.slice(i);
   } catch(err){ console.warn('Vorbereitung:', err); }
   return h;
 };
@@ -282,7 +287,8 @@ renderDash = function(){
 /* ---------- Bedienung ---------- */
 ['plFac','plOvReset'].forEach(a => RO_ACTS.add(a));
 function vbChkPatch(){
-  const pl = vbPlan(vbDay()); const chk = planState().chk[pl.D] || {}; const all = pl.groups.reduce((a,g) => a + g.items.length, 0); const done = pl.groups.reduce((a,g) => a + g.items.filter(i => chk[i.key]).length, 0);
+  const pl = vbPlan(vbDay()); const chk = planState().chk[pl.D] || {}; const vis = i => view.pl.allIng || !i.minor || chk[i.key];
+  const all = pl.groups.reduce((a,g) => a + g.items.filter(vis).length, 0); const done = pl.groups.reduce((a,g) => a + g.items.filter(i => chk[i.key]).length, 0);
   const pr = $('#plProg'); if(pr) pr.textContent = `${done} von ${all} erledigt`;
 }
 document.addEventListener('click', e => {
@@ -293,10 +299,11 @@ document.addEventListener('click', e => {
     case 'plGo': view.pl.off = +id || 0; go('vorb'); break;
     case 'plDay': view.pl.off = +id || 0; view.pl.all = false; render(); break;
     case 'plAll': view.pl.all = !view.pl.all; render(); break;
+    case 'plAllIng': view.pl.allIng = !view.pl.allIng; render(); break;
     case 'plFac': { if(!roGate()) break; const f = +id; if(Math.abs(f - 1) < 0.001) delete st.fac[D]; else st.fac[D] = f; save(); render(); break; }
     case 'plOvReset': { if(!roGate()) break; if(st.ov[D]){ delete st.ov[D][id]; if(!Object.keys(st.ov[D]).length) delete st.ov[D]; } save(); render(); break; }
     case 'plChk': { const c = st.chk[D] = st.chk[D] || {}; const on = !c[id]; if(on) c[id] = 1; else delete c[id]; if(!Object.keys(c).length) delete st.chk[D];
-      el.classList.toggle('on', on); el.setAttribute('aria-checked', on ? 'true' : 'false'); save(); vbChkPatch(); if(on){ try { gdAct('prep'); } catch(err){} }
+      el.classList.toggle('on', on); el.setAttribute('aria-checked', on ? 'true' : 'false'); save(); vbChkPatch();
       if(!!$('#app .pl-clear') !== !!st.chk[D]) render(); break; }
     case 'plChkClear': delete st.chk[D]; save(); render(); break;
     case 'plDraft': { const r = vbToDraft(id, D); if(!r) break; render(); const n = r.add + r.up;
@@ -321,60 +328,27 @@ document.addEventListener('focusin', e => { if(e.target.matches && e.target.matc
 document.addEventListener('toggle', e => { const t = e.target; if(t && t.dataset && t.dataset.open === 'plok') view.pl.okOpen = t.open; }, true);
 
 /* =====================================================================
-   Begleitung: Erklärungen, Begriffe, Anleitungen, Aufgaben, Schnellsuche
+   Hilfe-Texte und Schnellsuche
    ===================================================================== */
-H('nav_vorb','Vorbereitung', NAV_DESC.vorb);
 H('prognose','Prognose','Eine Schätzung, wie viele Portionen an einem Tag bestellt werden. Die App rechnet sie aus den gleichen Wochentagen der letzten Wochen.',1);
 H('spanne','Spanne','So viel schwankt ein Gericht an diesem Wochentag üblicherweise. „Meist 22–35“ heißt: An den meisten Tagen lag es dazwischen.',1);
 H('tagesfaktor','Ruhig oder volles Haus','Sie wissen mehr als die Zahlen: Feiertag, Wetter, Veranstaltung. Damit rechnet die App den ganzen Tag 30 % höher oder niedriger.',1);
 H('pl_menge','Menge überschreiben','Tippen Sie Ihre eigene Zahl ein, zum Beispiel bei einer Reservierung. „zurück“ holt die Prognose wieder.');
-H('charge','Charge','Eine ganze Menge von einem Basisrezept, so wie es in der Rezeptur steht. Zwei Chargen Dressing heißt: das Rezept zweimal ansetzen.',1);
-H('mise','Mise en place','Alles, was vor dem Service fertig stehen muss: vorgekochte Basisrezepte und bereitgestellte Zutaten.',1);
+H('charge','Charge','Eine ganze Menge von einem Basisrezept, so wie es in der Rezeptur steht. Zwei Chargen Dressing heißt: die Rezeptur zweimal ansetzen.',1);
+H('mise','Reicht die Ware?','Die App vergleicht, was die erwarteten Gerichte brauchen, mit dem Lager und den bestellten Lieferungen. Was fehlt, legen Sie mit einem Tipp in die Bestellung.');
 H('prepliste','Prep-Liste','Die Liste für die Küche zum Abhaken: was vorzukochen ist und was aus welchem Lager geholt wird.',1);
 H('pl_abhaken','Abhaken','Ein Tipp setzt das Häkchen, noch ein Tipp nimmt es weg. Die Häkchen gelten für diesen Tag und bleiben gespeichert.');
 H('pl_bestellung','In Bestellung legen','Legt alles, was bei diesem Lieferanten fehlt, in seinen Bestell-Entwurf. Gerundet auf ganze Gebinde. Gesendet wird noch nichts.');
 H('rueckblick','Rückblick','Die App rechnet für die letzten vier Wochen nach, was sie am Vorabend vorhergesagt hätte, und vergleicht es mit dem echten Verkauf.',1);
 H('pl_tag','Tag wählen','Die Prognose gibt es für heute und die nächsten sechs Tage. Am Ruhetag gibt es keine Vorbereitung.');
 HELP_SEL.push(
-  ['.nav-i[data-tab="vorb"],.m-only [data-tab="vorb"]','nav_vorb'],
   ['#app .pl-days button','pl_tag'], ['#app .pl-fac button','tagesfaktor'], ['#app input[data-plov]','pl_menge'], ['#app .pl-r','spanne'], ['#app .pl-tot','prognose'], ['#app .pl-fc .day-h','prognose'], ['#app .pl-basis','prognose'],
-  ['#app .pl-bq','charge'], ['#app .pl-mise .day-h','mise'], ['#app [data-act="plDraft"]','pl_bestellung'], ['#app .pl-prep .day-h','prepliste'], ['#app .pl-c','pl_abhaken'], ['#app .pl-dash','prognose']);
-
-TOURS.vorb = {id:'vorb', name:'Vorbereitung', steps:[
-  {t:'Tag wählen', sel:'#app .pl-days', x:'Heute, morgen oder ein Tag bis in sechs Tagen. Am Ruhetag gibt es keine Vorbereitung.'},
-  {t:'Prognose', sel:['#app .pl-fc .vb-list', '#app .pl-closed'], x:'So viele Portionen erwartet die App je Gericht. Sie rechnet aus den gleichen Wochentagen der letzten Wochen. „Meist 22–35“ zeigt, wie stark es schwankt.'},
-  {t:'Sie wissen es besser?', sel:'#app input[data-plov]', x:'Tippen Sie Ihre eigene Zahl in das Feld, zum Beispiel bei einer Reservierung. Mit „ruhig“ oder „volles Haus“ oben ändern Sie den ganzen Tag.'},
-  {t:'Mise en place', when:() => !isSimple(), sel:'#app .pl-mise', x:'Aus den Rezepturen gerechnet: welche Basisrezepte vorzukochen sind, in ganzen Chargen, und welche Zutaten im Lager fehlen. Fehlendes legen Sie mit einem Tipp in die Bestellung.'},
-  {t:'Prep-Liste', sel:'#plPrep', x:'Die Liste für die Küche. Ein Tipp hakt ab, das bleibt für den Tag gespeichert. Oben rechts gibt es die Liste als PDF zum Ausdrucken.'},
-]};
-
-GD_ACT_NUMS.push('fc', 'prep');
-(() => {
-  const at = id => { const i = MISSIONS.findIndex(m => m.id === id); return i < 0 ? MISSIONS.length : i + 1; };
-  MISSIONS.splice(at('inv1'), 0,
-    {id:'fc1', tier:1, ico:'vorb', t:'Erste Prognose ansehen', short:'Erste Prognose', goal:1, n:() => gdActs().fc, wozu:'Die App schätzt, was morgen bestellt wird. Das spart Wegwerfen und Ausverkauft.', go:() => { view.pl.off = 1; if((S.settings.closed || []).includes(dParse(dAdd(todayStr(), 1)).getDay())) view.pl.off = 0; go('vorb'); setTimeout(() => tourStart('vorb'), 120); }},
-    {id:'prep3', tier:1, ico:'check', t:'Prep-Liste abhaken', short:'Prep-Liste', goal:3, n:() => gdActs().prep, wozu:'Drei Punkte abhaken. So sieht jeder in der Küche, was schon steht.', go:() => { go('vorb'); setTimeout(() => { const el = $('#plPrep'); if(el) el.scrollIntoView({block:'start'}); }, 150); }});
-  MS_LEVELS[MS_LEVELS.length - 1][0] = MISSIONS.length;
-})();
+  ['#app .pl-mise .day-h','mise'], ['#app [data-act="plDraft"]','pl_bestellung'], ['#app .pl-prep .day-h','prepliste'], ['#app .pl-c','pl_abhaken'], ['#app .pl-dash','prognose']);
 
 const _palDataPlus = palData;
 palData = function(){
   const a = _palDataPlus();
   a.push({g:'Aktion', n:'Prognose für morgen', s:'Vorbereitung: was morgen gebraucht wird', run:() => { view.pl.off = 1; go('vorb'); }},
-    {g:'Aktion', n:'Prep-Liste als PDF', s:'Vorbereitung: Liste zum Ausdrucken', run:() => { if(view.tab !== 'vorb') go('vorb'); vbPrint(); }});
+    {g:'Aktion', n:'Prep-Liste als PDF speichern', s:'Vorbereitung: Liste zum Ausdrucken', run:() => { if(view.tab !== 'vorb') go('vorb'); vbPrint(); }});
   return a;
-};
-
-/* Handy: die neuen Bereiche stehen unter „Mehr“ */
-const _renderSetupPlus = renderSetup;
-renderSetup = function(){
-  const h = _renderSetupPlus(); const add = `<button type="button" class="btn" data-tab="vorb">${ico('vorb')}Vorbereitung</button>`;
-  return h.replace(/(<div class="row-btns m-only"[^>]*>)/, '$1' + add);
-};
-
-/* Nach dem Zeichnen: Aufgabe „Erste Prognose“ zählt, sobald eine Prognose wirklich zu sehen ist */
-const _renderPlus = render;
-render = function(){
-  _renderPlus();
-  if(view.tab === 'vorb' && $('#app .pl-fc') && !(+gdActs().fc > 0)) setTimeout(() => { try { if(view.tab === 'vorb' && !(+gdActs().fc > 0)) gdAct('fc'); } catch(e){} }, 0);
 };

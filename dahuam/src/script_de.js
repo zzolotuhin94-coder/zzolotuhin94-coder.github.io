@@ -3,21 +3,21 @@ const KEY = 'dahuam202_kueche_de_v1';
 const FRAMED = (()=>{ try { return window.self !== window.top; } catch(e){ return true; } })();
 const ALG = {A:'Gluten',B:'Krebstiere',C:'Ei',D:'Fisch',E:'Erdnuss',F:'Soja',G:'Milch/Laktose',H:'Schalenfrüchte',L:'Sellerie',M:'Senf',N:'Sesam',O:'Sulfite',P:'Lupinen',R:'Weichtiere'};
 
-/* ---------- Demodaten ---------- */
-function seed(){
+/* ---------- Beispieldaten ---------- */
+function seedBase(){
   // [id, Name, Einheit, Preis € je Einheit exkl. MwSt., Putzverlust %, Garverlust %, Allergene, Gewicht 1 Stk g]
   const prods = [
     ['pork','Schweinerücken','kg',9.5,5,15,''],
-    ['veal','Kalbsoberschale','kg',32,8,15,''],
-    ['beef_goulash','Rindswadschinken (Gulasch)','kg',14,8,35,''],
-    ['beef_mince','Rinderfaschiertes','kg',13,0,25,''],
-    ['speck','Tiroler Speck','kg',16,3,20,''],
+    ['veal','Kalbsoberschale','kg',32,11,15,''],
+    ['beef_goulash','Rindswadschinken (Gulasch)','kg',14,11,35,''],
+    ['beef_mince','Rindsfaschiertes','kg',13,0,20,''],
+    ['speck','Tiroler Speck g.g.A.','kg',19.5,5,20,''],
     ['flour','Mehl glatt','kg',0.9,0,0,'A'],
-    ['egg','Ei M','Stk',0.28,12,0,'C',55],
+    ['egg','Ei M','Stk',0.28,12,0,'C',60],
     ['quail','Wachtelei','Stk',0.35,12,0,'C',10],
     ['crumbs','Semmelbrösel','kg',2.5,0,0,'A'],
-    ['schmalz','Butterschmalz','kg',9,0,0,'G'],
-    ['fries','Pommes frites TK','kg',2.2,0,10,''],
+    ['schmalz','Butterschmalz','kg',11,0,0,'G'],
+    ['fries','Pommes frites TK','kg',2.2,0,20,''],
     ['lemon','Zitrone','Stk',0.35,0,0,'',110],
     ['cranberry','Preiselbeeren','kg',7,0,0,''],
     ['parsley','Petersilie','kg',12,30,0,''],
@@ -26,15 +26,15 @@ function seed(){
     ['butter','Butter','kg',8.5,0,0,'G'],
     ['cremefr','Crème fraîche','kg',6,0,0,'G'],
     ['parmesan','Parmesan','kg',22,0,0,'G'],
-    ['bergkase','Zillertaler Bergkäse','kg',18,3,0,'G'],
+    ['bergkase','Zillertaler Bergkäse','kg',18,8,0,'G'],
     ['emmental','Emmentaler','kg',12,3,0,'G'],
     ['cheddar','Cheddar','kg',14,0,0,'G'],
     ['sugar','Kristallzucker','kg',1.0,0,0,''],
     ['icing','Staubzucker','kg',1.6,0,0,''],
-    ['raisins','Rosinen','kg',6,0,0,''],
+    ['raisins','Rosinen (geschwefelt)','kg',6,0,0,'O'],
     ['applesauce','Apfelmus','kg',3,0,0,''],
     ['blueberry','Heidelbeeren TK','kg',9,0,0,''],
-    ['apples','Äpfel','kg',2.2,20,0,''],
+    ['apples','Äpfel','kg',1.8,28,0,''],
     ['strudel_dough','Strudelteig','kg',6,0,0,'A'],
     ['cinnamon','Zimt gemahlen','kg',20,0,0,''],
     ['onion','Zwiebel','kg',1.2,12,0,''],
@@ -53,10 +53,10 @@ function seed(){
     ['chutney','Tomatenchutney','kg',7,0,0,'O'],
     ['bread','Weißbrot / Baguette','kg',3.5,0,0,'A'],
     ['brioche','Brioche-Bun','Stk',0.85,0,0,'A C G',80],
-    ['wine','Weißwein trocken','l',6,0,0,'O'],
+    ['wine','Kochwein weiß, trocken','l',4,0,0,'O'],
     ['kirsch','Kirschwasser','l',25,0,0,''],
     ['starch','Maisstärke','kg',3,0,0,''],
-    ['oil','Rapsöl','l',2.8,0,0,''],
+    ['oil','Rapsöl','l',2.2,0,0,''],
     ['paprika','Paprikapulver edelsüß','kg',18,0,0,''],
     ['caraway','Kümmel','kg',15,0,0,''],
     ['salt','Salz','kg',0.5,0,0,''],
@@ -71,12 +71,12 @@ function seed(){
       [['flour',1000],['water',600],['oil',80],['salt',20]],
       'Mehl, Salz, Wasser und Öl 8 Min. glatt kneten. 30 Min. abgedeckt bei +4 °C rasten lassen. In Portionen zu 200 g teilen. Haltbarkeit 48 h bei +2 bis +4 °C.'],
     ['semi_goulash','Gulaschsuppe, Basis (Charge)','semi','Basisrezepte',8000,
-      [['beef_goulash',2000],['onion',1500],['oil',100],['paprika',60],['tomato_paste',80],['garlic',40],['caraway',10],['potato',1500],['water',4000],['salt',40],['pepper',5]],
+      [['beef_goulash',2000],['onion',1500],['oil',100],['paprika',80],['tomato_paste',80],['garlic',40],['caraway',10],['potato',1500],['water',4000],['salt',40],['pepper',5]],
       'Zwiebeln goldbraun rösten. Vom Herd nehmen, Paprikapulver und Tomatenmark einrühren, sofort mit etwas Wasser ablöschen. Rindfleisch in 1,5-cm-Würfeln, Kümmel und Knoblauch zugeben, 1,5 h schmoren. Kartoffelwürfel und restliches Wasser zugeben, 25 Min. köcheln. Salzen. Schockkühlen. Haltbarkeit 72 h.'],
     ['semi_caesar','Caesar-Dressing','semi','Basisrezepte',600,
       [['egg',3],['parmesan',80],['garlic',15],['lemon',1],['mustard',20],['oil',400],['salt',5],['pepper',2]],
-      'Eigelb mit Senf, Knoblauch und Zitronensaft mixen. Öl in dünnem Strahl zur Emulsion einarbeiten. Geriebenen Parmesan, Salz und Pfeffer zugeben. Haltbarkeit 48 h bei +2 bis +4 °C.'],
-    ['semi_strudel','Apfelstrudel, Blech für 12 Portionen','semi','Basisrezepte',3600,
+      'Pasteurisiertes Eigelb mit Senf, Knoblauch und Zitronensaft mixen. Öl in dünnem Strahl zur Emulsion einarbeiten. Geriebenen Parmesan, Salz und Pfeffer zugeben. Haltbarkeit 24 h bei +2 bis +4 °C.'],
+    ['semi_strudel','Apfelstrudel, Blech für 16 Portionen','semi','Basisrezepte',3000,
       [['strudel_dough',500],['apples',3000],['sugar',300],['cinnamon',10],['raisins',150],['crumbs',150],['butter',250]],
       'Äpfel schälen, blättrig schneiden, mit Zucker, Zimt und Rosinen mischen. Teig mit flüssiger Butter bestreichen, mit gerösteten Bröseln bestreuen, Fülle auflegen und einrollen. 40 Min. bei 180 °C backen, dabei mit Butter bestreichen.'],
     ['semi_blueberry','Heidelbeerkompott','semi','Basisrezepte',900,
@@ -84,31 +84,31 @@ function seed(){
       'Heidelbeeren mit Zucker und Wasser aufkochen. Mit in kaltem Wasser angerührter Stärke binden. Auskühlen lassen.'],
 
     ['dish_schnitzel_pork','Wiener Schnitzel vom Schwein mit Pommes','dish','Fondue & Hauptspeisen',470,
-      [['pork',180],['flour',20],['egg',1],['crumbs',50],['schmalz',40],['fries',200],['lemon',0.25],['cranberry',30],['parsley',3],['salt',2]],
+      [['pork',180],['flour',12],['egg',0.35],['crumbs',35],['schmalz',40],['fries',200],['lemon',0.25],['cranberry',30],['parsley',3],['salt',2]],
       'Fleisch auf 4 mm klopfen, salzen. In Mehl, Ei und Bröseln panieren, Panier nicht andrücken. In Butterschmalz bei 170 °C schwimmend herausbacken, Pfanne schwenken, damit die Panier souffliert, je Seite 2–3 Min. Anrichten mit Pommes, Zitronenspalte, Preiselbeeren und Petersilie.'],
     ['dish_schnitzel_veal','Wiener Schnitzel vom Kalb mit Pommes','dish','Fondue & Hauptspeisen',460,
-      [['veal',170],['flour',20],['egg',1],['crumbs',50],['schmalz',40],['fries',200],['lemon',0.25],['cranberry',30],['parsley',3],['salt',2]],
+      [['veal',170],['flour',12],['egg',0.35],['crumbs',35],['schmalz',40],['fries',200],['lemon',0.25],['cranberry',30],['parsley',3],['salt',2]],
       'Wie Schweinsschnitzel. Kalbfleisch vorsichtig zwischen Folie auf 4 mm klopfen.'],
     ['dish_fondue','Zillertaler Käsefondue (pro Person)','dish','Fondue & Hauptspeisen',700,
-      [['bergkase',120],['emmental',80],['wine',100],['starch',8],['kirsch',10],['garlic',3],['bread',150],['potato',200],['pickles',80]],
+      [['bergkase',120],['emmental',80],['wine',100],['starch',8],['kirsch',20],['garlic',3],['bread',150],['potato',200],['pickles',80]],
       'Caquelon mit Knoblauch ausreiben. Wein aufkochen, geriebenen Käse unter Rühren in Achterform schmelzen. Stärke im Kirschwasser anrühren, einrühren und glatt erhitzen. Auf dem Rechaud servieren mit Brotwürfeln, Kartoffeln in der Schale und Mixed Pickles.'],
     ['dish_kaiser','Kaiserschmarrn mit Apfelmus und Heidelbeerkompott','dish','Desserts',480,
       [['flour',120],['milk',250],['egg',3],['sugar',25],['butter',30],['raisins',20],['icing',10],['applesauce',80],['semi_blueberry',60],['salt',1]],
       'Dotter mit Milch und Mehl glatt rühren, Eiklar mit Zucker und einer Prise Salz steif schlagen, unterheben. In die Pfanne mit geschmolzener Butter gießen, Rosinen darüberstreuen, unten anbacken. 6 Min. bei 180 °C im Rohr fertig backen. Mit zwei Spateln zerreißen, mit Staubzucker karamellisieren. Mit Apfelmus und Kompott servieren.'],
     ['dish_elsasser','Flammkuchen „Der Elsässer“','dish','Flammkuchen',380,
-      [['semi_flammdough',200],['cremefr',80],['speck',60],['onion',50],['spring',15],['salt',1],['pepper',0.5]],
+      [['semi_flammdough',150],['cremefr',80],['speck',60],['onion',50],['spring',15],['salt',1],['pepper',0.5]],
       'Teig dünn (2 mm) ausrollen, mit Crème fraîche bestreichen, salzen, pfeffern. Zwiebelringe und Speckstreifen verteilen. 6–8 Min. bei 300 °C backen. Mit Frühlingszwiebel bestreuen.'],
     ['dish_goulash','Gulaschsuppe mit Brot','dish','Suppen',360,
       [['semi_goulash',300],['bread',60]],
-      'Portion Basis auf 85 °C erhitzen. Im tiefen Teller anrichten, Brot extra.'],
+      'Portion Basis auf Kerntemperatur mindestens 75 °C regenerieren. Im tiefen Teller anrichten, Brot extra.'],
     ['dish_tomato','Fruchtige Tomatensuppe mit Crème fraîche und Pesto','dish','Suppen',330,
       [['passata',250],['onion',30],['oil',10],['sugar',5],['cream',30],['cremefr',20],['pesto',10],['salt',2]],
       'Zwiebel in Öl anschwitzen, Passata und Zucker zugeben, 15 Min. köcheln. Obers zugeben, pürieren, salzen. Mit einem Löffel Crème fraîche und Pestotupfen servieren.'],
     ['dish_caesar','Caesar Salat','dish','Salate & Bowls',300,
       [['romaine',150],['semi_caesar',50],['parmesan',15],['capers',10],['quail',3],['bread',40],['butter',10],['garlic',3]],
       'Brotwürfel in Butter mit Knoblauch rösten. Römersalat zupfen, mit Dressing marinieren. Anrichten, Croûtons, Kapern, halbierte Wachteleier und Parmesanspäne darauf.'],
-    ['dish_strudel','Oma Lisl’s Apfelstrudel','dish','Desserts',305,
-      [['semi_strudel',300],['icing',5]],
+    ['dish_strudel','Oma Lisl’s Apfelstrudel','dish','Desserts',185,
+      [['semi_strudel',180],['icing',5]],
       'Portion 5 Min. bei 160 °C erwärmen, mit Staubzucker bestreuen.'],
     ['dish_burger','Wadel-Beißer-Burger','dish','Burger & Kebap',380,
       [['beef_mince',200],['brioche',1],['speck',30],['cheddar',30],['bbq',30],['red_onion',30],['romaine',20],['chutney',30],['salt',2],['pepper',0.5]],
@@ -192,15 +192,14 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fin = n => (typeof n === 'number' && isFinite(n)) ? n : 0;
 const eur = n => fin(n).toLocaleString('de-AT',{style:'currency',currency:'EUR'});
-const num = (n,d=0) => fin(n).toLocaleString('de-AT',{maximumFractionDigits:d});
+const num = (n,d=0) => fin(n).toLocaleString('de-DE',{maximumFractionDigits:d});
 const pct = n => (n==null || !isFinite(n)) ? '—' : num(n,1)+' %';
 const byName = (a,b) => a.name.localeCompare(b.name,'de');
 
-let S = load() || seed();
+let S;
 let view = {tab:'menu', card:null, q:'', ctype:'all', pq:''};
 
-function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
-function load(){ try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; } catch(e){ return null; } }
+/* save() und load(): siehe store.js */
 
 const P = id => S.products.find(p => p.id === id);
 const C = id => S.cards.find(c => c.id === id);
@@ -224,7 +223,7 @@ function line(it, depth){
   } else {
     const c = r.o; res.name = 'BR · ' + c.name; res.grossG = q;
     const t = totals(c, depth+1);
-    res.cost = c.yieldG ? q * t.cost / c.yieldG : 0;
+    { const y = +c.yieldG || t.out; res.cost = y ? q * t.cost / y : 0; }
     res.netAuto = q; res.net = it.net !== '' && it.net != null ? +it.net : q; res.out = res.net;
     t.alg.forEach(a => res.alg.add(a));
   }
@@ -244,312 +243,5 @@ function menuCalc(m){
   return {c, t, cost, netPrice, fc: cost!=null && netPrice ? cost/netPrice*100 : null, margin: cost!=null ? netPrice - cost : null};
 }
 function fcClass(fc){ if(fc==null) return 'na'; const tg = +S.settings.target; return fc <= tg ? 'good' : fc <= tg+7 ? 'warn' : 'bad'; }
-function fcBadge(fc){ return `<span class="fc ${fcClass(fc)}">${fc==null ? 'keine Rezeptur' : pct(fc)}</span>`; }
 function chips(set){ const a = [...set].sort(); return a.length ? `<div class="chips">${a.map(x=>`<span class="alg" title="${esc(ALG[x]||x)}">${esc(x)}</span>`).join('')}</div>` : ''; }
 function usage(ref){ return S.cards.filter(c => c.items.some(i => i.ref === ref)); }
-
-/* ---------- Darstellung ---------- */
-function render(){
-  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === view.tab));
-  const app = $('#app');
-  if(view.tab === 'menu') app.innerHTML = renderMenu();
-  else if(view.tab === 'cards') app.innerHTML = view.card && C(view.card) ? renderCard(C(view.card)) : renderCards();
-  else if(view.tab === 'products') app.innerHTML = renderProducts();
-  else app.innerHTML = renderSetup();
-}
-function demoNote(){ return S.demo ? `<div class="note">Demodaten. Speisekarte und Preise stammen von dahuam202.at. Rezepturen und Einkaufspreise sind Richtwerte: Ersetzen Sie sie unter „Rezepturen“ und „Produkte“ durch Ihre eigenen.</div>` : ''; }
-
-function renderMenu(){
-  const q = view.q.trim().toLowerCase();
-  const all = S.menu.map(m => ({m, k:menuCalc(m)}));
-  const linked = all.filter(x => x.k.cost != null);
-  const avg = linked.length ? linked.reduce((s,x)=>s+x.k.fc,0)/linked.length : null;
-  const over = linked.filter(x => x.k.fc > S.settings.target).length;
-  const shown = all.filter(({m}) => !q || (m.name+' '+m.desc+' '+m.section).toLowerCase().includes(q));
-  const sections = [...new Set(shown.map(x => x.m.section))];
-  let h = `<h1>Speisekarte</h1>
-  <div class="kpis">
-    <div class="kpi"><div class="v">${S.menu.length}</div><div class="l">Gerichte auf der Karte</div></div>
-    <div class="kpi"><div class="v">${linked.length}</div><div class="l">mit Rezeptur</div></div>
-    <div class="kpi"><div class="v">${pct(avg)}</div><div class="l">Ø Wareneinsatz</div></div>
-    <div class="kpi"><div class="v" style="color:${over?'var(--bad)':'var(--good)'}">${over}</div><div class="l">über Ziel ${num(S.settings.target)} %</div></div>
-  </div>
-  ${demoNote()}
-  <div class="bar"><input id="mq" class="search" type="search" placeholder="Speisekarte durchsuchen" value="${esc(view.q)}"><span class="sp"></span><button type="button" class="btn primary" data-act="newMenu">+ Gericht</button></div>`;
-  if(!shown.length) h += `<div class="list"><div class="empty">Nichts gefunden.</div></div>`;
-  for(const s of sections){
-    h += `<h2>${esc(s)}</h2><div class="list">`;
-    for(const {m,k} of shown.filter(x => x.m.section === s)){
-      h += `<div class="row">
-        <div><div class="nm">${esc(m.name)}</div>${m.desc?`<div class="ds">${esc(m.desc)}</div>`:''}${k.t?chips(k.t.alg):''}</div>
-        <div class="nums"><div class="p">${eur(m.price)}</div><div class="s">${k.cost!=null?'WE '+eur(k.cost):'&nbsp;'}</div></div>
-        <div class="acts">${fcBadge(k.fc)}
-          ${k.c ? `<button type="button" class="btn" data-act="openCard" data-id="${k.c.id}">Rezeptur</button>` : `<button type="button" class="btn" data-act="newCardFor" data-id="${m.id}">+ Rezeptur</button>`}
-          <button type="button" class="icon" title="Gericht bearbeiten" aria-label="Gericht bearbeiten" data-act="editMenu" data-id="${m.id}">✎</button></div>
-      </div>`;
-    }
-    h += `</div>`;
-  }
-  return h;
-}
-
-function renderCards(){
-  const q = view.q.trim().toLowerCase();
-  const list = S.cards.filter(c => (view.ctype==='all' || c.type===view.ctype) && (!q || (c.name+' '+c.category).toLowerCase().includes(q)))
-    .sort((a,b) => a.type===b.type ? byName(a,b) : (a.type==='semi'?1:-1));
-  let h = `<h1>Rezepturen</h1>${demoNote()}
-  <div class="bar"><input id="cq" class="search" type="search" placeholder="Rezepturen durchsuchen" value="${esc(view.q)}">
-    <div class="seg">${[['all','Alle'],['dish','Gerichte'],['semi','Basisrezepte']].map(([k,l])=>`<button type="button" class="${view.ctype===k?'on':''}" data-act="ctype" data-id="${k}">${l}</button>`).join('')}</div>
-    <span class="sp"></span>
-    <button type="button" class="btn" data-act="newCard" data-id="semi">+ Basisrezept</button>
-    <button type="button" class="btn primary" data-act="newCard" data-id="dish">+ Gericht</button></div>
-  <div class="list">`;
-  if(!list.length) h += `<div class="empty">Noch keine Rezepturen. Legen Sie die erste mit „+ Gericht“ an.</div>`;
-  for(const c of list){
-    const t = totals(c);
-    const per100 = c.yieldG ? t.cost / c.yieldG * 100 : 0;
-    const menus = S.menu.filter(m => m.card === c.id).map(menuCalc);
-    h += `<div class="row click" data-act="openCard" data-id="${c.id}">
-      <div><div class="nm">${esc(c.name)}</div><div class="ds"><span class="tag ${c.type==='semi'?'semi':''}">${c.type==='semi'?'Basisrezept':'Gericht'}</span> Nr. ${c.no||'—'} · ${esc(c.category||'ohne Kategorie')} · Ausbeute ${num(c.yieldG)} g · ${c.items.length} Zutaten</div>${chips(t.alg)}</div>
-      <div class="nums"><div class="p">${eur(t.cost)}</div><div class="s">${eur(per100)} / 100 g</div></div>
-      <div class="acts">${c.type==='dish' ? fcBadge(menus.length ? menus[0].fc : null) : ''}</div>
-    </div>`;
-  }
-  return h + `</div>`;
-}
-
-function refOptions(sel, selfId){
-  const ps = [...S.products].sort(byName);
-  const cs = S.cards.filter(c => c.type==='semi' && c.id!==selfId).sort(byName);
-  return `<option value="">— wählen —</option><optgroup label="Produkte">${ps.map(p=>`<option value="p:${p.id}" ${sel==='p:'+p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</optgroup>`
-    + (cs.length ? `<optgroup label="Basisrezepte">${cs.map(c=>`<option value="c:${c.id}" ${sel==='c:'+c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</optgroup>` : '');
-}
-
-function renderCard(c){
-  const t = totals(c);
-  const per100 = c.yieldG ? t.cost / c.yieldG * 100 : 0;
-  const menus = S.menu.filter(m => m.card === c.id);
-  const cats = [...new Set([...S.menu.map(m=>m.section), ...S.cards.map(x=>x.category)].filter(Boolean))];
-  const usedIn = usage('c:'+c.id);
-  const vat = 1 + S.settings.vat/100;
-  const rec = t.cost / (S.settings.target/100) * vat;
-  let rows = c.items.map((it,i) => {
-    const l = t.lines[i];
-    return `<tr>
-      <td><select id="ref-${i}" data-li="${i}" data-lf="ref" aria-label="Zutat">${refOptions(it.ref, c.id)}</select></td>
-      <td class="r"><input id="qty-${i}" type="number" step="any" min="0" data-li="${i}" data-lf="qty" value="${esc(it.qty)}" aria-label="Brutto"></td>
-      <td class="muted">${l.unit}</td>
-      <td class="r"><input id="net-${i}" type="number" step="any" min="0" data-li="${i}" data-lf="net" value="${esc(it.net)}" placeholder="${num(l.netAuto,1)}" aria-label="Netto in g"></td>
-      <td class="r num">${num(l.out,1)}</td>
-      <td class="r num">${eur(l.cost)}</td>
-      <td><button type="button" class="icon" data-act="delLine" data-id="${i}" title="Zeile entfernen" aria-label="Zeile entfernen">×</button></td>
-    </tr>`;
-  }).join('');
-  return `<button type="button" class="back" data-act="backCards">← Alle Rezepturen</button>
-  <div class="bar" style="margin-top:0"><h1 style="flex:1 1 300px">${esc(c.name)}</h1>
-    ${FRAMED ? '' : `<button type="button" class="btn" data-act="printCard" data-id="${c.id}">Rezeptur drucken</button>`}
-    <button type="button" class="btn" data-act="dupCard" data-id="${c.id}">Duplizieren</button>
-    <button type="button" class="btn danger" data-act="delCard" data-id="${c.id}">Löschen</button></div>
-  <div class="grid2">
-    <div style="min-width:0">
-      <div class="panel"><div class="fields">
-        <label class="f">Bezeichnung<input id="cf-name" data-cf="name" value="${esc(c.name)}"></label>
-        <label class="f">Typ<select id="cf-type" data-cf="type"><option value="dish" ${c.type==='dish'?'selected':''}>Gericht</option><option value="semi" ${c.type==='semi'?'selected':''}>Basisrezept</option></select></label>
-        <label class="f">Kategorie<input id="cf-category" data-cf="category" list="cats" value="${esc(c.category)}"><datalist id="cats">${cats.map(x=>`<option value="${esc(x)}">`).join('')}</datalist></label>
-        <label class="f">${c.type==='semi'?'Ausbeute Charge, g':'Portionsgewicht, g'}<input id="cf-yieldG" data-cf="yieldG" type="number" step="any" min="0" value="${esc(c.yieldG)}" placeholder="${num(t.out)}"></label>
-      </div></div>
-      <h2>Zutaten ${c.type==='semi'?'pro Charge':'pro Portion'}</h2>
-      <div class="tbl-wrap"><table class="edit">
-        <thead><tr><th>Zutat</th><th class="r">Brutto</th><th></th><th class="r">Netto, g</th><th class="r">Fertig, g</th><th class="r">Betrag</th><th></th></tr></thead>
-        <tbody>${rows || `<tr><td colspan="7" class="muted">Erste Zutat hinzufügen.</td></tr>`}</tbody>
-        <tfoot><tr><td>Summe</td><td class="r num">${num(t.gross)}</td><td></td><td class="r num">${num(t.net)}</td><td class="r num">${num(t.out)}</td><td class="r num">${eur(t.cost)}</td><td></td></tr></tfoot>
-      </table></div>
-      <div class="bar"><button type="button" class="btn" data-act="addLine">+ Zutat</button><span class="hint" style="margin:0">Netto wird aus dem Putzverlust des Produkts berechnet. Für einen eigenen Wert einfach überschreiben.</span></div>
-      <h2>Zubereitung</h2>
-      <textarea id="cf-method" data-cf="method" placeholder="Vorbereitung, Reihenfolge, Temperatur, Zeit, Anrichten, Lagerung">${esc(c.method)}</textarea>
-    </div>
-    <div style="min-width:0">
-      <div class="panel">
-        <div class="muted" style="font-size:13px">Wareneinsatz ${c.type==='semi'?'pro Charge':'pro Portion'}</div>
-        <div class="big">${eur(t.cost)}</div>
-        <div class="kv">
-          <span>pro 100 g</span><span>${eur(per100)}</span>
-          ${c.type==='semi' && c.yieldG ? `<span>pro kg</span><span>${eur(t.cost/c.yieldG*1000)}</span>` : ''}
-          <span>Rezeptur Nr.</span><span>${c.no||'—'}</span>
-          <span>Summe Fertiggewicht</span><span>${num(t.out)} g</span>
-        </div>
-        ${c.type==='dish' ? `<div class="hint">Verkaufspreis für ${num(S.settings.target)} % Wareneinsatz: <b class="mono">${eur(rec)}</b> inkl. ${num(S.settings.vat)} % MwSt.</div>` : ''}
-      </div>
-      <div class="panel"><div class="muted" style="font-size:13px">Allergene (Codes laut EU-VO 1169/2011)</div>
-        ${t.alg.size ? `<div class="kv">${[...t.alg].sort().map(a=>`<span>${esc(ALG[a]||a)}</span><span>${esc(a)}</span>`).join('')}</div>` : '<div class="hint">Keine gefunden. Bitte die Produktdaten prüfen.</div>'}
-      </div>
-      ${c.type==='dish' ? `<div class="panel"><div class="muted" style="font-size:13px">Auf der Speisekarte</div>
-        ${menus.length ? menus.map(m=>{const k=menuCalc(m);return `<div class="kv"><span>${esc(m.name)}</span><span>${eur(m.price)}</span><span>Wareneinsatz</span><span>${fcBadge(k.fc)}</span><span>Rohertrag exkl. MwSt.</span><span>${eur(k.margin)}</span></div>`}).join('<hr style="border:0;border-top:1px solid var(--line)">') : '<div class="hint">Mit keinem Gericht verknüpft. Verknüpfen Sie sie unter „Speisekarte“ mit ✎.</div>'}
-      </div>` : `<div class="panel"><div class="muted" style="font-size:13px">Verwendet in</div>
-        ${usedIn.length ? `<div class="kv">${usedIn.map(u=>`<span>${esc(u.name)}</span><span><button type="button" class="btn" data-act="openCard" data-id="${u.id}">Öffnen</button></span>`).join('')}</div>` : '<div class="hint">Noch in keiner Rezeptur verwendet.</div>'}
-      </div>`}
-    </div>
-  </div>`;
-}
-
-function renderProducts(){
-  const q = view.pq.trim().toLowerCase();
-  const list = S.products.filter(p => !q || p.name.toLowerCase().includes(q)).sort(byName);
-  return `<h1>Produkte und Einkaufspreise</h1>${demoNote()}
-  <div class="bar"><input id="pq" class="search" type="search" placeholder="Produkt suchen" value="${esc(view.pq)}"><span class="sp"></span><button type="button" class="btn primary" data-act="newProd">+ Produkt</button></div>
-  <div class="tbl-wrap"><table class="prods">
-    <thead><tr><th>Produkt</th><th>Einheit</th><th class="r">Preis €, exkl. MwSt.</th><th class="r">Putzverlust %</th><th class="r">Garverlust %</th><th>Allergene</th><th class="r">In Rezepturen</th><th></th></tr></thead>
-    <tbody>${list.map(p=>`<tr>
-      <td>${esc(p.name)}${p.unit==='Stk'&&p.pieceG?` <span class="muted">(${num(p.pieceG)} g/Stk)</span>`:''}</td>
-      <td>${esc(p.unit)}</td>
-      <td class="r"><input id="pp-${p.id}" type="number" step="0.01" min="0" data-pp="${p.id}" data-pf="price" value="${esc(p.price)}" aria-label="Preis"></td>
-      <td class="r"><input id="plc-${p.id}" type="number" step="any" min="0" max="100" data-pp="${p.id}" data-pf="lossCold" value="${esc(p.lossCold)}" aria-label="Putzverlust"></td>
-      <td class="r"><input id="plh-${p.id}" type="number" step="any" min="0" max="100" data-pp="${p.id}" data-pf="lossHot" value="${esc(p.lossHot)}" aria-label="Garverlust"></td>
-      <td>${chips(new Set(algList(p.alg)))}</td>
-      <td class="r num">${usage('p:'+p.id).length}</td>
-      <td><button type="button" class="icon" data-act="editProd" data-id="${p.id}" title="Bearbeiten" aria-label="Produkt bearbeiten">✎</button></td>
-    </tr>`).join('') || `<tr><td colspan="8" class="muted">Nichts gefunden.</td></tr>`}</tbody>
-  </table></div>
-  <div class="hint">Preis je kg, l oder Stück. Ändern Sie einen Preis, und Wareneinsatz aller Rezepturen und der Speisekarte wird sofort neu berechnet.</div>`;
-}
-
-function renderSetup(){
-  return `<h1>Einstellungen</h1>
-  <div class="grid2" style="margin-top:14px"><div class="panel"><div class="fields">
-    <label class="f">Name des Betriebs<input id="s-name" data-sf="name" value="${esc(S.settings.name)}"></label>
-    <label class="f">MwSt. Speisen, %<input id="s-vat" data-sf="vat" type="number" step="any" min="0" value="${esc(S.settings.vat)}"></label>
-    <label class="f">Ziel-Wareneinsatz, %<input id="s-target" data-sf="target" type="number" step="any" min="1" value="${esc(S.settings.target)}"></label>
-  </div><div class="hint">In Österreich gilt für Speisen der ermäßigte Steuersatz von 10 %. Der Wareneinsatz wird vom Preis exkl. MwSt. berechnet.</div></div>
-  <div class="panel"><div class="muted" style="font-size:13px">Daten</div>
-    <div class="hint" style="margin-top:4px">Die Daten werden nur in diesem Browser gespeichert. Erstellen Sie regelmäßig eine Sicherung und übertragen Sie sie per Import auf andere Geräte.</div>
-    <div class="bar"><button type="button" class="btn" data-act="export">Sicherung erstellen</button>
-      <label class="btn" for="importFile" style="display:inline-block">Sicherung laden</label><input id="importFile" type="file" accept="application/json,.json" hidden>
-      <button type="button" class="btn danger" data-act="reset">Demodaten wiederherstellen</button></div>
-  </div></div>`;
-}
-
-/* ---------- Dialoge ---------- */
-function openDialog(title, body, onOk, opts={}){
-  const f = $('#dlgForm'), d = $('#dlg');
-  f.innerHTML = `<h3>${esc(title)}</h3>${body}<div class="dlg-actions">${opts.del?'<button type="button" class="btn danger" id="dlgDel">Löschen</button>':''}<span class="sp"></span><button type="button" class="btn" id="dlgCancel">${opts.cancel||'Abbrechen'}</button>${onOk?`<button type="submit" class="btn primary">${opts.ok||'Speichern'}</button>`:''}</div>`;
-  f.onsubmit = e => { e.preventDefault(); if(onOk){ const r = onOk(new FormData(f)); if(r === false) return; } d.close(); save(); render(); };
-  $('#dlgCancel').onclick = () => d.close();
-  if(opts.del) $('#dlgDel').onclick = () => { d.close(); opts.del(); };
-  d.showModal();
-}
-function ask(text, yes, ok='Löschen'){ openDialog('Bitte bestätigen', `<p style="margin:0">${esc(text)}</p>`, () => { yes(); }, {ok}); }
-function info(title, text){ openDialog(title, `<p style="margin:0">${esc(text)}</p>`, null, {cancel:'OK'}); }
-
-function menuDialog(m){
-  const isNew = !m; m = m || {id:uid('m'), section:'', name:'', desc:'', price:'', card:''};
-  const secs = [...new Set(S.menu.map(x=>x.section))];
-  const opts = S.cards.filter(c=>c.type==='dish').sort(byName);
-  openDialog(isNew ? 'Neues Gericht' : 'Gericht bearbeiten', `
-    <label class="f">Kategorie<input name="section" list="secs" required value="${esc(m.section)}"><datalist id="secs">${secs.map(s=>`<option value="${esc(s)}">`).join('')}</datalist></label>
-    <label class="f">Bezeichnung<input name="name" required value="${esc(m.name)}"></label>
-    <label class="f">Beschreibung<input name="desc" value="${esc(m.desc)}"></label>
-    <label class="f">Preis inkl. MwSt., €<input name="price" type="number" step="0.01" min="0" required value="${esc(m.price)}"></label>
-    <label class="f">Rezeptur<select name="card"><option value="">— nicht verknüpft —</option>${opts.map(c=>`<option value="${c.id}" ${m.card===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label>`,
-    fd => { Object.assign(m, {section:fd.get('section').trim(), name:fd.get('name').trim(), desc:fd.get('desc').trim(), price:+fd.get('price'), card:fd.get('card')}); if(isNew) S.menu.push(m); },
-    {del: isNew ? null : () => ask(`„${m.name}“ von der Speisekarte löschen? Die Rezeptur bleibt erhalten.`, () => { S.menu = S.menu.filter(x=>x!==m); })});
-}
-
-function prodDialog(p){
-  const isNew = !p; p = p || {id:uid('p'), name:'', unit:'kg', price:'', lossCold:0, lossHot:0, alg:'', pieceG:''};
-  const has = new Set(algList(p.alg));
-  openDialog(isNew ? 'Neues Produkt' : 'Produkt bearbeiten', `
-    <label class="f">Bezeichnung<input name="name" required value="${esc(p.name)}"></label>
-    <div class="fields">
-      <label class="f">Einheit<select name="unit">${['kg','l','Stk'].map(u=>`<option ${p.unit===u?'selected':''}>${u}</option>`).join('')}</select></label>
-      <label class="f">Preis je Einheit, € exkl. MwSt.<input name="price" type="number" step="0.01" min="0" required value="${esc(p.price)}"></label>
-      <label class="f">Gewicht 1 Stk, g (bei „Stk“)<input name="pieceG" type="number" step="any" min="0" value="${esc(p.pieceG)}"></label>
-      <label class="f">Putzverlust, %<input name="lossCold" type="number" step="any" min="0" max="100" value="${esc(p.lossCold)}"></label>
-      <label class="f">Garverlust, %<input name="lossHot" type="number" step="any" min="0" max="100" value="${esc(p.lossHot)}"></label>
-    </div>
-    <div class="muted" style="font-size:12.5px">Allergene</div>
-    <div class="algs">${Object.entries(ALG).map(([k,v])=>`<label><input type="checkbox" name="alg" value="${k}" ${has.has(k)?'checked':''}> <b class="mono">${k}</b> ${esc(v)}</label>`).join('')}</div>`,
-    fd => { Object.assign(p, {name:fd.get('name').trim(), unit:fd.get('unit'), price:+fd.get('price'), pieceG:fd.get('pieceG'), lossCold:+fd.get('lossCold')||0, lossHot:+fd.get('lossHot')||0, alg:fd.getAll('alg').join(' ')}); if(isNew) S.products.push(p); },
-    {del: isNew ? null : () => { const u = usage('p:'+p.id); if(u.length) return info('Produkt wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(c=>c.name).join(', ')}. Entfernen Sie es dort zuerst.`); ask(`Produkt „${p.name}“ löschen?`, () => { S.products = S.products.filter(x=>x!==p); }); }});
-}
-
-function newCard(type, fromMenu){
-  const c = {id:uid(type==='semi'?'semi':'dish'), no:S.settings.nextNo++, name: fromMenu ? fromMenu.name : (type==='semi'?'Neues Basisrezept':'Neues Gericht'), type, category: fromMenu ? fromMenu.section : (type==='semi'?'Basisrezepte':''), yieldG:'', method:'', items:[{ref:'',qty:'',net:''}]};
-  S.cards.push(c); if(fromMenu) fromMenu.card = c.id;
-  view = {...view, tab:'cards', card:c.id}; save(); render(); scrollTo(0,0);
-}
-
-function printCard(id){
-  const c = C(id), t = totals(c);
-  $('#print').innerHTML = `
-    <div class="meta"><span>${esc(S.settings.name)}</span><span>Datum: ${new Date().toLocaleDateString('de-AT')}</span></div>
-    <h1>Rezeptur Nr. ${c.no||''}</h1>
-    <div><b>${esc(c.name)}</b> · ${c.type==='semi'?'Basisrezept':'Gericht'} · ${esc(c.category||'')}</div>
-    <div>Ausbeute: ${num(c.yieldG||t.out)} g ${c.type==='semi'?'(Charge)':'(1 Portion)'}</div>
-    <table><thead><tr><th>Nr.</th><th>Zutat</th><th class="r">Brutto</th><th>Einh.</th><th class="r">Netto, g</th><th class="r">Fertig, g</th><th class="r">Betrag, €</th></tr></thead>
-    <tbody>${c.items.map((it,i)=>{const l=t.lines[i];return `<tr><td>${i+1}</td><td>${esc(l.name)}</td><td class="r">${num(+it.qty,2)}</td><td>${l.unit}</td><td class="r">${num(l.net,1)}</td><td class="r">${num(l.out,1)}</td><td class="r">${num(l.cost,2)}</td></tr>`}).join('')}</tbody>
-    <tfoot><tr><td></td><td>Summe</td><td class="r">${num(t.gross)}</td><td></td><td class="r">${num(t.net)}</td><td class="r">${num(t.out)}</td><td class="r">${num(t.cost,2)}</td></tr></tfoot></table>
-    <p><b>Zubereitung:</b><br>${esc(c.method).replace(/\n/g,'<br>')}</p>
-    <p><b>Allergene:</b> ${[...t.alg].sort().map(a=>`${a} (${ALG[a]||''})`).join(', ') || 'keine'}</p>
-    <div class="sign"><span>Küchenchef ____________</span><span>Kalkulation ____________</span></div>`;
-  window.print();
-}
-
-function exportData(){
-  const json = JSON.stringify(S, null, 1);
-  openDialog('Sicherung', `<p class="hint" style="margin:0">Kopieren Sie den Text und speichern Sie ihn als .json-Datei. Wiederherstellen unter „Einstellungen“ mit „Sicherung laden“.</p>
-    <textarea id="expTxt" readonly style="min-height:200px;font:12px var(--f-mono)">${esc(json)}</textarea>
-    <div class="bar" style="margin:0"><button type="button" class="btn" id="copyBtn">Kopieren</button>${FRAMED?'':'<button type="button" class="btn" id="dlBtn">Datei herunterladen</button>'}<span class="hint" id="copyMsg" style="margin:0"></span></div>`, null, {cancel:'Schließen'});
-  $('#copyBtn').onclick = () => { const ta = $('#expTxt'); const done = () => $('#copyMsg').textContent = 'Kopiert'; navigator.clipboard?.writeText(json).then(done, () => { ta.select(); $('#copyMsg').textContent = 'Text markiert, mit Strg+C kopieren'; }) ?? (ta.select()); };
-  if(!FRAMED) $('#dlBtn').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([json],{type:'application/json'})); a.download = 'dahuam202-kueche-'+new Date().toISOString().slice(0,10)+'.json'; a.click(); };
-}
-
-/* ---------- Ereignisse ---------- */
-document.addEventListener('click', e => {
-  const tab = e.target.closest('#tabs button');
-  if(tab){ view = {...view, tab:tab.dataset.tab, card:null, q:''}; location.hash = tab.dataset.tab; render(); return; }
-  const el = e.target.closest('[data-act]'); if(!el) return;
-  const id = el.dataset.id, act = el.dataset.act;
-  const c = view.card ? C(view.card) : null;
-  switch(act){
-    case 'newMenu': menuDialog(); break;
-    case 'editMenu': menuDialog(S.menu.find(m=>m.id===id)); break;
-    case 'openCard': view = {...view, tab:'cards', card:id}; location.hash = 'cards'; render(); scrollTo(0,0); break;
-    case 'backCards': view.card = null; render(); break;
-    case 'newCardFor': newCard('dish', S.menu.find(m=>m.id===id)); break;
-    case 'newCard': newCard(id); break;
-    case 'ctype': view.ctype = id; render(); break;
-    case 'addLine': c.items.push({ref:'',qty:'',net:''}); save(); render(); break;
-    case 'delLine': c.items.splice(+id,1); save(); render(); break;
-    case 'dupCard': { const src = C(id); const cp = JSON.parse(JSON.stringify(src)); cp.id = uid(src.type); cp.no = S.settings.nextNo++; cp.name += ' (Kopie)'; S.cards.push(cp); view.card = cp.id; save(); render(); break; }
-    case 'delCard': { const src = C(id); const u = usage('c:'+id); if(u.length){ info('Basisrezept wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(x=>x.name).join(', ')}. Entfernen Sie es dort zuerst.`); break; }
-      ask(`Rezeptur „${src.name}“ löschen? Die Gerichte bleiben auf der Speisekarte, aber ohne Rezeptur.`, () => { S.cards = S.cards.filter(x=>x.id!==id); S.menu.forEach(m=>{ if(m.card===id) m.card=''; }); view.card = null; }); break; }
-    case 'printCard': printCard(id); break;
-    case 'newProd': prodDialog(); break;
-    case 'editProd': prodDialog(P(id)); break;
-    case 'export': exportData(); break;
-    case 'reset': ask('Alle Daten durch die Demodaten ersetzen? Ihre Änderungen gehen verloren.', () => { S = seed(); }, 'Ersetzen'); break;
-  }
-});
-
-document.addEventListener('input', e => {
-  const t = e.target;
-  if(t.id === 'mq' || t.id === 'cq'){ view.q = t.value; const pos = t.selectionStart; render(); const n = $('#'+t.id); n.focus(); n.setSelectionRange(pos,pos); }
-  if(t.id === 'pq'){ view.pq = t.value; const pos = t.selectionStart; render(); const n = $('#pq'); n.focus(); n.setSelectionRange(pos,pos); }
-});
-
-document.addEventListener('change', e => {
-  const t = e.target, c = view.card ? C(view.card) : null;
-  if(t.dataset.cf && c){ const f = t.dataset.cf; c[f] = f==='yieldG' ? (t.value===''?'':+t.value) : t.value; save(); if(f!=='method') render(); return; }
-  if(t.dataset.li != null && c){ const it = c.items[+t.dataset.li]; const f = t.dataset.lf; it[f] = f==='ref' ? t.value : (t.value===''?'':+t.value); if(f==='ref') it.net = ''; save(); render(); const n = document.getElementById(t.id); n && n.focus(); return; }
-  if(t.dataset.pp){ const p = P(t.dataset.pp); p[t.dataset.pf] = +t.value || 0; save(); render(); return; }
-  if(t.dataset.sf){ const f = t.dataset.sf; S.settings[f] = f==='name' ? t.value : (+t.value || 0); save(); return; }
-  if(t.id === 'importFile' && t.files[0]){
-    const r = new FileReader();
-    r.onload = () => { try { const d = JSON.parse(r.result); if(!d.products || !d.cards || !d.menu) throw 0; S = d; save(); view = {tab:'menu',card:null,q:'',ctype:'all',pq:''}; render(); info('Fertig', 'Daten wurden geladen.'); } catch(err){ info('Laden fehlgeschlagen', 'Die Datei ist keine Sicherung dieser App. Wählen Sie eine .json-Datei, die mit „Sicherung erstellen“ gespeichert wurde.'); } };
-    r.readAsText(t.files[0]); t.value = '';
-  }
-});
-
-function fromHash(){ const h = location.hash.slice(1); if(['menu','cards','products','setup'].includes(h) && h !== view.tab){ view = {...view, tab:h, card:null, q:''}; render(); } }
-window.addEventListener('hashchange', fromHash);
-fromHash(); render();

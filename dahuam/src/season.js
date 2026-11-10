@@ -35,7 +35,6 @@ function spStatus(sp){ const t = todayStr(); if((sp.to||sp.from) < t) return ['p
 function fmtShort(s){ const [y,m,d] = s.split('-'); return `${d}.${m}.`; }
 function fmtRange(sp){ return sp.to && sp.to !== sp.from ? `${fmtShort(sp.from)}–${fmtShort(sp.to)}${sp.to.slice(0,4)}` : `${fmtShort(sp.from)}${sp.from.slice(0,4)}`; }
 function mdLabel(md){ const [m,d] = md.split('-'); return `${d}.${m}.`; }
-function ornSvg(k, cls='g-orn'){ return ORN[k] ? `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${ORN[k]}</svg>` : ''; }
 function fontStack(f, serif){ return `"${f}",${serif?'Georgia,serif':'system-ui,sans-serif'}`; }
 
 function seasonSeed(d){
@@ -57,99 +56,8 @@ function seasonMigrate(d){
 }
 
 /* ---------- Gästekarte für Saison + Datum ---------- */
-function paperStyle(s){ const p = s.pal; return `--gp:${p.paper};--gi:${p.ink};--ga:${p.accent};--gm:${p.muted};--gr:${p.rule};--gfd:${fontStack(s.fd, !/Grotesque|Sans/.test(s.fd))};--gfb:${fontStack(s.fb)}`; }
-function itemHtml(m, s, used){
-  const k = m.card ? menuCalc(m) : null; const alg = k && k.t ? [...k.t.alg].sort() : []; alg.forEach(a=>used.add(a));
-  const img = s.photos && m.id ? menuImg(m) : '';
-  return `<article class="g-item ${img?'has-ph':''} ${m.top?'is-top':''}">
-    ${img ? `<img class="g-ph" src="${IMG[img]}" alt="${esc(m.name)}" loading="lazy">` : ''}
-    <div class="g-txt"><div class="g-row"><span class="g-n">${esc(m.name)}${m.veg==='vg'?' <i class="g-mark" title="Vegan">VG</i>':m.veg==='v'?' <i class="g-mark" title="Vegetarisch">V</i>':''}</span><span class="lead"></span><span class="g-p">${fin(+m.price).toLocaleString('de-AT',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
-    ${m.top?`<div class="g-top">★ Empfehlung des Hauses</div>`:''}
-    ${s.desc && m.desc ? `<div class="g-d">${esc(m.desc)}</div>` : ''}
-    ${s.allergens && alg.length ? `<div class="g-a">${alg.join(' · ')}</div>` : ''}</div>
-  </article>`;
-}
-function specialBlock(sp, s, used, standalone){
-  const items = sp.items.map(it => ({...it, id:'', top:false, card: it.card || ''}));
-  const st = sp.style === 'saison' ? '' : ` g-sp-${sp.style}`;
-  return `<section class="g-special${st} ${standalone?'is-page':''}">
-    <div class="g-sp-head"><span class="g-sp-date">${sp.to && sp.to!==sp.from ? `${fmtShort(sp.from)} – ${fmtShort(sp.to)}` : new Date(sp.from+'T12:00:00').toLocaleDateString('de-AT',{weekday:'long', day:'numeric', month:'long'})}</span>
-      <h3 class="g-sp-title">${esc(sp.name)}</h3>${sp.note?`<p class="g-sp-note">${esc(sp.note)}</p>`:''}</div>
-    <div class="g-list">${items.map(it => itemHtml(it, {...s, photos:false}, used)).join('')}</div>
-  </section>`;
-}
-function guestHtml(seasonKey, dateStr){
-  dateStr = dateStr || todayStr();
-  const k = seasonKey || seasonFor(dateStr) || 'winter';
-  const s = S.settings.seasons[k];
-  const items = menuSorted().filter(m => !m.hidden && inSeason(m, k));
-  const used = new Set();
-  const inserts = specialsFor(dateStr).filter(sp => sp.mode !== 'tageskarte');
-  let body = inserts.map(sp => specialBlock(sp, s, used)).join('');
-  for(const sec of secList()){
-    const list = items.filter(m=>m.section===sec); if(!list.length) continue;
-    body += `<section class="g-sec"><h3 class="g-h"><span>${esc(sec)}</span></h3><div class="g-list">${list.map(m => itemHtml(m, s, used)).join('')}</div></section>`;
-  }
-  const legend = s.allergens && used.size ? `<div class="g-leg">${[...used].sort().map(a=>`<span><b>${a}</b> ${esc(ALG[a])}</span>`).join('')}</div>` : '';
-  const cover = s.cover && IMG[s.cover] ? `<img class="g-cover" src="${IMG[s.cover]}" alt="">` : '';
-  return `<div class="g-paper g-${s.layout} g-season-${k}" style="${paperStyle(s)}">
-    ${cover}
-    <header class="g-head">${ornSvg(s.orn,'g-orn top')}<div class="g-mark-logo">DAHUAM<span>.</span>202</div><h2 class="g-title">${esc(s.title)}</h2>${s.subtitle?`<div class="g-sub">${esc(s.subtitle)}</div>`:''}</header>
-    ${body || '<p class="g-empty">Noch keine sichtbaren Gerichte in dieser Saison.</p>'}
-    <footer class="g-foot">${ornSvg(s.orn,'g-orn')}<div class="g-keys"><span><i class="g-mark">V</i> vegetarisch</span><span><i class="g-mark">VG</i> vegan</span><span>★ Empfehlung des Hauses</span></div>${legend}<p>${esc(s.footer)}</p></footer>
-  </div>`;
-}
-function tageskarteHtml(sp, k){
-  const s = S.settings.seasons[k || seasonFor(sp.from) || 'winter']; const used = new Set();
-  const inner = specialBlock(sp, s, used, true);
-  const legend = used.size ? `<div class="g-leg">${[...used].sort().map(a=>`<span><b>${a}</b> ${esc(ALG[a])}</span>`).join('')}</div>` : '';
-  return `<div class="g-paper g-tk g-${s.layout} ${sp.style!=='saison'?'g-tk-'+sp.style:''}" style="${paperStyle(s)}">
-    <header class="g-head"><div class="g-mark-logo">DAHUAM<span>.</span>202</div><div class="g-sub">Tageskarte</div></header>${inner}
-    <footer class="g-foot">${legend}<p>Solange der Vorrat reicht. Preise in Euro inkl. MwSt.</p></footer></div>`;
-}
 
 /* ---------- Gästekarte: Werkzeuge ---------- */
-function renderGuest(){
-  const date = view.gdate || (view.gdate = todayStr());
-  const auto = seasonFor(date);
-  const k = view.gseason || auto || 'winter';
-  const s = S.settings.seasons[k];
-  const sps = specialsFor(date);
-  const tks = sps.filter(sp => sp.mode === 'tageskarte');
-  const tog = (f,l) => `<label class="tog"><input type="checkbox" data-sv="${f}" ${s[f]?'checked':''}><span></span>${l}</label>`;
-  const presets = SEASONS.map(([pk,pl]) => { const p = THEMES[pk].pal; return `<button type="button" class="sw-preset ${JSON.stringify(s.pal)===JSON.stringify(p)?'on':''}" data-act="palPreset" data-id="${pk}" title="${esc(THEMES[pk].theme)}"><i style="background:${p.paper}"></i><i style="background:${p.accent}"></i><i style="background:${p.ink}"></i><span>${esc(THEMES[pk].theme)}</span></button>`; }).join('');
-  return `<div class="guest-wrap">
-    <aside class="guest-tools">
-      <section class="panel">
-        <div class="panel-h"><h2>Was sehen die Gäste?</h2></div>
-        <label class="f">Datum<input id="gdate" type="date" value="${date}"></label>
-        <div class="chips-row tight"><button type="button" class="chip ${date===todayStr()?'on':''}" data-act="gdate" data-id="${todayStr()}">Heute</button><button type="button" class="chip" data-act="gdate" data-id="${addDays(todayStr(),1)}">Morgen</button>${S.specials.filter(sp=>spStatus(sp)[0]!=='past').slice(0,3).map(sp=>`<button type="button" class="chip" data-act="gdate" data-id="${sp.from}">${esc(sp.name)}</button>`).join('')}</div>
-        <p class="hint">${auto ? `Am ${fmtDate(date+'T12:00:00')} gilt die <b>${esc(S.settings.seasons[auto].title)}</b>` : 'An diesem Datum gilt keine Saisonkarte'}${sps.length ? ` und ${sps.length===1?'die Aktion':'die Aktionen'} <b>${sps.map(x=>esc(x.name)).join(', ')}</b>.` : '.'}</p>
-        ${(() => { const miss = guestItems(k, date).filter(m=>!hasAlg(m)).length + sps.reduce((n,sp)=>n+sp.items.filter(it=>!hasAlg(it)).length,0); return miss ? `<div class="warn-box">${ico('spark')}<span><b>${miss} Gerichte ohne Allergenangabe.</b> In Österreich Pflicht: Rezeptur verknüpfen oder Allergene im Gericht eintragen.</span><button type="button" class="btn sm" data-act="goMenu" data-id="noalg">Anzeigen</button></div>` : '<div class="ok-box">Alle Gerichte haben Allergenangaben.</div>'; })()}
-      </section>
-      <section class="panel">
-        <div class="panel-h"><h2>Saisonkarte gestalten</h2>${view.gseason?`<button type="button" class="link sm-link" data-act="gseason" data-id="">nach Datum</button>`:''}</div>
-        ${seg('gseason', k, SEASONS.map(([sk,sl])=>[sk,sl]))}
-        <div class="fields two">
-          <label class="f">Gültig ab<input type="text" inputmode="numeric" placeholder="TT.MM." data-smd="from" value="${mdLabel(s.from)}"></label>
-          <label class="f">bis<input type="text" inputmode="numeric" placeholder="TT.MM." data-smd="to" value="${mdLabel(s.to)}"></label>
-        </div>
-        <div class="f">Layout</div>${seg('glayout', s.layout, GSTYLES)}
-        <div class="f">Farben</div><div class="presets">${presets}</div>
-        <div class="colors">${[['paper','Papier'],['ink','Schrift'],['accent','Akzent']].map(([c,l])=>`<label class="clr"><input type="color" data-pal="${c}" value="${s.pal[c]}" aria-label="${l}"><span>${l}</span></label>`).join('')}</div>
-        <label class="f">Schrift<select data-sv="fontpair">${FONTPAIRS.map(([a,b,l])=>`<option value="${esc(a+'|'+b)}" ${s.fd===a&&s.fb===b?'selected':''}>${l} · ${esc(a)}</option>`).join('')}</select></label>
-        <div class="f">Ornament</div><div class="orns">${ORN_ORDER.map(o=>`<button type="button" class="orn-b ${s.orn===o?'on':''}" data-act="gorn" data-id="${o}" title="${ORN_LABEL[o]}" aria-label="${ORN_LABEL[o]}">${o==='keins'?'<span>—</span>':ornSvg(o,'ico')}</button>`).join('')}</div>
-        <div class="togs">${tog('photos','Fotos')}${tog('desc','Beschreibungen')}${tog('allergens','Allergene')}</div>
-        <label class="f">Titel<input data-st="title" value="${esc(s.title)}"></label>
-        <label class="f">Untertitel<input data-st="subtitle" value="${esc(s.subtitle)}"></label>
-        <label class="f">Fußzeile<textarea data-st="footer" class="sm-ta">${esc(s.footer)}</textarea></label>
-        <div class="row-btns"><button type="button" class="btn sm" data-act="gcover">${ico('camera')}${s.cover?'Titelbild ändern':'Titelbild'}</button>${s.cover?'<button type="button" class="btn sm" data-act="gcoverDel">Entfernen</button>':''}<button type="button" class="btn sm" data-act="gReset" data-id="${k}">Design zurücksetzen</button></div>
-        <p class="hint">${S.menu.filter(m=>!m.hidden && inSeason(m,k)).length} Gerichte auf der ${esc(s.title)}. Welche Gerichte in welcher Saison laufen, legen Sie unter „Saison & Aktionen“ fest.</p>
-      </section>
-    </aside>
-    <div class="guest-prev">${guestPrevHtml()}</div>
-  </div>`;
-}
 
 /* ---------- Saison & Aktionen ---------- */
 function dayOfYear(md){ const [m,d] = md.split('-').map(Number); return Math.round((Date.UTC(2025,m-1,d) - Date.UTC(2025,0,1))/864e5); }
@@ -169,7 +77,7 @@ function renderPlan(){
   const q = view.pq.trim().toLowerCase();
   const dishes = menuSorted().filter(m => !q || m.name.toLowerCase().includes(q));
   return `<section class="panel">
-    <div class="panel-h"><h2>Jahresplan ${y}</h2><div class="row-btns"><button type="button" class="btn sm primary" data-act="newSpecial">${ico('plus')}Aktion / Spezialität</button></div></div>
+    <div class="panel-h"><h2>Jahresplan ${y}</h2></div>
     <div class="tl-wrap"><div class="tline">
       <div class="tl-months">${months.map(m=>`<span>${m}</span>`).join('')}</div>
       <div class="tl-track">${bars}<span class="tl-today ${todayX > 92 ? 'r' : todayX < 4 ? 'l' : ''}" style="left:${todayX.toFixed(2)}%" title="Heute"></span></div>
@@ -184,7 +92,7 @@ function renderPlan(){
         <h3>${esc(sp.name)}</h3>${sp.note?`<p class="muted sm">${esc(sp.note)}</p>`:''}
         <ul class="sp-items">${sp.items.map(it=>`<li><span>${esc(it.name)}</span>${+it.price > 0 ? `<span class="mono">${eur(it.price)}</span>` : ''}</li>`).join('')}</ul>
         <div class="sp-foot"><span class="tag">${sp.mode==='tageskarte'?'Eigene Tageskarte':'Einleger auf der Karte'} · ${esc((SPECIAL_STYLES.find(x=>x[0]===sp.style)||[,''])[1])}</span>
-          <span class="row-btns"><button type="button" class="icon-btn" data-act="previewSpecial" data-id="${sp.id}" title="Vorschau" aria-label="Vorschau">${ico('eye')}</button><button type="button" class="icon-btn" data-act="dupSpecial" data-id="${sp.id}" title="Für nächstes Jahr kopieren" aria-label="Kopieren">${ico('copy')}</button>${!FRAMED && sp.mode==='tageskarte'?`<button type="button" class="icon-btn" data-act="printSpecial" data-id="${sp.id}" title="Tageskarte drucken" aria-label="Drucken">${ico('print')}</button>`:''}<button type="button" class="icon-btn" data-act="editSpecial" data-id="${sp.id}" title="Bearbeiten" aria-label="Bearbeiten">${ico('edit')}</button></span></div>
+          <span class="row-btns"><button type="button" class="icon-btn" data-act="previewSpecial" data-id="${sp.id}" title="Vorschau" aria-label="Vorschau">${ico('eye')}</button><button type="button" class="icon-btn" data-act="dupSpecial" data-id="${sp.id}" title="Für nächstes Jahr kopieren" aria-label="Kopieren">${ico('copy')}</button>${sp.mode==='tageskarte'?`<button type="button" class="icon-btn" data-act="printSpecial" data-id="${sp.id}" title="Tageskarte drucken" aria-label="Drucken">${ico('print')}</button>`:''}<button type="button" class="icon-btn" data-act="editSpecial" data-id="${sp.id}" title="Bearbeiten" aria-label="Bearbeiten">${ico('edit')}</button></span></div>
       </article>`; }).join('')}</div>`; }).join('') || '<div class="panel empty">Noch keine Aktionen geplant.</div>'}
     </section>
     <section class="panel flush">

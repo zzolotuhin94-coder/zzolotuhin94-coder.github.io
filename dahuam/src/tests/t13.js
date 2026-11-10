@@ -14,7 +14,7 @@ await p.fill('input[name=p_romaine]','3.95');await p.fill('input[name=p_quail]',
 await p.screenshot({path:'pr-fix.png'});
 await p.click('#dlg button[value=ok], #dlg .btn.primary');await p.waitForTimeout(300);
 console.log('after fix',await ev(()=>JSON.stringify([P('romaine').price,P('romaine').priceDemo,P('quail').price,P('parmesan').priceDemo])));
-await ev(()=>{go('products')});await p.waitForTimeout(300);await p.screenshot({path:'pr-prods.png'});
+await ev(()=>{view.more={products:true};go('products')});await p.waitForTimeout(300);await p.screenshot({path:'pr-prods.png'});
 await p.click('[data-act=plImport]');await p.waitForTimeout(200);await p.click('#plSample');await p.waitForTimeout(200);
 console.log('pl',await p.textContent('#plOut .hint'));await p.screenshot({path:'pr-pl.png'});
 await p.click('#dlg .btn.primary');await p.waitForTimeout(300);
