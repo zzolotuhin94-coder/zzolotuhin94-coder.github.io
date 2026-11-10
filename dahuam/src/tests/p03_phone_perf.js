@@ -27,7 +27,7 @@ ok(seen.length===5&&new Set(seen).size===5,'mini guide with 5 steps, ends cleanl
 // Hilfe
 const hp=await ev(()=>{go('vorb');helpApply();const c=[...document.querySelectorAll('#app [data-help]')].map(e=>e.dataset.help);return {v:[...new Set(c)],bad:HELP_SEL.filter(x=>!HELP[x[1]]).length,len:Object.values(HELP).filter(h=>h.x.length<25||h.x.length>230).map(h=>h.k)}});
 ok(['prognose','spanne','pl_menge','tagesfaktor','charge','mise','prepliste','pl_abhaken','pl_tag','pdf'].every(k=>hp.v.includes(k))&&hp.bad===0&&hp.len.length===0,'help mode: new elements carry explanations; all texts 25–230 characters',hp.v);
-ok(await ev(()=>MISSIONS.length===18&&['fc1','prep3'].every(id=>MISSIONS.some(m=>m.id===id&&m.tier===1))&&MS_LEVELS[3][0]===18&&GD_ACT_NUMS.includes('fc')&&GD_ACT_NUMS.includes('prep')),'two new missions in „Alltag“, Gipfel = all 18');
+ok(await ev(()=>MISSIONS.length===21&&['fc1','prep3'].every(id=>MISSIONS.some(m=>m.id===id&&m.tier===1))&&MS_LEVELS[3][0]===21&&GD_ACT_NUMS.includes('fc')&&GD_ACT_NUMS.includes('prep')),'two new missions in „Alltag“, Gipfel = all 21');
 if(errs.length)console.log('errors desktop',JSON.stringify(errs));await b.close();if(errs.length)process.exitCode=1;}
 // ---------- Handy 390 ----------
 {const {b,p,errs}=await L.open({vp:{width:390,height:844},mobile:true,touch:true});const ev=(f,a)=>p.evaluate(f,a);const w=ms=>p.waitForTimeout(ms);await p.addStyleTag({content:'.reward{display:none!important}'});

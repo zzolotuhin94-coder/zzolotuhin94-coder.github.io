@@ -9,13 +9,13 @@ await p.evaluate(()=>go('aufbau'));await settle(p,900);
 let s=await st(p);
 ok(s.s.length===0&&Object.values(s.a).every(v=>Array.isArray(v)?v.length===0:v===0),'fresh demo data: no stamp, every counter 0',s);
 const rows=await p.evaluate(()=>msState().map(x=>[x.m.id,x.n,x.goal,x.done]));
-ok(rows.length===18&&rows.filter(r=>!['allprices','allrecipes','allalg'].includes(r[0])).every(r=>r[1]===0),'18 missions; all action missions at 0 although the demo data has prices, recipes, orders, inventories',rows.filter(r=>r[1]>0));
+ok(rows.length===21&&rows.filter(r=>!['allprices','allrecipes','allalg'].includes(r[0])).every(r=>r[1]===0),'21 missions; all action missions at 0 although the demo data has prices, recipes, orders, inventories',rows.filter(r=>r[1]>0));
 ok(await p.evaluate(()=>document.querySelectorAll('#app .ms-next [data-act="missionGo"]').length===1&&document.querySelector('#app .ms-next h2').textContent==='Rundgang ansehen'),'Aufbau shows exactly one "next mission" with one start button');
 ok(await p.evaluate(()=>document.querySelectorAll('#app .au-row').length===6),'the six data stations are still there');
 ok(await p.evaluate(()=>/Talstation/.test(document.querySelector('#app .ms-lvl').textContent)),'calm level title');
 // tiers
 await p.click('#app [data-act="msTier"][data-id="1"]');await settle(p,200);
-ok(await p.evaluate(()=>document.querySelectorAll('#app .ms-row').length===13),'tier Alltag opens',await p.evaluate(()=>document.querySelectorAll('#app .ms-row').length));
+ok(await p.evaluate(()=>document.querySelectorAll('#app .ms-row').length===15),'tier Alltag opens',await p.evaluate(()=>document.querySelectorAll('#app .ms-row').length));
 // mission start button → right place + matching guide
 await p.click('#app .ms-row [data-act="missionGo"][data-id="prices5"]');await settle(p,700);
 let t=await T(p);ok(t&&t.id==='pcheck'&&t.tab==='pcheck','„5 echte Preise“ opens the Preis-Check and starts its guide',t&&[t.id,t.tab]);
@@ -68,7 +68,7 @@ await p.evaluate(()=>missionGo('link5'));await settle(p,800);t=await T(p);ok(t&&
 // Stempelkarte + level
 await p.evaluate(()=>go('stempel'));await settle(p,300);
 const sk=await p.evaluate(()=>({on:document.querySelectorAll('#app .stamp.on').length,all:document.querySelectorAll('#app .stamp').length,lvl:document.querySelector('#app .sk-lvl').textContent,nav:document.querySelector('.side .nav-i.on').dataset.tab}));
-ok(sk.all===18&&sk.on===7&&/Mittelstation/.test(sk.lvl)&&sk.nav==='aufbau','Stempelkarte: 7 of 18 stamps, level Mittelstation',sk);
+ok(sk.all===21&&sk.on===7&&/Mittelstation/.test(sk.lvl)&&sk.nav==='aufbau','Stempelkarte: 7 of 21 stamps, level Mittelstation',sk);
 await p.click('#app .stamp.on');await settle(p,200);ok(await p.evaluate(()=>/Erledigt am/.test((document.querySelector('.gd-bub')||{}).textContent||'')),'tapping a stamp tells what it is for');
 // persistence
 await p.reload();await settle(p,900);const s2=await st(p);ok(s2.s.length===7&&s2.a.prices.length>=5&&s2.a.sent===1,'stamps and counters survive a reload',s2);

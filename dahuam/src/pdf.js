@@ -36,7 +36,7 @@ async function exportPdf(filename){
       root.querySelectorAll('*').forEach(n => { const tt = win.getComputedStyle(n).textTransform; if(tt && tt !== 'none'){ n.childNodes.forEach(t => { if(t.nodeType === 3) t.nodeValue = tt === 'uppercase' ? t.nodeValue.toUpperCase() : tt === 'lowercase' ? t.nodeValue.toLowerCase() : t.nodeValue; }); n.style.textTransform = 'none'; } });
     }});
     const H2 = Math.floor(canvas.height / scale); const k = H2 / H0; cuts = cuts.map(c => Math.round(c * k));
-    const {jsPDF} = window.jspdf; const pdf = new jsPDF({unit:'pt', format:'a4', compress:true});
+    const {jsPDF} = window.jspdf; const pdf = new jsPDF({unit:'pt', format:'a4', compress:true, orientation: el.classList.contains('land') ? 'landscape' : 'portrait'});
     const pw = pdf.internal.pageSize.getWidth(), ph = pdf.internal.pageSize.getHeight();
     const M = 26; // Seitenrand oben/unten in pt
     const pagePx = Math.floor(W * (ph - 2*M) / pw);
@@ -54,7 +54,7 @@ async function exportPdf(filename){
     const ok = await saveFile(filename, pdf.output('blob'));
     if(ok) toast(`PDF erstellt: ${filename} (${page} ${page===1?'Seite':'Seiten'})`);
   } catch(e){ toast('PDF fehlgeschlagen: ' + (e.message || e)); }
-  finally { el.classList.remove('pdf'); }
+  finally { el.classList.remove('pdf', 'land'); }
 }
 
 /* window.print(): eingebettet (wo Drucken gesperrt ist) oder bei PDF-Knopf → PDF */

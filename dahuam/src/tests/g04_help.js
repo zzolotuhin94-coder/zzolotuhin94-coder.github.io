@@ -63,7 +63,7 @@ const bub=p=>p.evaluate(()=>{const n=document.querySelector('.gd-bub');return n?
  ok(await p.evaluate(()=>view.tab==='begriffe'&&document.querySelector('#bg-garverlust').classList.contains('hit')),'palette finds a term and jumps to it');
  // nav: title + group names
  const nav=await p.evaluate(()=>({titles:[...document.querySelectorAll('.side .nav-i')].map(b=>b.title),groups:[...document.querySelectorAll('.side .nav-group')].map(g=>g.textContent).filter(Boolean)}));
- ok(nav.titles.length===11&&nav.titles.every(t=>t.length>20),'every nav item has a one-line description',nav.titles[3]);ok(nav.groups.join('|')==='Start|Karte & Rezepte|Ware & Einkauf|Verkauf','nav groups have plain names',nav.groups);
+ ok(nav.titles.length===13&&nav.titles.every(t=>t.length>20),'every nav item has a one-line description',nav.titles[3]);ok(nav.groups.join('|')==='Start|Karte & Rezepte|Ware & Einkauf|Verkauf|Team','nav groups have plain names',nav.groups);
  // breadcrumb
  await p.evaluate(()=>go('cards','dish_kaiser'));await settle(p,250);
  ok(await p.evaluate(()=>{const c=document.querySelector('#app .crumb');return !!c&&c.querySelector('.back').textContent.trim()==='Alle Rezepturen'&&c.querySelector('.crumb-here').textContent===C('dish_kaiser').name&&/Kaiserschmarrn.*Rezepturen/.test(document.title)}),'recipe detail: back link + current place + document title');
