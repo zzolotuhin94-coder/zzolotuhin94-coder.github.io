@@ -91,10 +91,10 @@ await p.evaluate(()=>{go('setup')});await p.click('#app [data-act="gdReset"]');a
 s=await st(p);ok(s.s.length===0&&s.a.prices.length===0&&s.a.sent===0,'„Stempel zurücksetzen“ clears stamps and counters, data untouched',s.s);
 ok(await p.evaluate(()=>S.products.filter(p=>!p.priceDemo&&!p.noStock).length>=5),'… confirmed prices are still confirmed, but no longer counted (not re-earned from data)');
 // old saved state without game.acts
-await p.evaluate(()=>{const d=JSON.parse(localStorage.getItem(KEY));delete d.game.acts;delete d.game.stamps;delete d.game.minit;localStorage.setItem(KEY,JSON.stringify(d));localStorage.removeItem(KEY+'_guide')});
+await p.evaluate(async()=>{const d=await __store.read();delete d.game.acts;delete d.game.stamps;delete d.game.minit;await __store.replace(d);localStorage.removeItem(KEY+'_guide')});
 await p.reload();await settle(p,900);
 ok(await p.evaluate(()=>Array.isArray(S.game.acts.prices)&&typeof S.game.stamps==='object'&&!document.body.classList.contains('simple')&&!document.querySelector('.gd-wel')&&!GD.t),'old saved state: migrated, „Alles zeigen“, no dialog');
-await p.evaluate(()=>{const d=JSON.parse(localStorage.getItem(KEY));delete d.game;localStorage.setItem(KEY,JSON.stringify(d))});await p.reload();await settle(p,900);
+await p.evaluate(async()=>{const d=await __store.read();delete d.game;await __store.replace(d)});await p.reload();await settle(p,900);
 await p.evaluate(()=>go('aufbau'));await settle(p,200);ok(await p.evaluate(()=>!!S.game&&S.game.acts.tour===0&&document.querySelectorAll('#app .ms-row').length>0),'state without any game data loads');
 // backup file from before the guide
 const old=JSON.parse(fs.readFileSync(__dirname+'/../fixtests/backup_test.json','utf8'));

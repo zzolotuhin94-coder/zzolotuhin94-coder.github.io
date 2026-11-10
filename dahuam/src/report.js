@@ -300,7 +300,7 @@ function applyMapping(key, mid){
 }
 async function readFileAsCsv(file){
   if(/\.xlsx?$/i.test(file.name)){
-    if(!window.XLSX) await new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; s.onload = res; s.onerror = () => rej(new Error('Excel-Leser konnte nicht geladen werden. Bitte die Datei als CSV speichern.')); document.head.appendChild(s); });
+    if(!window.XLSX){ try { await loadLib(XLSX_LIB); } catch(e){ throw new Error('Excel-Leser konnte nicht geladen werden. Bitte die Datei als CSV speichern.'); } }
     const wb = XLSX.read(await file.arrayBuffer(), {type:'array'}); return XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]], {FS:';'});
   }
   return await file.text();

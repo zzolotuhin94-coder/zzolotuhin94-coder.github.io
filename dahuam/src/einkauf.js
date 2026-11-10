@@ -136,12 +136,12 @@ orderView = function(){
       ${todayList.length ? `<div class="oc-grid">${todayList.map(card).join('')}</div>` : '<p class="hint">Heute ist kein Bestelltag.</p>'}
     </section>
     <section class="panel"><div class="panel-h"><h2>Erwartete Lieferungen</h2></div>
-      ${expected.length ? `<ul class="todo">${expected.map(o=>{ const sp = SUP(o.supplier); const late = o.deliveryDate < t; return `<li><button type="button" data-act="ordRecv" data-id="${o.id}"><b class="${late?'bad-t':''}">${late?'!':o.deliveryDate===t?'heute':'morgen'}</b><span>${esc(sp.name)} · ${o.lines.length} Positionen · ${eur(orderTotal(o))}<small class="muted" style="display:block">${o.no} · ${statusPill(o.status)} ${late?'· überfällig':''}</small></span>${ico('arrow','flip')}</button></li>`; }).join('')}</ul>` : '<p class="hint">Heute und morgen kommen keine bestellten Lieferungen.</p>'}
+      ${expected.length ? `<ul class="todo">${expected.map(o=>{ const sp = SUP(o.supplier); const late = o.deliveryDate < t; return `<li><button type="button" data-act="ordRecv" data-id="${o.id}"><b class="${late?'bad-t':''}">${late?'!':o.deliveryDate===t?'heute':'morgen'}</b><span>${esc(sp.name)} · ${o.lines.length} Positionen · ${eur(orderTotal(o))}<small class="muted" style="display:block">${esc(o.no)} · ${statusPill(o.status)} ${late?'· überfällig':''}</small></span>${ico('arrow','flip')}</button></li>`; }).join('')}</ul>` : '<p class="hint">Heute und morgen kommen keine bestellten Lieferungen.</p>'}
     </section></div>
   <h2 class="sec-h">Letzte Bestellung je Lieferant</h2>
   <div class="lo-grid">${sups.map(sp => { const o = lastOrder(sp.id); const st = supStats(sp.id); return `<article class="lo">
     <div class="lo-h"><b>${esc(sp.name)}</b>${o?statusPill(o.status):''}</div>
-    ${o ? `<div class="muted sm">${o.no} · ${fmtDate(o.sentAt||o.createdAt)} · von ${esc(userName(o.createdBy))}</div>
+    ${o ? `<div class="muted sm">${esc(o.no)} · ${fmtDate(o.sentAt||o.createdAt)} · von ${esc(userName(o.createdBy))}</div>
       <div class="lo-m"><span class="mono">${o.lines.length} Pos.</span><span class="mono">${o.receipt ? `<small class="tot-l">geliefert</small> ${eur(deliveredTotal(o))}` : `<small class="tot-l">bestellt</small> ${eur(orderTotal(o))}`}</span><span class="muted sm">${st.onTime!=null?`pünktlich ${st.onTime} %`:''}</span></div>
       <div class="row-btns"><button type="button" class="btn sm" data-act="ordOpen" data-id="${o.id}">Ansehen</button><button type="button" class="btn sm" data-act="ordRe" data-id="${o.id}">Nachbestellen</button></div>` : `<p class="hint">Noch keine Bestellung.</p><div class="row-btns"><button type="button" class="btn sm" data-act="ordNew" data-id="${sp.id}">Erste Bestellung</button></div>`}
   </article>`; }).join('')}</div>
@@ -153,7 +153,7 @@ function orderList(){
   const f = view.ofilter || 'open';
   const list = S.orders.filter(o => f==='all' || (f==='open' ? ['draft','approval','sent','confirmed','complaint'].includes(o.status) : o.status===f)).sort((a,b)=>(b.sentAt||b.createdAt).localeCompare(a.sentAt||a.createdAt));
   return list.length ? `<ul class="olist">${list.map(o=>{ const sp = SUP(o.supplier); return `<li><button type="button" data-act="ordOpen" data-id="${o.id}">
-    <span class="mono sm muted">${o.no}</span><span class="on"><b>${esc(sp?sp.name:'?')}</b><small class="muted">${o.lines.length} Positionen · Lieferung ${fmtDate(o.deliveryDate+'T12:00:00')}</small></span>${statusPill(o.status)}<span class="mono ol-tot">${o.receipt ? `<small class="tot-l">geliefert</small> ${eur(deliveredTotal(o))}` : `<small class="tot-l">bestellt</small> ${eur(orderTotal(o))}`}</span></button></li>`; }).join('')}</ul>` : '<div class="empty">Keine Bestellungen in dieser Ansicht.</div>';
+    <span class="mono sm muted">${esc(o.no)}</span><span class="on"><b>${esc(sp?sp.name:'?')}</b><small class="muted">${o.lines.length} Positionen · Lieferung ${fmtDate(o.deliveryDate+'T12:00:00')}</small></span>${statusPill(o.status)}<span class="mono ol-tot">${o.receipt ? `<small class="tot-l">geliefert</small> ${eur(deliveredTotal(o))}` : `<small class="tot-l">bestellt</small> ${eur(orderTotal(o))}`}</span></button></li>`; }).join('')}</ul>` : '<div class="empty">Keine Bestellungen in dieser Ansicht.</div>';
 }
 
 /* ---------- Bestellung bearbeiten / senden / empfangen ---------- */
@@ -164,7 +164,7 @@ function orderEditor(o){
   const hasCold = o.lines.some(l => P(l.pid)?.loc === 'K' || P(l.pid)?.loc === 'T');
   const head = `<button type="button" class="back" data-act="ordBack">${ico('arrow')}Alle Bestellungen</button>
   <section class="panel ord-head">
-    <div><div class="eyebrow">${o.no} · ${esc(SUP_CATS[sp.cat]||'')}</div><h1 class="h-ord">${esc(sp.name)}</h1>
+    <div><div class="eyebrow">${esc(o.no)} · ${esc(SUP_CATS[sp.cat]||'')}</div><h1 class="h-ord">${esc(sp.name)}</h1>
       <div class="muted sm">${CHANNELS[sp.channel]}${sp.email?' · '+esc(sp.email):''}${sp.phone?' · '+esc(sp.phone):''}${sp.customerNo?' · Kundennr. '+esc(sp.customerNo):''}</div></div>
     <div class="ord-st">${statusPill(o.status)}<span class="muted sm">erstellt ${fmtDate(o.createdAt)} von ${esc(userName(o.createdBy))}${o.sentAt?` · gesendet ${fmtDate(o.sentAt)} via ${esc(o.sentVia||'')}`:''}</span></div>
   </section>`;
@@ -285,7 +285,7 @@ function supplierDialog(sp){
 }
 function delayDialog(o){
   const sp = SUP(o.supplier);
-  openDialog('Lieferung verschoben', `<p class="dlg-p">Neuer Liefertermin für ${esc(sp.name)}, ${o.no}. Das Cockpit zeigt die Lieferung dann am neuen Tag.</p>
+  openDialog('Lieferung verschoben', `<p class="dlg-p">Neuer Liefertermin für ${esc(sp.name)}, ${esc(o.no)}. Das Cockpit zeigt die Lieferung dann am neuen Tag.</p>
     <label class="f">Neuer Termin<input name="d" type="date" required value="${addDays(o.deliveryDate,1)}"></label>
     <label class="f">Grund<select name="r"><option>Schneefall / Straße gesperrt</option><option>Lieferant hat verschoben</option><option>Ware nicht lieferbar</option><option>Sonstiges</option></select></label>`,
     fd => { o.deliveryDate = fd.get('d'); o.confirmedNote = `Verschoben: ${fd.get('r')}`; }, {ok:'Verschieben', done:'Liefertermin geändert'});

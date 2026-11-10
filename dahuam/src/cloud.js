@@ -6,13 +6,14 @@ const CLOUD_KEY = KEY + '_cloud', BASE_KEY = KEY + '_base';
 let CL = (() => { try { return JSON.parse(localStorage.getItem(CLOUD_KEY)) || {}; } catch(e){ return {}; } })();
 let cloudState = 'off', cloudMsg = '', pushTimer = null, pushing = false, dirty = false, pollTimer = null;
 function clSave(){ try { localStorage.setItem(CLOUD_KEY, JSON.stringify(CL)); } catch(e){} }
-function baseGet(){ try { return JSON.parse(localStorage.getItem(BASE_KEY)); } catch(e){ return null; } }
-function baseSet(d){ try { localStorage.setItem(BASE_KEY, JSON.stringify(d)); } catch(e){} }
+function baseGet(){ return STORE.baseGet(); }
+function baseSet(d){ STORE.baseSet(d); }
+const CLOUD_NEWER = 'Die Cloud-Daten stammen aus einer neueren Version der App. Bitte diese App neu laden, dann geht der Abgleich wieder. Es wurde nichts geändert.';
 function cloudReady(){ return !FRAMED && !!(CL.url && CL.anon && CL.session && CL.rid); }
 /* Fehlertexte: deutsch, ohne Technik */
 function cloudErrText(x){
   const m = String((x && x.message) || x || ''); const st = x && x.status;
-  if(/^(E-Mail oder Passwort|Dieses Konto|Sitzung abgelaufen|Bitte )/.test(m)) return m;
+  if(/^(E-Mail oder Passwort|Dieses Konto|Sitzung abgelaufen|Bitte |Die Cloud-Daten stammen)/.test(m)) return m;
   if(x instanceof TypeError || /failed to fetch|networkerror|load failed|fetch|network|dns|cors|timed? ?out|invalid url|parse url/i.test(m) || st === 0 || st === 404 || st >= 500) return 'Keine Verbindung zum Cloud-Projekt. Adresse und Schlüssel prüfen.';
   if(st === 401 || st === 403 || /api key|apikey|jwt|not authorized|permission|unauthori[sz]ed/i.test(m)) return 'Zugriff abgelehnt. Schlüssel und Anmeldung prüfen.';
   if(/nicht angemeldet/.test(m)) return 'Nicht angemeldet. Bitte neu verbinden.';
@@ -48,7 +49,7 @@ async function cloudLogin(url, anon, email, pw){
   if(!ms || !ms.length) throw new Error('Dieses Konto ist noch keinem Betrieb zugeordnet. Bitte den Inhaber, Sie zum Team hinzuzufügen.');
   const m = ms[0]; CL.rid = m.restaurant_id; CL.rname = m.restaurant_name; CL.member = {name:m.name, role:m.role}; CL.version = 0; clSave();
 }
-function cloudLogout(){ CL = {}; clSave(); try { localStorage.removeItem(BASE_KEY); } catch(e){} clearInterval(pollTimer); setCloud('off'); render(); }
+function cloudLogout(){ CL = {}; clSave(); baseSet(null); clearInterval(pollTimer); setCloud('off'); render(); }
 
 /* ---------- 3-Wege-Zusammenführung (Basis, lokal, Cloud) ---------- */
 const COLL = ['products','cards','menu','specials','moves','inventories','suppliers','orders'];
@@ -84,29 +85,34 @@ function merge3(base, local, remote){
 /* ---------- Sync ---------- */
 function snapshot(){ return JSON.parse(JSON.stringify(S)); }
 async function cloudPull(first){
+  if(STORE.isReader()) return;
+  await STORE.baseLoad();
   const st = await rpc('get_state', {p_rid:CL.rid});
   if(!st || !st.data){ return cloudPush(true); }
+  if(schemaNewer(st.data)) throw new Error(CLOUD_NEWER);
   if(st.version === CL.version && !first) return;
   const base = baseGet();
   if(!base && first){ return st; }
   const [m, c] = merge3(base, S, st.data);
   const changed = J(m) !== J(S);
   S = migrate(m) || S; CL.version = st.version; CL.lastBy = st.updated_by; clSave();
-  baseSet(st.data); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
+  baseSet(st.data); STORE.save();
   if(J(S) !== J(st.data)) dirty = true;
   if(changed && !first){ const ae = document.activeElement; if(!ae || !ae.closest('#app input, #app textarea, #app select, #dlg')) render(); toast(`Neue Daten von ${st.updated_by || 'Team'} übernommen${c?` (${c} gleichzeitig bearbeitet)`:''}`); }
   await syncPhotos();
   if(dirty) schedulePush(200);
 }
 async function cloudPush(force){
-  if(!cloudReady() || pushing) return; pushing = true; setCloud('busy');
+  if(!cloudReady() || pushing || STORE.isReader()) return; pushing = true; setCloud('busy');
   try {
+    await STORE.baseLoad();
     for(let attempt = 0; attempt < 3; attempt++){
       const data = snapshot();
       const res = await rpc('save_state', {p_rid:CL.rid, p_data:data, p_expected:CL.version||0});
       if(res && res.ok){ CL.version = res.version; clSave(); baseSet(data); dirty = J(S) !== J(data); setCloud('ok', 'Gespeichert '+new Date().toLocaleTimeString('de-AT')); break; }
+      if(schemaNewer(res.data)) throw new Error(CLOUD_NEWER);
       const [m, c] = merge3(baseGet(), S, res.data); S = migrate(m) || S; CL.version = res.version; clSave(); baseSet(res.data);
-      try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
+      STORE.save();
       render(); if(c) toast(`${c} Einträge wurden gleichzeitig auf einem anderen Gerät geändert und zusammengeführt`);
     }
   } catch(err){ dirty = true; setCloud(navigator.onLine === false ? 'offline' : 'err', err.message); }
@@ -114,7 +120,7 @@ async function cloudPush(force){
 }
 function schedulePush(ms=1500){ if(!cloudReady()) return; dirty = true; clearTimeout(pushTimer); pushTimer = setTimeout(cloudPush, ms); }
 async function cloudPoll(){
-  if(!cloudReady() || document.hidden || pushing) return;
+  if(!cloudReady() || document.hidden || pushing || STORE.isReader()) return;
   try { const v = await rpc('get_version', {p_rid:CL.rid}); if(v && v.version > (CL.version||0)) await cloudPull(false); else if(dirty) schedulePush(100); else setCloud('ok', cloudMsg); }
   catch(err){ setCloud(navigator.onLine === false ? 'offline' : 'err', err.message); }
 }
@@ -127,6 +133,7 @@ async function cloudStart(){
 async function cloudConnectFlow(url, anon, email, pw){
   await cloudLogin(url, anon, email, pw);
   const st = await rpc('get_state', {p_rid:CL.rid});
+  if(st && schemaNewer(st.data)) throw new Error(CLOUD_NEWER);
   if(!st || !st.data){ CL.version = 0; await cloudPush(true); toast('Verbunden. Ihre Daten liegen jetzt in der Cloud.'); }
   else {
     openDialog('Cloud-Daten gefunden', `<p class="dlg-p">Für <b>${esc(CL.rname)}</b> gibt es bereits Daten in der Cloud (Stand ${fmtDate(st.updated_at||new Date().toISOString())}, ${esc(st.updated_by||'Team')}). Was soll passieren?</p>
@@ -217,7 +224,7 @@ renderSetup = function(){
       <div class="row-btns wrap" style="margin-top:12px"><button type="button" class="btn" data-act="export">Sicherung erstellen</button>
         <button type="button" class="btn" data-act="importPick">Sicherung laden</button><input id="importFile" type="file" accept="application/json,.json" hidden>
         <button type="button" class="btn danger" data-act="reset">Demodaten wiederherstellen</button></div>
-      ${(() => { const sf = safetyGet(); return sf && sf.data ? `<div class="safety"><span><b>Sicherheitskopie vom ${fmtDate(sf.at)}</b><small class="muted">${esc(sf.why||'')} · ${plural((sf.data.menu||[]).length,'Gericht','Gerichte')}, ${plural((sf.data.cards||[]).length,'Rezeptur','Rezepturen')}</small></span><span class="row-btns"><button type="button" class="btn sm" data-act="safetyRestore">Letzte Daten wiederherstellen</button><button type="button" class="btn sm" data-act="safetyDl">Als Datei speichern</button></span></div>` : ''; })()}
+      ${(() => { const sf = safetyGet(); return sf ? `<div class="safety"><span><b>Sicherheitskopie vom ${fmtDate(sf.at)}</b><small class="muted">${esc(sf.why||'')} · ${plural(+sf.nMenu||0,'Gericht','Gerichte')}, ${plural(+sf.nCards||0,'Rezeptur','Rezepturen')}</small></span><span class="row-btns"><button type="button" class="btn sm" data-act="safetyRestore">Letzte Daten wiederherstellen</button><button type="button" class="btn sm" data-act="safetyDl">Als Datei speichern</button></span></div>` : ''; })()}
     </section>
   </div>`;
 };

@@ -852,15 +852,16 @@ function exportData(){
     <div class="togs"><label class="tog"><input type="checkbox" id="expImg" ${nImg?'checked':''}><span></span>Fotos einschließen (${nImg})</label></div>
     <div class="row-btns"><button type="button" class="btn primary" id="dlBtn">${ico('download')}Datei speichern</button><button type="button" class="btn" id="copyBtn">${ico('copy')}Als Text kopieren</button></div>
     <p class="hint" id="expMsg" role="status">${esc(backupName())}</p>`, null, {cancel:'Schließen'});
-  const json = () => JSON.stringify($('#expImg').checked ? {...S, images:IMG} : S);
+  const json = () => JSON.stringify({...S, schema:APP_SCHEMA, app:APP_VERSION + ' · ' + APP_BUILD, exportedAt:new Date().toISOString(), ...($('#expImg').checked ? {images:IMG} : {})});
   $('#dlBtn').onclick = async () => { const ok = await saveFile(backupName(), new Blob([json()], {type:'application/json'})); $('#expMsg').textContent = ok ? `Gespeichert als ${backupName()}` : 'Nicht gespeichert. „Als Text kopieren“ funktioniert immer.'; if(ok) toast('Sicherung gespeichert'); };
   $('#copyBtn').onclick = () => { const txt = json(); const fb = () => { let ta = $('#expTxt'); if(!ta){ ta = document.createElement('textarea'); ta.id = 'expTxt'; ta.className = 'code'; ta.readOnly = true; ta.setAttribute('aria-label','Sicherung als Text'); $('#expMsg').insertAdjacentElement('afterend', ta); } ta.value = txt; ta.select(); toast('Text markiert, mit Strg+C kopieren'); }; const pr = navigator.clipboard?.writeText(txt); if(pr) pr.then(()=>toast('Kopiert'), fb); else fb(); };
 }
 /* Sicherheitskopie vor dem Überschreiben aller Daten (ohne Fotos; die bleiben im Browser gespeichert) */
 const SAFETY_KEY = KEY + '_safety';
-function safetyStore(why){ try { localStorage.setItem(SAFETY_KEY, JSON.stringify({at:new Date().toISOString(), why, data:S})); return true; } catch(e){ return false; } }
-function safetyGet(){ try { return JSON.parse(localStorage.getItem(SAFETY_KEY)); } catch(e){ return null; } }
-function safetyClear(){ try { localStorage.removeItem(SAFETY_KEY); } catch(e){} }
+/* liegt seit Paket A in IndexedDB; safetyGet() liefert nur Datum, Anlass und Zähler, die Daten kommen über STORE.safetyData() */
+function safetyStore(why){ return STORE.safetyStore(why); }
+function safetyGet(){ return STORE.st.safety; }
+function safetyClear(){ STORE.safetyClear(); }
 function loadBackup(d){
   const imgs = d.images; delete d.images; const nd = migrate(d); if(!nd) throw 0;
   const old = S; const kept = safetyStore('vor „Sicherung laden“'); S = nd;
@@ -868,7 +869,7 @@ function loadBackup(d){
   if(imgs) Object.entries(imgs).forEach(([k,v])=>imgPut(k,v)); save(); go('dash');
   toast(kept ? 'Sicherung geladen' : 'Sicherung geladen (ohne Sicherheitskopie, Speicher voll)', kept ? {label:'Rückgängig', ms:8000, action:safetyRestore} : null);
 }
-function safetyRestore(){ const sf = safetyGet(); if(!sf || !sf.data) return; const nd = migrate(sf.data); if(!nd){ toast('Sicherheitskopie ist nicht lesbar'); return; } S = nd; safetyClear(); save(); go('dash'); toast('Letzte Daten wiederhergestellt'); }
+async function safetyRestore(){ const sf = safetyGet(); if(!sf) return; let d = null; try { d = await STORE.safetyData(); } catch(e){} const nd = d && migrate(d); if(!nd){ toast('Sicherheitskopie ist nicht lesbar'); return; } S = nd; safetyClear(); save(); go('dash'); toast('Letzte Daten wiederhergestellt'); }
 
 /* ---------- Schnellsuche ---------- */
 let palSel = 0, palItems = [];
@@ -1040,6 +1041,7 @@ document.addEventListener('change', e => {
   if(t.id === 'importFile' && t.files[0]){
     const r = new FileReader(); const fname = t.files[0].name;
     r.onload = () => { let d; try { d = JSON.parse(r.result); if(!d || typeof d !== 'object' || !Array.isArray(d.products) || !Array.isArray(d.cards) || !Array.isArray(d.menu)) throw 0; } catch(err){ info('Laden fehlgeschlagen', 'Die Datei ist keine Sicherung dieser App. Wählen Sie eine .json-Datei, die mit „Sicherung erstellen“ gespeichert wurde.'); return; }
+      if(schemaNewer(d)){ info('Sicherung ist neuer als die App', 'Diese Sicherung stammt aus einer neueren Version der App und kann hier nicht geladen werden. Bitte die App neu laden, damit sie aktuell ist, und dann noch einmal versuchen. Es wurde nichts geändert.'); return; }
       openDialog('Sicherung laden?', `<p class="dlg-p">Die Datei <b>${esc(fname)}</b> enthält ${plural(d.menu.length,'Gericht','Gerichte')}, ${plural(d.cards.length,'Rezeptur','Rezepturen')} und ${plural(d.products.length,'Produkt','Produkte')}.</p><p class="dlg-p">Alle aktuellen Daten (${plural(S.menu.length,'Gericht','Gerichte')}, ${plural(S.cards.length,'Rezeptur','Rezepturen')}, ${plural(S.products.length,'Produkt','Produkte')}, Lager, Bestellungen, Verkäufe) werden ersetzt. Vorher wird automatisch eine Sicherheitskopie angelegt; unter „Einstellungen“ lässt sie sich einmal zurückholen.</p>`,
         () => { setTimeout(() => { try { loadBackup(d); } catch(err){ info('Laden fehlgeschlagen', 'Die Datei ist keine Sicherung dieser App. Wählen Sie eine .json-Datei, die mit „Sicherung erstellen“ gespeichert wurde.'); } }, 0); }, {ok:'Daten ersetzen', toast:false}); };
     r.readAsText(t.files[0]); t.value = '';
@@ -1047,12 +1049,15 @@ document.addEventListener('change', e => {
 });
 
 /* ---------- Start ---------- */
-S = migrate(load()) || seed();
+function startApp(){
 document.querySelectorAll('.nav-slot').forEach(n => n.innerHTML = navHtml(n.closest('.bottom')));
-try { const th = localStorage.getItem(KEY+'_theme'); if(th) document.documentElement.dataset.theme = th; } catch(e){}
 themeIcon();
 matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', themeIcon);
-function fromHash(){ const h = location.hash.slice(1); if(TABS.some(t=>t[0]===h) && h !== view.tab){ view = {...view, tab:h, card:null, q:''}; render(); } }
 window.addEventListener('hashchange', fromHash);
 fromHash(); render();
 imgLoadAll().then(() => { if(Object.keys(IMG).length) render(); });
+}
+function fromHash(){ const h = location.hash.slice(1); if(TABS.some(t=>t[0]===h) && h !== view.tab){ view = {...view, tab:h, card:null, q:''}; render(); } }
+try { const th = localStorage.getItem(KEY+'_theme'); if(th) document.documentElement.dataset.theme = th; } catch(e){}
+/* Daten kommen aus IndexedDB: erst laden, dann zeichnen (siehe store.js und reliab.js) */
+BOOT_P.then(relStart, e => relStart({status:'corrupt', kind:'read', error:String(e)}));

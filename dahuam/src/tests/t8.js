@@ -2,7 +2,7 @@ const {chromium}=require('playwright');
 (async()=>{const b=await chromium.launch();const errs=[];
 const F='http://127.0.0.1:8765/dahuam/index.html?nointro';
 const p=await b.newPage({viewport:{width:1440,height:1000},timezoneId:'Europe/Vienna',deviceScaleFactor:1});p.on('pageerror',e=>errs.push(e.message));
-await p.goto(F);await p.evaluate(()=>localStorage.clear());await p.reload();await p.waitForTimeout(1300);const ev=(f,a)=>p.evaluate(f,a);await ev(()=>{S.settings.guestStyle='web';S.settings.guestStylePick=true;save()}); /* alte Stile testen: Hauskarte ist jetzt Standard */
+await p.goto(F);await p.evaluate(()=>__store.wipe(true));await p.reload();await p.waitForTimeout(1300);const ev=(f,a)=>p.evaluate(f,a);await ev(()=>{S.settings.guestStyle='web';S.settings.guestStylePick=true;save()}); /* alte Stile testen: Hauskarte ist jetzt Standard */
 console.log('sections',await ev(()=>secList().join(' | ')));
 console.log('klassiker',await ev(()=>menuSorted().filter(m=>m.section==='Klassiker').map(m=>m.name+(m.vlabel?' ('+m.vlabel+')':'')).join(', ')));
 for(const [d,n] of [['2027-01-20','winter'],['2027-07-20','sommer']]){await ev(d=>{view.mtab='guest';view.gdate=d;view.gseason=null;go('menu')},d);await p.waitForTimeout(500);

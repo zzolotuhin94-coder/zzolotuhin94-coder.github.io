@@ -10,7 +10,7 @@ const tV=await time('vorb','view.pl.off=2;view.pl.all=true'),tD=await time('dash
 ok(big.days===250&&big.dishes===72&&tV<150,`Vorbereitung renders < 150 ms with 250 days × 72 dishes (cold cache, all rows, incl. back-test): ${tV} ms`);ok(tD<150,`Heute with the forecast block: ${tD} ms`);
 const warm=await ev(()=>{go('vorb');const t0=performance.now();render();return performance.now()-t0});ok(warm<60,`second render uses the cache: ${Math.round(warm)} ms`);
 ok(await ev(()=>{const pl=vbPlan(vbDay());return pl.dishes.length===72&&pl.batches.length>0&&pl.prods.length>20&&document.querySelectorAll('#app .pl-fc .pl-row').length===72}),'72 dishes forecast, batches and ingredients computed');
-await ev(()=>{localStorage.removeItem(KEY)});await p.goto('about:blank');await p.goto(L.URL);await w(800);await ev(()=>{localStorage.removeItem(KEY)});await p.reload();await w(800);await p.addStyleTag({content:'.reward{display:none!important}'});
+await ev(()=>__store.wipe());await p.goto('about:blank');await p.goto(L.URL);await w(800);await ev(()=>__store.wipe());await p.reload();await w(800);await p.addStyleTag({content:'.reward{display:none!important}'});
 const openDay=()=>ev(()=>{let o=0;while((S.settings.closed||[]).includes(dParse(dAdd(todayStr(),o)).getDay()))o++;view.pl.off=o;go('vorb');window.scrollTo(0,0)});
 // Einfach-Modus
 await ev(()=>setMode('simple',true));await openDay();await w(250);

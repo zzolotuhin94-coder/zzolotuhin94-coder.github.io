@@ -73,7 +73,7 @@ renderDash = function(){
   const dueSt = due.map(sp => ({sp, st: supToday(sp)}));
   const openDue = dueSt.filter(x => x.st.state === 'open'), sentDue = dueSt.filter(x => x.st.state === 'sent'), pastDue = dueSt.filter(x => x.st.state === 'past');
   const orderInfo = !due.length ? 'kein Bestelltag' : openDue.length ? `${openDue.length} ${openDue.length===1?'Bestellung':'Bestellungen'} offen, bis ${esc(openDue[openDue.length-1].sp.cutoff)} Uhr` : pastDue.length ? `Annahmeschluss vorbei${sentDue.length ? `, ${sentDue.length} bestellt` : ''}` : 'alles bestellt';
-  const subParts = [closed ? `${DAYNAME[w]} ist Ruhetag` : 'Servicetag', sTitle, orderInfo];
+  const subParts = [closed ? `${DAYNAME[w]} ist Ruhetag` : 'Servicetag', esc(sTitle), orderInfo];
   const orderRow = ({sp, st}) => {
     const lowN = lowStock().filter(p=>p.supplier===sp.id).length; const val = lowStock().filter(p=>p.supplier===sp.id).reduce((a,p)=>a+packSuggest(p)*(p.packQty||1)*p.price,0);
     const sub = `${CHANNELS[sp.channel]} · Lieferung ${dayLabel(st.delivery)}${lowN?` · ${lowN} unter Mindestbestand, ${eur(val)}`:''}`;
@@ -84,7 +84,7 @@ renderDash = function(){
   const pastLine = pastDue.length ? `<li class="rw past rw-fold"><button type="button" class="rw-more" data-act="dashPast" aria-expanded="${view.dashPast?'true':'false'}">Annahmeschluss heute vorbei: ${pastDue.length} ${pastDue.length===1?'Lieferant':'Lieferanten'} · ${view.dashPast?'ausblenden':'anzeigen'}</button></li>` + (view.dashPast ? pastDue.map(orderRow).join('') : '') : '';
   const orderRows = [...openDue, ...sentDue].map(orderRow).join('');
   const recvRows = exp.map(o => { const sp = SUP(o.supplier); const late = o.deliveryDate < t;
-    return dayRow(late ? `<span class="bad-t">${fmtDate(o.deliveryDate+'T12:00:00').slice(0,6)}</span>` : 'heute', esc(sp ? sp.name : '?'), `${o.no} · ${o.lines.length} Positionen · ${eur(orderTotal(o))}${late?' · überfällig':''}`, statusPill(o.status), `<button type="button" class="btn sm" data-act="ordRecv" data-id="${o.id}">Wareneingang</button>`); }).join('');
+    return dayRow(late ? `<span class="bad-t">${fmtDate(o.deliveryDate+'T12:00:00').slice(0,6)}</span>` : 'heute', esc(sp ? sp.name : '?'), `${esc(o.no)} · ${o.lines.length} Positionen · ${eur(orderTotal(o))}${late?' · überfällig':''}`, statusPill(o.status), `<button type="button" class="btn sm" data-act="ordRecv" data-id="${o.id}">Wareneingang</button>`); }).join('');
   const cardRows = [
     ...live.map(sp => dayRow('Aktion', esc(sp.name), `${sp.items.length} ${sp.items.length===1?'Gericht':'Gerichte'}${sp.to && sp.to!==sp.from ? ` · bis ${fmtDate(sp.to+'T12:00:00')}` : ''}`, '', `<button type="button" class="btn sm" data-act="previewSpecial" data-id="${sp.id}">Karte</button>`)),
     ...dayDishes.map(m => dayRow(DAYNAME[w].slice(0,2), esc(dishLabel(m)), `${esc(m.section)} · ${eur(m.price)}`, '', m.card && C(m.card) ? `<button type="button" class="btn sm" data-act="openCard" data-id="${m.card}">Rezeptur</button>` : '')),

@@ -2,7 +2,7 @@
 const {chromium}=require('playwright');
 (async()=>{const b=await chromium.launch();const errs=[];const F='http://127.0.0.1:8765/dahuam/index.html?nointro';
 const p=await b.newPage({viewport:{width:1440,height:960},timezoneId:'Europe/Vienna'});p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&errs.push('c '+m.text().slice(0,160)));
-await p.goto(F);await p.evaluate(()=>localStorage.clear());await p.reload();await p.waitForTimeout(1200);const ev=(f,a)=>p.evaluate(f,a);
+await p.goto(F);await p.evaluate(()=>__store.wipe(true));await p.reload();await p.waitForTimeout(1200);const ev=(f,a)=>p.evaluate(f,a);
 console.log('default style',await ev(()=>[S.settings.guestStyle,hsStyle(),!!S.settings.menuCopy]));
 // Prüfung je Blatt: nichts läuft über, nichts wird abgeschnitten
 const check=()=>ev(()=>{const out=[];document.querySelectorAll('.hs-sheet .hs-page').forEach((pg,i)=>{const pr=pg.getBoundingClientRect();const sc=pr.width/794;const bad=[];
@@ -55,7 +55,7 @@ await m.evaluate(()=>{view.mtab='guest';view.gdate='2027-01-20';go('menu')});awa
 console.log('phone',await m.evaluate(()=>({sw:document.documentElement.scrollWidth,sheets:document.querySelectorAll('.hs-sheet').length,sheetW:Math.round(document.querySelector('.hs-sheet').getBoundingClientRect().width),cols:new Set([...document.querySelectorAll('.hs-sheet')].map(s=>Math.round(s.getBoundingClientRect().left))).size,scale:getComputedStyle(document.querySelector('.hs-prev')).getPropertyValue('--hs-s')})));
 await m.evaluate(()=>document.querySelector('.hs-sheet').scrollIntoView());await m.waitForTimeout(300);await m.screenshot({path:'hauskarte-out/phone-390.png'});
 // helles / dunkles App-Thema
-for(const th of ['light','dark']){await p.goto(F);await p.evaluate(()=>localStorage.clear());await p.reload();await p.waitForTimeout(800);
+for(const th of ['light','dark']){await p.goto(F);await p.evaluate(()=>__store.wipe(true));await p.reload();await p.waitForTimeout(800);
   await p.evaluate(t=>{const btn=document.querySelector('[data-act=theme],[data-act=toggleTheme],#themeBtn');const cur=document.documentElement.dataset.theme||document.documentElement.getAttribute('data-theme');window.__th=[cur,!!btn];document.documentElement.dataset.theme=t;view.mtab='guest';view.gdate='2027-01-20';go('menu')},th);await p.waitForTimeout(1500);
   console.log('theme',th,await p.evaluate(()=>[window.__th,getComputedStyle(document.body).backgroundColor]));await p.screenshot({path:'hauskarte-out/app-'+th+'.png'});}
 console.log('errors',errs);await b.close();})();

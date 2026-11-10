@@ -2,7 +2,7 @@ const {chromium}=require('playwright');
 (async()=>{const b=await chromium.launch();const errs=[];
 const F='http://127.0.0.1:8765/dahuam/index.html?nointro';
 const p=await b.newPage({viewport:{width:1440,height:960},timezoneId:'Europe/Vienna'});p.on('pageerror',e=>errs.push(e.message+' '+e.stack.split('\n')[1]));p.on('console',m=>m.type()==='error'&&errs.push(m.text()));
-await p.goto(F);await p.evaluate(()=>localStorage.clear());await p.reload();await p.waitForTimeout(900);const ev=(f,a)=>p.evaluate(f,a);
+await p.goto(F);await p.evaluate(()=>__store.wipe(true));await p.reload();await p.waitForTimeout(900);const ev=(f,a)=>p.evaluate(f,a);
 await ev(()=>go('dash'));await p.screenshot({path:'e-dash.png'});
 console.log('suppliers',await ev(()=>S.suppliers.length),'orders',await ev(()=>S.orders.map(o=>o.no+':'+o.status).join(' ')));
 await ev(()=>{view.stab='bestellung';view.order=null;go('stock')});await p.waitForTimeout(300);await p.screenshot({path:'e-cockpit.png',fullPage:true});

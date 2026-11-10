@@ -2,10 +2,13 @@
    PDF-Export: Speisekarte, Tageskarte, Rezeptur, Auswertung als A4-PDF.
    Funktioniert auch dort, wo window.print() gesperrt ist (eingebettet).
    ===================================================================== */
-const PDF_LIBS = ['https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'];
+/* Bibliotheken liegen im eigenen Ordner vendor/ (auch ohne Internet). Nur wo es den Ordner nicht gibt (eingebettete Vorschau), kommt die gleiche Version von cdnjs. */
+const PDF_LIBS = [['vendor/html2canvas.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js', () => window.html2canvas], ['vendor/jspdf.umd.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', () => window.jspdf]];
+const XLSX_LIB = ['vendor/xlsx.full.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', () => window.XLSX];
 let PDF_NAME = null;
-function loadScript(src){ return new Promise((ok, no) => { if([...document.scripts].some(s => s.src === src)) return ok(); const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => no(new Error('Bibliothek konnte nicht geladen werden')); document.head.appendChild(s); }); }
-async function pdfLibs(){ for(const s of PDF_LIBS) await loadScript(s); if(!window.html2canvas || !window.jspdf) throw new Error('PDF-Bibliothek fehlt'); }
+function loadScript(src){ return new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => { s.remove(); no(new Error('Bibliothek konnte nicht geladen werden')); }; document.head.appendChild(s); }); }
+async function loadLib(lib){ const [local, cdn, has] = lib; if(has()) return; try { await loadScript(local); } catch(e){} if(has()) return; await loadScript(cdn); if(!has()) throw new Error('Bibliothek konnte nicht geladen werden'); }
+async function pdfLibs(){ for(const l of PDF_LIBS) await loadLib(l); if(!window.html2canvas || !window.jspdf) throw new Error('PDF-Bibliothek fehlt'); }
 async function saveFile(filename, data){
   try { const dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null;
     if(dl){ try { await dl.save({filename, data}); return true; } catch(e){ if(e && e.code === 'declined') return false; if(e && !['unavailable','not_granted','capability_disabled','capability_removed'].includes(e.code)) { toast('Speichern nicht möglich: ' + (e.message || e.code)); return false; } } }

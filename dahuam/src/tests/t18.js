@@ -1,6 +1,6 @@
 const {chromium}=require('playwright');
 (async()=>{const b=await chromium.launch();const errs=[];const ctx=await b.newContext({acceptDownloads:true,viewport:{width:1440,height:960}});const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));
-await p.goto('http://127.0.0.1:8765/dahuam/index.html?nointro');await p.evaluate(()=>localStorage.clear());await p.reload();await p.waitForTimeout(1000);
+await p.goto('http://127.0.0.1:8765/dahuam/index.html?nointro');await p.evaluate(()=>__store.wipe(true));await p.reload();await p.waitForTimeout(1000);
 await p.evaluate(()=>{view.mtab='guest';go('menu')});await p.waitForTimeout(400);
 console.log('btns',await p.evaluate(()=>[...document.querySelectorAll('.page-h .row-btns button')].map(b=>b.textContent.trim()).join(' | ')));
 const [d]=await Promise.all([p.waitForEvent('download',{timeout:60000}),p.click('[data-pdf=printMenu]')]);

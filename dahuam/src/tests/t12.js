@@ -2,7 +2,7 @@ const {chromium}=require('playwright');
 (async()=>{const b=await chromium.launch();const errs=[];
 const F='http://127.0.0.1:8765/dahuam/index.html?nointro';
 const p=await b.newPage({viewport:{width:1440,height:960},timezoneId:'Europe/Vienna',deviceScaleFactor:1});p.on('pageerror',e=>errs.push(e.message+' '+(e.stack||'').split('\n')[1]));p.on('console',m=>m.type()==='error'&&errs.push(m.text()));
-await p.goto(F);await p.evaluate(()=>localStorage.clear());await p.reload();await p.waitForTimeout(1500);const ev=(f,a)=>p.evaluate(f,a);await ev(()=>{S.settings.guestStyle='web';S.settings.guestStylePick=true;save()}); /* alte Stile testen: Hauskarte ist jetzt Standard */
+await p.goto(F);await p.evaluate(()=>__store.wipe(true));await p.reload();await p.waitForTimeout(1500);const ev=(f,a)=>p.evaluate(f,a);await ev(()=>{S.settings.guestStyle='web';S.settings.guestStylePick=true;save()}); /* alte Stile testen: Hauskarte ist jetzt Standard */
 console.log('sales days',await ev(()=>Object.keys(S.salesDays).length),'size KB',await ev(()=>Math.round(JSON.stringify(S.salesDays).length/1024)),'S KB',await ev(()=>Math.round(JSON.stringify(S).length/1024)));
 await ev(()=>{view.rp.unit='month';view.rp.ref='2026-02-15';view.rp.cmp='prev';go('report')});await p.waitForTimeout(500);await p.screenshot({path:'r-month.png',fullPage:true});
 console.log('label',await p.textContent('.rp-label b'));

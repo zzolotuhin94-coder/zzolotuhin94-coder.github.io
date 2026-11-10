@@ -204,5 +204,5 @@ palFilter = function(q){
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if(!el) return;
   if(el.dataset.act === 'safetyRestore'){ const sf = safetyGet(); if(!sf) return; ask(`Daten vom ${fmtDate(sf.at)} (${sf.why}) wiederherstellen? Der jetzige Stand wird dabei ersetzt. Das geht nur einmal.`, () => { setTimeout(safetyRestore, 0); }, 'Wiederherstellen'); }
-  if(el.dataset.act === 'safetyDl'){ const sf = safetyGet(); if(sf) saveFile(`dahuam202-sicherheitskopie-${String(sf.at).slice(0,10)}.json`, new Blob([JSON.stringify(sf.data)], {type:'application/json'})).then(ok => ok && toast('Sicherheitskopie gespeichert')); }
+  if(el.dataset.act === 'safetyDl'){ const sf = safetyGet(); if(sf) STORE.safetyData().then(d => d ? saveFile(`dahuam202-sicherheitskopie-${String(sf.at).slice(0,10)}.json`, new Blob([JSON.stringify(d)], {type:'application/json'})) : false).then(ok => ok && toast('Sicherheitskopie gespeichert')); }
 });

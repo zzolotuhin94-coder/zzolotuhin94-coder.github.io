@@ -1,4 +1,6 @@
-import os, sys
+import os, sys, json, hashlib
+APP_VERSION = '1.1.0'   # Paket A: Zuverlässigkeit
+SITE = '/home/user/zzolotuhin94-coder.github.io/dahuam/'
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 R = lambda f: open(f, encoding='utf-8').read()
 def sub(s, pairs, label):
@@ -12,6 +14,7 @@ core = sub(core, [
   ("const num = (n,d=0) => fin(n).toLocaleString('de-AT',{maximumFractionDigits:d});", "const num = (n,d=0) => fin(n).toLocaleString('de-DE',{maximumFractionDigits:d});"),
   ('function seed(){', 'function seedBase(){'),
   ('let S = load() || seed();', 'let S;'),
+  ("function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }\nfunction load(){ try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; } catch(e){ return null; } }\n", '/* save() und load(): siehe store.js */\n'),
   ("['beef_mince','Rinderfaschiertes','kg',13,0,25,''],", "['beef_mince','Rindsfaschiertes','kg',13,0,20,''],"),
   ("['speck','Tiroler Speck','kg',16,3,20,''],", "['speck','Tiroler Speck g.g.A.','kg',19.5,5,20,''],"),
   ("['veal','Kalbsoberschale','kg',32,8,15,''],", "['veal','Kalbsoberschale','kg',32,11,15,''],"),
@@ -66,7 +69,8 @@ ui = sub(ui, [
 ui = sub(ui, [
   # 1 Import robust + Normalisierung
   ("function migrate(d){\n  if(!d) return null;", "function migrate(d){\n  if(!d || typeof d !== 'object') return null;\n  if(!Array.isArray(d.products) || !Array.isArray(d.cards) || !Array.isArray(d.menu)) return null;\n  d.settings = Object.assign({name:'Mein Betrieb', vat:10, target:28, nextNo:d.cards.length+1}, d.settings||{});\n  if(!(+d.settings.target >= 1)) d.settings.target = 28; if(!(+d.settings.vat >= 0)) d.settings.vat = 10;\n  d.products = d.products.filter(p=>p && p.id); d.products.forEach(p=>{ p.name = p.name||p.id; p.unit = ['kg','l','Stk'].includes(p.unit)?p.unit:'kg'; p.price = +p.price||0; p.alg = p.alg||''; });\n  d.cards = d.cards.filter(c=>c && c.id); d.cards.forEach(c=>{ c.name = c.name||'Rezeptur'; c.type = c.type==='semi'?'semi':'dish'; if(!Array.isArray(c.items)) c.items = []; c.items = c.items.filter(i=>i && typeof i==='object'); if(c.steps && !Array.isArray(c.steps)) c.steps = []; });\n  d.menu = d.menu.filter(m=>m && m.id); d.menu.forEach(m=>{ m.name = m.name||'Gericht'; m.section = m.section||'Ohne Kategorie'; m.price = +m.price||0; m.desc = m.desc||''; });"),
-  ("fromHash(); render();\nimgLoadAll()", "try { fromHash(); render(); } catch(err){ console.error(err); $('#app').innerHTML = `<section class=\"panel\" style=\"max-width:560px\"><h2>Gespeicherte Daten konnten nicht geladen werden</h2><p class=\"hint\">Laden Sie eine Sicherung oder starten Sie mit den Demodaten neu.</p><div class=\"row-btns\" style=\"margin-top:12px\"><button type=\"button\" class=\"btn primary\" data-act=\"importPick\">Sicherung laden</button><button type=\"button\" class=\"btn danger\" data-act=\"reset\">Demodaten laden</button></div><input id=\"importFile\" type=\"file\" accept=\"application/json,.json\" hidden></section>`; }\nimgLoadAll()"),
+  # Paket A: schlägt das erste Zeichnen fehl, geht es zur Wiederherstellungs-Seite (reliab.js) statt zu „Demodaten laden“
+  ("fromHash(); render();\nimgLoadAll()", "try { fromHash(); render(); } catch(err){ console.error(err); REL.renderFail = err; }\nimgLoadAll()"),
   # 2/3 Klick nach Bearbeiten + Tab-Fokus
   ("c[f] = f==='yieldG' ? (t.value===''?'':+t.value) : t.value; save(); render(); toast('Gespeichert'); return;", "c[f] = f==='yieldG' ? (t.value===''?'':+t.value) : t.value; save(); softRender(); toast('Gespeichert'); return;"),
   ("if(f==='ref') it.net = ''; save(); render(); return;", "if(f==='ref') it.net = ''; save(); softRender(); return;"),
@@ -162,14 +166,23 @@ ui = sub(ui, [
 start = '/* ---------- Start ---------- */'
 a, b = ui.split(start)
 season = R('season.js') + '\n' + R('season2.js') + '\n' + R('season3.js') + '\n' + R('einkauf.js') + '\n' + R('menu2.js') + '\n' + R('cloud.js') + '\n' + R('ui3.js') + '\n' + R('sales.js') + '\n' + R('report.js') + '\n' + R('menu3.js') + '\n' + R('prices.js') + '\n' + R('game.js') + '\n' + R('drag.js') + '\n' + R('labor.js') + '\n' + R('polish.js') + '\n' + R('pdf.js') + '\n' + R('hauskarte.js') + '\n' + R('fixes.js') + '\n' + R('guide_txt.js') + '\n' + R('guide.js') + '\n' + R('guide_game.js') + '\n' + R('vorbereitung.js') + '\n' + R('team.js')
-js = core + '\n' + a + '\n' + season + '\n' + start + b
+ui = sub(ui, [
+  ("imgLoadAll().then(() => { if(Object.keys(IMG).length) render(); cloudStart(); });", "imgLoadAll().then(() => { REL.imgReady = true; if(!S || REL.recover) return; if(Object.keys(IMG).length) render(); cloudStart(); });"),
+], 'paket-a')
+a, b = ui.split(start)
+js = core + '\n' + R('store.js') + '\n' + a + '\n' + season + '\n' + R('reliab.js') + '\n' + start + b
 
 shell = R('shell_final.html')
 shell = sub(shell, [
-  ('family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Bricolage+Grotesque',
-   'family=Barlow+Condensed:wght@300;400;500;600;700&family=PT+Sans:wght@400;700&family=Saira+Condensed:wght@300;400&family=Roboto+Condensed:wght@400;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Schibsted+Grotesk:wght@500;600&family=Bricolage+Grotesque'),
-  ('<div class="side-foot"><span>Restobar | Café</span>', '<span id="cloudChip" class="cloud-chip off" hidden></span>\n    <div class="side-foot"><button type="button" class="whoami" data-tab="setup" id="whoami"></button>'),
-  ('#print{display:none}', R('season.css') + R('einkauf.css') + R('menu2.css') + R('ui3.css') + R('intro.css') + R('intro2.css') + R('report.css') + R('menu3.css') + R('prices.css') + R('game.css') + R('drag.css') + R('labor.css') + R('polish.css') + R('hauskarte.css') + R('fixes.css') + R('guide.css') + R('plus.css') + R('team.css') + '.m-only{display:none}@media (max-width:900px){.m-only{display:flex}}' + '\n.dish-main:focus-visible,.rc:focus-visible{outline-offset:-3px}\n.title-in{hyphens:auto;-webkit-hyphens:auto}\n#print{display:none}'),
+  # Paket A: keine fremden Dienste beim Start. Schriften liegen in vendor/fonts (fonts.css aus vendor.py), font-display:swap
+  ('<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">\n',
+   '<meta name="mobile-web-app-capable" content="yes">\n<meta name="apple-mobile-web-app-title" content="DAHUAM Küche">\n<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">\n<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">\n'),
+  ('<html lang="de">', '<html lang="de" class="booting">'),
+  ('<style>\n', '<style>\n' + R('fonts.css')),
+  ('    <main id="app"></main>', '    <div id="relBars"></div>\n    <main id="app"></main>'),
+  ('</small></span></div>\n      <button type="button" class="theme-btn" data-act="palette"', '</small></span></div>\n      <span class="save-dot" data-saveind="save-dot" role="img" hidden></span>\n      <button type="button" class="theme-btn" data-act="palette"'),
+  ('<div class="side-foot"><span>Restobar | Café</span>', '<span id="cloudChip" class="cloud-chip off" hidden></span>\n    <div class="side-foot"><button type="button" class="whoami" data-tab="setup" id="whoami"></button><span class="save-ind" data-saveind="save-ind" hidden></span>'),
+  ('#print{display:none}', R('season.css') + R('einkauf.css') + R('menu2.css') + R('ui3.css') + R('intro.css') + R('intro2.css') + R('report.css') + R('menu3.css') + R('prices.css') + R('game.css') + R('drag.css') + R('labor.css') + R('polish.css') + R('hauskarte.css') + R('fixes.css') + R('guide.css') + R('plus.css') + R('team.css') + R('reliab.css') + '.m-only{display:none}@media (max-width:900px){.m-only{display:flex}}' + '\n.dish-main:focus-visible,.rc:focus-visible{outline-offset:-3px}\n.title-in{hyphens:auto;-webkit-hyphens:auto}\n#print{display:none}'),
 ], 'shell')
 shell = shell.replace('<body>\n', '<body>\n' + R('intro.html'), 1)
 js = js.replace("${!FRAMED && sp.mode==='tageskarte'?", "${sp.mode==='tageskarte'?").replace("Tabelle (CSV)</button>${FRAMED?'':`", "Tabelle (CSV)</button>${false?'':`")
@@ -195,5 +208,32 @@ _light = _re.search(r':root\{([^}]*--bg:#f7f5f0[^}]*)\}', R('ui3.css')).group(1)
 pdfcss = '#print.pdf{display:block!important;position:absolute;left:-12000px;top:0;width:794px;padding:44px 50px;box-sizing:border-box;background:#fff;color:#000;color-scheme:light;' + _light + '}\n' + _pdfcss(shell) + '\n#print.pdf .wk-paper{box-shadow:none;max-width:none;padding:0}#print.pdf .wk-tabs,#print.pdf .wk-filters{display:none}#print.pdf .wk-cols{columns:2}'
 shell = shell.replace('</style>', pdfcss + '\n</style>', 1)
 out = shell.replace('/*SCRIPT*/', js)
-open('/home/user/zzolotuhin94-coder.github.io/dahuam/index.html', 'w', encoding='utf-8').write(out)
-print('built', len(out))
+assert 'fonts.googleapis.com/css2?family=Cormorant' not in out and out.count('<link rel="stylesheet"') == 0
+
+# ---------- Paket A: Offline-Paket (Service Worker, Manifest) mit gemeinsamer Build-Kennung ----------
+ICONS = ['icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-192.png', 'icons/maskable-512.png', 'icons/apple-touch-icon.png']
+PRECACHE = ['manifest.webmanifest', 'icons/icon-192.png', 'icons/apple-touch-icon.png'] + ['brand/' + f for f in sorted(os.listdir(SITE + 'brand'))] \
+    + ['photos/unmatched/gaststube.webp', 'photos/unmatched/aussen-winter.webp', 'photos/unmatched/silvesterabend-fondue.webp'] + json.load(open('vendor_files.json'))
+manifest = json.dumps({
+  'name': 'DAHUAM.202 Küche', 'short_name': 'DAHUAM Küche', 'description': 'Kalkulation, Lager, Einkauf und Dienstplan für die Küche',
+  'lang': 'de-AT', 'dir': 'ltr', 'id': './', 'start_url': './index.html', 'scope': './', 'display': 'standalone', 'orientation': 'any',
+  'background_color': '#1f2326', 'theme_color': '#173229',
+  'icons': [
+    {'src': 'icons/icon-192.png', 'sizes': '192x192', 'type': 'image/png', 'purpose': 'any'},
+    {'src': 'icons/icon-512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any'},
+    {'src': 'icons/maskable-192.png', 'sizes': '192x192', 'type': 'image/png', 'purpose': 'maskable'},
+    {'src': 'icons/maskable-512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'maskable'}]}, ensure_ascii=False, indent=1)
+sw = R('sw-src.js')
+h = hashlib.sha256(); h.update(out.encode('utf-8')); h.update(sw.encode('utf-8')); h.update(manifest.encode('utf-8')); h.update(os.environ.get('DAHUAM_BUILD_SALT', '').encode())
+missing = [f for f in PRECACHE if f != 'manifest.webmanifest' and not os.path.exists(SITE + f)]
+if missing: sys.exit('fehlt im Ordner dahuam/: ' + ', '.join(missing) + '  (python3 vendor.py / node icons.js)')
+for f in PRECACHE:
+    if f != 'manifest.webmanifest': h.update(open(SITE + f, 'rb').read())
+BUILD = h.hexdigest()[:10]
+assert out.count("'/*APP_BUILD*/'") == 1 and out.count("'/*APP_VERSION*/'") == 1
+out = out.replace('/*APP_BUILD*/', BUILD).replace('/*APP_VERSION*/', APP_VERSION)
+OUTDIR = os.environ.get('DAHUAM_OUT', SITE)
+open(OUTDIR + 'index.html', 'w', encoding='utf-8').write(out)
+open(OUTDIR + 'manifest.webmanifest', 'w', encoding='utf-8').write(manifest + '\n')
+open(OUTDIR + 'sw.js', 'w', encoding='utf-8').write(sw.replace('/*APP_BUILD*/', BUILD).replace('/*PRECACHE*/[]', json.dumps(PRECACHE)))
+print('built', len(out), 'version', APP_VERSION, 'build', BUILD, 'precache', len(PRECACHE) + 1, 'files', (sum(os.path.getsize(SITE + f) for f in PRECACHE if os.path.exists(SITE + f)) + len(out.encode('utf-8'))) // 1024, 'KB')

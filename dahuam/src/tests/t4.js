@@ -47,6 +47,6 @@ console.log('import toast',await p.textContent('#toast'),'menu',await ev(()=>S.m
 await p.reload();await p.waitForTimeout(600);console.log('after reload app html len',await ev(()=>document.querySelector('#app').innerHTML.length), await ev(()=>S.settings.name));
 // mobile
 const m=await b.newPage({viewport:{width:390,height:844},colorScheme:'dark'});m.on('pageerror',e=>errs.push('m '+e.message));
-await m.goto(F);await m.waitForTimeout(500);await m.evaluate(()=>{localStorage.clear();});await m.reload();await m.waitForTimeout(600);
+await m.goto(F);await m.waitForTimeout(500);await m.evaluate(()=>__store.wipe(true));await m.reload();await m.waitForTimeout(600);
 for(const t of ['guest','plan']){ await m.evaluate(t=>{view.mtab=t;go('menu')},t);await m.waitForTimeout(300);const w=await m.evaluate(()=>document.documentElement.scrollWidth);console.log('m',t,w);await m.screenshot({path:'sm-'+t+'.png'}); }
 console.log('errors',errs);await b.close();})();

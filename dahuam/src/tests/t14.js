@@ -2,7 +2,7 @@ const {chromium}=require('playwright');
 (async()=>{const b=await chromium.launch();const errs=[];
 const F='http://127.0.0.1:8765/dahuam/index.html?nointro';
 const p=await b.newPage({viewport:{width:1440,height:960},deviceScaleFactor:1});p.on('pageerror',e=>errs.push(e.message));
-await p.goto(F);await p.evaluate(()=>localStorage.clear());await p.reload();await p.waitForTimeout(1200);const ev=(f,a)=>p.evaluate(f,a);
+await p.goto(F);await p.evaluate(()=>__store.wipe(true));await p.reload();await p.waitForTimeout(1200);const ev=(f,a)=>p.evaluate(f,a);
 const cid=await ev(()=>S.cards.find(c=>/Caesar/.test(c.name)&&c.items.some(i=>i.ref==='p:romaine')).id);
 await ev(id=>{go('cards');view.card=id;render()},cid);await p.waitForTimeout(300);
 const refs=()=>ev(id=>C(id).items.map(i=>i.ref.slice(2)).join(','),cid);

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" class="booting">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -8,10 +8,47 @@
 <meta name="theme-color" content="#173229">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="robots" content="noindex">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700&family=PT+Sans:wght@400;700&family=Saira+Condensed:wght@300;400&family=Roboto+Condensed:wght@400;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Schibsted+Grotesk:wght@500;600&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DAHUAM Küche">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <style>
+@font-face{font-family:"Figtree";font-style:normal;font-weight:400 700;font-display:swap;src:url(vendor/fonts/figtree-latin-ext-wght-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Figtree";font-style:normal;font-weight:400 700;font-display:swap;src:url(vendor/fonts/figtree-latin-wght-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:300;font-display:swap;src:url(vendor/fonts/barlow-condensed-latin-ext-300-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:300;font-display:swap;src:url(vendor/fonts/barlow-condensed-latin-300-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:400;font-display:swap;src:url(vendor/fonts/barlow-condensed-latin-ext-400-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:400;font-display:swap;src:url(vendor/fonts/barlow-condensed-latin-400-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:500;font-display:swap;src:url(vendor/fonts/barlow-condensed-latin-ext-500-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:500;font-display:swap;src:url(vendor/fonts/barlow-condensed-latin-500-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:600;font-display:swap;src:url(vendor/fonts/barlow-condensed-latin-ext-600-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:600;font-display:swap;src:url(vendor/fonts/barlow-condensed-latin-600-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:700;font-display:swap;src:url(vendor/fonts/barlow-condensed-latin-ext-700-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:700;font-display:swap;src:url(vendor/fonts/barlow-condensed-latin-700-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Fraunces";font-style:normal;font-weight:300 600;font-display:swap;src:url(vendor/fonts/fraunces-latin-ext-opsz-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Fraunces";font-style:normal;font-weight:300 600;font-display:swap;src:url(vendor/fonts/fraunces-latin-opsz-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Fraunces";font-style:italic;font-weight:300 600;font-display:swap;src:url(vendor/fonts/fraunces-latin-ext-opsz-italic.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Fraunces";font-style:italic;font-weight:300 600;font-display:swap;src:url(vendor/fonts/fraunces-latin-opsz-italic.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Caveat";font-style:normal;font-weight:400 600;font-display:swap;src:url(vendor/fonts/caveat-latin-ext-wght-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Caveat";font-style:normal;font-weight:400 600;font-display:swap;src:url(vendor/fonts/caveat-latin-wght-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"PT Sans";font-style:normal;font-weight:400;font-display:swap;src:url(vendor/fonts/pt-sans-latin-ext-400-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"PT Sans";font-style:normal;font-weight:400;font-display:swap;src:url(vendor/fonts/pt-sans-latin-400-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"PT Sans";font-style:normal;font-weight:700;font-display:swap;src:url(vendor/fonts/pt-sans-latin-ext-700-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"PT Sans";font-style:normal;font-weight:700;font-display:swap;src:url(vendor/fonts/pt-sans-latin-700-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Roboto Condensed";font-style:normal;font-weight:400 700;font-display:swap;src:url(vendor/fonts/roboto-condensed-latin-ext-wght-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Roboto Condensed";font-style:normal;font-weight:400 700;font-display:swap;src:url(vendor/fonts/roboto-condensed-latin-wght-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Saira Condensed";font-style:normal;font-weight:300;font-display:swap;src:url(vendor/fonts/saira-condensed-latin-ext-300-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Saira Condensed";font-style:normal;font-weight:300;font-display:swap;src:url(vendor/fonts/saira-condensed-latin-300-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Saira Condensed";font-style:normal;font-weight:400;font-display:swap;src:url(vendor/fonts/saira-condensed-latin-ext-400-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Saira Condensed";font-style:normal;font-weight:400;font-display:swap;src:url(vendor/fonts/saira-condensed-latin-400-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Schibsted Grotesk";font-style:normal;font-weight:500 600;font-display:swap;src:url(vendor/fonts/schibsted-grotesk-latin-ext-wght-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Schibsted Grotesk";font-style:normal;font-weight:500 600;font-display:swap;src:url(vendor/fonts/schibsted-grotesk-latin-wght-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Source Serif 4";font-style:normal;font-weight:400 600;font-display:swap;src:url(vendor/fonts/source-serif-4-latin-ext-opsz-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Source Serif 4";font-style:normal;font-weight:400 600;font-display:swap;src:url(vendor/fonts/source-serif-4-latin-opsz-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Source Serif 4";font-style:italic;font-weight:400 600;font-display:swap;src:url(vendor/fonts/source-serif-4-latin-ext-opsz-italic.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Source Serif 4";font-style:italic;font-weight:400 600;font-display:swap;src:url(vendor/fonts/source-serif-4-latin-opsz-italic.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"JetBrains Mono";font-style:normal;font-weight:500;font-display:swap;src:url(vendor/fonts/jetbrains-mono-latin-ext-500-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"JetBrains Mono";font-style:normal;font-weight:500;font-display:swap;src:url(vendor/fonts/jetbrains-mono-latin-500-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 /* Layout: app shell. Pine sidebar (desktop) / bottom tab bar (phone); content = summary first, then cards and dense tables.
    Accent = Marille (apricot), a nod to the Wachau and to the Marillenknödel on the card. */
 :root{
@@ -3139,6 +3176,49 @@ body.simple .tm-sh b{font-size:13.5px}
   #dlgForm[data-tm] .tog,#dlgForm[data-tm] .btn.sm{min-height:42px}
   #dlgForm[data-tm] .link{min-height:40px}
 }
+
+/* ---------- Paket A: Zuverlässigkeit ---------- */
+html.booting .shell,html.booting .bottom,html.booting #pal{visibility:hidden}
+html.rel-recover .side nav,html.rel-recover .side-help,html.rel-recover .bottom,html.rel-recover .kbd-btn,html.rel-recover .side-foot,html.rel-recover .topbar .theme-btn{visibility:hidden}
+#relBars{position:sticky;top:0;z-index:19}
+@media (max-width:900px){#relBars{top:calc(var(--rel-top,54px) + env(safe-area-inset-top,0px))}}
+.rel-bar{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;padding:9px clamp(16px,3vw,28px);font-size:13.5px;line-height:1.4;background:var(--surface-2);color:var(--fg);border-bottom:1px solid var(--line)}
+.rel-bar > span:first-child{flex:1 1 260px;min-width:0}
+.rel-bar b{font-weight:600}
+.rel-bar.bad{background:var(--bad-bg)}
+.rel-bar.info{background:var(--accent-soft)}
+.rel-acts{display:flex;gap:8px;flex-wrap:wrap}
+.rel-bar .btn.sm{background:var(--surface)}
+@keyframes relNudge{0%,100%{transform:none}30%{transform:translateX(-4px)}60%{transform:translateX(4px)}}
+.rel-bar.nudge{animation:relNudge .3s}
+@media (prefers-reduced-motion:reduce){.rel-bar.nudge{animation:none;outline:2px solid var(--accent);outline-offset:-2px}}
+/* steht im unteren Rand der Seitenleiste und braucht keine eigene Zeile (die Navigation behält ihre Höhe) */
+.save-ind{position:absolute;left:calc(max(14px,env(safe-area-inset-left,0px)) + 8px);bottom:2px;display:flex;align-items:center;gap:6px;font-size:11px;line-height:13px;color:var(--side-muted);white-space:nowrap}
+.save-ind::before,.save-dot{content:"";width:7px;height:7px;border-radius:50%;background:var(--side-muted);flex:none}
+.save-ind.ok::before,.save-dot.ok{background:#5fd39a}
+.save-ind.busy::before,.save-dot.busy{background:#e8bb4a}
+.save-ind.bad::before,.save-dot.bad{background:#ff8b7a}
+.save-ind.bad{color:#ffb4a8}
+.save-ind[hidden],.save-dot[hidden]{display:none}
+.save-dot{display:none}
+@media (max-width:900px){.save-dot{display:block;margin-right:2px}}
+.rel-remind{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;margin:0 0 16px;padding:9px 14px;border:1px solid var(--line);border-radius:var(--r-s);background:var(--surface);font-size:13.5px;color:var(--muted)}
+.rel-panel .rel-remind{margin:12px 0 0}
+.rel-kv{grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:6px 16px;margin-top:0}
+.rel-kv > span:nth-child(odd){color:var(--muted)}
+.rel-kv > span:nth-child(even){text-align:right;overflow-wrap:anywhere}
+.rel-h3{margin:18px 0 8px;font-size:14px;font-weight:600}
+.rel-snaps{list-style:none;margin:0;padding:0}
+.rel-snaps li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line)}
+.rel-s-t{display:flex;flex-direction:column;min-width:0;font-size:13.5px}
+.rel-s-t b{font-weight:600}
+.rel-s-t small{color:var(--muted);font-size:12.5px}
+.rel-rec{max-width:640px;margin:24px auto}
+.rel-rec h1{font-size:22px;margin:0 0 8px}
+.rel-rec h2{font-size:15px;margin:22px 0 6px}
+.rel-rec .hint{margin:0 0 8px}
+@media (max-width:900px){.rel-snaps .btn.sm,.rel-bar .btn.sm,.rel-remind .btn.sm{min-height:40px}}
+@media print{#relBars{display:none}}
 .m-only{display:none}@media (max-width:900px){.m-only{display:flex}}
 .dish-main:focus-visible,.rc:focus-visible{outline-offset:-3px}
 .title-in{hyphens:auto;-webkit-hyphens:auto}
@@ -3248,14 +3328,16 @@ body.print-menu #print.pdf .g-paper{box-shadow:none;border-radius:0;max-width:no
     <button type="button" class="kbd-btn" data-act="palette"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Suchen<kbd>Strg K</kbd></button>
     <nav class="nav-slot" aria-label="Hauptnavigation"></nav>
     <span id="cloudChip" class="cloud-chip off" hidden></span>
-    <div class="side-foot"><button type="button" class="whoami" data-tab="setup" id="whoami"></button><button type="button" class="theme-btn" data-act="theme" aria-label="Design wechseln"></button></div>
+    <div class="side-foot"><button type="button" class="whoami" data-tab="setup" id="whoami"></button><span class="save-ind" data-saveind="save-ind" hidden></span><button type="button" class="theme-btn" data-act="theme" aria-label="Design wechseln"></button></div>
   </aside>
   <div>
     <header class="topbar">
       <div class="brand"><span class="logo">202</span><span><b>DAHUAM.202</b><small>Küche · Gerlos</small></span></div>
+      <span class="save-dot" data-saveind="save-dot" role="img" hidden></span>
       <button type="button" class="theme-btn" data-act="palette" aria-label="Suchen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
       <button type="button" class="theme-btn" data-act="theme" aria-label="Design wechseln"></button>
     </header>
+    <div id="relBars"></div>
     <main id="app"></main>
   </div>
 </div>
@@ -3470,8 +3552,7 @@ const byName = (a,b) => a.name.localeCompare(b.name,'de');
 let S;
 let view = {tab:'menu', card:null, q:'', ctype:'all', pq:''};
 
-function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
-function load(){ try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; } catch(e){ return null; } }
+/* save() und load(): siehe store.js */
 
 const P = id => S.products.find(p => p.id === id);
 const C = id => S.cards.find(c => c.id === id);
@@ -3518,6 +3599,507 @@ function fcClass(fc){ if(fc==null) return 'na'; const tg = +S.settings.target; r
 function fcBadge(fc){ return `<span class="fc ${fcClass(fc)}">${fc==null ? 'keine Rezeptur' : pct(fc)}</span>`; }
 function chips(set){ const a = [...set].sort(); return a.length ? `<div class="chips">${a.map(x=>`<span class="alg" title="${esc(ALG[x]||x)}">${esc(x)}</span>`).join('')}</div>` : ''; }
 function usage(ref){ return S.cards.filter(c => c.items.some(i => i.ref === ref)); }
+
+/* =====================================================================
+   Paket A · Speicher
+   Hauptdaten liegen in IndexedDB (Datenbank dahuam202_daten), zerlegt in
+   kleine Teile ("units"). Ein Speichervorgang schreibt nur geänderte Teile
+   und die Versionsnummer in EINER Transaktion: ganz oder gar nicht.
+   Vorher steht dieselbe Änderung als Notiz ("Journal") im localStorage,
+   damit auch ein Absturz zwischen Tippen und Schreiben nichts kostet.
+   Ohne IndexedDB: localStorage wie früher, aber Fehler werden sichtbar.
+   ===================================================================== */
+const APP_SCHEMA = 2;                       // Datenformat; ohne Angabe = 1 (vor Paket A)
+const APP_VERSION = '1.1.0', APP_BUILD = '4f6e985b55';
+function schemaNewer(d){ return !!d && typeof d === 'object' && +d.schema > APP_SCHEMA; }
+const NEWER_MSG = 'Diese Daten stammen aus einer neueren Version der App. Bitte zuerst die App neu laden, damit sie aktuell ist, und dann noch einmal versuchen. Es wurde nichts geändert.';
+
+const STORE = (() => {
+  const DBN = 'dahuam202_daten', JKEY = KEY + '_journal', LKEY = KEY + '_lease', BKEY = KEY + '_bus', RKEY = KEY + '_rev';
+  const TAB = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const U = '\u001f', BUDGET = 20, SLICE = 8, JMAX = 1500000;
+  const st = { mode:'mem', db:null, sid:'', rev:0, metaAt:0, writer:'', pers:new Map(), fly:null, cur:null, pass:null, restarts:0,
+    dirty:false, gen:0, error:null, savedAt:0, role:'owner', confirmed:true, since:0, frozen:false, ready:false, fresh:false,
+    legacy:null, stray:null, ops:0, safety:null, base:undefined, baseP:null, status:'', retryN:0, journalOk:true, blocked:0, stats:{} };
+  const subs = [], waiters = [];
+  const emit = (t, d) => { subs.slice().forEach(f => { try { f(t, d); } catch(e){ console.warn('Speicher:', e); } }); settle(); };
+  const ls = {
+    get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+    set(k, v){ try { localStorage.setItem(k, v); return true; } catch(e){ return false; } },
+    del(k){ try { localStorage.removeItem(k); } catch(e){} } };
+  const isLocal = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  const now = () => Date.now();
+  const dayOf = t => { const d = new Date(t); return new Date(d.getTime() - d.getTimezoneOffset()*6e4).toISOString().slice(0, 10); };
+  const isObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
+  const hash = s => { let h = 2166136261; for(let i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+  const isMarker = raw => { if(!raw || raw.length > 400) return false; try { const m = JSON.parse(raw); return !!(m && m._store); } catch(e){ return false; } };
+
+  /* ---------- Zerlegen und Zusammensetzen ---------- */
+  function plan(S){
+    const man = {v:1, top:[], parts:{}}, list = [];
+    const part = (path, v) => {
+      if(Array.isArray(v) && v.length > 96){
+        const names = [], used = new Set(); let a = 0;
+        const cut = b => { const f = v[a]; let nm = f && typeof f === 'object' && f.id != null ? String(f.id) : '@' + a; if(used.has(nm)) nm += '~' + a; used.add(nm); names.push(nm); const x = a, y = b; list.push([path + U + '#' + nm, () => JSON.stringify(v.slice(x, y))]); a = b; };
+        for(let i = 1; i < v.length; i++){ const e = v[i]; const edge = e && typeof e === 'object' && e.id != null ? hash(String(e.id)) % 128 === 0 : i % 128 === 0; if(edge || i - a >= 512) cut(i); }
+        cut(v.length);
+        return {t:'a', c:names};
+      }
+      if(isObj(v)){
+        const keys = Object.keys(v); if(keys.length <= 48) return null;
+        const bk = new Map();
+        for(const k of keys){ const b = /^\d{4}-\d{2}/.test(k) ? k.slice(0, 7) : 'h' + (hash(k) % 16); let o = bk.get(b); if(!o) bk.set(b, o = {}); o[k] = v[k]; }
+        const sim = []; for(const [b, o] of bk){ for(const k of Object.keys(o)) sim.push(k); list.push([path + U + '/' + b, () => JSON.stringify(o)]); }
+        let same = sim.length === keys.length; for(let i = 0; same && i < keys.length; i++) if(sim[i] !== keys[i]) same = false;
+        const d = {t:'o', b:[...bk.keys()]}; if(!same) d.ord = keys; return d;
+      }
+      return null;
+    };
+    for(const k of Object.keys(S)){
+      const v = S[k]; if(v === undefined || typeof v === 'function') continue;
+      man.top.push(k);
+      let d = part(k, v);
+      if(!d && isObj(v)){
+        let sub = null; const rest = {};
+        for(const k2 of Object.keys(v)){ const d2 = part(k + U + k2, v[k2]); if(d2) (sub = sub || {})[k2] = d2; else rest[k2] = v[k2]; }
+        if(sub){ d = {t:'s', sub, ord:Object.keys(v)}; list.push([k, () => JSON.stringify(rest)]); }
+      }
+      if(d) man.parts[k] = d; else list.push([k, () => { const s = JSON.stringify(v); return s === undefined ? 'null' : s; }]);
+    }
+    list.push(['!m', () => JSON.stringify(man)]);
+    return list;
+  }
+  function assemble(get){
+    const mj = get('!m'); if(mj == null) throw new Error('Inhaltsverzeichnis fehlt');
+    const man = JSON.parse(mj); if(!man || !Array.isArray(man.top)) throw new Error('Inhaltsverzeichnis unlesbar');
+    const need = id => { const s = get(id); if(s == null) throw new Error('Teil fehlt: ' + id); return JSON.parse(s); };
+    const build = (path, d) => {
+      if(d.t === 'a'){ const out = []; for(const n of d.c){ const a = need(path + U + '#' + n); for(let i = 0; i < a.length; i++) out.push(a[i]); } return out; }
+      const tmp = {}; for(const b of d.b) Object.assign(tmp, need(path + U + '/' + b));
+      if(!d.ord) return tmp; const o = {}; for(const k of d.ord) if(k in tmp) o[k] = tmp[k]; return o;
+    };
+    const S = {};
+    for(const k of man.top){ const d = (man.parts || {})[k];
+      if(!d) S[k] = need(k);
+      else if(d.t === 's'){ const rest = need(k), o = {}; for(const k2 of d.ord){ if(d.sub[k2]) o[k2] = build(k + U + k2, d.sub[k2]); else if(k2 in rest) o[k2] = rest[k2]; } S[k] = o; }
+      else S[k] = build(k, d);
+    }
+    return S;
+  }
+  function unitsOf(S){ const m = new Map(); for(const [id, f] of plan(S)) m.set(id, f()); return m; }
+
+  /* ---------- IndexedDB ---------- */
+  function openDb(){
+    return new Promise((res, rej) => {
+      let done = false; const fin = (f, x) => { if(!done){ done = true; f(x); } };
+      const tm = setTimeout(() => fin(rej, new Error('IndexedDB antwortet nicht')), 4000);
+      try {
+        const r = indexedDB.open(DBN, 1);
+        r.onupgradeneeded = () => { const db = r.result; for(const n of ['kv', 'units', 'snapMeta', 'snapData']) if(!db.objectStoreNames.contains(n)) db.createObjectStore(n); };
+        r.onsuccess = () => { clearTimeout(tm); const db = r.result; db.onversionchange = () => { try { db.close(); } catch(e){} if(st.db === db) st.db = null; }; db.onclose = () => { if(st.db === db) st.db = null; }; if(done){ try { db.close(); } catch(e){} } else fin(res, db); };
+        r.onerror = () => { clearTimeout(tm); fin(rej, r.error || new Error('IndexedDB gesperrt')); };
+        r.onblocked = () => {};
+      } catch(e){ clearTimeout(tm); fin(rej, e); }
+    });
+  }
+  const rq = r => new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+  function tx(names, mode, fn){
+    return new Promise((res, rej) => {
+      let t, out;
+      try { try { t = st.db.transaction(names, mode, {durability:'strict'}); } catch(e){ if(e && e.name === 'TypeError') t = st.db.transaction(names, mode); else throw e; } }
+      catch(e){ return rej(e); }
+      t.oncomplete = () => res(out); t.onerror = e => { if(!t._why && e && e.target && e.target.error) t._why = e.target.error; }; t.onabort = () => rej(t._why || t.error || new Error('Abbruch'));
+      try { out = fn(t); } catch(e){ t._why = e; try { t.abort(); } catch(x){ rej(e); } }
+    });
+  }
+  async function op(p){ st.ops++; try { return await p; } finally { st.ops--; settle(); } }
+  function kvGet(k){ if(!st.db) return Promise.resolve(k === 'meta' ? null : memKv.get(k)); let r; return op(tx(['kv'], 'readonly', t => { r = t.objectStore('kv').get(k); }).then(() => r.result)); }
+  function kvSet(k, v){ if(!st.db){ if(v === undefined) memKv.delete(k); else memKv.set(k, v); return Promise.resolve(); } return op(tx(['kv'], 'readwrite', t => { const s = t.objectStore('kv'); if(v === undefined) s.delete(k); else s.put(v, k); })); }
+  const memKv = new Map();
+  async function readAll(){
+    let meta, keys, vals, saf;
+    await tx(['kv', 'units'], 'readonly', t => { const kv = t.objectStore('kv'), us = t.objectStore('units'); meta = kv.get('meta'); saf = kv.get('safetyMeta'); keys = us.getAllKeys(); vals = us.getAll(); });
+    const m = new Map(); keys.result.forEach((k, i) => m.set(k, vals.result[i]));
+    return {meta:meta.result || null, units:m, safety:saf.result || null};
+  }
+
+  /* ---------- Journal (Notiz der letzten ungeschriebenen Änderung) ---------- */
+  function diff(cur){
+    const ch = new Map(), rm = [];
+    const fly = st.fly ? st.fly.touch : null;
+    for(const [id, s] of cur) if(st.pers.get(id) !== s || (fly && fly.has(id))) ch.set(id, s);
+    for(const id of st.pers.keys()) if(!cur.has(id)) rm.push(id);
+    if(fly) for(const id of fly) if(!cur.has(id) && !st.pers.has(id)) rm.push(id);
+    return {ch, rm};
+  }
+  function journalWrite(d){
+    if(st.mode !== 'idb') return;
+    if(!st.sid) st.sid = TAB + Math.random().toString(36).slice(2, 8);      // Kennung dieses Speichers, entsteht vor dem ersten Schreiben
+    if(!d.ch.size && !d.rm.length){ ls.del(JKEY); st.journalOk = true; return; }
+    let n = 0; for(const s of d.ch.values()) n += s.length;
+    st.journalOk = n <= JMAX && ls.set(JKEY, JSON.stringify({v:1, base:st.rev, sid:st.sid, tab:TAB, at:now(), ch:[...d.ch], rm:d.rm}));
+    if(!st.journalOk) ls.del(JKEY);
+  }
+  const journalFits = (j, meta) => !!j && j.sid === (meta.sid || '') && (j.base === meta.rev || (j.base < meta.rev && j.tab === meta.writer));
+  /* Wurde der Schreibvorgang beim Schließen doch noch fertig, steht alles aus der Notiz schon im Speicher: dann gibt es nichts nachzuholen */
+  const journalNews = (j, units) => j.ch.some(([id, s]) => units.get(id) !== s) || j.rm.some(id => units.has(id));
+  function journalRead(){ const raw = ls.get(JKEY); if(!raw) return null; try { const j = JSON.parse(raw); return j && j.v === 1 && Array.isArray(j.ch) ? j : null; } catch(e){ return null; } }
+
+  /* ---------- Speichern ---------- */
+  function save(){
+    if(st.frozen) return;
+    if(st.role !== 'owner'){ st.blocked++; emit('blocked'); return; }
+    st.dirty = true; st.gen++;
+    if(st.ready) kick();
+  }
+  let kicked = false, sliceT = 0, commitT = 0, retryT = 0;
+  function kick(){ if(kicked) return; kicked = true; const go = () => { kicked = false; run(BUDGET); }; if(typeof queueMicrotask === 'function') queueMicrotask(go); else Promise.resolve().then(go); }
+  function canWrite(){ return st.ready && !st.frozen && st.role === 'owner' && st.confirmed; }
+  function run(limit){
+    if(!st.dirty || !canWrite()) return;
+    if(st.mode !== 'idb') return lsCommit();
+    if(!st.cur || st.cur.gen !== st.gen){
+      let p = st.pass;
+      if(!p || p.gen !== st.gen){ if(p) st.restarts++; p = st.pass = {gen:st.gen, list:plan(S), map:new Map(), i:0, t:0}; }
+      const t0 = performance.now(), lim = st.restarts >= 3 ? Infinity : limit;
+      while(p.i < p.list.length){ const u = p.list[p.i++]; p.map.set(u[0], u[1]()); if(performance.now() - t0 > lim) break; }
+      const dt = performance.now() - t0; p.t += dt; if(dt > (st.stats.maxSlice || 0)) st.stats.maxSlice = dt;
+      if(p.i < p.list.length){ clearTimeout(sliceT); sliceT = setTimeout(() => run(SLICE), 0); return; }
+      st.cur = {gen:p.gen, map:p.map}; st.pass = null; st.restarts = 0; st.stats.lastPass = p.t;
+      journalWrite(diff(st.cur.map));
+    }
+    clearTimeout(commitT);
+    if(limit === Infinity) commit(); else commitT = setTimeout(commit, 120);
+  }
+  function commit(){
+    clearTimeout(commitT);
+    if(st.fly || !st.cur || !canWrite() || st.mode !== 'idb') return;
+    const cur = st.cur, d = diff(cur.map);
+    if(!d.ch.size && !d.rm.length){ if(st.gen === cur.gen){ st.dirty = false; ls.del(JKEY); st.error = null; emit('saved'); } return; }
+    if(!st.db){ fail(new Error('Datenbank geschlossen')); return; }
+    st.fly = {touch:new Set([...d.ch.keys(), ...d.rm])};
+    emit('saving');
+    const snapP = autoSnapshot();
+    const expect = st.rev, at = now(), sid = st.sid || (st.sid = TAB + Math.random().toString(36).slice(2, 8));
+    op(tx(['kv', 'units'], 'readwrite', t => {
+      const kv = t.objectStore('kv'), us = t.objectStore('units'), g = kv.get('meta');
+      g.onsuccess = () => {
+        const m = g.result || {rev:0};
+        if((+m.rev || 0) !== expect){ t._why = Object.assign(new Error('conflict'), {conflict:true}); t.abort(); return; }
+        try { for(const [id, s] of d.ch) us.put(s, id); for(const id of d.rm) us.delete(id); kv.put({rev:expect + 1, sid, schema:APP_SCHEMA, at, writer:TAB, build:APP_BUILD}, 'meta'); }
+        catch(e){ t._why = e; try { t.abort(); } catch(x){} }
+      };
+    })).then(() => {
+      st.rev = expect + 1; st.metaAt = at; st.writer = TAB; st.sid = sid;
+      for(const [id, s] of d.ch) st.pers.set(id, s); for(const id of d.rm) st.pers.delete(id);
+      st.fly = null; st.error = null; st.retryN = 0; st.savedAt = at; st.fresh = false;
+      if(st.gen === cur.gen){ st.dirty = false; ls.del(JKEY); } else if(st.cur && st.cur.gen === st.gen){ journalWrite(diff(st.cur.map)); commitT = setTimeout(commit, 60); } else kick();
+      post({t:'saved', rev:st.rev});
+      emit('saved');
+      afterFirstCommit();
+      return snapP;
+    }, err => {
+      st.fly = null;
+      if(err && err.conflict){ conflict(); return; }
+      fail(err);
+    }).catch(e => console.warn('Speicher:', e));
+  }
+  function lsCommit(){
+    if(st.mode === 'mem'){ st.error = describe({name:'NoStore'}); emit('error'); return; }
+    try {
+      const cr = +(localStorage.getItem(RKEY) || 0);
+      if(cr !== st.rev){ conflict(); return; }
+      localStorage.setItem(KEY, JSON.stringify(S)); localStorage.setItem(RKEY, String(st.rev + 1));
+      st.rev++; st.dirty = false; st.error = null; st.savedAt = st.metaAt = now(); st.fresh = false;
+      post({t:'saved', rev:st.rev}); emit('saved');
+    } catch(e){ fail(e); }
+  }
+  function describe(e){
+    const name = (e && e.name) || '', msg = String((e && e.message) || e || '');
+    if(name === 'NoStore') return {kind:'nostore', text:'dieser Browser lässt hier kein Speichern zu (zum Beispiel im privaten Fenster)'};
+    if(name === 'QuotaExceededError' || /quota|storage.*full|exceeded/i.test(msg)) return {kind:'quota', text:'der Speicher dieses Browsers ist voll'};
+    return {kind:'other', text:'der Browser hat das Speichern abgelehnt', detail:name + ' ' + msg};
+  }
+  function fail(err){
+    st.error = describe(err); st.error.at = now(); console.warn('Speichern fehlgeschlagen:', err);
+    emit('error');
+    clearTimeout(retryT); const wait = [4000, 15000, 60000][Math.min(st.retryN++, 2)];
+    retryT = setTimeout(() => retry(true), wait);
+  }
+  async function retry(quiet){
+    clearTimeout(retryT);
+    if(st.mode === 'idb' && !st.db){ try { st.db = await openDb(); } catch(e){ if(!quiet) emit('error'); } }
+    if(st.dirty){ if(st.mode === 'idb' && st.cur && st.cur.gen === st.gen) commit(); else run(Infinity); }
+    else { st.error = null; emit('saved'); }
+    return idle();
+  }
+  function flushNow(){ if(st.dirty && canWrite()) run(Infinity); }
+  function settle(){ if(!waiters.length) return; if(st.ops > 0 || st.fly) return; if(st.dirty && canWrite() && !st.error) return; waiters.splice(0).forEach(f => f()); }
+  function idle(){ return new Promise(res => { waiters.push(res); setTimeout(settle, 0); }); }
+
+  /* ---------- Erster Schreibvorgang: alte Kopie im localStorage ablösen ---------- */
+  let firstDone = false;
+  async function afterFirstCommit(){
+    if(firstDone || st.mode !== 'idb') return; firstDone = true;
+    const raw = st.legacy || st.stray; if(!raw && isMarker(ls.get(KEY))) return;
+    try {
+      const back = await op(readAll());                       // zurücklesen und prüfen
+      if(!back.meta || back.meta.rev < 1) throw new Error('Prüfung: keine Version');
+      for(const [id, s] of st.pers) if(!st.fly && back.meta.rev === st.rev && back.units.get(id) !== s) throw new Error('Prüfung: Teil weicht ab');
+      assemble(id => back.units.get(id));
+      if(raw) await snapPut(st.legacy ? 'umzug' : 'alt', st.legacy ? 'Stand vor der Umstellung des Speichers' : 'Stand aus einer älteren App-Version', {raw}, 0, now());
+      ls.set(KEY, JSON.stringify({_store:'idb', rev:back.meta.rev, at:new Date().toISOString()}));
+      st.legacy = st.stray = null; emit('migrated');
+    } catch(e){ console.warn('Umstellung noch nicht abgeschlossen:', e); firstDone = false; }
+  }
+
+  /* ---------- Frühere Stände ---------- */
+  function sizeOf(data){ if(data.raw != null) return data.raw.length; let n = 0; for(const k in data.u) n += data.u[k].length; return n; }
+  function countsOf(get){ const n = id => { try { const s = get(id); return s ? JSON.parse(s).length : null; } catch(e){ return null; } }; return {menu:n('menu'), cards:n('cards'), products:n('products')}; }
+  async function snapPut(kind, why, data, rev, at){
+    if(!st.db) return null;
+    const id = new Date(now()).toISOString() + '-' + Math.random().toString(36).slice(2, 6);
+    let counts = {}; try { if(data.raw != null){ const d = JSON.parse(data.raw); counts = {menu:(d.menu || []).length, cards:(d.cards || []).length, products:(d.products || []).length}; } else counts = countsOf(k => data.u[k]); } catch(e){}
+    const meta = {id, kind, why, at, taken:now(), rev, size:sizeOf(data), counts};
+    await op(tx(['snapMeta', 'snapData'], 'readwrite', t => { t.objectStore('snapMeta').put(meta, id); t.objectStore('snapData').put(data, id); }));
+    await snapPrune(); emit('snaps'); return meta;
+  }
+  async function snapList(){ if(!st.db) return []; let r; await op(tx(['snapMeta'], 'readonly', t => { r = t.objectStore('snapMeta').getAll(); })); return r.result.sort((a, b) => b.at - a.at || b.taken - a.taken); }
+  const weekOf = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return dayOf(d.getTime()); };
+  async function snapPrune(){
+    const all = await snapList(); const keep = new Set();
+    const auto = all.filter(x => x.kind === 'auto'); auto.slice(0, 7).forEach(x => keep.add(x.id));
+    const weeks = new Set(); for(const x of auto.slice(7)){ const w = weekOf(x.at); if(weeks.has(w)) continue; if(weeks.size >= 4) break; weeks.add(w); keep.add(x.id); }
+    all.filter(x => x.kind !== 'auto').slice(0, 5).forEach(x => keep.add(x.id));
+    const drop = all.filter(x => !keep.has(x.id)); if(!drop.length) return;
+    await op(tx(['snapMeta', 'snapData'], 'readwrite', t => { for(const x of drop){ t.objectStore('snapMeta').delete(x.id); t.objectStore('snapData').delete(x.id); } }));
+  }
+  async function snapLoad(id){ let r; await op(tx(['snapData'], 'readonly', t => { r = t.objectStore('snapData').get(id); })); const d = r.result; if(!d) throw new Error('Stand nicht gefunden'); return d.raw != null ? JSON.parse(d.raw) : assemble(k => d.u[k]); }
+  async function snapDelete(id){ await op(tx(['snapMeta', 'snapData'], 'readwrite', t => { t.objectStore('snapMeta').delete(id); t.objectStore('snapData').delete(id); })); emit('snaps'); }
+  let lastAutoRev = -1;
+  /* Tagesstand: vor der ersten Änderung eines neuen Tages wird der bisherige Stand aufgehoben */
+  function autoSnapshot(){
+    if(!st.db || !st.pers.size || !st.metaAt || st.rev === lastAutoRev) return Promise.resolve();
+    if(dayOf(st.metaAt) === dayOf(now())) return Promise.resolve();
+    lastAutoRev = st.rev; const rev = st.rev, at = st.metaAt, u = Object.fromEntries(st.pers);
+    return snapList().then(l => l.some(x => x.kind === 'auto' && x.rev === rev && x.at === at) ? null : snapPut('auto', '', {u}, rev, at)).catch(e => console.warn('Früherer Stand:', e));
+  }
+  function snapNow(kind, why){ const u = Object.fromEntries(unitsOf(S)); return snapPut(kind, why, {u}, st.rev, now()); }
+
+  /* ---------- Sicherheitskopie und Cloud-Basis ---------- */
+  function safetyStore(why){
+    let raw; try { raw = JSON.stringify(S); } catch(e){ return false; }
+    const m = st.safety = {at:new Date().toISOString(), why, nMenu:(S.menu || []).length, nCards:(S.cards || []).length};
+    memKv.set('safety', {...m, raw});
+    if(st.db) op(tx(['kv'], 'readwrite', t => { t.objectStore('kv').put(m, 'safetyMeta'); t.objectStore('kv').put({...m, raw}, 'safety'); })).then(() => { if(st.safety === m) memKv.delete('safety'); }, e => console.warn('Sicherheitskopie:', e));
+    else ls.set(KEY + '_safety', JSON.stringify({at:m.at, why, data:JSON.parse(raw)}));
+    emit('safety'); return true;
+  }
+  async function safetyData(){ let x = memKv.get('safety'); if(!x && st.db) x = await kvGet('safety').catch(() => null); return x && x.raw ? JSON.parse(x.raw) : null; }
+  function safetyClear(){ st.safety = null; memKv.delete('safety'); ls.del(KEY + '_safety'); if(st.db) op(tx(['kv'], 'readwrite', t => { t.objectStore('kv').delete('safetyMeta'); t.objectStore('kv').delete('safety'); })).catch(() => {}); emit('safety'); }
+  function baseLoad(){ if(!st.baseP) st.baseP = (async () => { let b = null; try { b = st.db ? await kvGet('base') : null; } catch(e){} if(b == null){ const raw = ls.get(KEY + '_base'); if(raw){ try { b = JSON.parse(raw); if(st.db){ await kvSet('base', b); ls.del(KEY + '_base'); } } catch(e){ b = null; } } } if(st.base === undefined) st.base = b || null; })(); return st.baseP; }
+  function baseGet(){ return st.base || null; }
+  function baseSet(d){ st.base = d || null; if(st.db) kvSet('base', d == null ? undefined : d).catch(e => console.warn('Cloud-Basis:', e)); else if(d == null) ls.del(KEY + '_base'); else ls.set(KEY + '_base', JSON.stringify(d)); }
+
+  /* ---------- Zwei Fenster: nur eines schreibt ---------- */
+  let bc = null, seq = 0, onHere = null, onReleased = null, beatT = 0, reloadT = 0;
+  function post(m){ m.from = TAB; m.n = ++seq; if(bc){ try { bc.postMessage(m); return; } catch(e){} } ls.set(BKEY, JSON.stringify(m)); }
+  function leaseRead(){ try { return JSON.parse(ls.get(LKEY)); } catch(e){ return null; } }
+  function leaseWrite(){ ls.set(LKEY, JSON.stringify({id:TAB, since:st.since, t:now()})); }
+  function claim(){ st.role = 'owner'; st.confirmed = true; st.since = now(); leaseWrite(); }
+  function beat(){
+    const l = leaseRead();
+    if(st.role === 'owner'){
+      if(l && l.id !== TAB && (l.since > st.since || (l.since === st.since && l.id > TAB))){ demote('lease'); return; }
+      leaseWrite();
+    } else if(st.confirmed){
+      if(!l){ takeover(true); return; }
+      if(now() - l.t > 15000){ let got = false; onHere = () => { got = true; }; post({t:'who'}); setTimeout(() => { if(!got && st.role === 'reader'){ const l2 = leaseRead(); if(!l2 || now() - l2.t > 15000) takeover(true); } }, 600); }
+    }
+  }
+  function leaseInit(){
+    try { if(typeof BroadcastChannel === 'function'){ bc = new BroadcastChannel('dahuam202_bus'); bc.onmessage = e => onBus(e.data); } } catch(e){ bc = null; }
+    window.addEventListener('storage', e => {
+      if(e.key === BKEY && e.newValue && !bc){ try { onBus(JSON.parse(e.newValue)); } catch(x){} }
+      if(e.key === LKEY) beat();
+      if(e.key === RKEY && st.mode === 'ls' && st.role === 'reader') scheduleReload();
+    });
+    beatT = setInterval(beat, 4000);
+    const l = leaseRead();
+    if(!l || l.id === TAB){ claim(); setTimeout(beat, 300 + Math.random()*200); return Promise.resolve(); }
+    st.role = 'reader'; st.confirmed = false;
+    return new Promise(res => { let fin = false; const end = () => { if(!fin){ fin = true; res(); } };
+      onHere = () => { st.confirmed = true; end(); };
+      post({t:'who'});
+      setTimeout(() => { if(!st.confirmed){ onHere = null; claim(); } end(); }, 500); });
+  }
+  function onBus(m){
+    if(!m || m.from === TAB) return;
+    if(m.t === 'who'){ if(st.role === 'owner' && st.confirmed) post({t:'here'}); }
+    else if(m.t === 'here'){ if(onHere){ const f = onHere; onHere = null; f(); } }
+    else if(m.t === 'takeover'){ if(st.role === 'owner'){ flushNow(); const end = () => { demote('takeover'); post({t:'released', rev:st.rev}); }; const tm = setTimeout(end, 1500); idle().then(() => { clearTimeout(tm); if(st.role === 'owner') end(); }); } }
+    else if(m.t === 'released'){ if(onReleased){ const f = onReleased; onReleased = null; f(); } }
+    else if(m.t === 'saved'){ if(st.role === 'reader') scheduleReload(); }
+  }
+  function demote(why){
+    if(st.role !== 'owner') return;
+    const lost = st.dirty; st.role = 'reader'; st.confirmed = true;
+    clearTimeout(commitT); clearTimeout(sliceT); clearTimeout(retryT);
+    if(lost && why !== 'takeover'){ try { snapNow('konflikt', 'Nicht gespeicherte Änderungen dieses Fensters'); } catch(e){} }
+    st.dirty = false; st.cur = null; st.pass = null; st.error = null;
+    try { const d = document.getElementById('dlg'); if(d && d.open) d.close(); } catch(e){}
+    emit('role', why);
+    if(why !== 'takeover') scheduleReload();
+  }
+  function conflict(){ if(st.role === 'owner'){ const l = leaseRead(); if(l && l.id === TAB) ls.del(LKEY); demote('conflict'); } }
+  function scheduleReload(){ clearTimeout(reloadT); reloadT = setTimeout(() => { if(st.role === 'reader') reload().catch(e => console.warn(e)); }, 150); }
+  /* Stand neu aus dem Speicher lesen (Lesefenster, Übernahme) */
+  async function reload(asOwner){
+    let state = null;
+    if(st.mode === 'idb' && st.db){
+      const r = await op(readAll()); if(!r.meta) return false;
+      const get0 = id => r.units.get(id); let get = get0, applied = false;
+      if(asOwner){ const j = journalRead(); if(journalFits(j, r.meta) && !journalNews(j, r.units)) ls.del(JKEY); else if(journalFits(j, r.meta)){ const o = new Map(j.ch), rm = new Set(j.rm); get = id => o.has(id) ? o.get(id) : rm.has(id) ? undefined : r.units.get(id); applied = true; } else if(j) ls.del(JKEY); }
+      try { state = assemble(get); } catch(e){ if(!applied) throw e; state = assemble(get0); applied = false; ls.del(JKEY); }
+      if(schemaNewer(state)) return false;
+      st.rev = r.meta.rev; st.sid = r.meta.sid || ''; st.metaAt = r.meta.at; st.writer = r.meta.writer; st.pers = r.units; st.cur = null; st.pass = null; st.dirty = applied; if(applied) st.gen++;
+    } else if(st.mode === 'ls'){
+      const raw = ls.get(KEY); if(!raw) return false; state = JSON.parse(raw); st.rev = +(ls.get(RKEY) || 0); st.dirty = false;
+    } else return false;
+    const nd = migrate(state); if(!nd) return false;
+    S = nd; st.savedAt = st.metaAt;
+    try { render(); } catch(e){ console.warn(e); }
+    emit('reloaded');
+    return true;
+  }
+  async function takeover(auto){
+    if(st.role === 'owner' || st.taking) return; st.taking = true;
+    try {
+      if(!auto){ await new Promise(res => { onReleased = res; post({t:'takeover'}); setTimeout(res, 1800); }); onReleased = null; }
+      st.since = now(); leaseWrite();                 // Anspruch anmelden, aber erst nach dem Neuladen schreiben
+      try { await reload(true); } finally { st.role = 'owner'; st.confirmed = true; }
+      emit('role', 'owner');
+      if(st.dirty) kick();
+    } finally { st.taking = false; }
+  }
+  /* Lesefenster: Eingaben abfangen, Navigation bleibt möglich */
+  const roOk = t => !!(t && t.closest && t.closest('#relBars, [data-tab], .nav-slot, .side nav, .bottom, [data-act="theme"]'));
+  const roKeys = new Set(['Tab', 'Escape', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown', 'Home', 'End', 'F5', 'F12']);
+  function roGuard(e){
+    if(st.recovering){ e.stopImmediatePropagation(); if(e.type === 'click' || e.type === 'change'){ try { relRecEvent(e); } catch(x){ console.warn(x); } } return; }
+    if(st.role === 'owner' || !st.ready) return;
+    const t = e.target;
+    if(e.type === 'keydown'){ if(roKeys.has(e.key) || ((e.ctrlKey || e.metaKey) && /^[rRcCaAfF]$/.test(e.key))) return; if((e.key === 'Enter' || e.key === ' ') && roOk(t)) return; }
+    else if(roOk(t)) return;
+    e.stopImmediatePropagation(); if(e.cancelable && e.type !== 'pointerdown') e.preventDefault();
+    if(e.type === 'click' || e.type === 'change'){ st.blocked++; emit('blocked'); }
+  }
+  ['click', 'dblclick', 'pointerdown', 'mousedown', 'keydown', 'beforeinput', 'input', 'change', 'submit', 'dragstart', 'drop', 'paste', 'cut'].forEach(ev => window.addEventListener(ev, roGuard, true));
+
+  /* ---------- Start ---------- */
+  /* Alles Gespeicherte löschen (Tests, „?fresh=1“ nur auf localhost). all: auch die kleinen Geräte-Einstellungen */
+  async function wipe(all){
+    clearInterval(beatT); clearTimeout(commitT); clearTimeout(sliceT); clearTimeout(retryT);
+    st.frozen = true; st.dirty = false; st.cur = null; st.pass = null;
+    try { await idle(); } catch(e){}
+    try { if(st.db){ st.db.close(); st.db = null; } } catch(e){}
+    await new Promise(res => { try { const r = indexedDB.deleteDatabase(DBN); r.onsuccess = r.onerror = r.onblocked = () => res(); } catch(e){ res(); } });
+    try { Object.keys(localStorage).filter(k => all ? k.indexOf(KEY) === 0 : [KEY, JKEY, LKEY, BKEY, RKEY, KEY + '_safety', KEY + '_base', KEY + '_defekt', KEY + '_lastBackup'].includes(k)).forEach(k => localStorage.removeItem(k)); } catch(e){}
+  }
+  async function preserve(kind, data){ const rec = {at:new Date().toISOString(), kind, ...data}; memKv.set('corrupt', rec); if(st.db){ try { await kvSet('corrupt', rec); } catch(e){ console.warn(e); } } return rec; }
+  async function boot(){
+    const t0 = performance.now();
+    if(isLocal && /[?&]fresh=1\b/.test(location.search)){ await wipe(true); st.frozen = false; }
+    const lsOk = (() => { try { localStorage.setItem(KEY + '_probe', '1'); localStorage.removeItem(KEY + '_probe'); return true; } catch(e){ return false; } })();
+    const roleP = leaseInit();
+    try { st.db = await openDb(); st.mode = 'idb'; } catch(e){ st.db = null; st.mode = lsOk ? 'ls' : 'mem'; st.idbError = String((e && e.message) || e); }
+    let res;
+    try { res = st.mode === 'idb' ? await loadIdb(roleP) : (await roleP, loadLs()); }
+    catch(e){ console.warn('Start:', e); res = {status:'corrupt', kind:'read', error:String((e && e.message) || e)}; }
+    if(res.status !== 'ok' && res.status !== 'fresh') st.frozen = true;
+    st.fresh = res.status === 'fresh'; st.status = res.status; st.stats.boot = performance.now() - t0;
+    return res;
+  }
+  async function loadIdb(roleP){
+    const r = await readAll(); await roleP;
+    const raw = ls.get(KEY), full = !!raw && !isMarker(raw);
+    st.safety = r.safety;
+    if(!r.safety){ const sr = ls.get(KEY + '_safety'); if(sr){ try { const sf = JSON.parse(sr); if(sf && sf.data){ const m = {at:sf.at, why:sf.why, nMenu:(sf.data.menu || []).length, nCards:(sf.data.cards || []).length}; await tx(['kv'], 'readwrite', t => { t.objectStore('kv').put(m, 'safetyMeta'); t.objectStore('kv').put({...m, raw:JSON.stringify(sf.data)}, 'safety'); }); st.safety = m; } ls.del(KEY + '_safety'); } catch(e){} } }
+    if(!r.meta){
+      if(full){ let d; try { d = JSON.parse(raw); } catch(e){ await preserve('ls', {raw}); return {status:'corrupt', kind:'ls'}; }
+        if(schemaNewer(d)) return {status:'newer'};
+        st.legacy = raw; return {status:'ok', state:d, legacy:true}; }
+      /* allererste Änderung, Absturz vor dem ersten Schreiben: die Notiz enthält dann den ganzen Stand */
+      const j0 = st.role === 'owner' ? journalRead() : null;
+      if(j0 && j0.base === 0 && !(raw && isMarker(raw))){ try { const o = new Map(j0.ch); const state = assemble(id => o.get(id)); if(!schemaNewer(state)){ st.sid = j0.sid || ''; return {status:'ok', state, replay:true}; } } catch(e){} }
+      if(j0) ls.del(JKEY);
+      if(raw && isMarker(raw)) return {status:'lost'};
+      return {status:'fresh'};
+    }
+    st.rev = +r.meta.rev || 0; st.sid = r.meta.sid || ''; st.metaAt = r.meta.at || 0; st.writer = r.meta.writer || ''; st.pers = r.units; st.savedAt = st.metaAt;
+    if(full) st.stray = raw;
+    if(+r.meta.schema > APP_SCHEMA) return {status:'newer'};
+    let get = id => r.units.get(id), replay = false;
+    const j = st.role === 'owner' ? journalRead() : null;
+    if(j){
+      if(journalFits(j, r.meta) && !journalNews(j, r.units)) ls.del(JKEY);
+      else if(journalFits(j, r.meta)){ const o = new Map(j.ch), rm = new Set(j.rm); get = id => o.has(id) ? o.get(id) : rm.has(id) ? undefined : r.units.get(id); replay = true; }
+      else if(j.sid !== st.sid) ls.del(JKEY);
+      else { try { const o = new Map(j.ch), rm = new Set(j.rm); const u = {}; for(const [id, s] of r.units) if(!rm.has(id)) u[id] = s; for(const [id, s] of o) u[id] = s; assemble(id => u[id]); await snapPut('konflikt', 'Nicht gespeicherte Änderungen aus einem anderen Fenster', {u}, j.base, j.at || now()); } catch(e){} ls.del(JKEY); }
+    }
+    let state;
+    try { state = assemble(get); }
+    catch(e){ if(replay){ replay = false; ls.del(JKEY); try { state = assemble(id => r.units.get(id)); } catch(e2){ state = null; } }
+      if(!state){ await preserve('idb', {meta:r.meta, units:Object.fromEntries(r.units), error:String(e.message || e)}); return {status:'corrupt', kind:'idb'}; } }
+    if(schemaNewer(state)) return {status:'newer'};
+    return {status:'ok', state, replay};
+  }
+  function loadLs(){
+    const raw = ls.get(KEY); st.rev = +(ls.get(RKEY) || 0);
+    try { const sf = JSON.parse(ls.get(KEY + '_safety')); if(sf && sf.data){ st.safety = {at:sf.at, why:sf.why, nMenu:(sf.data.menu || []).length, nCards:(sf.data.cards || []).length}; memKv.set('safety', {...st.safety, raw:JSON.stringify(sf.data)}); } } catch(e){}
+    if(!raw) return {status:'fresh'};
+    if(isMarker(raw)) return {status:'unreachable'};
+    let d; try { d = JSON.parse(raw); } catch(e){ memKv.set('corrupt', {at:new Date().toISOString(), kind:'ls', raw}); ls.set(KEY + '_defekt', raw); return {status:'corrupt', kind:'ls'}; }
+    if(schemaNewer(d)) return {status:'newer'};
+    return {status:'ok', state:d};
+  }
+  /* nach dem ersten Bild: Schreiben freigeben */
+  function started(opts){
+    st.ready = true; st.frozen = false;
+    if(opts && opts.dirty){ st.dirty = true; st.gen++; }
+    if(st.dirty) kick();
+    else if(st.stray) afterFirstCommit();
+    emit('ready');
+  }
+  /* beschädigter Stand: erst nach der Entscheidung des Nutzers wieder schreiben */
+  function resume(){ st.frozen = false; st.ready = true; st.status = 'ok'; st.dirty = true; st.gen++; st.cur = null; st.pass = null; kick(); emit('ready'); }
+  async function persistInfo(ask){
+    const out = {supported:!!(navigator.storage && navigator.storage.persisted), persisted:null, usage:null, quota:null, mode:st.mode};
+    try { if(out.supported){ out.persisted = await navigator.storage.persisted(); if(!out.persisted && ask && navigator.storage.persist) out.persisted = await navigator.storage.persist(); } } catch(e){}
+    try { if(navigator.storage && navigator.storage.estimate){ const e = await navigator.storage.estimate(); out.usage = e.usage; out.quota = e.quota; } } catch(e){}
+    st.persist = out; return out;
+  }
+  window.addEventListener('pagehide', e => { flushNow(); if(st.role === 'owner' && !e.persisted){ const l = leaseRead(); if(l && l.id === TAB) ls.del(LKEY); } });
+  window.addEventListener('pageshow', e => { if(e.persisted) beat(); });
+  document.addEventListener('visibilitychange', () => { if(document.hidden) flushNow(); else beat(); });
+
+  /* ---------- Für Tests und Fehlersuche ---------- */
+  async function read(){ await idle(); if(st.mode === 'idb' && st.db){ const r = await op(readAll()); return r.meta ? assemble(id => r.units.get(id)) : null; } const raw = ls.get(KEY); return raw && !isMarker(raw) ? JSON.parse(raw) : null; }
+  async function replace(d){
+    await idle(); st.frozen = true; clearTimeout(commitT); clearTimeout(sliceT); st.dirty = false; ls.del(JKEY);
+    if(st.mode === 'idb' && st.db){ const u = unitsOf(d), rev = st.rev + 1; await op(tx(['kv', 'units'], 'readwrite', t => { const us = t.objectStore('units'); us.clear(); for(const [id, s] of u) us.put(s, id); t.objectStore('kv').put({rev, sid:st.sid || (st.sid = TAB + 'r'), schema:+d.schema || 1, at:now(), writer:TAB, build:APP_BUILD}, 'meta'); })); st.rev = rev; st.pers = u; if(!isMarker(ls.get(KEY))) ls.set(KEY, JSON.stringify({_store:'idb', rev, at:new Date().toISOString()})); }
+    else { ls.set(KEY, JSON.stringify(d)); ls.set(RKEY, String(++st.rev)); }
+  }
+  return { st, TAB, boot, started, resume, save, flush:flushNow, idle, retry, read, replace, wipe, on:f => { subs.push(f); }, plan, assemble, unitsOf,
+    kvGet, kvSet, preserve, snaps:snapList, snapLoad, snapDelete, snapNow, snapPut, safetyStore, safetyData, safetyClear, baseLoad, baseGet, baseSet,
+    takeover, persistInfo, isReader:() => st.role !== 'owner', describe,
+    status(){ return {mode:st.mode, role:st.role, confirmed:st.confirmed, dirty:st.dirty, writing:!!st.fly, error:st.error, savedAt:st.savedAt, rev:st.rev, journalOk:st.journalOk, fresh:st.fresh}; } };
+})();
+try { window.__store = STORE; } catch(e){}
+/* Das Lesen aus dem Speicher beginnt sofort und läuft, während der Rest der App geladen wird. Gezeichnet wird erst danach (reliab.js: relStart). */
+const BOOT_P = STORE.boot();
+function save(){ STORE.save(); }
+function load(){ return null; }
 
 /* =====================================================================
    Erweiterung: Lager, Inventur, Fotos, Zubereitungsschritte, Gästekarte
@@ -4419,15 +5001,16 @@ function exportData(){
     <div class="togs"><label class="tog"><input type="checkbox" id="expImg" ${nImg?'checked':''}><span></span>Fotos einschließen (${nImg})</label></div>
     <div class="row-btns"><button type="button" class="btn primary" id="dlBtn">${ico('download')}Datei speichern</button><button type="button" class="btn" id="copyBtn">${ico('copy')}Als Text kopieren</button></div>
     <p class="hint" id="expMsg" role="status">${esc(backupName())}</p>`, null, {cancel:'Schließen'});
-  const json = () => JSON.stringify($('#expImg').checked ? {...S, images:IMG} : S);
+  const json = () => JSON.stringify({...S, schema:APP_SCHEMA, app:APP_VERSION + ' · ' + APP_BUILD, exportedAt:new Date().toISOString(), ...($('#expImg').checked ? {images:IMG} : {})});
   $('#dlBtn').onclick = async () => { const ok = await saveFile(backupName(), new Blob([json()], {type:'application/json'})); $('#expMsg').textContent = ok ? `Gespeichert als ${backupName()}` : 'Nicht gespeichert. „Als Text kopieren“ funktioniert immer.'; if(ok) toast('Sicherung gespeichert'); };
   $('#copyBtn').onclick = () => { const txt = json(); const fb = () => { let ta = $('#expTxt'); if(!ta){ ta = document.createElement('textarea'); ta.id = 'expTxt'; ta.className = 'code'; ta.readOnly = true; ta.setAttribute('aria-label','Sicherung als Text'); $('#expMsg').insertAdjacentElement('afterend', ta); } ta.value = txt; ta.select(); toast('Text markiert, mit Strg+C kopieren'); }; const pr = navigator.clipboard?.writeText(txt); if(pr) pr.then(()=>toast('Kopiert'), fb); else fb(); };
 }
 /* Sicherheitskopie vor dem Überschreiben aller Daten (ohne Fotos; die bleiben im Browser gespeichert) */
 const SAFETY_KEY = KEY + '_safety';
-function safetyStore(why){ try { localStorage.setItem(SAFETY_KEY, JSON.stringify({at:new Date().toISOString(), why, data:S})); return true; } catch(e){ return false; } }
-function safetyGet(){ try { return JSON.parse(localStorage.getItem(SAFETY_KEY)); } catch(e){ return null; } }
-function safetyClear(){ try { localStorage.removeItem(SAFETY_KEY); } catch(e){} }
+/* liegt seit Paket A in IndexedDB; safetyGet() liefert nur Datum, Anlass und Zähler, die Daten kommen über STORE.safetyData() */
+function safetyStore(why){ return STORE.safetyStore(why); }
+function safetyGet(){ return STORE.st.safety; }
+function safetyClear(){ STORE.safetyClear(); }
 function loadBackup(d){
   const imgs = d.images; delete d.images; const nd = migrate(d); if(!nd) throw 0;
   const old = S; const kept = safetyStore('vor „Sicherung laden“'); S = nd;
@@ -4435,7 +5018,7 @@ function loadBackup(d){
   if(imgs) Object.entries(imgs).forEach(([k,v])=>imgPut(k,v)); save(); go('dash');
   toast(kept ? 'Sicherung geladen' : 'Sicherung geladen (ohne Sicherheitskopie, Speicher voll)', kept ? {label:'Rückgängig', ms:8000, action:safetyRestore} : null);
 }
-function safetyRestore(){ const sf = safetyGet(); if(!sf || !sf.data) return; const nd = migrate(sf.data); if(!nd){ toast('Sicherheitskopie ist nicht lesbar'); return; } S = nd; safetyClear(); save(); go('dash'); toast('Letzte Daten wiederhergestellt'); }
+async function safetyRestore(){ const sf = safetyGet(); if(!sf) return; let d = null; try { d = await STORE.safetyData(); } catch(e){} const nd = d && migrate(d); if(!nd){ toast('Sicherheitskopie ist nicht lesbar'); return; } S = nd; safetyClear(); save(); go('dash'); toast('Letzte Daten wiederhergestellt'); }
 
 /* ---------- Schnellsuche ---------- */
 let palSel = 0, palItems = [];
@@ -4614,6 +5197,7 @@ document.addEventListener('change', e => {
   if(t.id === 'importFile' && t.files[0]){
     const r = new FileReader(); const fname = t.files[0].name;
     r.onload = () => { let d; try { d = JSON.parse(r.result); if(!d || typeof d !== 'object' || !Array.isArray(d.products) || !Array.isArray(d.cards) || !Array.isArray(d.menu)) throw 0; } catch(err){ info('Laden fehlgeschlagen', 'Die Datei ist keine Sicherung dieser App. Wählen Sie eine .json-Datei, die mit „Sicherung erstellen“ gespeichert wurde.'); return; }
+      if(schemaNewer(d)){ info('Sicherung ist neuer als die App', 'Diese Sicherung stammt aus einer neueren Version der App und kann hier nicht geladen werden. Bitte die App neu laden, damit sie aktuell ist, und dann noch einmal versuchen. Es wurde nichts geändert.'); return; }
       openDialog('Sicherung laden?', `<p class="dlg-p">Die Datei <b>${esc(fname)}</b> enthält ${plural(d.menu.length,'Gericht','Gerichte')}, ${plural(d.cards.length,'Rezeptur','Rezepturen')} und ${plural(d.products.length,'Produkt','Produkte')}.</p><p class="dlg-p">Alle aktuellen Daten (${plural(S.menu.length,'Gericht','Gerichte')}, ${plural(S.cards.length,'Rezeptur','Rezepturen')}, ${plural(S.products.length,'Produkt','Produkte')}, Lager, Bestellungen, Verkäufe) werden ersetzt. Vorher wird automatisch eine Sicherheitskopie angelegt; unter „Einstellungen“ lässt sie sich einmal zurückholen.</p>`,
         () => { setTimeout(() => { try { loadBackup(d); } catch(err){ info('Laden fehlgeschlagen', 'Die Datei ist keine Sicherung dieser App. Wählen Sie eine .json-Datei, die mit „Sicherung erstellen“ gespeichert wurde.'); } }, 0); }, {ok:'Daten ersetzen', toast:false}); };
     r.readAsText(t.files[0]); t.value = '';
@@ -5189,12 +5773,12 @@ orderView = function(){
       ${todayList.length ? `<div class="oc-grid">${todayList.map(card).join('')}</div>` : '<p class="hint">Heute ist kein Bestelltag.</p>'}
     </section>
     <section class="panel"><div class="panel-h"><h2>Erwartete Lieferungen</h2></div>
-      ${expected.length ? `<ul class="todo">${expected.map(o=>{ const sp = SUP(o.supplier); const late = o.deliveryDate < t; return `<li><button type="button" data-act="ordRecv" data-id="${o.id}"><b class="${late?'bad-t':''}">${late?'!':o.deliveryDate===t?'heute':'morgen'}</b><span>${esc(sp.name)} · ${o.lines.length} Positionen · ${eur(orderTotal(o))}<small class="muted" style="display:block">${o.no} · ${statusPill(o.status)} ${late?'· überfällig':''}</small></span>${ico('arrow','flip')}</button></li>`; }).join('')}</ul>` : '<p class="hint">Heute und morgen kommen keine bestellten Lieferungen.</p>'}
+      ${expected.length ? `<ul class="todo">${expected.map(o=>{ const sp = SUP(o.supplier); const late = o.deliveryDate < t; return `<li><button type="button" data-act="ordRecv" data-id="${o.id}"><b class="${late?'bad-t':''}">${late?'!':o.deliveryDate===t?'heute':'morgen'}</b><span>${esc(sp.name)} · ${o.lines.length} Positionen · ${eur(orderTotal(o))}<small class="muted" style="display:block">${esc(o.no)} · ${statusPill(o.status)} ${late?'· überfällig':''}</small></span>${ico('arrow','flip')}</button></li>`; }).join('')}</ul>` : '<p class="hint">Heute und morgen kommen keine bestellten Lieferungen.</p>'}
     </section></div>
   <h2 class="sec-h">Letzte Bestellung je Lieferant</h2>
   <div class="lo-grid">${sups.map(sp => { const o = lastOrder(sp.id); const st = supStats(sp.id); return `<article class="lo">
     <div class="lo-h"><b>${esc(sp.name)}</b>${o?statusPill(o.status):''}</div>
-    ${o ? `<div class="muted sm">${o.no} · ${fmtDate(o.sentAt||o.createdAt)} · von ${esc(userName(o.createdBy))}</div>
+    ${o ? `<div class="muted sm">${esc(o.no)} · ${fmtDate(o.sentAt||o.createdAt)} · von ${esc(userName(o.createdBy))}</div>
       <div class="lo-m"><span class="mono">${o.lines.length} Pos.</span><span class="mono">${o.receipt ? `<small class="tot-l">geliefert</small> ${eur(deliveredTotal(o))}` : `<small class="tot-l">bestellt</small> ${eur(orderTotal(o))}`}</span><span class="muted sm">${st.onTime!=null?`pünktlich ${st.onTime} %`:''}</span></div>
       <div class="row-btns"><button type="button" class="btn sm" data-act="ordOpen" data-id="${o.id}">Ansehen</button><button type="button" class="btn sm" data-act="ordRe" data-id="${o.id}">Nachbestellen</button></div>` : `<p class="hint">Noch keine Bestellung.</p><div class="row-btns"><button type="button" class="btn sm" data-act="ordNew" data-id="${sp.id}">Erste Bestellung</button></div>`}
   </article>`; }).join('')}</div>
@@ -5206,7 +5790,7 @@ function orderList(){
   const f = view.ofilter || 'open';
   const list = S.orders.filter(o => f==='all' || (f==='open' ? ['draft','approval','sent','confirmed','complaint'].includes(o.status) : o.status===f)).sort((a,b)=>(b.sentAt||b.createdAt).localeCompare(a.sentAt||a.createdAt));
   return list.length ? `<ul class="olist">${list.map(o=>{ const sp = SUP(o.supplier); return `<li><button type="button" data-act="ordOpen" data-id="${o.id}">
-    <span class="mono sm muted">${o.no}</span><span class="on"><b>${esc(sp?sp.name:'?')}</b><small class="muted">${o.lines.length} Positionen · Lieferung ${fmtDate(o.deliveryDate+'T12:00:00')}</small></span>${statusPill(o.status)}<span class="mono ol-tot">${o.receipt ? `<small class="tot-l">geliefert</small> ${eur(deliveredTotal(o))}` : `<small class="tot-l">bestellt</small> ${eur(orderTotal(o))}`}</span></button></li>`; }).join('')}</ul>` : '<div class="empty">Keine Bestellungen in dieser Ansicht.</div>';
+    <span class="mono sm muted">${esc(o.no)}</span><span class="on"><b>${esc(sp?sp.name:'?')}</b><small class="muted">${o.lines.length} Positionen · Lieferung ${fmtDate(o.deliveryDate+'T12:00:00')}</small></span>${statusPill(o.status)}<span class="mono ol-tot">${o.receipt ? `<small class="tot-l">geliefert</small> ${eur(deliveredTotal(o))}` : `<small class="tot-l">bestellt</small> ${eur(orderTotal(o))}`}</span></button></li>`; }).join('')}</ul>` : '<div class="empty">Keine Bestellungen in dieser Ansicht.</div>';
 }
 
 /* ---------- Bestellung bearbeiten / senden / empfangen ---------- */
@@ -5217,7 +5801,7 @@ function orderEditor(o){
   const hasCold = o.lines.some(l => P(l.pid)?.loc === 'K' || P(l.pid)?.loc === 'T');
   const head = `<button type="button" class="back" data-act="ordBack">${ico('arrow')}Alle Bestellungen</button>
   <section class="panel ord-head">
-    <div><div class="eyebrow">${o.no} · ${esc(SUP_CATS[sp.cat]||'')}</div><h1 class="h-ord">${esc(sp.name)}</h1>
+    <div><div class="eyebrow">${esc(o.no)} · ${esc(SUP_CATS[sp.cat]||'')}</div><h1 class="h-ord">${esc(sp.name)}</h1>
       <div class="muted sm">${CHANNELS[sp.channel]}${sp.email?' · '+esc(sp.email):''}${sp.phone?' · '+esc(sp.phone):''}${sp.customerNo?' · Kundennr. '+esc(sp.customerNo):''}</div></div>
     <div class="ord-st">${statusPill(o.status)}<span class="muted sm">erstellt ${fmtDate(o.createdAt)} von ${esc(userName(o.createdBy))}${o.sentAt?` · gesendet ${fmtDate(o.sentAt)} via ${esc(o.sentVia||'')}`:''}</span></div>
   </section>`;
@@ -5338,7 +5922,7 @@ function supplierDialog(sp){
 }
 function delayDialog(o){
   const sp = SUP(o.supplier);
-  openDialog('Lieferung verschoben', `<p class="dlg-p">Neuer Liefertermin für ${esc(sp.name)}, ${o.no}. Das Cockpit zeigt die Lieferung dann am neuen Tag.</p>
+  openDialog('Lieferung verschoben', `<p class="dlg-p">Neuer Liefertermin für ${esc(sp.name)}, ${esc(o.no)}. Das Cockpit zeigt die Lieferung dann am neuen Tag.</p>
     <label class="f">Neuer Termin<input name="d" type="date" required value="${addDays(o.deliveryDate,1)}"></label>
     <label class="f">Grund<select name="r"><option>Schneefall / Straße gesperrt</option><option>Lieferant hat verschoben</option><option>Ware nicht lieferbar</option><option>Sonstiges</option></select></label>`,
     fd => { o.deliveryDate = fd.get('d'); o.confirmedNote = `Verschoben: ${fd.get('r')}`; }, {ok:'Verschieben', done:'Liefertermin geändert'});
@@ -5604,13 +6188,14 @@ const CLOUD_KEY = KEY + '_cloud', BASE_KEY = KEY + '_base';
 let CL = (() => { try { return JSON.parse(localStorage.getItem(CLOUD_KEY)) || {}; } catch(e){ return {}; } })();
 let cloudState = 'off', cloudMsg = '', pushTimer = null, pushing = false, dirty = false, pollTimer = null;
 function clSave(){ try { localStorage.setItem(CLOUD_KEY, JSON.stringify(CL)); } catch(e){} }
-function baseGet(){ try { return JSON.parse(localStorage.getItem(BASE_KEY)); } catch(e){ return null; } }
-function baseSet(d){ try { localStorage.setItem(BASE_KEY, JSON.stringify(d)); } catch(e){} }
+function baseGet(){ return STORE.baseGet(); }
+function baseSet(d){ STORE.baseSet(d); }
+const CLOUD_NEWER = 'Die Cloud-Daten stammen aus einer neueren Version der App. Bitte diese App neu laden, dann geht der Abgleich wieder. Es wurde nichts geändert.';
 function cloudReady(){ return !FRAMED && !!(CL.url && CL.anon && CL.session && CL.rid); }
 /* Fehlertexte: deutsch, ohne Technik */
 function cloudErrText(x){
   const m = String((x && x.message) || x || ''); const st = x && x.status;
-  if(/^(E-Mail oder Passwort|Dieses Konto|Sitzung abgelaufen|Bitte )/.test(m)) return m;
+  if(/^(E-Mail oder Passwort|Dieses Konto|Sitzung abgelaufen|Bitte |Die Cloud-Daten stammen)/.test(m)) return m;
   if(x instanceof TypeError || /failed to fetch|networkerror|load failed|fetch|network|dns|cors|timed? ?out|invalid url|parse url/i.test(m) || st === 0 || st === 404 || st >= 500) return 'Keine Verbindung zum Cloud-Projekt. Adresse und Schlüssel prüfen.';
   if(st === 401 || st === 403 || /api key|apikey|jwt|not authorized|permission|unauthori[sz]ed/i.test(m)) return 'Zugriff abgelehnt. Schlüssel und Anmeldung prüfen.';
   if(/nicht angemeldet/.test(m)) return 'Nicht angemeldet. Bitte neu verbinden.';
@@ -5646,7 +6231,7 @@ async function cloudLogin(url, anon, email, pw){
   if(!ms || !ms.length) throw new Error('Dieses Konto ist noch keinem Betrieb zugeordnet. Bitte den Inhaber, Sie zum Team hinzuzufügen.');
   const m = ms[0]; CL.rid = m.restaurant_id; CL.rname = m.restaurant_name; CL.member = {name:m.name, role:m.role}; CL.version = 0; clSave();
 }
-function cloudLogout(){ CL = {}; clSave(); try { localStorage.removeItem(BASE_KEY); } catch(e){} clearInterval(pollTimer); setCloud('off'); render(); }
+function cloudLogout(){ CL = {}; clSave(); baseSet(null); clearInterval(pollTimer); setCloud('off'); render(); }
 
 /* ---------- 3-Wege-Zusammenführung (Basis, lokal, Cloud) ---------- */
 const COLL = ['products','cards','menu','specials','moves','inventories','suppliers','orders'];
@@ -5682,29 +6267,34 @@ function merge3(base, local, remote){
 /* ---------- Sync ---------- */
 function snapshot(){ return JSON.parse(JSON.stringify(S)); }
 async function cloudPull(first){
+  if(STORE.isReader()) return;
+  await STORE.baseLoad();
   const st = await rpc('get_state', {p_rid:CL.rid});
   if(!st || !st.data){ return cloudPush(true); }
+  if(schemaNewer(st.data)) throw new Error(CLOUD_NEWER);
   if(st.version === CL.version && !first) return;
   const base = baseGet();
   if(!base && first){ return st; }
   const [m, c] = merge3(base, S, st.data);
   const changed = J(m) !== J(S);
   S = migrate(m) || S; CL.version = st.version; CL.lastBy = st.updated_by; clSave();
-  baseSet(st.data); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
+  baseSet(st.data); STORE.save();
   if(J(S) !== J(st.data)) dirty = true;
   if(changed && !first){ const ae = document.activeElement; if(!ae || !ae.closest('#app input, #app textarea, #app select, #dlg')) render(); toast(`Neue Daten von ${st.updated_by || 'Team'} übernommen${c?` (${c} gleichzeitig bearbeitet)`:''}`); }
   await syncPhotos();
   if(dirty) schedulePush(200);
 }
 async function cloudPush(force){
-  if(!cloudReady() || pushing) return; pushing = true; setCloud('busy');
+  if(!cloudReady() || pushing || STORE.isReader()) return; pushing = true; setCloud('busy');
   try {
+    await STORE.baseLoad();
     for(let attempt = 0; attempt < 3; attempt++){
       const data = snapshot();
       const res = await rpc('save_state', {p_rid:CL.rid, p_data:data, p_expected:CL.version||0});
       if(res && res.ok){ CL.version = res.version; clSave(); baseSet(data); dirty = J(S) !== J(data); setCloud('ok', 'Gespeichert '+new Date().toLocaleTimeString('de-AT')); break; }
+      if(schemaNewer(res.data)) throw new Error(CLOUD_NEWER);
       const [m, c] = merge3(baseGet(), S, res.data); S = migrate(m) || S; CL.version = res.version; clSave(); baseSet(res.data);
-      try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
+      STORE.save();
       render(); if(c) toast(`${c} Einträge wurden gleichzeitig auf einem anderen Gerät geändert und zusammengeführt`);
     }
   } catch(err){ dirty = true; setCloud(navigator.onLine === false ? 'offline' : 'err', err.message); }
@@ -5712,7 +6302,7 @@ async function cloudPush(force){
 }
 function schedulePush(ms=1500){ if(!cloudReady()) return; dirty = true; clearTimeout(pushTimer); pushTimer = setTimeout(cloudPush, ms); }
 async function cloudPoll(){
-  if(!cloudReady() || document.hidden || pushing) return;
+  if(!cloudReady() || document.hidden || pushing || STORE.isReader()) return;
   try { const v = await rpc('get_version', {p_rid:CL.rid}); if(v && v.version > (CL.version||0)) await cloudPull(false); else if(dirty) schedulePush(100); else setCloud('ok', cloudMsg); }
   catch(err){ setCloud(navigator.onLine === false ? 'offline' : 'err', err.message); }
 }
@@ -5725,6 +6315,7 @@ async function cloudStart(){
 async function cloudConnectFlow(url, anon, email, pw){
   await cloudLogin(url, anon, email, pw);
   const st = await rpc('get_state', {p_rid:CL.rid});
+  if(st && schemaNewer(st.data)) throw new Error(CLOUD_NEWER);
   if(!st || !st.data){ CL.version = 0; await cloudPush(true); toast('Verbunden. Ihre Daten liegen jetzt in der Cloud.'); }
   else {
     openDialog('Cloud-Daten gefunden', `<p class="dlg-p">Für <b>${esc(CL.rname)}</b> gibt es bereits Daten in der Cloud (Stand ${fmtDate(st.updated_at||new Date().toISOString())}, ${esc(st.updated_by||'Team')}). Was soll passieren?</p>
@@ -5815,7 +6406,7 @@ renderSetup = function(){
       <div class="row-btns wrap" style="margin-top:12px"><button type="button" class="btn" data-act="export">Sicherung erstellen</button>
         <button type="button" class="btn" data-act="importPick">Sicherung laden</button><input id="importFile" type="file" accept="application/json,.json" hidden>
         <button type="button" class="btn danger" data-act="reset">Demodaten wiederherstellen</button></div>
-      ${(() => { const sf = safetyGet(); return sf && sf.data ? `<div class="safety"><span><b>Sicherheitskopie vom ${fmtDate(sf.at)}</b><small class="muted">${esc(sf.why||'')} · ${plural((sf.data.menu||[]).length,'Gericht','Gerichte')}, ${plural((sf.data.cards||[]).length,'Rezeptur','Rezepturen')}</small></span><span class="row-btns"><button type="button" class="btn sm" data-act="safetyRestore">Letzte Daten wiederherstellen</button><button type="button" class="btn sm" data-act="safetyDl">Als Datei speichern</button></span></div>` : ''; })()}
+      ${(() => { const sf = safetyGet(); return sf ? `<div class="safety"><span><b>Sicherheitskopie vom ${fmtDate(sf.at)}</b><small class="muted">${esc(sf.why||'')} · ${plural(+sf.nMenu||0,'Gericht','Gerichte')}, ${plural(+sf.nCards||0,'Rezeptur','Rezepturen')}</small></span><span class="row-btns"><button type="button" class="btn sm" data-act="safetyRestore">Letzte Daten wiederherstellen</button><button type="button" class="btn sm" data-act="safetyDl">Als Datei speichern</button></span></div>` : ''; })()}
     </section>
   </div>`;
 };
@@ -6413,7 +7004,7 @@ function applyMapping(key, mid){
 }
 async function readFileAsCsv(file){
   if(/\.xlsx?$/i.test(file.name)){
-    if(!window.XLSX) await new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; s.onload = res; s.onerror = () => rej(new Error('Excel-Leser konnte nicht geladen werden. Bitte die Datei als CSV speichern.')); document.head.appendChild(s); });
+    if(!window.XLSX){ try { await loadLib(XLSX_LIB); } catch(e){ throw new Error('Excel-Leser konnte nicht geladen werden. Bitte die Datei als CSV speichern.'); } }
     const wb = XLSX.read(await file.arrayBuffer(), {type:'array'}); return XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]], {FS:';'});
   }
   return await file.text();
@@ -7463,7 +8054,7 @@ renderDash = function(){
   const dueSt = due.map(sp => ({sp, st: supToday(sp)}));
   const openDue = dueSt.filter(x => x.st.state === 'open'), sentDue = dueSt.filter(x => x.st.state === 'sent'), pastDue = dueSt.filter(x => x.st.state === 'past');
   const orderInfo = !due.length ? 'kein Bestelltag' : openDue.length ? `${openDue.length} ${openDue.length===1?'Bestellung':'Bestellungen'} offen, bis ${esc(openDue[openDue.length-1].sp.cutoff)} Uhr` : pastDue.length ? `Annahmeschluss vorbei${sentDue.length ? `, ${sentDue.length} bestellt` : ''}` : 'alles bestellt';
-  const subParts = [closed ? `${DAYNAME[w]} ist Ruhetag` : 'Servicetag', sTitle, orderInfo];
+  const subParts = [closed ? `${DAYNAME[w]} ist Ruhetag` : 'Servicetag', esc(sTitle), orderInfo];
   const orderRow = ({sp, st}) => {
     const lowN = lowStock().filter(p=>p.supplier===sp.id).length; const val = lowStock().filter(p=>p.supplier===sp.id).reduce((a,p)=>a+packSuggest(p)*(p.packQty||1)*p.price,0);
     const sub = `${CHANNELS[sp.channel]} · Lieferung ${dayLabel(st.delivery)}${lowN?` · ${lowN} unter Mindestbestand, ${eur(val)}`:''}`;
@@ -7474,7 +8065,7 @@ renderDash = function(){
   const pastLine = pastDue.length ? `<li class="rw past rw-fold"><button type="button" class="rw-more" data-act="dashPast" aria-expanded="${view.dashPast?'true':'false'}">Annahmeschluss heute vorbei: ${pastDue.length} ${pastDue.length===1?'Lieferant':'Lieferanten'} · ${view.dashPast?'ausblenden':'anzeigen'}</button></li>` + (view.dashPast ? pastDue.map(orderRow).join('') : '') : '';
   const orderRows = [...openDue, ...sentDue].map(orderRow).join('');
   const recvRows = exp.map(o => { const sp = SUP(o.supplier); const late = o.deliveryDate < t;
-    return dayRow(late ? `<span class="bad-t">${fmtDate(o.deliveryDate+'T12:00:00').slice(0,6)}</span>` : 'heute', esc(sp ? sp.name : '?'), `${o.no} · ${o.lines.length} Positionen · ${eur(orderTotal(o))}${late?' · überfällig':''}`, statusPill(o.status), `<button type="button" class="btn sm" data-act="ordRecv" data-id="${o.id}">Wareneingang</button>`); }).join('');
+    return dayRow(late ? `<span class="bad-t">${fmtDate(o.deliveryDate+'T12:00:00').slice(0,6)}</span>` : 'heute', esc(sp ? sp.name : '?'), `${esc(o.no)} · ${o.lines.length} Positionen · ${eur(orderTotal(o))}${late?' · überfällig':''}`, statusPill(o.status), `<button type="button" class="btn sm" data-act="ordRecv" data-id="${o.id}">Wareneingang</button>`); }).join('');
   const cardRows = [
     ...live.map(sp => dayRow('Aktion', esc(sp.name), `${sp.items.length} ${sp.items.length===1?'Gericht':'Gerichte'}${sp.to && sp.to!==sp.from ? ` · bis ${fmtDate(sp.to+'T12:00:00')}` : ''}`, '', `<button type="button" class="btn sm" data-act="previewSpecial" data-id="${sp.id}">Karte</button>`)),
     ...dayDishes.map(m => dayRow(DAYNAME[w].slice(0,2), esc(dishLabel(m)), `${esc(m.section)} · ${eur(m.price)}`, '', m.card && C(m.card) ? `<button type="button" class="btn sm" data-act="openCard" data-id="${m.card}">Rezeptur</button>` : '')),
@@ -7587,10 +8178,13 @@ renderMenuCalc = function(){
    PDF-Export: Speisekarte, Tageskarte, Rezeptur, Auswertung als A4-PDF.
    Funktioniert auch dort, wo window.print() gesperrt ist (eingebettet).
    ===================================================================== */
-const PDF_LIBS = ['https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'];
+/* Bibliotheken liegen im eigenen Ordner vendor/ (auch ohne Internet). Nur wo es den Ordner nicht gibt (eingebettete Vorschau), kommt die gleiche Version von cdnjs. */
+const PDF_LIBS = [['vendor/html2canvas.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js', () => window.html2canvas], ['vendor/jspdf.umd.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', () => window.jspdf]];
+const XLSX_LIB = ['vendor/xlsx.full.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', () => window.XLSX];
 let PDF_NAME = null;
-function loadScript(src){ return new Promise((ok, no) => { if([...document.scripts].some(s => s.src === src)) return ok(); const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => no(new Error('Bibliothek konnte nicht geladen werden')); document.head.appendChild(s); }); }
-async function pdfLibs(){ for(const s of PDF_LIBS) await loadScript(s); if(!window.html2canvas || !window.jspdf) throw new Error('PDF-Bibliothek fehlt'); }
+function loadScript(src){ return new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => { s.remove(); no(new Error('Bibliothek konnte nicht geladen werden')); }; document.head.appendChild(s); }); }
+async function loadLib(lib){ const [local, cdn, has] = lib; if(has()) return; try { await loadScript(local); } catch(e){} if(has()) return; await loadScript(cdn); if(!has()) throw new Error('Bibliothek konnte nicht geladen werden'); }
+async function pdfLibs(){ for(const l of PDF_LIBS) await loadLib(l); if(!window.html2canvas || !window.jspdf) throw new Error('PDF-Bibliothek fehlt'); }
 async function saveFile(filename, data){
   try { const dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null;
     if(dl){ try { await dl.save({filename, data}); return true; } catch(e){ if(e && e.code === 'declined') return false; if(e && !['unavailable','not_granted','capability_disabled','capability_removed'].includes(e.code)) { toast('Speichern nicht möglich: ' + (e.message || e.code)); return false; } } }
@@ -7716,7 +8310,7 @@ function hausMigrate(d){
 }
 
 /* ---------- Schriften: Barlow Condensed (Titel, Preise), Fraunces (Ziffern, Namen, Fließtext), Caveat (nur Tafel) ---------- */
-(function(){ const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Caveat:wght@400..600&display=swap'; document.head.appendChild(l); })();
+/* seit Paket A als Dateien im Ordner vendor/fonts (fonts.css), kein fremder Dienst mehr */
 const HS_FONTS = ['300 20px "Fraunces"','400 20px "Fraunces"','500 20px "Fraunces"','600 20px "Fraunces"','italic 300 20px "Fraunces"','italic 400 20px "Fraunces"','400 20px "Caveat"','600 20px "Caveat"','300 20px "Barlow Condensed"','400 20px "Barlow Condensed"','500 20px "Barlow Condensed"','600 20px "Barlow Condensed"'];
 
 /* ---------- Linienzeichnungen (Gold), eigenständige SVGs mit festen Farben ---------- */
@@ -8381,7 +8975,7 @@ palFilter = function(q){
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if(!el) return;
   if(el.dataset.act === 'safetyRestore'){ const sf = safetyGet(); if(!sf) return; ask(`Daten vom ${fmtDate(sf.at)} (${sf.why}) wiederherstellen? Der jetzige Stand wird dabei ersetzt. Das geht nur einmal.`, () => { setTimeout(safetyRestore, 0); }, 'Wiederherstellen'); }
-  if(el.dataset.act === 'safetyDl'){ const sf = safetyGet(); if(sf) saveFile(`dahuam202-sicherheitskopie-${String(sf.at).slice(0,10)}.json`, new Blob([JSON.stringify(sf.data)], {type:'application/json'})).then(ok => ok && toast('Sicherheitskopie gespeichert')); }
+  if(el.dataset.act === 'safetyDl'){ const sf = safetyGet(); if(sf) STORE.safetyData().then(d => d ? saveFile(`dahuam202-sicherheitskopie-${String(sf.at).slice(0,10)}.json`, new Blob([JSON.stringify(d)], {type:'application/json'})) : false).then(ok => ok && toast('Sicherheitskopie gespeichert')); }
 });
 
 /* =====================================================================
@@ -8794,7 +9388,7 @@ TOURS.setup = {id:'setup', name:'Einstellungen', steps:[
 /* ---------- Einstellungen je Gerät ---------- */
 const GKEY = KEY + '_guide';
 const G_NOINTRO = /[?&]nointro/.test(location.search);
-const G_FRESH = (() => { try { return localStorage.getItem(KEY) === null; } catch(e){ return false; } })();
+let G_FRESH = (() => { try { return localStorage.getItem(KEY) === null; } catch(e){ return false; } })();
 let GP = (() => { try { return JSON.parse(localStorage.getItem(GKEY)) || {}; } catch(e){ return {}; } })();
 function gpSave(){ try { localStorage.setItem(GKEY, JSON.stringify(GP)); } catch(e){} }
 function isSimple(){ return GP.mode === 'simple'; }
@@ -9088,6 +9682,7 @@ window.addEventListener('click', e => {
   if(t.closest('.gd-helpbar, [data-act="helpMode"], #gd, dialog, #pal')) return;
   if(t.closest('.gd-bub')){ if(t.closest('[data-act="goTab"]')) bubHide(); return; }
   const hit = helpFind(t); const pass = !!t.closest(HELP_PASS);
+  clearTimeout(gdHoverT);   /* die Erklärung zum Klick bleibt stehen; eine noch ausstehende Erklärung vom Überfahren ersetzt sie nicht mehr */
   const ctl = t.closest('[data-act],[data-pdf],[data-pick],button,a,input,select,textarea,label,summary,tr.row,.sh-chip');
   if(!pass && ctl){ e.preventDefault(); e.stopImmediatePropagation(); if(ctl.matches('input,select,textarea')) setTimeout(() => ctl.blur(), 0); }
   if(hit) bubShow(hit.el, hit.h, {note: !pass && ctl && ctl.matches('[data-act],[data-pdf],button,a') ? 'Solange die Hilfe an ist, wird hier nichts ausgeführt.' : ''});
@@ -10866,16 +11461,325 @@ render = function(){
   try { const st = $('#ckSticky'); if(st){ const tb = document.querySelector('.topbar'); const h = tb && tb.offsetHeight; st.style.setProperty('--ck-top', (h || 0) + 'px'); st.classList.toggle('full', /^(\d+) von \1$/.test($('#ckProg').textContent)); } } catch(e){}
 };
 
+/* =====================================================================
+   Paket A · Zuverlässigkeit (Oberfläche zu store.js)
+   Start aus dem Speicher, Statuszeile, Wiederherstellung, frühere Stände,
+   Erinnerung an die Sicherung, zweites Fenster, Offline-Betrieb.
+   ===================================================================== */
+const REL = {persist:null, snaps:null, update:false, sw:null, swState:'', bars:'', lastSaveShown:0, recover:null, seedSig:null, memBackup:''};
+const BK_KEY = KEY + '_lastBackup';
+
+/* ---------- Datenformat: neuere Daten werden nicht angefasst ---------- */
+const _migrateRel = migrate;
+migrate = function(d){
+  if(schemaNewer(d)) return null;
+  const r = _migrateRel(d);
+  if(r && !relShapeOk(r)) return null;
+  if(r){ r.schema = APP_SCHEMA; delete r.app; delete r.exportedAt; }
+  return r;
+};
+/* Grundform prüfen: Listen müssen Listen sein, Verzeichnisse Verzeichnisse. Sonst gilt der Stand als unlesbar (Wiederherstellungs-Seite), statt später mitten in der Arbeit zu scheitern. */
+const REL_ARR = ['products', 'cards', 'menu', 'moves', 'inventories', 'specials', 'suppliers', 'orders', 'salesImports'];
+const REL_OBJ = ['settings', 'salesDays', 'posMap', 'game', 'saleGroups', 'salesReal', 'salesUnmapped', 'plan', 'team', 'checks'];
+function relShapeOk(d){
+  const obj = x => !!x && typeof x === 'object' && !Array.isArray(x);
+  for(const k of REL_ARR){ if(d[k] === undefined) continue; if(!Array.isArray(d[k])) return false; if(d[k].some(x => !obj(x))) d[k] = d[k].filter(obj); }
+  for(const k of REL_OBJ) if(d[k] != null && !obj(d[k])) return false;
+  if(!obj(d.settings)) return false;
+  for(const k of ['sections', 'closed', 'users']) if(d.settings[k] !== undefined && !Array.isArray(d.settings[k])) return false;
+  return true;
+}
+const _seedRel = seed;
+seed = function(){ const d = _seedRel(); d.schema = APP_SCHEMA; return d; };
+
 /* ---------- Start ---------- */
-S = migrate(load()) || seed();
+function relShow(){ document.documentElement.classList.remove('booting'); }
+function relStart(r){
+  try {
+    if(r.status === 'ok'){
+      let d = null; try { d = migrate(r.state); } catch(e){ console.error(e); }
+      if(!d){ STORE.st.frozen = true; let raw = ''; try { raw = JSON.stringify(r.state); } catch(e){} STORE.preserve('form', {raw}).then(() => relRecover({status:'corrupt', kind:'form'})); return; }
+      S = d; G_FRESH = false;
+      REL.appInit = true; startApp();
+      if(REL.renderFail){   // Daten lesbar, aber so beschädigt, dass die App sie nicht zeigen kann: nichts schreiben, Auswahl anbieten
+        STORE.st.frozen = true; let raw = ''; try { raw = JSON.stringify(d); } catch(e){}
+        S = undefined; REL.renderFail = null; STORE.preserve('anzeige', {raw}).then(() => relRecover({status:'corrupt', kind:'anzeige'})); return; }
+      relShow(); STORE.started({dirty: !!(r.legacy || r.replay)});
+      if(r.replay) setTimeout(() => toast('Letzte Änderung wiederhergestellt'), 600);
+    } else if(r.status === 'fresh'){
+      S = seed(); G_FRESH = true;
+      REL.appInit = true; startApp(); relShow(); STORE.started();
+    } else { relRecover(r); return; }
+    relAfterStart();
+  } catch(e){ console.error(e); relShow(); }
+}
+function relAfterStart(){
+  relBars(); relInd();
+  const later = window.requestIdleCallback ? f => requestIdleCallback(f, {timeout:2500}) : f => setTimeout(f, 800);
+  later(() => { relPersist(false); relSnaps(); swStart(); relManifest(); relFontFallback(); });
+}
+
+/* ---------- Wiederherstellung: beschädigte oder nicht lesbare Daten ---------- */
+const REC_TXT = {
+  corrupt:['Die gespeicherten Daten sind beschädigt', 'Die App hat nichts überschrieben. Der beschädigte Stand ist aufgehoben und lässt sich unten als Datei speichern. Wählen Sie, womit Sie weiterarbeiten.'],
+  lost:['Die gespeicherten Daten sind nicht mehr da', 'Der Browser hat den Speicher dieser Seite geleert. Das passiert, wenn der Platz knapp wird oder die Daten der Seite gelöscht wurden. Wählen Sie, womit Sie weiterarbeiten.'],
+  unreachable:['Der Speicher ist gerade nicht erreichbar', 'Ihre Daten liegen in diesem Browser, lassen sich aber im Moment nicht öffnen. Oft hilft es, alle anderen Fenster dieser Seite zu schließen und neu zu laden. Es wurde nichts überschrieben.'],
+  newer:['Die gespeicherten Daten sind neuer als diese App', 'Die Daten wurden mit einer neueren Version der App gespeichert. Bitte laden Sie die Seite neu, damit die App aktuell ist. Es wurde nichts geändert.'],
+};
+async function relRecover(r){
+  REL.recover = r; STORE.st.frozen = true; STORE.st.recovering = true;
+  const kind = REC_TXT[r.status] ? r.status : 'corrupt'; const [title, text] = REC_TXT[kind];
+  let snaps = []; try { snaps = await STORE.snaps(); } catch(e){}
+  const hasRaw = kind === 'corrupt';
+  const choice = kind !== 'newer';
+  const app = $('#app');
+  app.innerHTML = `<section class="panel rel-rec" role="alert"><h1>${esc(title)}</h1><p class="dlg-p">${esc(text)}</p>
+    ${kind === 'unreachable' || kind === 'newer' ? `<div class="row-btns"><button type="button" class="btn primary" data-rel="reload">Seite neu laden</button></div>` : ''}
+    ${choice && snaps.length ? `<h2>Früheren Stand laden</h2><ul class="rel-snaps">${snaps.slice(0, 8).map(relSnapRow).join('')}</ul>` : ''}
+    ${choice ? `<h2>Sicherung laden</h2><p class="hint">Eine Datei, die Sie mit „Sicherung erstellen“ gespeichert haben.</p><div class="row-btns"><button type="button" class="btn" data-rel="recFile">Datei wählen</button><input id="relFile" type="file" accept="application/json,.json" hidden></div>
+    <h2>Neu beginnen</h2><div class="row-btns"><button type="button" class="btn" data-rel="recDemo">Mit Demodaten starten</button><button type="button" class="btn" data-rel="recEmpty">Leer starten</button></div>` : ''}
+    ${hasRaw ? `<h2>Beschädigten Stand aufheben</h2><p class="hint">Für eine spätere Prüfung. Die Datei enthält alles, was noch lesbar ist.</p><div class="row-btns"><button type="button" class="btn" data-rel="recRaw">Als Datei speichern</button></div>` : ''}
+    <p class="hint" id="relRecMsg" role="status"></p></section>`;
+  document.documentElement.classList.add('rel-recover'); relShow();
+}
+function relAdopt(d, msg){
+  const rec = REL.recover;
+  S = d; REL.recover = null; REL.renderFail = null; STORE.st.recovering = false; document.documentElement.classList.remove('rel-recover');
+  if(!REL.appInit){ REL.appInit = true; startApp(); } else { try { fromHash(); render(); } catch(e){ console.error(e); REL.renderFail = e; } }
+  if(REL.renderFail){ S = undefined; REL.renderFail = null; REL.recover = rec; STORE.st.recovering = true; relRecover(rec).then(() => { const m = $('#relRecMsg'); if(m) m.textContent = 'Dieser Stand lässt sich nicht anzeigen. Bitte einen anderen wählen.'; }); return; }
+  STORE.resume(); relAfterStart(); go('dash'); if(REL.imgReady) cloudStart(); if(msg) toast(msg);
+}
+function relEmptyState(){
+  const d = seed();
+  const out = migrate({settings:{name:'Mein Betrieb', vat:d.settings.vat, target:d.settings.target, sections:[...(d.settings.sections || [])]}, products:[], cards:[], menu:[]});
+  return out;
+}
+async function relRawBlob(){ let c = null; try { c = await STORE.kvGet('corrupt'); } catch(e){} return new Blob([JSON.stringify(c || REL.recover || {})], {type:'application/json'}); }
+
+/* ---------- Statuszeilen ---------- */
+function relLastBackup(){ try { return localStorage.getItem(BK_KEY) || ''; } catch(e){ return REL.memBackup || ''; } }
+function relBackupDays(){ const at = relLastBackup(); const t = at ? new Date(at).getTime() : NaN; return isFinite(t) ? Math.max(0, Math.floor((Date.now() - t) / 864e5)) : null; }
+function relMarkBackup(){ REL.memBackup = new Date().toISOString(); try { localStorage.setItem(BK_KEY, REL.memBackup); } catch(e){} if(view.tab === 'dash' || view.tab === 'setup') softRender(); }
+function relSeedSig(){ if(!REL.seedSig){ try { const d = _seedRel(); REL.seedSig = [d.menu.length, d.cards.length, d.products.length, (d.moves || []).length, (d.orders || []).length, (d.suppliers || []).length].join('/'); } catch(e){ REL.seedSig = '?'; } } return REL.seedSig; }
+/* Echte Daten: nicht mehr der unveränderte Demostand */
+function relHasRealData(){
+  try {
+    if(!S) return false; if(!S.demo) return true;
+    if((S.products || []).some(p => p.priceDemo === false)) return true;
+    if((S.salesImports || []).length || Object.keys(S.salesReal || {}).length) return true;
+    if((S.inventories || []).some(i => !i.demo)) return true;
+    if(S.team && (S.team.people || []).some(p => !p.demo)) return true;
+    return [S.menu.length, S.cards.length, S.products.length, (S.moves || []).length, (S.orders || []).length, (S.suppliers || []).length].join('/') !== relSeedSig();
+  } catch(e){ return false; }
+}
+function relBackupDue(){ if(!relHasRealData()) return false; const d = relBackupDays(); return d === null || d >= 7; }
+function relBackupLine(){
+  const d = relBackupDays();
+  return d === null ? 'Es gibt noch keine Sicherung als Datei.' : `Die letzte Sicherung als Datei ist ${d} Tage alt.`;
+}
+async function relBackup(btn){
+  if(!S) return;
+  const data = new Blob([JSON.stringify({...S, schema:APP_SCHEMA, app:APP_VERSION + ' · ' + APP_BUILD, exportedAt:new Date().toISOString(), images:IMG})], {type:'application/json'});
+  const ok = await saveFile(backupName(), data);
+  toast(ok ? 'Sicherung gespeichert: ' + backupName() : 'Sicherung nicht gespeichert');
+}
+const _saveFileRel = saveFile;
+saveFile = async function(name, data){ const ok = await _saveFileRel(name, data); try { if(ok && /^dahuam202-kueche-\d{4}-\d\d-\d\d\.json$/.test(name)) relMarkBackup(); } catch(e){} return ok; };
+
+function relBars(){
+  const box = $('#relBars'); if(!box) return; const s = STORE.status(); const out = [];
+  if(!REL.recover){
+    if(s.role !== 'owner' && s.confirmed) out.unshift(`<div class="rel-bar info" role="status"><span><b>In einem anderen Fenster geöffnet.</b> Hier können Sie alles ansehen. Ändern geht immer nur in einem Fenster, damit nichts verloren geht.</span><span class="rel-acts"><button type="button" class="btn sm" data-rel="takeover">Hier weiterarbeiten</button></span></div>`);
+    else if(s.error && s.error.kind === 'nostore' && FRAMED) out.unshift(`<div class="rel-bar" role="status"><span><b>Vorschau.</b> Änderungen bleiben nur, solange diese Ansicht offen ist.</span></div>`);
+    if(REL.photoFail && !(s.error && s.error.kind === 'nostore')) out.push(`<div class="rel-bar bad" role="alert"><span><b>Foto nicht gespeichert</b> – der Browser hat es nicht angenommen (Speicher voll?). Es ist nur noch in diesem Fenster zu sehen.</span><span class="rel-acts"><button type="button" class="btn sm" data-rel="photoRetry">Erneut versuchen</button><button type="button" class="btn sm" data-rel="backup">Sicherung jetzt speichern</button></span></div>`);
+    if(s.role !== 'owner' && s.confirmed){}
+    else if(s.error && s.error.kind === 'nostore' && FRAMED){}
+    else if(s.error) out.push(`<div class="rel-bar bad" role="alert"><span><b>Nicht gespeichert</b> – ${esc(s.error.text)}. Ihre Änderungen sind noch da, solange dieses Fenster offen bleibt.</span><span class="rel-acts"><button type="button" class="btn sm" data-rel="retry">Erneut versuchen</button><button type="button" class="btn sm" data-rel="backup">Sicherung jetzt speichern</button></span></div>`);
+    if(REL.update) out.push(`<div class="rel-bar info" role="status"><span><b>Neue Version bereit.</b> Sie wird beim nächsten Start verwendet.</span><span class="rel-acts"><button type="button" class="btn sm" data-rel="update">Neu laden</button></span></div>`);
+  }
+  const html = out.join(''); if(html === REL.bars) return; REL.bars = html; box.innerHTML = html;
+  try { const tb = document.querySelector('.topbar'); box.style.setProperty('--rel-top', ((tb && tb.offsetHeight) || 0) + 'px'); } catch(e){}
+}
+let relIndT = 0;
+function relInd(){
+  const s = STORE.status(); let cls = '', txt = '', tip = '';
+  const tm = s.savedAt ? new Date(s.savedAt).toLocaleTimeString('de-AT', {hour:'2-digit', minute:'2-digit'}) : '';
+  if(REL.recover){ cls = ''; }
+  else if(s.role !== 'owner' && s.confirmed){ cls = 'ro'; txt = 'Nur ansehen'; tip = 'In einem anderen Fenster geöffnet'; }
+  else if(s.error){ cls = 'bad'; txt = 'Nicht gespeichert'; tip = s.error.text; }
+  else if(s.dirty || s.writing){ cls = 'busy'; txt = 'Speichert …'; }
+  else if(s.rev > 0 && s.savedAt){ cls = 'ok'; txt = 'Gespeichert'; tip = 'Zuletzt gespeichert um ' + tm + ' Uhr'; }
+  const apply = () => { document.querySelectorAll('[data-saveind]').forEach(n => { n.hidden = !cls; n.className = n.dataset.saveind + ' ' + cls; if(n.dataset.saveind === 'save-ind') n.textContent = txt; n.title = tip || txt; n.setAttribute('aria-label', txt + (tip ? '. ' + tip : '')); }); };
+  clearTimeout(relIndT);
+  if(cls === 'busy') relIndT = setTimeout(() => { const x = STORE.status(); if((x.dirty || x.writing) && !x.error) apply(); }, 700); else apply();
+}
+STORE.on((t, d) => {
+  if(!S && !REL.recover) return;
+  relInd();
+  if(t === 'error' || t === 'role' || t === 'saved' || t === 'ready' || t === 'reloaded') relBars();
+  if(t === 'role' && d === 'conflict') toast('In einem anderen Fenster wurde weitergearbeitet. Dieses Fenster zeigt jetzt den neuen Stand.');
+  if(t === 'blocked'){ const b = document.querySelector('#relBars .rel-bar.info'); if(b){ b.classList.remove('nudge'); void b.offsetWidth; b.classList.add('nudge'); } }
+  if(t === 'saved' && !REL.persistAsked && relHasRealData()){ REL.persistAsked = true; relPersist(true); }
+  if((t === 'snaps' || t === 'safety' || t === 'migrated') && view.tab === 'setup'){ relSnaps(); }
+  if(t === 'saved' && view.tab === 'setup'){ const n = $('#relSavedAt'); if(n) n.textContent = relSavedText(); }
+});
+function relSavedText(){ const s = STORE.status(); if(s.error) return 'Nicht gespeichert'; if(s.mode === 'mem') return 'nur in diesem Fenster'; return s.savedAt ? 'Gespeichert ' + new Date(s.savedAt).toLocaleTimeString('de-AT') : 'noch nichts geändert'; }
+
+/* ---------- Speicher: dauerhaft? belegt? frühere Stände ---------- */
+const relMb = n => n == null ? '—' : n >= 1e9 ? num(n/1e9, 1) + ' GB' : n >= 1e6 ? num(n/1e6, 1) + ' MB' : num(Math.max(1, Math.round(n/1e3))) + ' KB';
+async function relPersist(ask){ try { REL.persist = await STORE.persistInfo(ask); } catch(e){ REL.persist = {supported:false}; } relPanelRefresh(); return REL.persist; }
+async function relSnaps(){ try { REL.snaps = await STORE.snaps(); } catch(e){ REL.snaps = []; } relPanelRefresh(); }
+function relPanelRefresh(){ const n = $('#relPanel'); if(n && view.tab === 'setup'){ const ae = document.activeElement; if(ae && n.contains(ae) && ae.tagName !== 'BUTTON') return; const id = ae && n.contains(ae) ? ae.dataset.rel + '|' + (ae.dataset.id || '') : null; n.outerHTML = relPanel(); if(id){ const b = [...document.querySelectorAll('#relPanel [data-rel]')].find(x => x.dataset.rel + '|' + (x.dataset.id || '') === id); if(b) b.focus({preventScroll:true}); } } }
+const SNAP_KIND = {auto:'Tagesstand', umzug:'vor der Umstellung des Speichers', alt:'aus einer älteren App-Version', konflikt:'nicht gespeicherte Änderungen', hand:'von Hand aufgehoben'};
+function relSnapRow(x){
+  const c = x.counts || {}; const when = new Date(x.at).toLocaleString('de-AT', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
+  const bits = [SNAP_KIND[x.kind] || 'Stand', c.menu != null ? plural(c.menu, 'Gericht', 'Gerichte') : '', c.cards != null ? plural(c.cards, 'Rezeptur', 'Rezepturen') : '', relMb(x.size)].filter(Boolean);
+  return `<li><span class="rel-s-t"><b>${esc(when)} Uhr</b><small>${esc(bits.join(' · '))}</small></span><button type="button" class="btn sm" data-rel="snap" data-id="${esc(x.id)}" aria-label="Stand vom ${esc(when)} Uhr laden">Laden</button></li>`;
+}
+function relOfflineText(){
+  if(FRAMED) return 'nein, nur in der installierten App';
+  if(location.protocol === 'file:' || !('serviceWorker' in navigator) || !window.isSecureContext) return 'nein, in dieser Ansicht nicht möglich';
+  return REL.swState === 'active' ? 'ja' : REL.swState === 'error' ? 'nein, Einrichtung fehlgeschlagen' : 'wird eingerichtet …';
+}
+function relPanel(){
+  const s = STORE.status(), p = REL.persist, snaps = REL.snaps;
+  const where = s.mode === 'idb' ? 'in diesem Browser auf diesem Gerät' : s.mode === 'ls' ? 'in diesem Browser (einfacher Speicher)' : 'nirgends, nur in diesem Fenster';
+  const dur = !p ? 'wird geprüft …' : p.persisted === true ? 'dauerhaft' : p.persisted === false ? 'kann vom Browser gelöscht werden' : 'unbekannt (der Browser gibt keine Auskunft)';
+  const used = !p || p.usage == null ? '—' : `${relMb(p.usage)}${p.quota ? ' von ' + relMb(p.quota) : ''}`;
+  const lb = relLastBackup(); const due = relBackupDue();
+  return `<section class="panel rel-panel" id="relPanel"><div class="panel-h"><h2>Speicher & frühere Stände</h2><span class="muted sm" id="relSavedAt">${esc(relSavedText())}</span></div>
+    <div class="kv rel-kv">
+      <span>Gespeichert</span><span>${where}</span>
+      <span>Speicher</span><span id="relDur">${esc(dur)}</span>
+      <span>Belegt</span><span id="relUsed">${esc(used)}</span>
+      <span>Letzte Sicherung als Datei</span><span id="relLastBk">${lb ? fmtDate(lb) : 'noch keine'}</span>
+      <span>Ohne Internet nutzbar</span><span id="relOff">${esc(relOfflineText())}</span>
+      <span>Version</span><span id="relVer">${esc(APP_VERSION)} · Stand ${esc(APP_BUILD)} · Datenformat ${APP_SCHEMA}</span>
+    </div>
+    ${due ? `<p class="rel-remind"><span>${esc(relBackupLine())}</span></p>` : ''}
+    <div class="row-btns" style="margin-top:12px"><button type="button" class="btn sm" data-rel="backup">Sicherung speichern</button>${p && p.supported && p.persisted === false ? `<button type="button" class="btn sm" data-rel="persist">Dauerhaft speichern</button>` : ''}</div>
+    ${p && p.persisted === false ? `<p class="hint">Der Browser darf die Daten löschen, wenn der Platz knapp wird oder die Seite lange nicht geöffnet war. Am sichersten ist die App auf dem Home-Bildschirm, dazu regelmäßig eine Sicherung als Datei.</p>` : ''}
+    <h3 class="rel-h3">Frühere Stände</h3>
+    ${snaps && snaps.length ? `<ul class="rel-snaps">${snaps.map(relSnapRow).join('')}</ul>` : `<p class="hint" style="margin-top:0">${snaps ? 'Noch keine. Der erste Stand entsteht am nächsten Arbeitstag.' : 'Wird geladen …'}</p>`}
+    <p class="hint">Die App hebt von selbst den Stand der letzten 7 Arbeitstage und je einen Stand der 4 Wochen davor auf. Beim Laden wird der jetzige Stand vorher als Sicherheitskopie abgelegt.</p>
+  </section>`;
+}
+const _renderSetupRel = renderSetup;
+renderSetup = function(){
+  const h = _renderSetupRel(); const i = h.lastIndexOf('</div>');
+  if(REL.snaps === null) relSnaps(); if(REL.persist === null) relPersist(false);
+  return h.slice(0, i) + relPanel() + h.slice(i);
+};
+const _goRel = go;
+go = function(tab, card){ if(tab === 'setup' && view.tab !== 'setup'){ REL.snaps = null; REL.persist = null; } return _goRel(tab, card); };
+
+/* ---------- Heute: eine ruhige Zeile, wenn die Sicherung alt ist ---------- */
+const _renderDashRel = renderDash;
+renderDash = function(){
+  let h = _renderDashRel();
+  try { if(relBackupDue()){ const i = h.indexOf('<div class="day">'); if(i >= 0) h = h.slice(0, i) + `<p class="rel-remind"><span>${esc(relBackupLine())}</span><button type="button" class="btn sm" data-rel="backup">Sicherung speichern</button></p>` + h.slice(i); } } catch(e){ console.warn(e); }
+  return h;
+};
+
+/* ---------- Knöpfe ---------- */
+document.addEventListener('click', async e => {
+  const el = e.target.closest && e.target.closest('[data-rel]'); if(!el || REL.recover) return; const a = el.dataset.rel;
+  if(a === 'retry'){ el.disabled = true; await STORE.retry(false); el.disabled = false; relBars(); if(!STORE.status().error) toast('Gespeichert'); }
+  else if(a === 'backup'){ await relBackup(); }
+  else if(a === 'photoRetry'){ el.disabled = true; const ids = [...(REL.photoIds || [])]; REL.photoIds = new Set(); REL.photoFail = false; if(!idb) idb = await idbOpen(); ids.forEach(id => { if(IMG[id]) imgPut(id, IMG[id]); }); setTimeout(() => { relBars(); if(!REL.photoFail) toast('Foto gespeichert'); }, 900); }
+  else if(a === 'takeover'){ el.disabled = true; el.textContent = 'Einen Moment …'; try { await STORE.takeover(false); } catch(x){ console.warn(x); } relBars(); relInd(); if(!STORE.isReader()) toast('Sie arbeiten jetzt in diesem Fenster'); }
+  else if(a === 'update'){ swUpdateNow(el); }
+  else if(a === 'reload'){ location.reload(); }
+  else if(a === 'persist'){ const p = await relPersist(true); toast(p && p.persisted ? 'Speicher ist jetzt dauerhaft' : 'Der Browser hat das nicht zugesagt. Eine Sicherung als Datei hilft immer.'); }
+  else if(a === 'snap'){
+    const id = el.dataset.id; const when = el.closest('li') ? el.closest('li').querySelector('b').textContent : '';
+    if(typeof roGate === 'function' && !roGate()) return;
+    ask(`Stand vom ${when} laden? Der jetzige Stand wird ersetzt. Vorher legt die App eine Sicherheitskopie an.`, () => { setTimeout(async () => {
+      try { const d = migrate(await STORE.snapLoad(id)); if(!d) throw 0; safetyStore('vor „Früheren Stand laden“'); S = d; save(); go('dash'); toast('Früherer Stand geladen', {label:'Rückgängig', ms:8000, action:safetyRestore}); }
+      catch(x2){ info('Laden fehlgeschlagen', 'Dieser Stand ist nicht lesbar. Es wurde nichts geändert.'); } }, 0); }, 'Stand laden');
+  }
+});
+/* Auf der Wiederherstellungs-Seite gibt es noch keine Daten: store.js hält alle anderen Klick-Behandlungen der App fern und ruft nur diese Funktion */
+async function relRecEvent(e){
+  const t = e.target, m = $('#relRecMsg'), msg = x => { if(m) m.textContent = x; };
+  if(e.type === 'change'){
+    if(!t || t.id !== 'relFile' || !t.files[0]) return;
+    const r = new FileReader(); r.onload = () => {
+      let d; try { d = JSON.parse(r.result); } catch(x){ msg('Die Datei ist keine Sicherung dieser App.'); return; }
+      if(schemaNewer(d)){ msg('Diese Sicherung stammt aus einer neueren Version der App. Bitte zuerst die Seite neu laden.'); return; }
+      const imgs = d && d.images; if(d && typeof d === 'object') delete d.images; let nd = null; try { nd = migrate(d); } catch(x){}
+      if(!nd){ msg('Die Datei ist keine Sicherung dieser App.'); return; }
+      relAdopt(nd, 'Sicherung geladen'); if(imgs) imgLoadAll().then(() => { Object.entries(imgs).forEach(([k, v]) => imgPut(k, v)); render(); });
+    }; r.readAsText(t.files[0]); t.value = ''; return;
+  }
+  const el = t.closest && t.closest('.rel-rec [data-rel]'); if(!el) return; const a = el.dataset.rel;
+  if(a === 'reload') location.reload();
+  else if(a === 'snap'){ try { const d = migrate(await STORE.snapLoad(el.dataset.id)); if(!d) throw 0; relAdopt(d, 'Früherer Stand geladen'); } catch(x){ msg('Dieser Stand ist nicht lesbar. Bitte einen anderen wählen.'); } }
+  else if(a === 'recDemo') relAdopt(seed(), 'Demodaten geladen');
+  else if(a === 'recEmpty'){ let d = null; try { d = relEmptyState(); } catch(x){} if(d) relAdopt(d, 'Leerer Betrieb angelegt'); else msg('Leer starten ist gerade nicht möglich. Bitte die Demodaten wählen.'); }
+  else if(a === 'recFile') $('#relFile').click();
+  else if(a === 'recRaw'){ const ok = await saveFile('dahuam202-beschaedigt-' + todayStr() + '.json', await relRawBlob()); msg(ok ? 'Gespeichert.' : 'Nicht gespeichert.'); }
+}
+
+/* ---------- Fotos: nach dem Schreiben zurücklesen, damit auch ein verlorenes Foto auffällt ---------- */
+const _imgPutRel = imgPut;
+imgPut = function(id, data){
+  _imgPutRel(id, data);
+  setTimeout(() => {
+    const bad = () => { REL.photoFail = true; (REL.photoIds = REL.photoIds || new Set()).add(id); relBars(); };
+    if(IMG[id] !== data) return;                       // inzwischen ersetzt oder gelöscht
+    if(!idb){ if(STORE.status().mode !== 'mem') bad(); return; }
+    try { const r = idb.transaction('img').objectStore('img').get(id); r.onsuccess = () => { if(IMG[id] === data && r.result !== data) bad(); }; r.onerror = bad; } catch(e){ bad(); }
+  }, 400);
+};
+
+/* ---------- Offline: Service Worker, nur auf der eigenen Seite ---------- */
+function swOk(){ try { return !FRAMED && /^https?:$/.test(location.protocol) && 'serviceWorker' in navigator && window.isSecureContext && !/[?&]nosw\b/.test(location.search); } catch(e){ return false; } }
+function swStart(){
+  if(!swOk() || REL.swStarted) return; REL.swStarted = true;
+  let hadCtl = !!navigator.serviceWorker.controller;
+  const setState = st => { REL.swState = st; const n = $('#relOff'); if(n) n.textContent = relOfflineText(); };
+  navigator.serviceWorker.register('sw.js', {scope:'./'}).then(reg => {
+    REL.sw = reg;
+    const check = () => { if(reg.active) setState('active'); if(reg.waiting && navigator.serviceWorker.controller){ REL.update = true; relBars(); } };
+    const watch = w => { if(w) w.addEventListener('statechange', () => { check(); }); };
+    watch(reg.installing); watch(reg.waiting); check();
+    reg.addEventListener('updatefound', () => watch(reg.installing));
+    navigator.serviceWorker.ready.then(() => setState('active')).catch(() => {});
+    let last = Date.now();
+    document.addEventListener('visibilitychange', () => { if(!document.hidden && Date.now() - last > 36e5){ last = Date.now(); reg.update().catch(() => {}); } });
+  }).catch(e => { console.warn('Offline-Betrieb:', e); setState('error'); });
+  /* Ein neuer Worker übernimmt nur nach „Neu laden“ oder beim nächsten Start. Dann lädt die Seite einmal frisch, damit nichts gemischt wird. */
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if(!hadCtl){ hadCtl = true; return; } if(REL.reloading) return; REL.reloading = true; STORE.flush(); STORE.idle().then(() => location.reload()); });
+}
+async function swUpdateNow(btn){
+  if(btn){ btn.disabled = true; btn.textContent = 'Einen Moment …'; }
+  try { STORE.flush(); await STORE.idle(); } catch(e){}
+  const reg = REL.sw; if(reg && reg.waiting){ reg.waiting.postMessage({type:'SKIP_WAITING'}); setTimeout(() => { if(!REL.reloading){ REL.reloading = true; location.reload(); } }, 4000); } else location.reload();
+}
+/* Manifest und Symbol nur auf der eigenen Seite einhängen; in der eingebetteten Vorschau gibt es diese Dateien nicht */
+function relManifest(){ if(!swOk() && !(location.protocol === 'https:' && !FRAMED)) return; try { if(document.querySelector('link[rel="manifest"]')) return; const l = document.createElement('link'); l.rel = 'manifest'; l.href = 'manifest.webmanifest'; document.head.appendChild(l); const i = document.createElement('link'); i.rel = 'icon'; i.type = 'image/png'; i.sizes = '192x192'; i.href = 'icons/icon-192.png'; document.head.appendChild(i); } catch(e){} }
+/* Eingebettete Vorschau ohne den Ordner vendor/: Schriften nachträglich und ohne zu blockieren von Google holen. Auf der eigenen Seite passiert das nie. */
+function relFontFallback(){
+  if(!FRAMED || !document.fonts || !document.fonts.load) return;
+  const fb = () => { if(document.getElementById('relGf')) return; const l = document.createElement('link'); l.id = 'relGf'; l.rel = 'stylesheet'; l.media = 'print'; l.onload = () => { l.media = 'all'; }; l.href = 'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700&family=Figtree:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Caveat:wght@400..600&family=PT+Sans:wght@400;700&family=Saira+Condensed:wght@300;400&family=Roboto+Condensed:wght@400;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Schibsted+Grotesk:wght@500;600&family=JetBrains+Mono:wght@500&display=swap'; document.head.appendChild(l); };
+  document.fonts.load('500 16px "Figtree"').then(r => { if(!r || !r.length) fb(); }, fb);
+}
+window.addEventListener('appinstalled', () => { relPersist(true); });
+
+/* ---------- Start ---------- */
+function startApp(){
 document.querySelectorAll('.nav-slot').forEach(n => n.innerHTML = navHtml(n.closest('.bottom')));
-try { const th = localStorage.getItem(KEY+'_theme'); if(th) document.documentElement.dataset.theme = th; } catch(e){}
 themeIcon();
 matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', themeIcon);
-function fromHash(){ const h = location.hash.slice(1); if(TABS.some(t=>t[0]===h) && h !== view.tab){ view = {...view, tab:h, card:null, q:''}; render(); } }
 window.addEventListener('hashchange', fromHash);
-try { fromHash(); render(); } catch(err){ console.error(err); $('#app').innerHTML = `<section class="panel" style="max-width:560px"><h2>Gespeicherte Daten konnten nicht geladen werden</h2><p class="hint">Laden Sie eine Sicherung oder starten Sie mit den Demodaten neu.</p><div class="row-btns" style="margin-top:12px"><button type="button" class="btn primary" data-act="importPick">Sicherung laden</button><button type="button" class="btn danger" data-act="reset">Demodaten laden</button></div><input id="importFile" type="file" accept="application/json,.json" hidden></section>`; }
-imgLoadAll().then(() => { if(Object.keys(IMG).length) render(); cloudStart(); });
+try { fromHash(); render(); } catch(err){ console.error(err); REL.renderFail = err; }
+imgLoadAll().then(() => { REL.imgReady = true; if(!S || REL.recover) return; if(Object.keys(IMG).length) render(); cloudStart(); });
+}
+function fromHash(){ const h = location.hash.slice(1); if(TABS.some(t=>t[0]===h) && h !== view.tab){ view = {...view, tab:h, card:null, q:''}; render(); } }
+try { const th = localStorage.getItem(KEY+'_theme'); if(th) document.documentElement.dataset.theme = th; } catch(e){}
+/* Daten kommen aus IndexedDB: erst laden, dann zeichnen (siehe store.js und reliab.js) */
+BOOT_P.then(relStart, e => relStart({status:'corrupt', kind:'read', error:String(e)}));
 
 </script>
 </body>

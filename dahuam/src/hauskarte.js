@@ -48,7 +48,7 @@ function hausMigrate(d){
 }
 
 /* ---------- Schriften: Barlow Condensed (Titel, Preise), Fraunces (Ziffern, Namen, Fließtext), Caveat (nur Tafel) ---------- */
-(function(){ const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Caveat:wght@400..600&display=swap'; document.head.appendChild(l); })();
+/* seit Paket A als Dateien im Ordner vendor/fonts (fonts.css), kein fremder Dienst mehr */
 const HS_FONTS = ['300 20px "Fraunces"','400 20px "Fraunces"','500 20px "Fraunces"','600 20px "Fraunces"','italic 300 20px "Fraunces"','italic 400 20px "Fraunces"','400 20px "Caveat"','600 20px "Caveat"','300 20px "Barlow Condensed"','400 20px "Barlow Condensed"','500 20px "Barlow Condensed"','600 20px "Barlow Condensed"'];
 
 /* ---------- Linienzeichnungen (Gold), eigenständige SVGs mit festen Farben ---------- */

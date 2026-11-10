@@ -8,7 +8,7 @@
 /* ---------- Einstellungen je Gerät ---------- */
 const GKEY = KEY + '_guide';
 const G_NOINTRO = /[?&]nointro/.test(location.search);
-const G_FRESH = (() => { try { return localStorage.getItem(KEY) === null; } catch(e){ return false; } })();
+let G_FRESH = (() => { try { return localStorage.getItem(KEY) === null; } catch(e){ return false; } })();
 let GP = (() => { try { return JSON.parse(localStorage.getItem(GKEY)) || {}; } catch(e){ return {}; } })();
 function gpSave(){ try { localStorage.setItem(GKEY, JSON.stringify(GP)); } catch(e){} }
 function isSimple(){ return GP.mode === 'simple'; }
@@ -302,6 +302,7 @@ window.addEventListener('click', e => {
   if(t.closest('.gd-helpbar, [data-act="helpMode"], #gd, dialog, #pal')) return;
   if(t.closest('.gd-bub')){ if(t.closest('[data-act="goTab"]')) bubHide(); return; }
   const hit = helpFind(t); const pass = !!t.closest(HELP_PASS);
+  clearTimeout(gdHoverT);   /* die Erklärung zum Klick bleibt stehen; eine noch ausstehende Erklärung vom Überfahren ersetzt sie nicht mehr */
   const ctl = t.closest('[data-act],[data-pdf],[data-pick],button,a,input,select,textarea,label,summary,tr.row,.sh-chip');
   if(!pass && ctl){ e.preventDefault(); e.stopImmediatePropagation(); if(ctl.matches('input,select,textarea')) setTimeout(() => ctl.blur(), 0); }
   if(hit) bubShow(hit.el, hit.h, {note: !pass && ctl && ctl.matches('[data-act],[data-pdf],button,a') ? 'Solange die Hilfe an ist, wird hier nichts ausgeführt.' : ''});

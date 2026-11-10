@@ -112,7 +112,7 @@ ok(await ev(()=>S.menu[0].name==='GEÄNDERT'),'safety copy restores the previous
 fs.writeFileSync(__dirname+'/bad_test.json','{"products":"x","cards":[],"menu":[{}]}');await p.setInputFiles('#importFile',__dirname+'/bad_test.json');await p.waitForTimeout(300);ok(/Laden fehlgeschlagen/.test(await dlgText()),'bad file → clear message');await ev(()=>$('#dlg').close());
 // old state without new fields loads
 const old=JSON.parse(fs.readFileSync(f));delete old.saleGroups;delete old.salesReal;old.moves.unshift({id:'mv_a',date:'2026-10-01T18:00:00.000Z',type:'sale',pid:'pork',qty:-1,price:9,note:'Verkauf 01.10.2026'},{id:'mv_b',date:'2026-10-01T18:00:00.000Z',type:'sale',pid:'fries',qty:-1,price:2,note:'Verkauf 01.10.2026'});old.invDraft={date:'2026-10-01T10:00:00.000Z',counts:{pork:-4,veal:2}};
-await ev(d=>{localStorage.setItem(KEY,JSON.stringify(d))},old);await p.reload();await p.waitForTimeout(800);
+await ev(d=>__store.replace(d),old);await p.reload();await p.waitForTimeout(800);
 ok(await ev(()=>{const a=S.moves.find(m=>m.id==='mv_a'),c=S.moves.find(m=>m.id==='mv_b');return a.grp&&a.grp===c.grp&&!!S.saleGroups[a.grp]&&S.invDraft.counts.pork===''&&S.invDraft.counts.veal===2&&typeof S.salesReal==='object'}),'old saved state loads; legacy sale moves grouped, negative counts cleared');
 await ev(()=>{S.invDraft=null;view.stab='buchungen';go('stock')});await p.waitForTimeout(200);ok(await p.locator('.moves li.mv-grp').count()>=1,'legacy sale booking shown as one unit');
 await L.done(b,errs);})();

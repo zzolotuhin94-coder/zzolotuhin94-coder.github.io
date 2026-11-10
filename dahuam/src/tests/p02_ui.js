@@ -65,9 +65,9 @@ const cN=await ev(()=>Object.keys(S.plan.chk[vbDay()]||{}).length);await ev(()=>
 ok(st3.inDis&&st3.fac&&await ev(()=>JSON.stringify([S.plan.ov,S.plan.fac]))===plan0&&await ev(()=>Object.keys(S.plan.chk[vbDay()]||{}).length)===cN+1,'staff: forecast numbers and day factor are read-only; checking off the prep list is allowed',st3);
 await ev(()=>{S.settings.currentUser='u_chef';save()});
 // ---------- Migration: alter Speicherstand ohne S.plan, kaputtes S.plan ----------
-await ev(()=>{const d=JSON.parse(localStorage.getItem(KEY));delete d.plan;localStorage.setItem(KEY,JSON.stringify(d))});await p.reload();await w(800);
+await ev(async()=>{const d=await __store.read();delete d.plan;await __store.replace(d)});await p.reload();await w(800);
 ok(await ev(()=>S.plan&&typeof S.plan.ov==='object'&&typeof S.plan.chk==='object'&&typeof S.plan.fac==='object'&&S.menu.length>50),'old saved state without S.plan loads and gets the new fields');
-await ev(()=>{const d=JSON.parse(localStorage.getItem(KEY));d.plan={ov:[1,2],chk:'x',fac:{'2020-01-01':1.3,'kaputt':2},loss:99};localStorage.setItem(KEY,JSON.stringify(d))});await p.reload();await w(800);
+await ev(async()=>{const d=await __store.read();d.plan={ov:[1,2],chk:'x',fac:{'2020-01-01':1.3,'kaputt':2},loss:99};await __store.replace(d)});await p.reload();await w(800);
 ok(await ev(()=>!Array.isArray(S.plan.ov)&&typeof S.plan.chk==='object'&&Object.keys(S.plan.fac).length===0),'broken or outdated S.plan is repaired; old dates are dropped');
 await ev(()=>{go('vorb')});await w(200);ok(await ev(()=>!!document.querySelector('#app .pl-days')),'…and the tab renders');
 // Sicherung: S.plan reist mit
