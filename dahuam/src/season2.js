@@ -63,8 +63,7 @@ const _seasonMigrate = seasonMigrate;
 seasonMigrate = function(d){ _seasonMigrate(d); d.menu.forEach(m => { if(!m.days) m.days = []; if(m.alg==null) m.alg = ''; }); if(!d.settings.closed) d.settings.closed = [3]; return d; };
 
 /* ---------- Allergene & Verfügbarkeit ---------- */
-function itemAlg(m){ const c = m.card && C(m.card); return c ? [...totals(c).alg].sort() : algList(m.alg).sort(); }
-function hasAlg(m){ return !!(m.card && C(m.card)) || algList(m.alg).length > 0; }
+/* itemAlg(), hasAlg() und algInfo(): siehe allergen.js (eine Zählung für alle Stellen) */
 function dayOk(m, date){ return !m.days || !m.days.length || m.days.includes(new Date(date+'T12:00:00').getDay()); }
 function seasonYear(k, date){ const y = +date.slice(0,4), s = S.settings.seasons[k]; if(s.from > s.to){ return date.slice(5) >= s.from ? `${y}/${String(y+1).slice(2)}` : `${y-1}/${String(y).slice(2)}`; } return String(y); }
 

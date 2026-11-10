@@ -1,0 +1,46 @@
+﻿Artikel;Einheit;Stückgewicht;Preis netto;Lieferant;Artikelnummer;Gebinde;Gebindegröße;Putzverlust;Garverlust;Allergene;Lagerort;Mindestbestand;Anfangsbestand
+Rindsknochen;kg;;2,40;Fleischerei Hörtnagl;FH-100;Kiste 10 kg;;0;0;keine;Kühlhaus;5;10
+Suppengemüse;kg;;1,90;Biohof Stern;;Kiste 5 kg;5;15;0;L;Gemüselager;3;5
+Zwiebel;kg;;1,20;Biohof Stern;;Sack 10 kg;;12;0;keine;Gemüselager;10;20
+Wasser;l;;0;;;;;0;0;keine;;;
+Salz;kg;;0,60;Gastro-Großmarkt Inntal;GI-501;Pkg 1 kg;1;0;0;keine;Trockenlager;5;10
+Pfefferkörner;kg;;22,00;Gastro-Großmarkt Inntal;GI-502;Dose 500 g;;0;0;keine;Trockenlager;0,5;1
+Mehl glatt;kg;;0,89;Gastro-Großmarkt Inntal;GI-510;Sack 10 kg;10;0;0;A;Trockenlager;15;20
+Milch;l;;1,05;Talmolkerei Gerlostal;TG-201;Kiste 12×1 l;;0;0;G;Kühlhaus;12;24
+Ei M;Stk;60;0,27;Biohof Stern;;Tray 30 Stk;;12;0;C;Kühlhaus;90;180
+Butter;kg;;8,40;Talmolkerei Gerlostal;TG-210;Karton 10x250 g;;0;0;G;Kühlhaus;3;5
+Schnittlauch;kg;;14,00;Biohof Stern;;Bund;;10;0;keine;Kühlhaus;0,2;0,3
+Vanilleeis;l;;6,50;Gastro-Großmarkt Inntal;GI-730;Wanne 5 l;5;0;0;G C;Tiefkühler;5;10
+Schweinsschnitzel;kg;;9,80;Fleischerei Hörtnagl;FH-210;Vakuum 5 kg;5;4;15;keine;Kühlhaus;8;10
+Semmelbrösel;kg;;2,40;Gastro-Großmarkt Inntal;GI-512;Sack 5 kg;5;0;0;A;Trockenlager;4;5
+Butterschmalz;kg;;11,50;Talmolkerei Gerlostal;TG-215;Kübel 2,5 kg;;0;0;G;Trockenlager;2;5
+Erdäpfel;kg;;0,95;Biohof Stern;;Sack 25 kg;25;20;0;keine;Gemüselager;25;50
+Zitrone;Stk;110;0,35;Biohof Stern;;Netz 10 Stk;10;0;0;keine;Gemüselager;10;20
+Bergkäse;kg;;17,50;Talmolkerei Gerlostal;TG-300;Laib 6 kg;;8;0;G;Kühlhaus;4;6
+Kokosmilch;l;;3,20;Gastro-Großmarkt Inntal;GI-640;Karton 6×1 l;6;0;0;keine;Trockenlager;6;12
+Basmatireis;kg;;2,90;Gastro-Großmarkt Inntal;GI-520;Sack 5 kg;5;0;0;keine;Trockenlager;5;10
+Limette;kg;;4,50;Biohof Stern;;Kiste 2 kg;2;0;0;keine;Gemüselager;1;2
+Currypaste;kg;;12,00;Gastro-Großmarkt Inntal;GI-641;Becher 1 kg;1;0;0;;Kühlhaus;1;2
+Tafelspitz;kg;;16,90;Fleischerei Hörtnagl;FH-110;Vakuum;;8;30;keine;Kühlhaus;4;6
+Kalbsschnitzel;kg;;31,00;Fleischerei Hörtnagl;FH-220;Vakuum 3 kg;3;8;15;keine;Kühlhaus;3;3
+Rostbraten;kg;;24,50;Fleischerei Hörtnagl;FH-120;Vakuum 4 kg;4;6;20;keine;Kühlhaus;3;4
+Forelle;Stk;350;4,80;Fischzucht Zillergrund;;Kiste 20 Stk;20;25;10;D;Kühlhaus;10;20
+Emmentaler;kg;;11,80;Talmolkerei Gerlostal;TG-310;Block 3 kg;3;3;0;G;Kühlhaus;3;3
+Preiselbeeren;kg;;6,90;Gastro-Großmarkt Inntal;GI-650;Eimer 3 kg;3;0;0;;Trockenlager;2;3
+Schlagobers 36 %;l;;4,40;Talmolkerei Gerlostal;TG-205;Karton 6×1 l;;0;0;G;Kühlhaus;6;12
+Topfen 20 %;kg;;3,90;Talmolkerei Gerlostal;TG-220;Becher 5 kg;5;0;0;G;Kühlhaus;5;5
+Kristallzucker;kg;;0,98;Gastro-Großmarkt Inntal;GI-530;Sack 10 kg;10;0;0;keine;Trockenlager;10;10
+Staubzucker;kg;;1,55;Gastro-Großmarkt Inntal;GI-531;Pkg 1 kg;1;0;0;keine;Trockenlager;3;5
+Äpfel;kg;;1,70;Biohof Stern;;Kiste 13 kg;13;28;0;keine;Gemüselager;10;13
+Hokkaidokürbis;kg;;1,60;Biohof Stern;;Kiste 10 kg;10;18;10;keine;Gemüselager;5;10
+Kürbiskernöl;l;;19,00;Biohof Stern;;Flasche 1 l;1;0;0;keine;Trockenlager;1;2
+Sonnenblumenöl;l;;2,10;Gastro-Großmarkt Inntal;GI-540;Kanister 10 l;10;0;0;keine;Trockenlager;10;20
+Paprikapulver edelsüß;kg;;17,00;Gastro-Großmarkt Inntal;GI-503;Dose 1 kg;1;0;0;keine;Trockenlager;0,5;1
+Zillertal Bier Fass;l;;2,85;Getränke Wildalm;GW-10;Fass 30 l;30;0;0;A;Bar;30;60
+Mineralwasser 0,33 l;Flasche;;0,42;Getränke Wildalm;GW-20;Kiste 24 Stk;24;0;0;keine;Bar;48;72
+Kaffeebohnen;kg;;18,50;Gastro-Großmarkt Inntal;GI-700;Pkg 1 kg;1;0;0;keine;Bar;2;4
+;kg;;3,00;Biohof Stern;;;;;;;;;
+Trüffelöl;l;;abc;Gastro-Großmarkt Inntal;;;;;;;;;
+Safran;g;;9,00;Gastro-Großmarkt Inntal;;;;;;;;;
+Zwiebel;kg;;1,30;Biohof Stern;;;;;;;;;
+Karotten;kg;;1,10;Biohof Stern;;Sack 10 kg;10;120;0;Q;Gemüselager;5;10

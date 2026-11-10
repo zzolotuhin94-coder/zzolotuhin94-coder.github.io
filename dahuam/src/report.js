@@ -56,10 +56,10 @@ function report(from, to){
   const a = salesAgg(from, to); const rows = [];
   let net = 0, we = 0, netCovered = 0, grossCovered = 0;
   for(const [mid, {q, g}] of a.by){
-    const m = S.menu.find(x=>x.id===mid); const vat = vatOf(m); const n = g/(1+vat/100);
+    const m = S.menu.find(x=>x.id===mid); const vat = +vatRate(m) || 0; const n = g/(1+vat/100);
     const k = m ? menuCalc(m) : null; const cpp = k && k.cost != null ? k.cost : null;
     const w = cpp != null ? cpp*q : null;
-    rows.push({mid, m, name: m ? dishLabel(m) : 'Gelöschtes Gericht', section: m ? m.section : '—', q, g, n, avg: q ? g/q : 0, we:w, cpp, fc: w != null && n ? w/n*100 : null, rg: w != null ? n - w : null});
+    rows.push({mid, m, vat, vc:vatClass(m), name: m ? dishLabel(m) : 'Gelöschtes Gericht', section: m ? m.section : '—', q, g, n, avg: q ? g/q : 0, we:w, cpp, fc: w != null && n ? w/n*100 : null, rg: w != null ? n - w : null});
     net += n; if(w != null){ we += w; netCovered += n; grossCovered += g; }
   }
   return {rows, qty:a.qty, gross:a.gross, net, we, netCovered, cover: a.gross ? grossCovered/a.gross*100 : 0, fc: netCovered ? we/netCovered*100 : null, rg: netCovered - we, days:a.days, openDays:a.openDays};
@@ -141,7 +141,7 @@ function buckets(from, to){
   while(isoDate(d) <= to){ const f = isoDate(d), e = isoDate(new Date(d.getFullYear(), d.getMonth()+1, 0, 12)); out.push({from:f < from ? from : f, to:e > to ? to : e, label:MONTHS[d.getMonth()].slice(0,3), tip:`${MONTHS[d.getMonth()]} ${d.getFullYear()}`}); d = new Date(d.getFullYear(), d.getMonth()+1, 1, 12); }
   return {g:'Monat', out};
 }
-function netOfDays(days, from, to){ let s = 0; for(const [d, rows] of Object.entries(S.salesDays||{})){ if(d < from || d > to) continue; for(const [mid,,g] of rows){ const m = S.menu.find(x=>x.id===mid); s += g/(1+vatOf(m)/100); } } return s; }
+function netOfDays(days, from, to){ let s = 0; for(const [d, rows] of Object.entries(S.salesDays||{})){ if(d < from || d > to) continue; for(const [mid,,g] of rows){ const m = S.menu.find(x=>x.id===mid); s += g/(1+(+vatRate(m)||0)/100); } } return s; }
 function chartSvg(from, to, cur, cr, cmp){
   const {g, out} = buckets(from, to); const vals = out.map(b => netOfDays(null, b.from, b.to));
   const off = cr ? dDiff(cr.from, from) : 0;
@@ -212,10 +212,10 @@ function specialsBlock(from, to, cur){
 }
 function monthTable(from, to){
   const {out} = (() => { let d = dParse(from); d = new Date(d.getFullYear(), d.getMonth(), 1, 12); const o = []; while(isoDate(d) <= to){ const f = isoDate(d), e = isoDate(new Date(d.getFullYear(), d.getMonth()+1, 0, 12)); o.push({from:f<from?from:f, to:e>to?to:e, label:`${MONTHS[d.getMonth()]} ${d.getFullYear()}`}); d = new Date(d.getFullYear(), d.getMonth()+1, 1, 12); } return {out:o}; })();
-  let tq = 0, tg = 0, t10 = 0, t20 = 0, tw = 0, tr = 0;
-  const rows = out.map(b => { const rp = report(b.from, b.to); let n10 = 0, n20 = 0; rp.rows.forEach(r => { if(vatOf(r.m) === 20) n20 += r.n; else n10 += r.n; }); tq += rp.qty; tg += rp.gross; t10 += n10; t20 += n20; tw += rp.we; tr += rp.rg;
+  let tq = 0, tg = 0, t10 = 0, t20 = 0, tw = 0, tr = 0; const vS = num(+S.settings.vat||0, 1), vG = num(+vatRate({vat:'g'})||0, 1);
+  const rows = out.map(b => { const rp = report(b.from, b.to); let n10 = 0, n20 = 0; rp.rows.forEach(r => { if(r.vc === 'g') n20 += r.n; else n10 += r.n; }); tq += rp.qty; tg += rp.gross; t10 += n10; t20 += n20; tw += rp.we; tr += rp.rg;
     return `<tr><td>${b.label}</td><td class="r">${num(rp.qty)}</td><td class="r">${eur(rp.gross)}</td><td class="r">${eur(n10)}</td><td class="r hide-m">${eur(n20)}</td><td class="r hide-m">${eur(rp.we)}</td><td class="r hide-m">${eur(rp.rg)}</td></tr>`; }).join('');
-  return `<section class="panel flush"><div class="panel-h pad"><h2>Monatsübersicht</h2><span class="muted sm">für Jahresbericht und Steuerberatung</span></div><div class="lt-wrap flat"><table class="lt"><thead><tr><th>Monat</th><th class="r">Portionen</th><th class="r">Umsatz brutto</th><th class="r">netto 10 %</th><th class="r hide-m">netto 20 %</th><th class="r hide-m">Wareneinsatz</th><th class="r hide-m">Rohertrag</th></tr></thead><tbody>${rows}</tbody>
+  return `<section class="panel flush"><div class="panel-h pad"><h2>Monatsübersicht</h2><span class="muted sm">für Jahresbericht und Steuerberatung</span></div><div class="lt-wrap flat"><table class="lt"><thead><tr><th>Monat</th><th class="r">Portionen</th><th class="r">Umsatz brutto</th><th class="r">netto Speisen ${vS} %</th><th class="r hide-m">netto Getränke ${vG} %</th><th class="r hide-m">Wareneinsatz</th><th class="r hide-m">Rohertrag</th></tr></thead><tbody>${rows}</tbody>
   <tfoot><tr><td>Summe</td><td class="r">${num(tq)}</td><td class="r">${eur(tg)}</td><td class="r">${eur(t10)}</td><td class="r hide-m">${eur(t20)}</td><td class="r hide-m">${eur(tw)}</td><td class="r hide-m">${eur(tr)}</td></tr></tfoot></table></div></section>`;
 }
 
@@ -297,12 +297,17 @@ async function readFileAsCsv(file){
 }
 /* Bericht: derselbe Inhalt wie am Bildschirm, ohne Bedienelemente */
 function rpPrint(){ const rp = view.rp; const r = rpRange(rp); $('#print').innerHTML = `<div class="rp-print"><div class="meta"><span>${esc(S.settings.name)}</span><span>Erstellt ${fmtDate(new Date().toISOString())}</span></div><h1>Auswertung · ${esc(r.label)}</h1>${$('#app').innerHTML.replace(/<section class="panel rp-period">[\s\S]*?<\/section>/,'').replace(/<details class="more"[\s\S]*?<\/details>/g,'').replace(/<div class="page-h">[\s\S]*?<\/div><\/div>/,'').replace(/<div class="toolbar tabs">[\s\S]*?<\/div><\/div>/,'')}</div>`; document.body.classList.remove('print-menu'); document.body.classList.add('print-report'); window.print(); setTimeout(()=>document.body.classList.remove('print-report'), 500); }
+/* Umsatz je Steuersatz: Speisen und Getränke getrennt, Abweichungen je Gericht zählen zum eigenen Satz */
+function vatSplit(rows){ const by = new Map(); rows.forEach(r => { const k = r.vc + '|' + r.vat; const a = by.get(k) || {vc:r.vc, vat:r.vat, label:r.vc === 'g' ? 'Getränke' : 'Speisen', q:0, g:0, n:0}; a.q += r.q; a.g += r.g; a.n += r.n; by.set(k, a); }); return [...by.values()].sort((a,b) => a.vat - b.vat || a.vc.localeCompare(b.vc)); }
 function rpCsvText(){
   const r = rpRange(view.rp); const to = r.to > isoDate(new Date()) ? isoDate(new Date()) : r.to; const cur = report(r.from, to);
   const f2 = n => n == null ? '' : (Math.round(n*100)/100).toFixed(2).replace('.', ',');
-  const lines = ['Gericht;Kategorie;Menge;Umsatz brutto;Umsatz netto;Ø Preis;Wareneinsatz;Wareneinsatz %;Rohertrag'];
-  cur.rows.sort((a,b)=>secList().indexOf(a.section)-secList().indexOf(b.section) || b.g-a.g).forEach(x => lines.push([x.name, x.section, String(x.q).replace('.',','), f2(x.g), f2(x.n), f2(x.avg), f2(x.we), x.fc!=null?f2(x.fc):'', f2(x.rg)].map(v => /[;"\n]/.test(v) ? `"${v.replace(/"/g,'""')}"` : v).join(';')));
-  lines.push(['Summe','',String(cur.qty).replace('.',','), f2(cur.gross), f2(cur.net), '', f2(cur.we), cur.fc!=null?f2(cur.fc):'', f2(cur.rg)].join(';'));
+  const lines = ['Gericht;Kategorie;Menge;Umsatz brutto;MwSt. %;Umsatz netto;Ø Preis;Wareneinsatz;Wareneinsatz %;Rohertrag'];
+  cur.rows.sort((a,b)=>secList().indexOf(a.section)-secList().indexOf(b.section) || b.g-a.g).forEach(x => lines.push([x.name, x.section, String(x.q).replace('.',','), f2(x.g), String(x.vat).replace('.',','), f2(x.n), f2(x.avg), f2(x.we), x.fc!=null?f2(x.fc):'', f2(x.rg)].map(v => /[;"\n]/.test(v) ? `"${v.replace(/"/g,'""')}"` : v).join(';')));
+  lines.push(['Summe','',String(cur.qty).replace('.',','), f2(cur.gross), '', f2(cur.net), '', f2(cur.we), cur.fc!=null?f2(cur.fc):'', f2(cur.rg)].join(';'));
+  // Aufteilung nach Steuersatz (für die Steuerberatung)
+  const split = vatSplit(cur.rows); lines.push('', 'Steuersatz;Klasse;Menge;Umsatz brutto;MwSt. %;Umsatz netto;MwSt. Betrag');
+  split.forEach(s => lines.push(['MwSt. ' + String(s.vat).replace('.',',') + ' %', s.label, String(s.q).replace('.',','), f2(s.g), String(s.vat).replace('.',','), f2(s.n), f2(s.g - s.n)].join(';')));
   return {text:'﻿'+lines.join('\r\n'), name:`DAHUAM202_Auswertung_${r.from}_${to}.csv`};
 }
 

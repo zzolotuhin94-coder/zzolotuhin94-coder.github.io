@@ -6,8 +6,8 @@ const OLD = fs.readFileSync(__dirname + '/../index.before-a.html', 'utf8');
   const oldApp = async (c) => { const p = await c.newPage(); await p.route('**/dahuam/alt.html*', r => r.fulfill({contentType:'text/html; charset=utf-8', body:OLD})); await p.goto(L.BASE + 'alt.html?nointro'); await p.waitForTimeout(700); return p; };
   // Paket B stellt beim Laden bewusst um: zwei Rollen, zwei Gästekarten-Stile, keine Aufgaben/Stempel, Kennzeichen „Grundzutat“. Diese Felder bleiben beim Vergleich außen vor (btests/b01 prüft sie einzeln).
   const cmp = (p, raw) => p.evaluate(async raw => { const old0 = JSON.parse(raw); await __store.idle(); const pers0 = await __store.read(); const diff = [];
-    const B = d => { d = JSON.parse(JSON.stringify(d)); const s = d.settings || {}; for(const k of ['users','currentUser','orderLimit','guestStyle','guestStylePick']) delete s[k]; Object.values(s.seasons || {}).forEach(x => { for(const k of ['layout','fd','fb','orn']) delete x[k]; });
-      (d.products || []).forEach(x => { delete x.basic; }); (d.orders || []).forEach(o => { if(o.status === 'approval') o.status = 'draft'; for(const k of ['createdBy','sentBy','approvalBy','approvedBy','approved']) delete o[k]; if(o.receipt) delete o.receipt.by; });
+    const B = d => { d = JSON.parse(JSON.stringify(d)); const s = d.settings || {}; for(const k of ['users','currentUser','orderLimit','guestStyle','guestStylePick','vatDrinks','secVat','algV']) delete s[k]; /* Paket C: zweiter Steuersatz, Steuerklassen, Allergen-Umstellung */ Object.values(s.seasons || {}).forEach(x => { for(const k of ['layout','fd','fb','orn']) delete x[k]; });
+      (d.products || []).forEach(x => { delete x.basic; delete x.algNone; }); (d.menu || []).forEach(m => { delete m.algNone; delete m.vat; }); (d.orders || []).forEach(o => { if(o.status === 'approval') o.status = 'draft'; for(const k of ['createdBy','sentBy','approvalBy','approvedBy','approved']) delete o[k]; if(o.receipt) delete o.receipt.by; });
       delete d.game; ((d.team && d.team.people) || []).forEach(x => { delete x.user; }); return d; };
     const old = B(old0), pers = B(pers0); if(JSON.stringify(Object.keys(pers0.game || {}).sort()) !== '["done","init"]') diff.push('game');
     for(const k of Object.keys(old)) if(JSON.stringify(old[k]) !== JSON.stringify(pers[k])) diff.push(k);
@@ -16,7 +16,7 @@ const OLD = fs.readFileSync(__dirname + '/../index.before-a.html', 'utf8');
   { // 1 Demostand, von der alten App gespeichert
     const c = await L.ctx(b); const o = await oldApp(c); const raw = await o.evaluate(() => { S.settings.name = 'Alt gespeichert'; save(); return localStorage.getItem(KEY); }); await o.close();
     const p = await L.page(c); const r = await cmp(p, raw);
-    L.ok(r.diff.length === 0, 'Demostand: jeder alte Schlüssel ist unverändert angekommen (bis auf die Umstellungen aus Paket B)', r.diff); L.ok(r.extra.join() === 'schema', 'neu ist nur das Datenformat', r.extra);
+    L.ok(r.diff.length === 0, 'Demostand: jeder alte Schlüssel ist unverändert angekommen (bis auf die Umstellungen aus Paket B)', r.diff); L.ok(r.extra.sort().join() === 'imports,schema', 'neu sind nur das Datenformat und die Liste der Importe (Paket C)', r.extra);
     L.ok(r.same && r.st.mode === 'idb' && r.st.rev === 1 && !r.st.dirty, 'liegt in IndexedDB, Speicher und Bildschirm sind gleich', r.st);
     L.ok(/"_store":"idb"/.test(r.marker) && r.marker.length < 200, 'alter Schlüssel ist nur noch ein kleiner Marker', r.marker);
     L.ok(r.snaps.length === 1 && r.snaps[0] === 'umzug:' + raw.length, 'alter Stand liegt zusätzlich als „vor der Umstellung“ bei den früheren Ständen', r.snaps);

@@ -32,14 +32,14 @@ function wkPass(m){
 function wkPrice(p){ return '€ ' + fin(+p).toLocaleString('de-AT',{minimumFractionDigits:2, maximumFractionDigits:2}); }
 function wkDish(e, used){
   const m = e.head, vars = e.vars, multi = vars.length > 1 || (m.group && m.vlabel);
-  const alg = [...new Set(vars.flatMap(v=>itemAlg(v)))].sort(); alg.forEach(a=>used.add(a));
+  const ai = algOfVars(vars), alg = ai.letters; alg.forEach(a=>used.add(a)); if(ai.open) used.add(ALG_MARK);
   const veg = vars.every(v=>v.veg==='vg') ? 'vg' : vars.every(v=>v.veg==='v'||v.veg==='vg') ? 'v' : '';
   const desc = [m.desc, hkDays(m)].filter(Boolean).join(' · ');
   return `<article class="wk-dish ${vars.some(v=>v.top)?'sig':''}">
     <div class="wk-l1"><h4 class="wk-n">${esc(m.name)}${veg?`<i class="wk-veg" title="${veg==='vg'?'vegan':'vegetarisch'}">${veg==='vg'?'VG':'V'}</i>`:''}</h4>${multi?'':`<span class="wk-p">${+m.price?wkPrice(m.price):''}</span>`}</div>
     ${desc ? `<p class="wk-d">${esc(desc)}</p>` : ''}
     ${multi ? `<div class="wk-vars">${vars.map(v=>`<div class="wk-var"><span>${esc(v.vlabel||v.name)}</span><span class="wk-p">${wkPrice(v.price)}</span></div>`).join('')}</div>` : ''}
-    ${alg.length ? `<div class="wk-a" title="${esc(alg.map(a=>ALG[a]).join(', '))}">Allergene ${alg.join(' ')}</div>` : ''}
+    ${alg.length || ai.open ? `<div class="wk-a" title="${esc(alg.map(a=>ALG[a]).join(', ') + (ai.open ? (alg.length ? ' · ' : '') + 'Angabe unvollständig' : ''))}">Allergene ${alg.concat(ai.open ? [ALG_MARK] : []).join(' ')}</div>` : ''}
     ${vars.some(v=>v.top) ? '<div class="wk-sig">Empfehlung des Hauses</div>' : ''}
   </article>`;
 }
@@ -65,7 +65,7 @@ function guestHtmlWeb(seasonKey, dateStr, opts={}){
     if(parts) body += parts;
   }
   if(!body) body = '<p class="wk-empty">Keine Gerichte für diese Auswahl.</p>';
-  const legend = used.size ? `<div class="wk-leg">${[...used].sort().map(a=>`<span><b>${a}</b> ${esc(ALG[a])}</span>`).join('')}</div>` : '';
+  const legend = ([...used].some(a=>ALG[a]) ? `<div class="wk-leg">${[...used].filter(a=>ALG[a]).sort().map(a=>`<span><b>${a}</b> ${esc(ALG[a])}</span>`).join('')}</div>` : '') + (used.has(ALG_MARK) ? `<p class="wk-open">${esc(algOpenText())}</p>` : '');
   const cover = s.cover && IMG[s.cover] ? `<figure class="wk-cover"><img src="${IMG[s.cover]}" alt=""></figure>` : '';
   return `<div class="wk-paper" style="--wk-a:${esc(s.accent || HK_ACCENT[k])}">${cover}
     <div class="wk-frame">

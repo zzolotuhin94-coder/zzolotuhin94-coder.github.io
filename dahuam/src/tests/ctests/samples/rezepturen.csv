@@ -1,0 +1,51 @@
+﻿Rezeptur;Typ;Zutat;Menge;Einheit;Ausbeute;Portionen;Portionsgewicht;Gericht auf der Karte
+Rindsuppe;Basisrezept;Rindsknochen;3;kg;8000;;;
+Rindsuppe;Basisrezept;Suppengemüse;800;g;;;;
+Rindsuppe;Basisrezept;Zwiebel;400;g;;;;
+Rindsuppe;Basisrezept;Wasser;10;l;;;;
+Rindsuppe;Basisrezept;Salz;2;EL;;;;
+Rindsuppe;Basisrezept;Pfefferkörner;1;TL;;;;
+Palatschinkenteig;Basisrezept;Mehl glatt;400;g;1200;;;
+Palatschinkenteig;Basisrezept;Milch;750;ml;;;;
+Palatschinkenteig;Basisrezept;Ei M;4;Stk;;;;
+Palatschinkenteig;Basisrezept;Salz;1;Prise;;;;
+Palatschinkenteig;Basisrezept;Butter;40;g;;;;
+Frittatensuppe;Gericht;Rindsuppe;300;ml;;;330;
+Frittatensuppe;Gericht;Palatschinkenteig;60;g;;;;
+Frittatensuppe;Gericht;Schnittlauch;1;TL;;;;
+Eispalatschinke;Gericht;Palatschinkenteig;120;g;;;240;
+Eispalatschinke;Gericht;Vanilleeis;100;ml;;;;
+Eispalatschinke;Gericht;Schokosauce;30;g;;;;
+Schnitzel Schwein;Gericht;Schweinsschnitzel;180;g;;;420;Wiener Schnitzel vom Schwein
+Schnitzel Schwein;Gericht;Mehl glatt;15;g;;;;
+Schnitzel Schwein;Gericht;Ei M;0,5;Stk;;;;
+Schnitzel Schwein;Gericht;Semmelbrösel;40;g;;;;
+Schnitzel Schwein;Gericht;Butterschmalz;2;EL;;;;
+Schnitzel Schwein;Gericht;Erdäpfel;250;g;;;;
+Schnitzel Schwein;Gericht;Zitrone;0,25;Stk;;;;
+Schnitzel Schwein;Gericht;Salz;1;Prise;;;;
+Käsespätzle;Gericht;Mehl glatt;2;kg;;10;380;
+Käsespätzle;Gericht;Ei M;20;Stk;;;;
+Käsespätzle;Gericht;Bergkäse;1,5;kg;;;;
+Käsespätzle;Gericht;Zwiebel;1;kg;;;;
+Käsespätzle;Gericht;Butter;300;g;;;;
+Käsespätzle;Gericht;Salz;3;EL;;;;
+Bratensaft;Basisrezept;Kalbsfond;500;g;600;;;
+Bratensaft;Basisrezept;Zwiebel;100;g;;;;
+Kalbsfond;Basisrezept;Bratensaft;200;g;1000;;;
+Kalbsfond;Basisrezept;Wasser;1;l;;;;
+Gemüsecurry;Gericht;Kokosmilch;150;ml;;;400;
+Gemüsecurry;Gericht;Zwiebeln;50;g;;;;
+Gemüsecurry;Gericht;Basmatireis;80;g;;;;
+Gemüsecurry;Gericht;Limette;0,5;Stk;;;;
+Gemüsecurry;Gericht;Currypaste;;EL;;;;
+;;;5;g;;;;
+
+Rezeptur;Schritt
+Rindsuppe;Knochen kalt aufsetzen, aufkochen, abschäumen.
+Rindsuppe;Gemüse und angeröstete Zwiebel zugeben, 3 Stunden leise köcheln, abseihen.
+Palatschinkenteig;Alle Zutaten glatt rühren, 20 Minuten rasten lassen.
+Frittatensuppe;Teig dünn ausbacken, in feine Streifen schneiden.
+Frittatensuppe;Suppe aufkochen, Frittaten in den Teller, aufgießen, Schnittlauch darüber.
+Schnitzel Schwein;Fleisch klopfen, salzen, in Mehl, Ei und Bröseln panieren.
+Schnitzel Schwein;In Butterschmalz schwimmend goldbraun backen.

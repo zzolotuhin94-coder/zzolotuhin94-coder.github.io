@@ -27,12 +27,12 @@ const GONE = [
   L.ok(found.length === 0, `${GONE.length} Zeichenfolgen entfernter Funktionen kommen in der gebauten Datei nicht mehr vor`, found);
   const size = fs.statSync(SITE + 'index.html').size;
   console.log(`  Größe index.html: vorher ${before} Bytes, nachher ${size} Bytes (${before ? Math.round((1 - size / before) * 100) : '?'} % weniger)`);
-  L.ok(before && size < before * 0.9, 'die gebaute Datei ist mindestens 10 % kleiner als vor Paket B', {vorher:before, nachher:size});
+  L.ok(before && size < before, 'die gebaute Datei ist kleiner als vor Paket B (nach Paket B waren es über 10 %; Paket C bringt Import, Allergen-Blatt und zweiten Steuersatz dazu)', {vorher:before, nachher:size});
   // im laufenden Programm: keine der alten Seiten, keine alten Einstellungen
   const b = await L.launch(); const {p} = await L.open(b, {vp:{width:1440, height:900}});
   const rt = await p.evaluate(() => ({tabs:TABS.map(t => t[0]).join(), fn:['renderLabor','renderStempel','renderBegriffe','renderAufbau','gdRewards','missionGo','isSimple','vsw','matrixSvg','guideHere','checkRewards'].filter(n => { try { return typeof eval(n) !== 'undefined'; } catch(e){ return false; } }), cls:document.body.className, intro:!!document.getElementById('intro'), skDefs:!!document.getElementById('skDefs')}));
   L.ok(rt.fn.length === 0 && !/simple/.test(rt.cls) && !rt.intro && !rt.skDefs, 'im laufenden Programm gibt es keine der entfernten Funktionen', rt);
-  L.ok(rt.tabs === 'dash,vorb,checkl,menu,cards,stock,buy,products,pcheck,dienst,report,setup,einr', 'Seiten der App', rt.tabs);
+  L.ok(rt.tabs === 'dash,vorb,checkl,menu,cards,stock,buy,products,pcheck,dienst,report,setup,einr,daten', 'Seiten der App', rt.tabs);
   // auf keiner Seite: Kachelreihen, Karten-/Kompakt-Schalter, Lagerort-Marken in den Zeilen, Strich-Spalten
   const bad = []; for(const h of L.SCREENS){ await L.go(p, h); const r = await p.evaluate(() => ({tiles:document.querySelectorAll('#app .tiles, #app .tile').length, vsw:document.querySelectorAll('#app .vsw').length, note:document.querySelectorAll('#app .note, #app .wozu, #app .pl-demo').length, eyebrow:document.querySelectorAll('#app .page-h .eyebrow').length, reward:document.querySelectorAll('.reward,.gd-rw').length, txt:/Stempel|Rezept-Labor|Demodaten|Beispielpreis|Küchenchef|Inhaber/.test(document.querySelector('#app').innerText)}));
     if(r.tiles || r.vsw || r.note || r.eyebrow || r.reward || r.txt) bad.push(h + ' ' + JSON.stringify(r)); }
@@ -49,8 +49,8 @@ const GONE = [
   // Beispieldaten: eine Zeile, die zu den Einstellungen führt
   await L.go(p, 'heute'); const demo = await p.evaluate(() => ({side:document.querySelector('#demoSide').textContent, vis:!document.querySelector('#demoSide').hidden, n:[...document.querySelectorAll('.demo-line')].filter(e => e.getClientRects().length).length}));
   L.ok(demo.vis && /^Beispieldaten · eigene Daten$/.test(demo.side) && demo.n === 1, 'Beispieldaten: genau eine ruhige Zeile (Seitenleiste)', demo);
-  await p.click('#demoSide [data-act="goDemo"]'); await p.waitForTimeout(300); L.ok(await p.evaluate(() => view.tab === 'setup' && !!document.querySelector('#setupDemo') && !!document.querySelector('#app [data-act="demoEmpty"]')), 'die Zeile führt zu Einstellungen › Beispieldaten');
-  await p.click('#app [data-act="demoEmpty"]'); await p.waitForTimeout(250); await p.click('#dlgForm button[type="submit"], #dlgForm .btn.primary'); await p.waitForTimeout(600);
+  await p.click('#demoSide [data-act="goDemo"]'); await p.waitForTimeout(300); L.ok(await p.evaluate(() => view.tab === 'daten' && !!document.querySelector('#app [data-act="leerAsk"]')), 'die Zeile führt zu Einstellungen › Eigene Daten (Paket C)');
+  await p.click('#app [data-act="leerAsk"]'); await p.waitForTimeout(250); await p.click('#dlgForm button[type="submit"], #dlgForm .btn.primary'); await p.waitForTimeout(600);
   L.ok(await p.evaluate(() => !S.demo && S.menu.length === 0 && document.querySelector('#demoSide').hidden && !!STORE.st.safety), '„Leer starten“: leerer Betrieb, Zeile weg, Sicherheitskopie angelegt');
   for(const h of L.SCREENS) await L.go(p, h);
   await L.done(b, p.errs); })();

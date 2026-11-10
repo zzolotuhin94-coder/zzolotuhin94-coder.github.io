@@ -68,7 +68,7 @@ H('teller','Teller','Das Bild einer Rezeptur. Jedes Stück ist eine Zutat. Je gr
 H('kostenstruktur','Kostenstruktur','Welche Zutat wie viel vom Wareneinsatz ausmacht. Die teuerste steht oben. Dort lohnt sich das Sparen.',1);
 H('preissim','Preis-Simulator','Ein Regler zum Ausprobieren: Was bleibt übrig, wenn das Gericht mehr oder weniger kostet? Erst „Übernehmen“ ändert den Preis.',1);
 H('produktionsmenge','Produktionsmenge','Wie viel Ware Sie für eine bestimmte Zahl von Portionen brauchen. Praktisch fürs Vorbereiten.',1);
-H('allergene','Allergene','Die 14 Stoffe, die auf der Karte stehen müssen, mit Buchstaben von A bis R. Die App liest sie aus den Zutaten der Rezeptur.',1);
+H('allergene','Allergene','Die 14 Stoffe, die auf der Karte stehen müssen, mit Buchstaben von A bis R. Die App liest sie aus den Zutaten der Rezeptur. Fehlt die Angabe bei einem Artikel, gilt das Gericht als unvollständig und steht auf der Karte mit °.',1);
 H('saison','Saison','Winter, Frühling, Sommer, Herbst. Ein Gericht kann nur in bestimmten Saisonen auf der Karte stehen.',1);
 H('aktion','Aktion','Eine Karte für kurze Zeit: Wildwochen, Silvester, Ostern. Sie gilt nur an den Tagen, die Sie festlegen.',1);
 H('kategorie','Kategorie','Eine Überschrift auf der Speisekarte: Suppen, Hauptspeisen, Desserts.',1);
@@ -84,13 +84,13 @@ H('differenz','Differenz','Der Unterschied zwischen Soll und Ist in Euro. Minus 
 H('lieferschein','Lieferschein','Der Zettel, den der Fahrer mitbringt. Darauf steht, was geliefert wurde. Die Nummer tragen Sie beim Wareneingang ein.',1);
 H('reklamation','Reklamation','Etwas an der Lieferung stimmt nicht: zu wenig, falsche Ware, zu warm. Die App schreibt den Text für den Lieferanten.',1);
 H('umsatz','Umsatz netto','Was Sie eingenommen haben, ohne Mehrwertsteuer.',1);
-H('mwst','Mehrwertsteuer','Die Steuer im Preis. Auf Speisen sind es in Österreich 10 %. Die App rechnet den Wareneinsatz immer vom Preis ohne Steuer.',1);
+H('mwst','Mehrwertsteuer','Die Steuer im Preis. Auf Speisen sind es in Österreich 10 %, auf Getränke 20 %. Die App rechnet den Wareneinsatz immer vom Preis ohne Steuer.',1);
 H('portionen','Portionen','Wie oft ein Gericht verkauft wurde.',1);
 H('kassendatei','Kassendatei','Eine Liste aus Ihrer Kasse: welches Gericht wie oft verkauft wurde. Sie laden die Datei in der Auswertung.',1);
 H('zuordnung','Zuordnung','Die Kasse nennt ein Gericht oft anders als die App. Hier sagen Sie einmal, was zusammengehört.',1);
 H('sicherung','Sicherung','Eine Datei mit allen Daten der App. Aufheben, zum Beispiel auf einem USB-Stick. Damit holen Sie alles zurück.',1);
-H('demodaten','Beispieldaten','Daten zum Ausprobieren. Die Karte ist echt, Preise und Bestände sind erfunden. Sie ersetzen sie nach und nach.',1);
-H('preischeck','Preis-Check','Die App zeigt ein Produkt nach dem anderen. Sie tippen Ihren Einkaufspreis ein oder bestätigen den Richtwert.',1);
+H('demodaten','Beispieldaten','Daten zum Ausprobieren. Die Karte ist echt, Preise und Bestände sind erfunden. Sie ersetzen sie nach und nach, oder starten leer: Einstellungen, „Eigene Daten“.',1);
+H('preischeck','Preis-Check','Die App zeigt einen Artikel nach dem anderen. Sie tippen Ihren Einkaufspreis ein oder bestätigen den Richtwert.',1);
 
 /* Navigation und Rahmen */
 H('nav_dash','Heute', NAV_DESC.dash);
@@ -101,9 +101,9 @@ H('nav_ware','Ware', NAV_DESC.ware);
 H('nav_team','Team & Zahlen', NAV_DESC.team);
 H('nav_mehr','Mehr','Speisekarte, Ware, Team & Zahlen, Einstellungen und die Suche.');
 H('nav_setup','Einstellungen', NAV_DESC.setup);
-H('suche','Suchen','Tippen Sie ein Gericht, ein Produkt oder eine Aktion ein, zum Beispiel „Schwund“. Am Computer geht auch Strg und K.');
+H('suche','Suchen','Tippen Sie ein Gericht, einen Artikel oder eine Aktion ein, zum Beispiel „Schwund“. Am Computer geht auch Strg und K.');
 H('design','Hell oder dunkel','Schaltet die Farben um. Dunkel ist angenehm in einer dunklen Küche.');
-H('whoami','Wer arbeitet gerade?','Zeigt, wer angemeldet ist. Das Team sieht alles und hakt ab, ändern darf der Chef.');
+H('whoami','Wer arbeitet gerade?','Zeigt, wer angemeldet ist. Das Team sieht alles, hakt ab, nimmt Ware an und bucht Schwund. Alles andere ändert der Chef.');
 H('hilfe_schalter','Was ist das?','Der Hilfe-Schalter. Solange er an ist, erklärt die App alles, worauf Sie tippen. Es wird dabei nichts geändert.');
 H('hier','So geht’s hier','Drei, vier Sätze dazu, wie diese Seite geht.');
 H('zurueck','Zurück','Bringt Sie eine Ebene zurück zur Liste.');
@@ -134,7 +134,7 @@ H('reihenfolge','Reihenfolge','Am Griff ziehen: Das Gericht wandert in seiner Ka
 H('neu_rezept','Neue Rezeptur','Legt eine leere Rezeptur für ein Gericht an. Danach kommen die Zutaten auf den Teller.');
 H('neu_basis','Neues Basisrezept','Für alles, was Sie vorkochen: Fond, Teig, Dressing.');
 H('r_typ','Gerichte oder Basisrezepte','Gerichte gehen an den Gast. Basisrezepte kochen Sie vor und verwenden sie in Gerichten.');
-H('zutat_plus','Zutat dazu','Öffnet die Liste aller Produkte und Basisrezepte. Ein Tipp legt die Zutat auf den Teller.');
+H('zutat_plus','Zutat dazu','Öffnet die Liste aller Artikel und Basisrezepte. Ein Tipp legt die Zutat auf den Teller.');
 H('zutat_weg','Vom Teller nehmen','Nimmt diese Zutat aus der Rezeptur. Sie können es gleich danach rückgängig machen.');
 H('menge','Menge','Wie viel von dieser Zutat in eine Portion kommt. Zahl eintippen und Enter drücken.');
 H('schritt','Zubereitung','Schritt für Schritt aufschreiben, wie das Gericht gemacht wird. Jeder Schritt kann ein Foto haben.');
@@ -172,15 +172,15 @@ H('r_buchen','Einbuchen','Bucht die Lieferung ins Lager. Bei Fehlern schreibt di
 H('r_status','Zustand der Ware','In Ordnung, zu wenig, fehlt, beschädigt oder falscher Artikel. Alles außer „in Ordnung“ kommt in die Reklamation.');
 H('r_temp','Temperatur','Bei Kühlware die gemessene Temperatur bei der Übernahme. Wichtig für die Hygiene-Aufzeichnung.');
 
-/* Produkte */
-H('prod_neu','Neues Produkt','Legt eine neue Zutat an: Name, Einheit, Einkaufspreis, Lieferant.');
+/* Artikel */
+H('prod_neu','Neuer Artikel','Legt eine neue Zutat an: Name, Einheit, Einkaufspreis, Lieferant.');
 H('prod_preis','Einkaufspreis','Was Sie dem Lieferanten zahlen, ohne Steuer, je kg, Liter oder Stück. Eintippen und Enter drücken.');
 H('prod_ok','Richtwert bestätigen','Der Richtwert stimmt ungefähr? Dann bestätigen. Er gilt ab jetzt als Ihr Preis.');
 H('prod_alle_ok','Alle bestätigen','Bestätigt alle Richtwerte, die gerade in der Liste stehen. Nur tippen, wenn Sie die Preise angesehen haben.');
 H('prod_import','Preisliste importieren','Lädt eine Preisliste vom Lieferanten als Datei. Die App zeigt vorher, was sich ändert.');
-H('pc_start','Preis-Check starten','Die App zeigt ein Produkt nach dem anderen. Sie tippen Ihren Preis ein. Enter geht weiter.');
+H('pc_start','Preis-Check starten','Die App zeigt einen Artikel nach dem anderen. Sie tippen Ihren Preis ein. Enter geht weiter.');
 H('pc_ok','Richtwert stimmt','Der gezeigte Preis passt. Er wird als Ihr Preis übernommen.');
-H('pc_skip','Überspringen','Dieses Produkt jetzt nicht. Es kommt beim nächsten Preis-Check wieder.');
+H('pc_skip','Überspringen','Diesen Artikel jetzt nicht. Er kommt beim nächsten Preis-Check wieder.');
 H('pc_feld','Ihr Einkaufspreis','Netto, wie auf der Rechnung. Leer lassen, wenn der Richtwert stimmt.');
 H('prod_stand','Stand','Zeigt, ob der Preis noch ein Richtwert ist oder wann Sie ihn zuletzt bestätigt haben.');
 
@@ -199,7 +199,7 @@ H('rp_anteil','Anteil','Wie viel Prozent aller verkauften Portionen auf dieses G
 H('s_sicherung','Sicherung erstellen','Speichert alle Daten als Datei. Am besten einmal pro Woche.');
 H('s_laden','Sicherung laden','Holt Daten aus einer Sicherungsdatei zurück. Die jetzigen Daten werden dabei ersetzt.');
 H('s_reset','Beispieldaten wiederherstellen','Ersetzt alles durch die Beispieldaten. Ihre eigenen Eingaben sind danach weg.');
-H('s_rolle','Rolle wechseln','Stellt um, wer gerade arbeitet. Das Team sieht alles, hakt ab und bereitet Bestellungen vor. Ändern darf der Chef.');
+H('s_rolle','Rolle wechseln','Stellt um, wer gerade arbeitet. Das Team sieht alles, hakt ab, bereitet Bestellungen vor, nimmt Ware an, bucht Schwund und zählt bei der Inventur mit. Alles andere ändert der Chef.');
 H('station','Einrichtung','Sechs Schritte zeigen, wie viel von Ihrem Betrieb schon in der App steht. Die App rechnet das aus Ihren Daten.');
 H('schwund_wert','Schwund','Was im Zeitraum als Schwund gebucht wurde, je Artikel in Euro zum Einkaufspreis.');
 H('grundzutat','Kleinmengen','Salz, Gewürze, Öl und alles, wovon der Tag nur ein paar Gramm braucht. Auf der Prep-Liste stehen sie erst, wenn Sie „alle Zutaten zeigen“ tippen.');
@@ -255,7 +255,7 @@ const HOWTO = {
   dash:['Oben steht, was heute zu bestellen ist und welche Lieferung kommt.', 'Der Knopf rechts in jeder Zeile führt direkt hin.', 'Unter „Offen“ steht, was an der Karte noch fehlt.'],
   vorb:['Oben wählen Sie den Tag: heute, morgen oder später in der Woche.', 'Die Prep-Liste zeigt, was vorzukochen und herzurichten ist. Ein Tipp hakt ab.', 'Die Prognose darunter können Sie überschreiben, zum Beispiel bei einer Reservierung.', 'Fehlt Ware, legen Sie sie mit einem Tipp in die Bestellung.'],
   checkl:['Jeden Tag gibt es frische Listen. Tippen Sie auf eine Liste und dann auf jeden erledigten Punkt.', 'Manche Punkte brauchen eine Zahl, zum Beispiel die Temperatur im Kühlhaus.', 'Im Verlauf sehen Sie die letzten 14 Tage, auch als PDF.'],
-  menu:['Eine Zeile je Gericht: Preis, Wareneinsatz und was übrig bleibt.', 'Den Preis ändern Sie direkt in der Zeile.', 'Am Griff links ziehen Sie ein Gericht an eine andere Stelle seiner Kategorie.', '„Ohne Rezeptur“ und „Ohne Allergene“ zeigen, wo noch etwas fehlt.'],
+  menu:['Eine Zeile je Gericht: Preis, Wareneinsatz und was übrig bleibt.', 'Den Preis ändern Sie direkt in der Zeile.', 'Am Griff links ziehen Sie ein Gericht an eine andere Stelle seiner Kategorie.', '„Ohne Rezeptur“ und „Allergene offen“ zeigen, wo noch etwas fehlt.'],
   guest:['So sehen die Gäste die Karte. Es zählt der gewählte Tag: Saison, Wochentag, Aktionen.', 'Links wählen Sie den Stil und die Texte.', '„Als PDF speichern“ macht eine Datei zum Drucken oder Verschicken.'],
   plan:['Die vier Balken sind Ihre Saisonen. Ein Tipp ändert, von wann bis wann eine gilt.', 'Eine Aktion ist eine eigene kleine Karte für ein paar Tage, zum Beispiel Wildwochen.', 'Welches Gericht in welcher Saison gilt, stellen Sie beim Gericht ein.'],
   cards:['Gerichte gehen an den Gast. Basisrezepte kochen Sie vor: Fond, Teig, Dressing.', 'Ein Tipp auf eine Zeile öffnet die Rezeptur.', '„+ Rezeptur“ legt eine neue an.'],
@@ -272,5 +272,6 @@ const HOWTO = {
   dienst:['Jede Person hat eine Zeile, jeder Tag eine Spalte. Ein Tipp auf ein Feld trägt einen Dienst ein.', 'Ein Tipp auf einen Dienst öffnet ihn zum Ändern. Urlaub und Krank tragen Sie im selben Fenster ein.', '„Als PDF speichern“ macht eine Seite zum Aufhängen, „Text kopieren“ den Plan für WhatsApp.'],
   report:['Oben wählen Sie den Zeitraum. Die Pfeile gehen einen Schritt zurück oder vor.', 'Darunter: was eingenommen wurde, die Renner, die Ladenhüter und jedes Gericht einzeln.', '„Schwund“ zeigt, was im Zeitraum weggeworfen wurde, in Euro.', 'Die Zahlen kommen aus Ihrer Kasse: unter „Kasse importieren“ laden Sie die Datei.'],
   setup:['Oben: Name, Steuer und Ihr Ziel für den Wareneinsatz.', '„Sicherung erstellen“ speichert alle Daten als Datei. Machen Sie das einmal pro Woche.', 'Unter „Wer arbeitet gerade?“ stellen Sie zwischen Chef und Team um.'],
+  daten:['Sechs Schritte von den Beispielen zu Ihren eigenen Daten, in dieser Reihenfolge.', 'Jeder Import zeigt zuerst eine Vorschau: neu, aktualisiert, unverändert oder Fehler. Erst „Übernehmen“ ändert etwas.', 'Nach jedem Import gibt es „Rückgängig“. Dann ist alles wie vorher.', 'Zu jedem Import gibt es eine Vorlage zum Ausfüllen, als CSV und als Excel.'],
   einr:['Sechs Schritte, bis Ihr Betrieb ganz in der App steht.', 'Der Knopf rechts bringt Sie an die Stelle, an der es weitergeht.', 'Der Stand rechnet sich aus Ihren Daten. Sie müssen nichts abhaken.'],
 };

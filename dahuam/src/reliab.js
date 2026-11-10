@@ -16,7 +16,7 @@ migrate = function(d){
   return r;
 };
 /* Grundform prüfen: Listen müssen Listen sein, Verzeichnisse Verzeichnisse. Sonst gilt der Stand als unlesbar (Wiederherstellungs-Seite), statt später mitten in der Arbeit zu scheitern. */
-const REL_ARR = ['products', 'cards', 'menu', 'moves', 'inventories', 'specials', 'suppliers', 'orders', 'salesImports'];
+const REL_ARR = ['products', 'cards', 'menu', 'moves', 'inventories', 'specials', 'suppliers', 'orders', 'salesImports', 'imports'];
 const REL_OBJ = ['settings', 'salesDays', 'posMap', 'game', 'saleGroups', 'salesReal', 'salesUnmapped', 'plan', 'team', 'checks'];
 function relShapeOk(d){
   const obj = x => !!x && typeof x === 'object' && !Array.isArray(x);

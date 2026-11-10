@@ -80,7 +80,7 @@ r=await ro('card',()=>go('cards','dish_kaiser'));ok(/Chef/.test(r.note)&&r.inp==
 r=await ro('setup',()=>go('setup'));ok(/Chef/.test(r.note)&&r.inp===0&&r.btn===0,'team: Einstellungen, Beispieldaten, Sicherung laden gesperrt',r);
 ok(await ev(()=>!document.querySelector('#app [data-act=export]').disabled&&[...document.querySelectorAll('.who-b')].every(b=>!b.disabled)),'team: backup export and user switch stay available');
 await ev(()=>{menuDialog(S.menu[0])});ok(!(await ev(()=>$('#dlg').open))&&/nur der Chef/.test(await toastT()),'team: edit dialog via palette refused');
-await ev(()=>moveDlg('in:pork'));ok(!(await ev(()=>$('#dlg').open)),'team: Lager buchen (auch über die Suche) gesperrt');
+await ev(()=>moveDlg('out:pork'));ok(!(await ev(()=>$('#dlg').open)),'team: Entnahme buchen (auch über die Suche) gesperrt; Wareneingang und Schwund sind seit Paket C erlaubt');
 await ev(()=>go('setup'));await p.click('.who-b:has-text("Chef")');await p.waitForTimeout(250);r=await ro('menu',()=>go('menu'));ok(r.note===''&&r.price===r.nprice,'chef: everything editable again');
 ok(await ev(()=>{const o={supplier:'sup_wein',lines:[{n:1,price:10000}]};S.settings.currentUser='u_chef';const a=canSend(o);S.settings.currentUser='u_staff';const d=canSend(o);S.settings.currentUser='u_chef';return a&&!d}),'orders: Chef sendet jede, Team keine (kein Limit mehr)');
 // ---------- 18 cloud wording

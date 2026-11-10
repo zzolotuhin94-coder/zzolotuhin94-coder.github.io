@@ -46,6 +46,7 @@ function seed(){
   menuV2Migrate(d);
   salesEnsure(d); if(d.demo && !d.salesDemoDone) salesDemo(d);
   pricesMigrate(d);
+  vatMigrate(d); algMigrate(d); datenMigrate(d);
   gameMigrate(d);
   hausMigrate(d);
   fixesMigrate(d);
@@ -74,6 +75,7 @@ function migrate(d){
   menuV2Migrate(d);
   salesEnsure(d); if(d.demo && !d.salesDemoDone) salesDemo(d);
   pricesMigrate(d);
+  vatMigrate(d); algMigrate(d); datenMigrate(d);
   gameMigrate(d);
   hausMigrate(d);
   fixesMigrate(d);
@@ -165,7 +167,7 @@ const ICO = {
 const ico = (n, cls='') => `<svg class="ico ${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICO[n]}</svg>`;
 
 /* Seiten der App: [Schlüssel, Titel]. Die Navigation (nav.js) fasst sie zu sieben Bereichen zusammen. */
-const TABS = [['dash','Heute'],['vorb','Vorbereitung'],['checkl','Checklisten'],['menu','Speisekarte'],['cards','Rezepte'],['stock','Ware'],['buy','Ware'],['products','Ware'],['pcheck','Preis-Check'],['dienst','Team & Zahlen'],['report','Team & Zahlen'],['setup','Einstellungen'],['einr','Einrichtung']];
+const TABS = [['dash','Heute'],['vorb','Vorbereitung'],['checkl','Checklisten'],['menu','Speisekarte'],['cards','Rezepte'],['stock','Ware'],['buy','Ware'],['products','Ware'],['pcheck','Preis-Check'],['dienst','Team & Zahlen'],['report','Team & Zahlen'],['setup','Einstellungen'],['einr','Einrichtung'],['daten','Eigene Daten']];
 view = {tab:'dash', card:null, q:'', sec:'all', ctype:'all', pq:'', sim:null, portions:20, mtab:'calc', stab:'bestand', loc:'all', mtype:'all', order:null, more:{}};
 
 /* ---------- Bausteine ---------- */
@@ -187,7 +189,7 @@ function fmtDate(iso){ return new Date(iso).toLocaleDateString('de-AT',{day:'2-d
 /* ---------- Rahmen ---------- */
 function render(){
   const app = $('#app');
-  const fn = {dash:renderDash, menu:renderMenu, stock:renderStock, products:renderProducts, setup:renderSetup, buy:renderBuy, report:renderReport, einr:renderEinrichtung, pcheck:renderPriceCheck, vorb:renderVorb, dienst:renderDienst, checkl:renderCheckl}[view.tab];
+  const fn = {dash:renderDash, menu:renderMenu, stock:renderStock, products:renderProducts, setup:renderSetup, buy:renderBuy, report:renderReport, einr:renderEinrichtung, pcheck:renderPriceCheck, vorb:renderVorb, dienst:renderDienst, checkl:renderCheckl, daten:renderDaten}[view.tab];
   app.innerHTML = fn ? fn() : (view.card && C(view.card) ? renderCard(C(view.card)) : renderCards());
   app.dataset.view = view.tab;
   app.classList.remove('enter'); void app.offsetWidth; app.classList.add('enter');
@@ -210,11 +212,11 @@ function autosize(el){ (el ? [el] : document.querySelectorAll('#app .title-in, #
 function refOptions(sel, selfId){
   const ps = [...S.products].sort(byName);
   const cs = S.cards.filter(c => c.type==='semi' && c.id!==selfId).sort(byName);
-  return `<option value="">— Zutat wählen —</option><optgroup label="Produkte">${ps.map(p=>`<option value="p:${p.id}" ${sel==='p:'+p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</optgroup>`
+  return `<option value="">— Zutat wählen —</option><optgroup label="Artikel">${ps.map(p=>`<option value="p:${p.id}" ${sel==='p:'+p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</optgroup>`
     + (cs.length ? `<optgroup label="Basisrezepte">${cs.map(c=>`<option value="c:${c.id}" ${sel==='c:'+c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</optgroup>` : '');
 }
-function simHtml(cost, price){
-  const np = price/(1+S.settings.vat/100), fc = np ? cost/np*100 : null;
+function simHtml(cost, price, rate){
+  const np = price/(1+(rate == null ? S.settings.vat : rate)/100), fc = np ? cost/np*100 : null;
   return `<div class="sim-out"><div class="fcw">${ring(fc,52,6)}<span><b class="mono big2">${pct(fc)}</b><small>Wareneinsatz</small></span></div>
     <div class="kv"><span>Rohertrag exkl. MwSt.</span><span>${eur(np-cost)}</span><span>Aufschlagsfaktor</span><span>${cost?num(np/cost,2)+'×':'—'}</span></div></div>`;
 }
@@ -231,7 +233,7 @@ function renderCard(c){
   const m0 = menus[0], k0 = m0 ? menuCalc(m0) : null;
   const cats = [...new Set([...secList(), ...S.cards.map(x=>x.category)].filter(Boolean))];
   const usedIn = usage('c:'+c.id);
-  const vat = 1 + S.settings.vat/100;
+  const rate = vatRate(m0 || {section:c.category}); const vat = 1 + rate/100;
   const rec = t.cost / (S.settings.target/100) * vat;
   const parts = t.lines.map(l=>({n:l.name, v:l.cost})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
   const top = parts.slice(0,5), rest = parts.slice(5).reduce((s,x)=>s+x.v,0), sum = t.cost || 1;
@@ -290,7 +292,7 @@ function renderCard(c){
           <tbody>${rows || `<tr><td colspan="6" class="muted">Erste Zutat hinzufügen.</td></tr>`}</tbody>
           <tfoot><tr><td>Summe</td><td class="r mono">${num(t.gross)} g</td><td class="r mono">${num(t.net)}</td><td class="r mono">${num(t.out)}</td><td class="r mono">${eur(t.cost)}</td><td></td></tr></tfoot>
         </table></div>
-        <div class="panel-f"><button type="button" class="btn" data-act="addLine">${ico('plus')}Zutat</button><span class="hint">Netto ergibt sich aus dem Putzverlust. Eigenen Wert einfach überschreiben.</span></div>
+        <div class="panel-f"><button type="button" class="btn" data-act="addLine">${ico('plus')}Zutat</button><button type="button" class="btn" data-act="recPaste" data-id="${c.id}">Rezeptur einfügen</button><span class="hint">Netto ergibt sich aus dem Putzverlust. Eigenen Wert einfach überschreiben.</span></div>
       </section>
       <section class="panel">
         <div class="panel-h"><h2>Zubereitung</h2><span class="muted sm">${steps.length} Schritte</span></div>
@@ -300,11 +302,11 @@ function renderCard(c){
     </div>
     <div class="col">
       ${c.type==='dish' ? `<section class="panel accent">
-        <div class="panel-h"><h2>Preis-Simulator</h2><span class="muted sm">inkl. ${num(S.settings.vat)} % MwSt.</span></div>
+        <div class="panel-h"><h2>Preis-Simulator</h2><span class="muted sm">inkl. ${num(rate)} % MwSt.</span></div>
         <div class="sim-price"><b class="mono" id="simVal">${eur(view.sim.price)}</b>${m0?`<button type="button" class="btn sm" data-act="applySim" data-id="${m0.id}" id="simApply" ${Math.abs(view.sim.price-m0.price)<0.05?'hidden':''}>Übernehmen</button>`:''}</div>
         <input id="sim" type="range" min="${smin}" max="${smax}" step="0.1" value="${view.sim.price}" aria-label="Verkaufspreis">
         <div class="range-l"><span>${eur(smin)}</span><span>${eur(smax)}</span></div>
-        <div id="simOut">${simHtml(t.cost, +view.sim.price)}</div>
+        <div id="simOut">${simHtml(t.cost, +view.sim.price, rate)}</div>
         <p class="hint">Für ${num(S.settings.target)} % Wareneinsatz: <button type="button" class="link" data-act="simTo" data-id="${(Math.round(rec*10)/10).toFixed(1)}">${eur(Math.round(rec*10)/10)}</button></p>
       </section>` : ''}
       <section class="panel">
@@ -318,7 +320,9 @@ function renderCard(c){
       </section>
       <section class="panel">
         <div class="panel-h"><h2>Allergene</h2><span class="muted sm">EU-VO 1169/2011</span></div>
-        ${t.alg.size ? `<div class="alg-big">${[...t.alg].sort().map(a=>`<span><b>${esc(a)}</b>${esc(ALG[a]||a)}</span>`).join('')}</div>` : '<p class="hint">Keine gefunden. Bitte die Produktdaten prüfen.</p>'}
+        ${(() => { const ai = algInfo({card:c.id}); const big = ai.letters.length ? `<div class="alg-big">${ai.letters.map(a=>`<span><b>${esc(a)}</b>${esc(ALG[a]||a)}</span>`).join('')}</div>` : '';
+          if(ai.state !== 'open') return big || '<p class="hint" style="margin-top:0">Keine Allergene. Alle Zutaten sind geprüft.</p>';
+          return big + `<p class="hint alg-inc" style="margin-top:${big ? '10px' : '0'}"><b>Allergene unvollständig.</b> ${ai.open.length ? `Bei ${plural(ai.open.length, 'Artikel', 'Artikeln')} fehlt die Angabe: ${ai.open.slice(0,6).map(p=>`<button type="button" class="link" data-act="pAlg" data-id="${p.id}">${esc(p.name)}</button>`).join(', ')}${ai.open.length > 6 ? ' …' : ''}.` : ''} ${esc(ai.gaps.map(g => g.charAt(0).toUpperCase() + g.slice(1) + '.').join(' '))}</p>`; })()}
       </section>
       ${c.type==='semi' ? `<section class="panel"><div class="panel-h"><h2>Verwendet in</h2></div>
         ${usedIn.length ? `<ul class="todo">${usedIn.map(u=>`<li><button type="button" data-act="openCard" data-id="${u.id}"><span>${esc(u.name)}</span>${ico('arrow','flip')}</button></li>`).join('')}</ul>` : '<p class="hint">Noch in keiner Rezeptur verwendet.</p>'}
@@ -433,7 +437,7 @@ function invUpdate(pid){
 /* ---------- Dialoge ---------- */
 function openDialog(title, body, onOk, opts={}){
   const f = $('#dlgForm'), d = $('#dlg');
-  f.oninput = null; f.onclick = null; delete f.dataset.force;
+  f.oninput = null; f.onclick = null; delete f.dataset.force; delete f.dataset.wide;
   f.innerHTML = `<div class="dlg-h"><h3>${esc(title)}</h3><button type="button" class="icon-btn" id="dlgX" aria-label="Schließen">${ico('x')}</button></div>${body}<div class="dlg-actions">${opts.del?'<button type="button" class="btn danger" id="dlgDel">Löschen</button>':''}<span class="sp"></span><button type="button" class="btn" id="dlgCancel">${opts.cancel||'Abbrechen'}</button>${onOk?`<button type="submit" class="btn primary">${opts.ok||'Speichern'}</button>`:''}</div>`;
   f.onsubmit = e => { e.preventDefault();
     // Zahlenfelder: Komma oder Punkt, nie negativ; erst prüfen, dann für den Handler normalisieren
@@ -471,7 +475,7 @@ function ask(text, yes, ok='Löschen'){ openDialog('Bitte bestätigen', `<p clas
 function info(title, text){ openDialog(title, `<p class="dlg-p">${esc(text)}</p>`, null, {cancel:'OK'}); }
 
 function menuDialog(m, prefill){
-  const isNew = !m; m = m || {id:uid('m'), section:'', name:'', desc:'', price:'', card:'', img:'', veg:'', top:false, hidden:false, seasons:[], days:[], alg:'', ...(prefill||{})};
+  const isNew = !m; m = m || {id:uid('m'), section:'', name:'', desc:'', price:'', card:'', img:'', veg:'', top:false, hidden:false, seasons:[], days:[], alg:'', algNone:false, vat:'', ...(prefill||{})};
   if(isNew && !m.section && secList().includes(view.sec)) m.section = view.sec;
   let img = m.img;
   const opts = S.cards.filter(c=>c.type==='dish').sort(byName);
@@ -483,6 +487,7 @@ function menuDialog(m, prefill){
     <div class="fields">
       <label class="f">Kategorie<select name="section" required>${secList().map(s=>`<option ${m.section===s?'selected':''}>${esc(s)}</option>`).join('')}</select></label>
       <label class="f">Preis inkl. MwSt., €<input name="price" class="num-in" type="text" inputmode="decimal" required value="${m.price===''?'':num2(m.price)}"></label>
+      <label class="f">Steuersatz<select name="vat"><option value="">wie die Kategorie</option><option value="s" ${m.vat==='s'?'selected':''}>Speisen · ${num(+S.settings.vat||0,1)} %</option><option value="g" ${m.vat==='g'?'selected':''}>Getränke · ${num(+vatRate({vat:'g'})||0,1)} %</option></select></label>
     </div>
     <label class="f">Rezeptur<select name="card"><option value="">— nicht verknüpft —</option>${opts.map(c=>`<option value="${c.id}" ${m.card===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label>
     <div class="togs">
@@ -492,22 +497,23 @@ function menuDialog(m, prefill){
     </div>
     <div class="f">Saison</div><div class="algs seasons">${SEASONS.map(([k,l])=>`<label class="algc"><input type="checkbox" name="sea" value="${k}" ${!m.seasons.length||m.seasons.includes(k)?'checked':''}><span>${l}</span></label>`).join('')}</div>
     <div class="f">Wochentage</div><div class="days">${DAYS.map(([i,l])=>`<label class="algc"><input type="checkbox" name="day" value="${i}" ${!m.days.length||m.days.includes(i)?'checked':''}><span>${l}</span></label>`).join('')}</div>
-    <details class="alg-det" ${!m.card && !algList(m.alg).length ? 'open' : ''}><summary>Allergene von Hand (wenn keine Rezeptur verknüpft ist)</summary><div class="algs">${Object.entries(ALG).map(([k,v])=>`<label class="algc"><input type="checkbox" name="alg" value="${k}" ${algList(m.alg).includes(k)?'checked':''}><span><b>${k}</b>${esc(v)}</span></label>`).join('')}</div></details>
+    <details class="alg-det" ${!m.card ? 'open' : ''}><summary>Allergene von Hand (gilt, solange keine Rezeptur verknüpft ist)</summary>${algControlHtml(algClean(m.alg), algClean(m.alg).length ? 'has' : m.algNone ? 'none' : 'open', {legend:'Allergene laut eigener Prüfung', note: algStampText(m) ? esc(algStampText(m)) : 'Mit Rezeptur rechnet die App die Allergene aus den Zutaten. Ohne Rezeptur gilt, was Sie hier eintragen; die App vermerkt Datum und Namen.'})}</details>
     <div class="togs"><label class="tog"><input type="checkbox" name="top" ${m.top?'checked':''}><span></span>Empfehlung des Hauses</label>
       <label class="tog"><input type="checkbox" name="show" ${m.hidden?'':'checked'}><span></span>Auf der Gästekarte zeigen</label></div>`,
-    fd => { const sec = fd.get('section'); if(isNew || sec !== m.section) m.order = nextOrder(sec);
+    fd => { const ar = algControlRead(fd); if(!ar){ const dt = $('#dlgForm .alg-det'); if(dt) dt.open = true; return false; }
+      const sec = fd.get('section'); if(isNew || sec !== m.section) m.order = nextOrder(sec);
       if(m.img && m.img !== img) imgDel(m.img);
-      Object.assign(m, {section:sec, name:fd.get('name').trim(), desc:fd.get('desc').trim(), price:+fd.get('price'), card:fd.get('card'), img, veg:fd.get('veg')||'', top:!!fd.get('top'), hidden:!fd.get('show'), seasons: fd.getAll('sea').length===4 ? [] : fd.getAll('sea'), days: fd.getAll('day').length===7 ? [] : fd.getAll('day').map(Number), alg: fd.getAll('alg').join(' ')}); if(isNew) S.menu.push(m); },
+      if(ar.alg !== algClean(m.alg).join(' ') || ar.algNone !== !!m.algNone){ if(ar.alg || ar.algNone){ m.algAt = todayStr(); m.algBy = me().name; } else { m.algAt = ''; m.algBy = ''; } }
+      Object.assign(m, {section:sec, name:fd.get('name').trim(), desc:fd.get('desc').trim(), price:+fd.get('price'), card:fd.get('card'), img, veg:fd.get('veg')||'', top:!!fd.get('top'), hidden:!fd.get('show'), seasons: fd.getAll('sea').length===4 ? [] : fd.getAll('sea'), days: fd.getAll('day').length===7 ? [] : fd.getAll('day').map(Number), alg: ar.alg, algNone: ar.algNone, vat: fd.get('vat') || ''}); if(isNew) S.menu.push(m); },
     {done: isNew ? ()=>`„${m.name}“ steht jetzt unter ${m.section}` : 'Gespeichert',
      del: isNew ? null : () => ask(`„${m.name}“ von der Speisekarte löschen? Die Rezeptur bleibt erhalten.`, () => { imgDel(m.img); S.menu = S.menu.filter(x=>x!==m); }),
-     after: f => { const bind = () => { $('#dlgPhoto').onclick = () => pickImage(data => { const id = uid('img'); imgPut(id, data); img = id; $('#dlgThumb').innerHTML = thumb(); }); const del = $('#dlgPhotoDel'); if(del) del.onclick = () => { img = ''; $('#dlgThumb').innerHTML = thumb(); }; }; bind(); }});
+     after: f => { const bind = () => { $('#dlgPhoto').onclick = () => pickImage(data => { const id = uid('img'); imgPut(id, data); img = id; $('#dlgThumb').innerHTML = thumb(); }); const del = $('#dlgPhotoDel'); if(del) del.onclick = () => { img = ''; $('#dlgThumb').innerHTML = thumb(); }; }; bind(); algControlBind(f); }});
 }
 
 function prodDialog(p){
-  const isNew = !p; p = p || {id:uid('p'), name:'', unit:'kg', price:'', lossCold:0, lossHot:0, alg:'', pieceG:'', stock:0, minStock:0, loc:'L', supplier:''};
-  const has = new Set(algList(p.alg));
+  const isNew = !p; p = p || {id:uid('p'), name:'', unit:'kg', price:'', lossCold:0, lossHot:0, alg:'', algNone:false, pieceG:'', stock:0, minStock:0, loc:'L', supplier:''};
   const sups = [...new Set(S.products.map(x=>x.supplier).filter(Boolean))];
-  openDialog(isNew ? 'Neues Produkt' : 'Produkt bearbeiten', `
+  openDialog(isNew ? 'Neuer Artikel' : 'Artikel bearbeiten', `
     <label class="f">Bezeichnung<input name="name" required value="${esc(p.name)}"></label>
     <div class="fields">
       <label class="f">Einheit<select name="unit">${['kg','l','Stk'].map(u=>`<option ${p.unit===u?'selected':''}>${u}</option>`).join('')}</select></label>
@@ -525,12 +531,11 @@ function prodDialog(p){
       <label class="f">Mindestbestand<input name="minStock" class="num-in" type="text" inputmode="decimal" value="${numIn(p.minStock)}"></label>
       ${isNew?`<label class="f">Anfangsbestand<input name="stock" class="num-in" type="text" inputmode="decimal" value="0"></label>`:''}
     </div>
-    <div class="f">Allergene</div>
-    <div class="algs">${Object.entries(ALG).map(([k,v])=>`<label class="algc"><input type="checkbox" name="alg" value="${k}" ${has.has(k)?'checked':''}><span><b>${k}</b>${esc(v)}</span></label>`).join('')}</div>
+    ${algControlHtml(algClean(p.alg), prodAlgState(p), {note:'„Keine Allergene“ ist eine bestätigte Angabe. „Noch nicht geprüft“ bleibt auf der Karte sichtbar offen.'})}
     <div class="togs"><label class="tog"><input type="checkbox" name="basic" ${p.basic===true?'checked':''}><span></span>Grundzutat wie Salz, Gewürze, Öl: steht nicht auf der Prep-Liste</label></div>`,
-    fd => { if(+fd.get('price') !== +p.price) markPrice(p, 'manuell'); Object.assign(p, {name:fd.get('name').trim(), unit:fd.get('unit'), price:+fd.get('price'), pieceG:fd.get('pieceG'), lossCold:+fd.get('lossCold')||0, lossHot:+fd.get('lossHot')||0, alg:fd.getAll('alg').join(' '), basic: fd.get('basic') ? true : (p.basic === true ? false : p.basic), loc:fd.get('loc'), supplier:fd.get('supplier'), artNo:fd.get('artNo').trim(), pack:fd.get('pack').trim(), packQty:+fd.get('packQty')||0, minStock:+fd.get('minStock')||0});
+    fd => { const ar = algControlRead(fd); if(!ar) return false; if(+fd.get('price') !== +p.price) markPrice(p, 'manuell'); Object.assign(p, {name:fd.get('name').trim(), unit:fd.get('unit'), price:+fd.get('price'), pieceG:fd.get('pieceG'), lossCold:+fd.get('lossCold')||0, lossHot:+fd.get('lossHot')||0, alg:ar.alg, algNone:ar.algNone, basic: fd.get('basic') ? true : (p.basic === true ? false : p.basic), loc:fd.get('loc'), supplier:fd.get('supplier'), artNo:fd.get('artNo').trim(), pack:fd.get('pack').trim(), packQty:+fd.get('packQty')||0, minStock:+fd.get('minStock')||0});
       if(isNew){ p.stock = 0; S.products.push(p); const s = +fd.get('stock')||0; if(s) addMove('in', p.id, s, 'Anfangsbestand'); } },
-    {del: isNew ? null : () => { const u = usage('p:'+p.id); if(u.length) return info('Produkt wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(c=>c.name).join(', ')}. Entfernen Sie es dort zuerst.`); ask(`Produkt „${p.name}“ löschen?`, () => { S.products = S.products.filter(x=>x!==p); }); }});
+    {del: isNew ? null : () => { const u = usage('p:'+p.id); if(u.length) return info('Artikel wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(c=>c.name).join(', ')}. Entfernen Sie es dort zuerst.`); ask(`Artikel „${p.name}“ löschen?`, () => { S.products = S.products.filter(x=>x!==p); }); }, after: f => algControlBind(f)});
 }
 
 function moveDlg(arg){
@@ -542,17 +547,17 @@ function moveDlg(arg){
     <label class="f">Artikel<select name="pid" id="mvPid" required>${p0?'':'<option value="">— wählen —</option>'}${prods.map(p=>`<option value="${p.id}" ${p0&&p0.id===p.id?'selected':''}>${esc(p.name)} · ${qtyFmt(+p.stock||0,p)}</option>`).join('')}</select></label>
     <div class="fields">
       <label class="f">Menge in <span id="mvUnit">${p0?esc(p0.unit):'Einheit'}</span><input name="qty" class="num-in" type="text" inputmode="decimal" required autocomplete="off" autofocus></label>
-      ${type==='in'?`<label class="f">Preis je Einheit, €<input name="price" id="mvPrice" class="num-in" type="text" inputmode="decimal" autocomplete="off" value="${p0?num2(p0.price):''}"></label>`:''}
+      ${type==='in' && canEditAll()?`<label class="f">Preis je Einheit, €<input name="price" id="mvPrice" class="num-in" type="text" inputmode="decimal" autocomplete="off" value="${p0?num2(p0.price):''}"></label>`:''}
       <label class="f">Datum<input name="date" type="date" max="${addDays(todayStr(),1)}" value="${todayStr()}"></label>
     </div>
     ${type==='waste'?`<label class="f">Grund<select name="note">${WASTE.map(w=>`<option>${w}</option>`).join('')}</select></label>`:`<label class="f">${type==='in'?'Lieferschein / Notiz':'Notiz'}<input name="note" placeholder="${type==='in'?'z. B. Lieferschein 2240':'z. B. für Mise en place'}"></label>`}
-    ${type==='in'?`<div class="togs"><label class="tog"><input type="checkbox" name="upd" checked><span></span>Preis in die Kalkulation übernehmen (gleitender Durchschnitt)</label></div>`:''}
+    ${type==='in' && canEditAll()?`<div class="togs"><label class="tog"><input type="checkbox" name="upd" checked><span></span>Preis in die Kalkulation übernehmen (gleitender Durchschnitt)</label></div>`:''}
     <div id="mvWarn"></div>`,
     (fd, f) => { const p = P(fd.get('pid')); const q = +fd.get('qty'); if(!p) return false;
       if(!(q > 0)) return dlgErr('qty', 'Bitte eine Menge größer als 0 eingeben.');
       if(dateTooFar(fd.get('date'))) return dlgErr('date', 'Das Datum liegt in der Zukunft. Buchungen sind höchstens für morgen möglich.');
       const date = fd.get('date') ? new Date(fd.get('date')+'T12:00:00').toISOString() : null;
-      if(type==='in'){ const old = p.price; const pr = fd.get('price')==='' ? p.price : +fd.get('price'); if(fd.get('upd') && pr !== p.price){ const s0 = Math.max(0, +p.stock||0); p.price = Math.round((s0*p.price + q*pr)/(s0+q)*100)/100; } addMove('in', p.id, q, fd.get('note'), pr, date); if(old !== p.price) S.moves[0].prevPrice = old; }
+      if(type==='in'){ const old = p.price; const pr = fd.get('price')==='' || fd.get('price') == null ? p.price : +fd.get('price'); if(fd.get('upd') && pr !== p.price){ const s0 = Math.max(0, +p.stock||0); p.price = Math.round((s0*p.price + q*pr)/(s0+q)*100)/100; } addMove('in', p.id, q, fd.get('note'), pr, date); if(old !== p.price) S.moves[0].prevPrice = old; }
       else { const st = +p.stock||0; const key = p.id+':'+q;
         if(q > st + 1e-9 && f.dataset.force !== key){
           $('#mvWarn').innerHTML = `<div class="warn-box dlg-warn" role="alert">${ico('spark')}<span><b>Mehr als der Bestand.</b> Im Lager sind ${esc(qtyFmt(st,p))}, gebucht würden ${esc(qtyFmt(q,p))}. Der Bestand ginge auf ${esc(qtyFmt(st-q,p))}. Bitte Menge prüfen oder zuerst den Wareneingang buchen.</span><button type="button" class="btn sm" id="mvForce">Trotzdem buchen</button></div>`;
@@ -633,7 +638,7 @@ function printCard(id){
     <tbody>${c.items.map((it,i)=>{const l=t.lines[i];return `<tr><td>${i+1}</td><td>${esc(l.name)}</td><td class="r">${num(+it.qty,2)}</td><td>${l.unit}</td><td class="r">${num(l.net,1)}</td><td class="r">${num(l.out,1)}</td><td class="r">${num(l.cost,2)}</td></tr>`}).join('')}</tbody>
     <tfoot><tr><td></td><td>Summe</td><td class="r">${num(t.gross)}</td><td></td><td class="r">${num(t.net)}</td><td class="r">${num(t.out)}</td><td class="r">${num(t.cost,2)}</td></tr></tfoot></table>
     <h2>Zubereitung</h2><ol class="pr-steps">${(c.steps||[]).map(s=>`<li>${esc(s.t)}${s.img&&IMG[s.img]?`<br><img src="${IMG[s.img]}" alt="">`:''}</li>`).join('')}</ol>
-    <p><b>Allergene:</b> ${[...t.alg].sort().map(a=>`${a} (${ALG[a]||''})`).join(', ') || 'keine'}</p>
+    <p><b>Allergene:</b> ${(() => { const ai = algInfo({card:c.id}); return (ai.letters.map(a=>`${a} (${ALG[a]||''})`).join(', ') || (ai.state === 'open' ? '' : 'keine')) + (ai.state === 'open' ? (ai.letters.length ? ' · ' : '') + 'Angabe unvollständig, bitte nachfragen' : ''); })()}</p>
     <div class="sign"><span>Küche ____________</span><span>Kalkulation ____________</span></div>`;
   document.body.classList.remove('print-menu'); window.print();
 }
@@ -683,11 +688,11 @@ function palData(){
     {g:'Aktion', n:'Schwund buchen', s:'', run:()=>moveDlg('waste')},
     {g:'Aktion', n:'Neues Gericht auf die Speisekarte', s:'', run:()=>menuDialog()},
     {g:'Aktion', n:'Neue Rezeptur anlegen', s:'', run:()=>newCard('dish')},
-    {g:'Aktion', n:'Neues Produkt anlegen', s:'', run:()=>prodDialog()},
+    {g:'Aktion', n:'Neuen Artikel anlegen', s:'', run:()=>prodDialog()},
     {g:'Aktion', n:'Preis-Check starten', s:'Richtwerte durch Ihre Preise ersetzen', run:()=>pcStart()},
     ...S.menu.map(m=>({g:'Speisekarte', n:dishLabel(m), s:eur(m.price)+' · '+m.section, run:()=> m.card ? go('cards', m.card) : menuDialog(m)})),
     ...S.cards.map(c=>({g:'Rezeptur', n:c.name, s:(c.type==='semi'?'Basisrezept':'Gericht')+' · Nr. '+c.no, run:()=>go('cards', c.id)})),
-    ...S.products.map(p=>({g:'Produkt', n:p.name, s:p.noStock?eur(p.price):qtyFmt(+p.stock||0,p)+' auf Lager', run:()=>prodDialog(p)})),
+    ...S.products.map(p=>({g:'Artikel', n:p.name, s:p.noStock?eur(p.price):qtyFmt(+p.stock||0,p)+' auf Lager', run:()=>prodDialog(p)})),
   ];
 }
 function palOpen(){ $('#pal').hidden = false; const i = $('#palIn'); i.value = ''; palFilter(''); i.focus(); }
@@ -706,7 +711,7 @@ function palDraw(){
 /* ---------- Navigation ---------- */
 function go(tab, card=null){
   tab = tabResolve(tab);
-  view = {...view, tab, card, q: tab===view.tab ? view.q : '', pq: tab===view.tab ? view.pq : ''};
+  view = {...view, tab, card, q: tab===view.tab ? view.q : '', pq: tab===view.tab ? view.pq : '', daten: tab === 'daten' ? view.daten : null};
   if(card) view.sim = null;
   render(); hashSync(); window.scrollTo({top:0});
 }
@@ -738,7 +743,7 @@ document.addEventListener('click', e => {
     case 'newMenu': menuDialog(); break;
     case 'editMenu': menuDialog(S.menu.find(m=>m.id===id)); break;
     case 'photoMenu': setPhoto(S.menu.find(m=>m.id===id)); break;
-    case 'toMenu': { const cc = C(id); const t = totals(cc); const rec = t.cost/(S.settings.target/100)*(1+S.settings.vat/100); const sec = secList().includes(cc.category) ? cc.category : secList().includes(SEC_MAP[cc.category]) ? SEC_MAP[cc.category] : secList()[0];
+    case 'toMenu': { const cc = C(id); const t = totals(cc); const sec = secList().includes(cc.category) ? cc.category : secList().includes(SEC_MAP[cc.category]) ? SEC_MAP[cc.category] : secList()[0]; const rec = t.cost/(S.settings.target/100)*(1+vatRate({section:sec})/100);
       menuDialog(null, {name:cc.name, section:sec, card:cc.id, price: Math.max(0.9, Math.ceil(rec) - 0.1).toFixed(2)}); break; }
     case 'openCard': go('cards', id); break;
     case 'backCards': go('cards'); break;
@@ -791,7 +796,7 @@ document.addEventListener('input', e => {
   }
   if(t.id === 'sim'){
     const c = C(view.card); view.sim.price = +t.value;
-    $('#simVal').textContent = eur(+t.value); $('#simOut').innerHTML = simHtml(totals(c).cost, +t.value);
+    $('#simVal').textContent = eur(+t.value); $('#simOut').innerHTML = simHtml(totals(c).cost, +t.value, vatRate(S.menu.find(x=>x.card===c.id) || {section:c.category}));
     const ap = $('#simApply'); if(ap){ const m = S.menu.find(x=>x.card===c.id); ap.hidden = Math.abs(+t.value - +m.price) < 0.05; }
   }
   if(t.id === 'portions'){ view.portions = Math.max(1, +t.value||1); $('#prodOut').innerHTML = prodHtml(C(view.card), view.portions); }
@@ -828,12 +833,12 @@ document.addEventListener('change', e => {
   if(t.dataset.gf){ S.settings.guest[t.dataset.gf] = t.checked; save(); $('.guest-prev').innerHTML = guestHtml(); return; }
   if(t.dataset.secname != null){ const i = +t.dataset.secname, old = S.settings.sections[i], nv = t.value.trim(); if(!nv || nv===old){ t.value = old; return; }
     if(S.settings.sections.includes(nv)){ t.value = old; toast('Diese Kategorie gibt es schon'); return; }
-    S.settings.sections[i] = nv; S.menu.forEach(m=>{ if(m.section===old) m.section = nv; }); S.cards.forEach(x=>{ if(x.category===old) x.category = nv; }); if(view.sec===old) view.sec = nv; save(); render(); toast('Kategorie umbenannt'); return; }
+    S.settings.sections[i] = nv; { const sv = S.settings.secVat || (S.settings.secVat = {}); if(sv[old]){ sv[nv] = sv[old]; delete sv[old]; } } S.menu.forEach(m=>{ if(m.section===old) m.section = nv; }); S.cards.forEach(x=>{ if(x.category===old) x.category = nv; }); if(view.sec===old) view.sec = nv; save(); render(); toast('Kategorie umbenannt'); return; }
   if(t.id === 'importFile' && t.files[0]){
     const r = new FileReader(); const fname = t.files[0].name;
     r.onload = () => { let d; try { d = JSON.parse(r.result); if(!d || typeof d !== 'object' || !Array.isArray(d.products) || !Array.isArray(d.cards) || !Array.isArray(d.menu)) throw 0; } catch(err){ info('Laden fehlgeschlagen', 'Die Datei ist keine Sicherung dieser App. Wählen Sie eine .json-Datei, die mit „Sicherung erstellen“ gespeichert wurde.'); return; }
       if(schemaNewer(d)){ info('Sicherung ist neuer als die App', 'Diese Sicherung stammt aus einer neueren Version der App und kann hier nicht geladen werden. Bitte die App neu laden, damit sie aktuell ist, und dann noch einmal versuchen. Es wurde nichts geändert.'); return; }
-      openDialog('Sicherung laden?', `<p class="dlg-p">Die Datei <b>${esc(fname)}</b> enthält ${plural(d.menu.length,'Gericht','Gerichte')}, ${plural(d.cards.length,'Rezeptur','Rezepturen')} und ${plural(d.products.length,'Produkt','Produkte')}.</p><p class="dlg-p">Alle aktuellen Daten (${plural(S.menu.length,'Gericht','Gerichte')}, ${plural(S.cards.length,'Rezeptur','Rezepturen')}, ${plural(S.products.length,'Produkt','Produkte')}, Lager, Bestellungen, Verkäufe) werden ersetzt. Vorher wird automatisch eine Sicherheitskopie angelegt; unter „Einstellungen“ lässt sie sich einmal zurückholen.</p>`,
+      openDialog('Sicherung laden?', `<p class="dlg-p">Die Datei <b>${esc(fname)}</b> enthält ${plural(d.menu.length,'Gericht','Gerichte')}, ${plural(d.cards.length,'Rezeptur','Rezepturen')} und ${plural(d.products.length,'Artikel','Artikel')}.</p><p class="dlg-p">Alle aktuellen Daten (${plural(S.menu.length,'Gericht','Gerichte')}, ${plural(S.cards.length,'Rezeptur','Rezepturen')}, ${plural(S.products.length,'Artikel','Artikel')}, Lager, Bestellungen, Verkäufe) werden ersetzt. Vorher wird automatisch eine Sicherheitskopie angelegt; unter „Einstellungen“ lässt sie sich einmal zurückholen.</p>`,
         () => { setTimeout(() => { try { loadBackup(d); } catch(err){ info('Laden fehlgeschlagen', 'Die Datei ist keine Sicherung dieser App. Wählen Sie eine .json-Datei, die mit „Sicherung erstellen“ gespeichert wurde.'); } }, 0); }, {ok:'Daten ersetzen', toast:false}); };
     r.readAsText(t.files[0]); t.value = '';
   }

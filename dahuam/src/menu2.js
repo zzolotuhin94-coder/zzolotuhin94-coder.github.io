@@ -51,21 +51,21 @@ function hkEntries(list){
 }
 function hkDish(e, used, opts={}){
   const m = e.head, vars = e.vars, multi = vars.length > 1 || (m.vlabel && vars.length===1 && m.group);
-  const alg = [...new Set(vars.flatMap(v => itemAlg(v)))].sort(); alg.forEach(a=>used.add(a));
+  const ai = algOfVars(vars), alg = ai.letters; alg.forEach(a=>used.add(a)); if(ai.open) used.add(ALG_MARK);
   const veg = vars.every(v=>v.veg==='vg') ? 'vg' : vars.every(v=>v.veg==='v' || v.veg==='vg') ? 'v' : '';
   const desc = [m.desc, hkDays(m)].filter(Boolean).join(', ');
   const name = m.name;
   const price = +m.price ? `<span class="hk-p">${hkPrice(m.price)}</span>` : '<span class="hk-p"></span>';
   return `<article class="hk-dish ${vars.some(v=>v.top) && !opts.noSig ? 'sig' : ''}">
     <div class="hk-l1"><span class="hk-n">${esc(name)}${veg?`<span class="hk-diet" title="${veg==='vg'?'vegan':'vegetarisch'}">${veg}</span>`:''}</span>${multi?'':price}</div>
-    ${desc || alg.length ? `<p class="hk-d">${esc(desc)}${alg.length?`<span class="hk-alg" title="${esc(alg.map(a=>ALG[a]).join(', '))}">${alg.join(' ')}</span>`:''}</p>` : ''}
+    ${desc || alg.length || ai.open ? `<p class="hk-d">${esc(desc)}${alg.length || ai.open?`<span class="hk-alg" title="${esc(alg.map(a=>ALG[a]).join(', ') + (ai.open ? (alg.length ? ' · ' : '') + 'Angabe unvollständig' : ''))}">${alg.concat(ai.open ? [ALG_MARK] : []).join(' ')}</span>`:''}</p>` : ''}
     ${multi ? vars.map(v=>`<div class="hk-var"><span>${esc(v.vlabel||v.name)}</span><span class="hk-p">${hkPrice(v.price)}</span></div>`).join('') : ''}
   </article>`;
 }
 function hkLegend(used, k){
   const s = S.settings.seasons[k];
   return `<footer class="hk-foot">
-    ${used.size ? `<div class="hk-leg">${[...used].sort().map(a=>`<span><b>${a}</b> ${esc(ALG[a])}</span>`).join('')}</div>` : ''}
+    ${[...used].some(a=>ALG[a]) ? `<div class="hk-leg">${[...used].filter(a=>ALG[a]).sort().map(a=>`<span><b>${a}</b> ${esc(ALG[a])}</span>`).join('')}</div>` : ''}${used.has(ALG_MARK) ? `<p class="hk-open">${esc(algOpenText())}</p>` : ''}
     <div class="hk-fl"><span>${esc(s.footer || 'Preise in Euro inkl. MwSt.')} · v vegetarisch · vg vegan · <span class="hk-sigkey"></span> Empfehlung des Hauses</span><span>Stand ${fmtDate(new Date().toISOString())}</span></div>
   </footer>`;
 }
@@ -130,7 +130,8 @@ function renderGuest(){
         <label class="f">Datum<input id="gdate" type="date" value="${date}"></label>
         <div class="chips-row tight"><button type="button" class="chip ${date===todayStr()?'on':''}" data-act="gdate" data-id="${todayStr()}">Heute</button><button type="button" class="chip" data-act="gdate" data-id="${addDays(todayStr(),1)}">Morgen</button>${S.specials.filter(sp=>spStatus(sp)[0]!=='past').slice(0,3).map(sp=>`<button type="button" class="chip" data-act="gdate" data-id="${sp.from}">${esc(sp.name)}</button>`).join('')}</div>
         <p class="hint">${auto ? `Am ${fmtDate(date+'T12:00:00')} gilt die <b>${esc(S.settings.seasons[auto].title)}</b>` : 'An diesem Datum gilt keine Saisonkarte'}${sps.length ? ` und ${sps.length===1?'die Aktion':'die Aktionen'} <b>${sps.map(x=>esc(x.name)).join(', ')}</b>.` : '.'}</p>
-        ${missAll || missSp ? `<p class="hint alg-miss"><b>${plural(missAll, 'Gericht', 'Gerichte')} ohne Allergenangabe</b>${missAll !== miss ? `, ${miss} davon auf dieser Karte. Die anderen sind ausgeblendet oder gerade nicht in Saison` : ''}${missSp ? `. Dazu ${missSp} in der Aktion` : ''}. In Österreich Pflicht. <button type="button" class="link" data-act="goMenu" data-id="noalg">Anzeigen</button></p>` : ''}
+        ${missAll || missSp ? `<p class="hint alg-miss" id="algMiss"><b>${plural(missAll, 'Gericht', 'Gerichte')} ohne vollständige Allergenangabe</b>${missAll !== miss ? `, ${miss} davon auf dieser Karte. Die anderen sind ausgeblendet oder gerade nicht in Saison` : ''}${missSp ? `. Dazu ${missSp} in der Aktion` : ''}. In Karte und PDF stehen sie mit ${ALG_MARK}, dazu ein Satz in der Legende. <button type="button" class="link" data-act="goMenu" data-id="noalg">Liste zeigen</button></p>` : ''}
+        <button type="button" class="link sm-link" data-act="algSheet">Allergen-Blatt als PDF</button>
       </section>
       <!--gstyle-->
       <section class="panel">
@@ -146,6 +147,7 @@ function renderGuest(){
         <label class="f">Titel der Karte<input data-st="title" value="${esc(s.title)}"></label>
         <label class="f">Unterzeile<input data-st="subtitle" value="${esc(s.subtitle||HK_PLACE)}"></label>
         <label class="f">Fußzeile<input data-st="footer" value="${esc(s.footer)}"></label>
+        <label class="f" data-algopen>Satz bei Gerichten mit ${ALG_MARK}<input data-hsc="algOpen" value="${esc(algOpenText())}"></label>
         <div class="togs"><label class="tog"><input type="checkbox" data-hkk="1" ${S.settings.kidsSheet!==false?'checked':''}><span></span>Kinderkarte als eigenes Blatt</label></div>
         <div class="row-btns"><button type="button" class="btn sm" data-act="gcover">${ico('camera')}${s.cover?'Titelbild ändern':'Titelbild (optional)'}</button>${s.cover?'<button type="button" class="btn sm" data-act="gcoverDel">Entfernen</button>':''}</div>
         <p class="hint">Fotos einzelner Gerichte erscheinen bewusst nicht in der Karte: Sie verschieben die Zeilen. Ein ruhiges Titelbild genügt.</p>

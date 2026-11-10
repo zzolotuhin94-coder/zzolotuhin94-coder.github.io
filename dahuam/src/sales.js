@@ -42,7 +42,14 @@ function salesAgg(from, to){
   }
   return {by, days, qty, gross, openDays};
 }
-function vatOf(m){ const s = (m && m.section) || ''; return /getränk|wein|bar/i.test(s) ? 20 : (+S.settings.vat || 10); }
+/* Getränke-Kategorien am Namen erkennen (nur für die Umstellung alter Stände und als Vorschlag beim Import) */
+function secLooksDrink(name){ const s = String(name||'').toLowerCase().replace(/schwein/g,''); return /getr[äa]nk|drinks?\b|wein|bier\b|\bbar\b|kaffee|\btee\b|spirituosen|schn[aä]ps|cocktail|aperitif|digestif|\bs[aä]fte?\b|alkoholfrei|limonaden?|softdrinks?|\bsekt\b|champagner/.test(s); }
+function vatMigrate(d){
+  const s = d.settings; if(!(+s.vatDrinks >= 0) || s.vatDrinks === '' || s.vatDrinks == null) s.vatDrinks = 20;
+  if(!s.secVat || typeof s.secVat !== 'object' || Array.isArray(s.secVat)){ s.secVat = {}; [...new Set([...(s.sections||[]), ...d.menu.map(m => m.section)])].forEach(n => { if(n && secLooksDrink(n)) s.secVat[n] = 'g'; }); }
+  d.menu.forEach(m => { if(m.vat !== 'g' && m.vat !== 's') m.vat = ''; });
+  return d;
+}
 
 /* ---------- Kassen-Import (CSV) ---------- */
 function csvParse(text){

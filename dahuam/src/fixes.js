@@ -29,15 +29,20 @@ function fixesMigrate(d){
 }
 
 /* ---------- Rollen: Der Chef darf alles. Das Team sieht alles, hakt Checklisten und Prep-Liste ab,
-   trägt den eigenen Frei-Wunsch ein und bereitet Bestellungen vor. Alles andere ist für das Team gesperrt. ---------- */
+   trägt den eigenen Frei-Wunsch ein, bereitet Bestellungen vor, bucht Wareneingang (mit und ohne Bestellung)
+   und Schwund und zählt in einer laufenden Inventur mit. Inventur starten, abschließen und verwerfen, Preise,
+   Rezepturen, Karte, Einstellungen, Importe und der Neustart bleiben beim Chef. ---------- */
 const RO_MSG = 'Das kann nur der Chef ändern';
 function canEditAll(){ return me().role === 'chef'; }
 function whoLabel(u){ const r = ROLES[u.role] || ''; return !r || u.name === r ? u.name : `${u.name} · ${r}`; }
-const RO_ACTS = new Set(['newMenu','editMenu','photoMenu','toMenu','newCardFor','newCard','photoCard','photoCardDel','addLine','delLine','stepAdd','stepDel','stepMove','stepPhoto','stepPhotoDel','applySim','dupCard','delCard','addSec','secMove','secDel','secSort','itemMove','itemHide','newProd','editProd','reset','importPick','safetyRestore','pConfirm','pConfirmAll','pFix','plImport','pcStart','pcFor','pcOk','pcSave','pcSkip','pcBack','tellerPick','gStyle','gcover','gcoverDel','newSpecial','editSpecial','dupSpecial','hkAccent','hsCopyReset','secDlg','moveDlg','sales','moveUndo','invStart','invFinish','invCancel','rBook','rAll','ordRecv','supEdit','rpImport','rpDemoDel','rpAnalyse','demoEmpty','mapSave']);
-const RO_INPUTS = 'input[data-mp],[data-pp],[data-li],[data-cf],textarea[data-step],.title-in,[data-sf],[data-us],[data-secname],[data-st],[data-smd],[data-ms],[data-hsc],[data-hkk],[data-hka],[data-inv],#pcIn';
+const RO_ACTS = new Set(['newMenu','editMenu','photoMenu','toMenu','newCardFor','newCard','photoCard','photoCardDel','addLine','delLine','stepAdd','stepDel','stepMove','stepPhoto','stepPhotoDel','applySim','dupCard','delCard','addSec','secMove','secDel','secSort','itemMove','itemHide','newProd','editProd','reset','importPick','safetyRestore','pConfirm','pConfirmAll','pFix','plImport','pcStart','pcFor','pcOk','pcSave','pcSkip','pcBack','tellerPick','gStyle','gcover','gcoverDel','newSpecial','editSpecial','dupSpecial','hkAccent','hsCopyReset','secDlg','sales','moveUndo','invStart','invFinish','invCancel','supEdit','rpImport','rpDemoDel','rpAnalyse','mapSave','pAlg','pAlgNone','pcAlg']);
+/* Lager buchen: Wareneingang und Schwund darf auch das Team, Entnahmen bucht der Chef */
+function moveTeamOk(arg){ return /^(in|waste)(:|$)/.test(String(arg || '')); }
+const RO_INPUTS = 'input[data-mp],[data-pp],[data-li],[data-cf],textarea[data-step],.title-in,[data-sf],[data-us],[data-secname],[data-secvat],[data-st],[data-smd],[data-ms],[data-hsc],[data-hkk],[data-hka],#pcIn';
 function roBlocked(el){
   if(canEditAll() || !el) return false;
   const a = el.dataset.act;
+  if(a === 'moveDlg') return !moveTeamOk(el.dataset.id);
   if(a) return RO_ACTS.has(a);
   return el.matches('.sh-chip,.ti-grip,.lt-grip,[data-pick]') || el.matches(RO_INPUTS);
 }
@@ -50,7 +55,7 @@ const _menuDialogF = menuDialog; menuDialog = function(m, pre){ if(roGate()) ret
 const _prodDialogF = prodDialog; prodDialog = function(p){ if(roGate()) return _prodDialogF(p); };
 const _newCardF = newCard; newCard = function(type, fromMenu){ if(!roGate()) return; _newCardF(type, fromMenu); const c = C(view.card); if(c && !fromMenu){ c.fresh = true; save(); } };
 const _specialDialogF = specialDialog; specialDialog = function(sp){ if(roGate()) return _specialDialogF(sp); };
-const _moveDlgF = moveDlg; moveDlg = function(arg){ if(roGate()) return _moveDlgF(arg); };
+const _moveDlgF = moveDlg; moveDlg = function(arg){ if(roGate(canEditAll() || moveTeamOk(arg))) return _moveDlgF(arg); };
 const _salesDlgF = salesDlg; salesDlg = function(){ if(roGate()) return _salesDlgF(); };
 function roApply(){
   const app = $('#app'); if(!app) return; app.querySelector('.ro-note')?.remove();
@@ -60,7 +65,7 @@ function roApply(){
     const inTools = el.closest('.guest-tools') && !el.dataset.act && el.id !== 'gdate';
     if(!inTools && !roBlocked(el)) return;
     n++; if('disabled' in el) el.disabled = true; el.classList.add('ro'); el.setAttribute('aria-disabled', 'true');
-    if(el.tagName === 'TR'){ el.classList.remove('row'); el.removeAttribute('data-act'); }
+    if(el.tagName === 'TR'){ el.classList.remove('row'); el.removeAttribute('data-act'); el.removeAttribute('aria-disabled'); /* die Zeile selbst ist kein Knopf mehr; Knöpfe darin (z. B. Wareneingang) können für das Team frei sein */ }
   });
   app.querySelectorAll('.link-btn[data-act="addLine"],.ti-add,.shelf').forEach(el => { el.hidden = true; });
   if(!n) return;

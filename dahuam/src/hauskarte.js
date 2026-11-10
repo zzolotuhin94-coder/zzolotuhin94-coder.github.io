@@ -189,7 +189,7 @@ function hsTheme(k){ const d = HS_SEASON[k] || HS_SEASON.winter; const s = S.set
   return {ac, ink, gl:d.gl, word:d.word}; }
 function hsInfo(e){
   const m = e.head, vars = e.vars, multi = vars.length > 1 || !!(m.group && m.vlabel);
-  const alg = [...new Set(vars.flatMap(v => itemAlg(v)))].sort();
+  const ai = algOfVars(vars), alg = ai.letters.concat(ai.open ? [ALG_MARK] : []);
   const veg = vars.every(v => v.veg === 'vg') ? 'vg' : vars.every(v => v.veg === 'v' || v.veg === 'vg') ? 'v' : '';
   return {name:m.name, desc:[m.desc, hkDays(m)].filter(Boolean).join(' · '), alg, veg, top:vars.some(v => v.top), seasonal:vars.some(v => v.seasons && v.seasons.length),
     prices: multi ? vars.map(v => [v.vlabel || v.name, v.price]) : [['', m.price]], section:m.section};
@@ -314,7 +314,7 @@ function hsKidsPage(x, sec){
   return true;
 }
 function hsBackPage(x){
-  const st = S.settings; const used = [...x.used].sort(); const keys = used.length ? used : Object.keys(ALG);
+  const st = S.settings; const used = [...x.used].filter(a => ALG[a]).sort(); const keys = used.length ? used : Object.keys(ALG); const algOpen = x.used.has(ALG_MARK);
   const contact = [st.address, [st.phone, st.email].filter(Boolean).join(' · ')].filter(Boolean);
   hsPage(x, 'hs-back', `<div class="hs-body">
     ${HS_A.stube ? `<figure class="photo"><img src="${HS_A.stube}" alt="Die Gaststube"></figure>` : ''}
@@ -323,7 +323,7 @@ function hsBackPage(x){
     <div class="mid">${HS_A.emblem ? `<img class="hs-emb2" src="${HS_A.emblem}" alt="">` : '<div class="hs-emb"><img src="brand/logo.svg" alt=""></div>'}<p class="addr"><b>${hsU(st.name)}</b>${contact.map(c => '<br>' + hsU(c)).join('')}</p></div>
     <div class="hs-leg"><div class="hx">ALLERGENE &amp; ZEICHEN</div><div class="lg">${keys.map(a => `<span><b>${a}</b> ${esc(ALG[a])}</span>`).join('')}</div>
       <div class="mk"><span>${hsVeg('v')} vegetarisch</span><span>${hsVeg('vg')} vegan</span><span>${hsGl(x.t.gl[0], 13, x.t.ac)} saisonal</span><span><i class="sw"></i> Empfehlung des Hauses</span></div>
-      <p class="fnote">${esc(x.s.footer || 'Alle Preise in Euro inkl. MwSt.')}</p></div></div>`, {footLeft:''});
+      ${algOpen ? `<p class="fnote alg-open">${esc(algOpenText())}</p>` : ''}<p class="fnote">${esc(x.s.footer || 'Alle Preise in Euro inkl. MwSt.')}</p></div></div>`, {footLeft:''});
 }
 
 /* ---------- Fließende Kapitel: messen, umbrechen, nie ein Gericht teilen ---------- */
@@ -452,6 +452,7 @@ function hsCopyPanel(){
       <details><summary>Einleitung je Kapitel (${secs.length})</summary>${secs.map(sn => `<label class="f">${esc(sn)}<input data-hsc="sec" data-sec="${esc(sn)}" value="${esc(hsCopy('sec', sn))}"></label>`).join('')}</details>
       <label class="f">Leitspruch (Titel und Rückseite)<input data-hsc="claim" value="${esc(hsCopy('claim'))}"></label>
       <label class="f">Text auf der Rückseite<textarea data-hsc="back" rows="2">${esc(hsCopy('back'))}</textarea></label>
+      <label class="f">Satz bei Gerichten mit ${ALG_MARK} (Allergene noch nicht vollständig)<input data-hsc="algOpen" value="${esc(algOpenText())}"></label>
       <p class="hint">Leere Felder bleiben in der Karte leer. Gerichte, Preise, Allergene, Saisonales und Aktionen kommen automatisch aus Ihren Daten.</p>
     </div></section>`;
 }
@@ -461,7 +462,7 @@ renderGuest = function(){
   const hint = st === 'haus' ? `„${HS_NAME}“: Schiefer, Gold und Kreidetafel auf fertigen A4-Blättern.` : '„Schlicht“: helles Papier, wenig Farbe. Gut für den Bürodrucker.';
   html = html.replace('<!--gstyle-->', `<section class="panel"><div class="panel-h"><h2>Gestaltung</h2></div>${seg('gStyle', st, [['haus', HS_NAME],['schlicht','Schlicht']])}<p class="hint">${hint}</p></section>`);
   if(st === 'haus'){
-    html = html.replace(/<\/aside>\s*<div class="guest-prev">/, hsCopyPanel() + '</aside><div class="guest-prev">');
+    html = html.replace(/<label class="f" data-algopen>[\s\S]*?<\/label>/, '').replace(/<\/aside>\s*<div class="guest-prev">/, hsCopyPanel() + '</aside><div class="guest-prev">');
     html = html.replace(/<div class="togs"><label class="tog"><input type="checkbox" data-hkk="1"[\s\S]*?<\/div>/, '').replace('Schrift, Raster und Papier bleiben in jeder Saison gleich. So erkennt man immer dasselbe Haus.', 'Schiefer, Gold und Schriften bleiben in jeder Saison gleich. Die Standardfarbe der Saison ist auf den Schiefer abgestimmt; wählen Sie eine andere, färbt sie Saisonzeichen und Kinderseite.').replace('Fotos einzelner Gerichte erscheinen bewusst nicht in der Karte: Sie verschieben die Zeilen. Ein ruhiges Titelbild genügt.', 'Ein eigenes Titelbild wird in Gold-Schiefer-Tönen ins Titelblatt geblendet. Ohne Bild zeichnet die Karte den Bergkamm.');
   }
   return html;

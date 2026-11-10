@@ -123,8 +123,8 @@ function orderText(o){
 function mailHref(o){ const sp = SUP(o.supplier); return `mailto:${encodeURIComponent(sp.email)}?subject=${encodeURIComponent(`Bestellung ${o.no} – ${S.settings.name}`)}&body=${encodeURIComponent(orderText(o))}`; }
 function waHref(o){ const sp = SUP(o.supplier); return `https://wa.me/${String(sp.whatsapp||sp.phone).replace(/\D/g,'').replace(/^00/,'')}?text=${encodeURIComponent(orderText(o))}`; }
 function receiveIn(p, units, unitPrice, note, date){
-  const old = p.price; if(unitPrice && Math.abs(unitPrice - p.price) > 0.0001){ const s0 = Math.max(0, +p.stock||0); p.price = Math.round((s0*p.price + units*unitPrice)/(s0+units)*100)/100; }
-  addMove('in', p.id, units, note, unitPrice || p.price, date); if(unitPrice) markPrice(p, 'Wareneingang'); if(old !== p.price) S.moves[0].prevPrice = old;
+  const old = p.price; const chef = canEditAll(); /* das Team bucht die Menge; Einkaufspreise ändert nur der Chef */ if(chef && unitPrice && Math.abs(unitPrice - p.price) > 0.0001){ const s0 = Math.max(0, +p.stock||0); p.price = Math.round((s0*p.price + units*unitPrice)/(s0+units)*100)/100; }
+  addMove('in', p.id, units, note, unitPrice || p.price, date); if(chef && unitPrice) markPrice(p, 'Wareneingang'); if(old !== p.price) S.moves[0].prevPrice = old;
 }
 
 /* ---------- Ansicht: Bestellungen-Cockpit ---------- */

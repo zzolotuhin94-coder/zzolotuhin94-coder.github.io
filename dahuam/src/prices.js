@@ -35,7 +35,7 @@ function plAnalyse(text){
 }
 function plDialog(){
   const sups = (S.suppliers||[]);
-  openDialog('Preisliste importieren', `<p class="dlg-p">CSV oder Excel-Liste des Lieferanten (oder aus der Rechnung abgetippt) mit Spalten <b>Artikel</b>, <b>Preis</b> netto und optional Artikelnr, Einheit, Gebinde. Erkannte Produkte werden aktualisiert, die Liste prüfen Sie vorher.</p>
+  openDialog('Preisliste importieren', `<p class="dlg-p">CSV oder Excel-Liste des Lieferanten (oder aus der Rechnung abgetippt) mit Spalten <b>Artikel</b>, <b>Preis</b> netto und optional Artikelnr, Einheit, Gebinde. Erkannte Artikel werden aktualisiert, die Liste prüfen Sie vorher. Für eine ganze Artikelliste mit Lieferant, Gebinde und Allergenen: Einstellungen › Eigene Daten.</p>
     <label class="f">Lieferant<select name="sup"><option value="">— beliebig —</option>${sups.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select></label>
     <div class="row-btns"><button type="button" class="btn sm" id="plFileBtn">Datei wählen</button><button type="button" class="btn sm" id="plSample">Beispiel</button><input id="plFile" type="file" accept=".csv,.txt,.xlsx,.xls" hidden></div>
     <textarea id="plText" class="code" rows="6" placeholder="Artikelnr;Artikel;Einheit;Preis"></textarea>
@@ -43,12 +43,12 @@ function plDialog(){
     <div id="plOut"></div>`,
     fd => { const res = plDialog.res; if(!res) { toast('Bitte zuerst „Prüfen“'); return false; } let n = 0, add = 0; const sid = fd.get('sup');
       res.lines.forEach((l, i) => { const sel = fd.get('m_'+i); if(sel === 'skip' || sel == null) return;
-        if(sel === 'new'){ const unit = /^(stk|stück|st)$/i.test(l.unit) ? 'Stk' : /^(l|liter)$/i.test(l.unit) ? 'l' : 'kg'; const p = {id:uid('p'), name:l.name, unit, price:l.price, lossCold:0, lossHot:0, alg:'', pieceG:'', stock:0, minStock:0, loc:'L', supplier:sid||'', artNo:l.art, pack:l.pack, packQty:0}; markPrice(p, 'Preisliste'); S.products.push(p); add++; return; }
+        if(sel === 'new'){ const unit = /^(stk|stück|st)$/i.test(l.unit) ? 'Stk' : /^(l|liter)$/i.test(l.unit) ? 'l' : 'kg'; const p = {id:uid('p'), name:l.name, unit, price:l.price, lossCold:0, lossHot:0, alg:'', algNone:false, pieceG:'', stock:0, minStock:0, loc:'L', supplier:sid||'', artNo:l.art, pack:l.pack, packQty:0}; markPrice(p, 'Preisliste'); S.products.push(p); add++; return; }
         const p = P(sel); if(!p) return; p.price = l.price; if(l.art) p.artNo = l.art; if(sid && !p.supplier) p.supplier = sid; markPrice(p, 'Preisliste'); n++; });
-      plDialog.msg = `${n} Preise aktualisiert${add?`, ${add} Produkte neu angelegt`:''}`; plDialog.res = null; },
+      plDialog.msg = `${n} Preise aktualisiert${add?`, ${add} Artikel neu angelegt`:''}`; plDialog.res = null; },
     {ok:'Preise übernehmen', done:()=>plDialog.msg, after: f => {
       plDialog.res = null;
-      const show = () => { const res = plDialog.res; const opts = sel => `<option value="skip">nicht übernehmen</option><option value="new">als neues Produkt</option>${[...S.products].sort(byName).map(p=>`<option value="${p.id}" ${sel===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}`;
+      const show = () => { const res = plDialog.res; const opts = sel => `<option value="skip">nicht übernehmen</option><option value="new">als neuer Artikel</option>${[...S.products].sort(byName).map(p=>`<option value="${p.id}" ${sel===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}`;
         $('#plOut').innerHTML = `<p class="hint">${res.lines.filter(l=>l.pid).length} von ${res.lines.length} Artikeln erkannt.</p><ul class="pl-list">${res.lines.map((l,i)=>`<li><span><b>${esc(l.name)}</b><small class="muted">${l.art?'Nr. '+esc(l.art)+' · ':''}${esc(l.unit||'')} ${l.old!=null?`· bisher ${eur(l.old)}`:''}</small></span><b class="mono">${eur(l.price)}</b><select name="m_${i}" class="sm-sel">${opts(l.pid || 'skip')}</select></li>`).join('')}</ul>`; };
       const run = () => { try { plDialog.res = plAnalyse($('#plText').value); show(); } catch(x){ $('#plOut').innerHTML = `<p class="hint bad-t">${esc(x.message)}</p>`; } };
       $('#plCheck').onclick = run;
@@ -59,7 +59,7 @@ function plDialog(){
 }
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if(!el) return; const id = el.dataset.id;
-  if(el.dataset.act === 'pFilter'){ view.pf = id; if(view.tab !== 'products') go('products'); else render(); }
+  if(el.dataset.act === 'pFilter'){ if($('#dlg').open) $('#dlg').close(); view.pf = id; if(view.tab !== 'products') go('products'); else render(); }
   if(el.dataset.act === 'pConfirm'){ const p = P(id); markPrice(p, 'bestätigt'); save(); render(); toast(`${p.name}: ${eur(p.price)} bestätigt`); }
   if(el.dataset.act === 'pConfirmAll'){ const q = view.pq.trim().toLowerCase(); const list = S.products.filter(p => !p.noStock && p.priceDemo && (!q || (p.name+' '+supName(p)+' '+(p.artNo||'')).toLowerCase().includes(q))); if(!list.length) return; ask(`${list.length} Richtwerte als bestätigte Einkaufspreise übernehmen? Besser: nur Preise bestätigen, die Sie geprüft haben.`, () => { list.forEach(p => markPrice(p, 'bestätigt')); }, 'Bestätigen'); }
   if(el.dataset.act === 'pFix') priceFixDialog(id.split(','));

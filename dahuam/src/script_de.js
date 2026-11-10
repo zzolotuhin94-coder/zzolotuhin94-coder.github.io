@@ -235,10 +235,13 @@ function totals(c, depth=0){
   for(const it of c.items){ const l = line(it, depth); t.lines.push(l); t.cost += l.cost; t.gross += l.grossG; t.net += l.net; t.out += l.out; l.alg.forEach(a => t.alg.add(a)); }
   return t;
 }
+/* MwSt.: Speisen oder Getränke. Die Klasse kommt vom Gericht (wenn dort gewählt), sonst von der Kategorie. EIN Helfer für alle Rechnungen. */
+function vatClass(m){ if(m && (m.vat === 'g' || m.vat === 's')) return m.vat; const sv = S.settings.secVat; return m && sv && sv[m.section] === 'g' ? 'g' : 's'; }
+function vatRate(m){ const s = S.settings; if(vatClass(m) === 'g'){ const v = +s.vatDrinks; return isFinite(v) && s.vatDrinks !== '' && s.vatDrinks != null ? v : 20; } return s.vat; }
 function menuCalc(m){
   const c = m.card ? C(m.card) : null;
   const t = c ? totals(c) : null;
-  const netPrice = (+m.price||0) / (1 + S.settings.vat/100);
+  const netPrice = (+m.price||0) / (1 + vatRate(m)/100);
   const cost = t ? t.cost : null;
   return {c, t, cost, netPrice, fc: cost!=null && netPrice ? cost/netPrice*100 : null, margin: cost!=null ? netPrice - cost : null};
 }

@@ -1,0 +1,138 @@
+
+/* ===== Paket C · Eigene Daten, Importe, Allergene in drei Zuständen, Allergen-Blatt ===== */
+.ed-list .au-row{grid-template-columns:32px minmax(0,1fr) auto}
+.ed-row .au-t small{display:block;margin-top:3px;font-size:13.5px;line-height:1.45;color:var(--muted)}
+.ed-links{display:flex!important;flex-wrap:wrap;gap:4px 16px;margin-top:6px!important}
+.ed-links .link{font-size:13.5px;min-height:28px}
+.ed-undo{margin-top:22px}
+.ed-log .rw{grid-template-columns:96px minmax(0,1fr) auto}
+.ed-log .rw-act{display:none}
+.ed-log .rw-main small{display:block;color:var(--muted);font-size:13px}
+.leer-cols{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px}
+.leer-cols h4{margin:0 0 4px;font:600 14px var(--f-body)}
+.leer-cols ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.5;color:var(--muted)}
+/* Import: Eingabe */
+.imp-in textarea.code{min-height:120px}
+.imp-tpl{margin-top:12px}
+.imp-cols{list-style:none;margin:0;padding:0;font-size:13px}
+.imp-cols li{display:grid;grid-template-columns:170px minmax(0,1fr);gap:4px 14px;padding:6px 0;border-top:1px solid var(--line)}
+.imp-cols li:first-child{border-top:0}
+.imp-cols span{color:var(--muted);overflow-wrap:anywhere}
+.imp-mapg{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px 14px}
+.imp-mapg select{width:100%;min-width:0}
+.imp-opt{margin:14px 0 4px}
+.imp-opt .hint{margin-top:8px}
+.imp-gnote{margin:8px 0 0}
+.imp-tb{margin-top:16px}
+/* Vorschau: offene Zeilen, der Zustand steht als Wort links */
+.imp-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.imp-r{display:grid;grid-template-columns:104px minmax(0,1fr) auto;gap:4px 16px;align-items:start;padding:11px 0;border-bottom:1px solid var(--line)}
+.imp-st{font:600 13px var(--f-body);color:var(--fg)}
+.imp-st small{display:block;font-weight:400;font-size:12px;color:var(--faint,var(--muted))}
+.imp-r.st-gleich .imp-st,.imp-r.st-gleich .imp-m b{color:var(--muted);font-weight:500}
+.imp-r.st-fehler .imp-st{color:var(--bad)}
+.imp-m{min-width:0}
+.imp-m > b{display:block;overflow-wrap:anywhere}
+.imp-m small{display:block;font-size:13px;color:var(--muted);line-height:1.45;overflow-wrap:anywhere}
+.imp-m .imp-why{color:var(--fg)}
+.imp-r.st-fehler .imp-why,.imp-l.fehler .imp-why{color:var(--bad)}
+.imp-x{text-align:right;white-space:nowrap;font-size:14px}
+.imp-raw{display:block;font-size:12px;color:var(--muted)}
+.imp-ctl{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:6px;font-size:13px;color:var(--muted)}
+.imp-ctl select{max-width:100%;min-width:0;flex:0 1 320px}
+.imp-empty{padding:18px 0;color:var(--muted)}
+.imp-det{margin-top:6px}
+.imp-det summary{cursor:pointer;font-size:13px;color:var(--muted);min-height:28px}
+.imp-lines{list-style:none;margin:4px 0 0;padding:0}
+.imp-l{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:6px 0;border-top:1px dashed var(--line);font-size:13.5px}
+.imp-l small{display:block;color:var(--muted);font-size:12.5px}
+.imp-l.skip .imp-ln{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line-strong)}
+.imp-ln{min-width:0;overflow-wrap:anywhere}
+.imp-lq{display:flex;align-items:center;gap:10px;white-space:nowrap;flex:none}
+.imp-q{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)}
+.imp-q input{width:76px;padding:5px 8px;text-align:right}
+.imp-steps{margin:8px 0 0;padding-left:20px;font-size:13px;color:var(--muted)}
+.imp-um{margin:18px 0 0}
+.imp-um .sec-h{margin-top:0}
+.imp-uml{list-style:none;margin:8px 0 0;padding:0;border-top:1px solid var(--line)}
+.imp-uml li{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);gap:6px 16px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.imp-uml small{display:block;font-size:12.5px;color:var(--muted)}
+.imp-uml select{width:100%;min-width:0;max-width:none}
+.imp-bar{position:sticky;bottom:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;margin-top:16px;padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line-strong)}
+.imp-bar-t{font-size:14px;color:var(--muted)}
+.imp-done{max-width:640px;padding:8px 0 26px}
+.imp-done .pc-tick{margin:0 0 14px}
+.imp-done .imp-sum{max-width:340px;margin:0 0 18px}
+.imp-done .row-btns{flex-wrap:wrap}
+.rp-txt{min-height:150px!important}
+.rp-out{max-height:240px;overflow:auto}
+/* Allergene: enthält · keine · nicht geprüft */
+.alg3{border:0;margin:6px 0 0;padding:0;min-width:0}
+.alg3 legend{padding:0;font:600 13px var(--f-body);color:var(--muted);margin-bottom:6px}
+.alg3-st{flex-wrap:wrap;gap:6px 18px}
+.alg3-l{margin-top:10px}
+.alg3-n{margin-top:8px}
+.alg-st{border:0;background:transparent;padding:4px 0;min-height:32px;cursor:pointer;color:var(--muted);font:500 13px var(--f-body);text-align:left;display:inline-flex;align-items:center}
+.alg-st.open span{color:var(--fg);text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px}
+.alg-st .chips{margin:0}
+.st-ref.none{color:var(--fg)}
+.alg-under{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.pc-alg{margin:14px 0 0;font-size:13.5px;color:var(--muted)}
+.pc-alg.open b{color:var(--fg)}
+.pc-ex.none b{color:var(--muted)}
+.alg-inc b{color:var(--fg)}
+.sec-list .sec-vat{flex:none;max-width:150px}
+.hk-open{margin:0 0 8px;font:italic 400 12px/1.4 var(--hk-serif,serif);color:var(--hk-m,#555)}
+.wk-open{margin:0 0 8px;text-align:center;font:italic 400 13px/1.4 var(--wk-text,inherit);color:var(--wk-m,#555)}
+.hs-leg .fnote.alg-open{font-style:normal}
+dialog:has(#dlgForm[data-wide]){width:min(900px,calc(100vw - 32px))}
+/* Allergen-Blatt: feste A4-Blätter, schwarz auf weiß */
+.ab-measure{position:absolute;left:-12000px;top:0;width:794px;visibility:hidden;pointer-events:none;contain:layout style}
+.ab-page{position:relative;width:794px;height:1123px;box-sizing:border-box;padding:46px 48px 40px;background:#fff;color:#111;display:flex;flex-direction:column;font:400 12.5px/1.35 var(--f-body,system-ui);overflow:hidden;color-scheme:light}
+.ab-h{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;padding-bottom:10px;border-bottom:2px solid #111;flex:none}
+.ab-h b{font:600 11.5px/1.2 var(--f-body);letter-spacing:.06em;color:#444}
+.ab-h h1{margin:3px 0 0;font:700 23px/1.1 var(--f-display,var(--f-body));letter-spacing:-.01em;color:#111}
+.ab-meta{display:flex;flex-direction:column;align-items:flex-end;gap:1px;font-size:11.5px;color:#444;text-align:right}
+.ab-body{flex:1;min-height:0;overflow:hidden;padding-top:10px}
+.ab-t{width:100%;border-collapse:collapse;table-layout:fixed}
+.ab-t th{font:600 12px/1 var(--f-body);text-align:center;padding:7px 2px;border-bottom:1px solid #111;color:#111}
+.ab-t th.ab-n{text-align:left;width:auto}
+.ab-t .ab-c{width:27px;text-align:center}
+.ab-t .ab-s{width:128px;text-align:right;font-size:11px;color:#444;white-space:nowrap}
+.ab-t th.ab-s{text-align:right}
+.ab-t td{padding:5px 2px;border-bottom:1px solid #d6d6d6;vertical-align:middle}
+.ab-t td.ab-n{text-align:left;padding-right:10px;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ab-t td.ab-c{font-size:11px;border-left:1px solid #e6e6e6}
+.ab-t tr.ab-sec td{padding:11px 2px 5px;font:700 11.5px/1 var(--f-body);letter-spacing:.06em;border-bottom:1px solid #111;color:#111}
+.ab-t tr.ab-open td.ab-s{color:#111;font-weight:600}
+.ab-t td.ab-n i{font-style:normal;font-weight:700}
+.ab-empty{padding:30px 0!important;text-align:center;color:#444}
+.ab-f{flex:none;padding-top:9px;border-top:1px solid #111;font-size:10.5px;color:#333}
+.ab-leg{display:flex;flex-wrap:wrap;gap:2px 14px;margin-bottom:5px}
+.ab-leg b{font-weight:700}
+.ab-f p{margin:0;line-height:1.4}
+.ab-prev{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;max-height:56vh;overflow:auto;padding:2px}
+.ab-sheet{position:relative;width:100%;aspect-ratio:794/1123;overflow:hidden;background:#fff;border:1px solid var(--line-strong);border-radius:3px}
+.ab-sheet > .ab-page{position:absolute;left:0;top:0;transform-origin:0 0;transform:scale(var(--ab-s,.33))}
+#print.pdf.ab-print{padding:0;width:794px;background:#fff}
+@media (max-width:760px){
+  .ed-list .au-row{grid-template-columns:32px minmax(0,1fr)}
+  .ed-list .au-a{grid-column:2}
+  .leer-cols{grid-template-columns:1fr}
+  .imp-r{grid-template-columns:minmax(0,1fr) auto}
+  .imp-st{grid-column:1 / -1;display:flex;gap:10px;align-items:baseline}
+  .imp-st small{display:inline}
+  .imp-cols li{grid-template-columns:1fr}
+  .imp-uml li{grid-template-columns:1fr}
+  .imp-l{flex-direction:column;gap:4px}
+  .imp-bar{bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+  .imp-bar .row-btns{width:100%}
+  .imp-bar .row-btns .btn{flex:1;min-height:44px}
+  .imp-ctl select,.imp-q input{min-height:40px}
+  .ed-log .rw{grid-template-columns:78px minmax(0,1fr)}
+  .ed-log .rw-meta{display:none}
+  .sec-list li{flex-wrap:wrap}
+  .sec-list .sec-vat{order:5;max-width:none;flex:1 1 100%;min-height:40px}
+  .ab-prev{grid-template-columns:1fr;max-height:48vh}
+  .alg-st{min-height:40px}
+}

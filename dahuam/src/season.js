@@ -144,7 +144,7 @@ function specialDialog(sp){
       const rows = $('#spRows');
       $('#spAdd').onclick = () => { rows.insertAdjacentHTML('beforeend', row({name:'',desc:'',price:'',veg:'',card:''})); rows.lastElementChild.querySelector('input').focus(); };
       rows.onclick = e => { const b = e.target.closest('[data-rm]'); if(b && rows.children.length > 1) b.closest('[data-row]').remove(); };
-      rows.onchange = e => { if(e.target.dataset.f === 'card' && e.target.value){ const r = e.target.closest('[data-row]'); const c = C(e.target.value); const nm = r.querySelector('[data-f=name]'); if(!nm.value) nm.value = c.name; const pr = r.querySelector('[data-f=price]'); if(!pr.value){ const tt = totals(c); pr.value = num2(Math.ceil(tt.cost/(S.settings.target/100)*(1+S.settings.vat/100)) - 0.1); } } };
+      rows.onchange = e => { if(e.target.dataset.f === 'card' && e.target.value){ const r = e.target.closest('[data-row]'); const c = C(e.target.value); const nm = r.querySelector('[data-f=name]'); if(!nm.value) nm.value = c.name; const pr = r.querySelector('[data-f=price]'); if(!pr.value){ const tt = totals(c); pr.value = num2(Math.ceil(tt.cost/(S.settings.target/100)*(1+vatRate(null)/100)) - 0.1); } } };
       $('#spFromMenu').onchange = e => { const m = S.menu.find(x=>x.id===e.target.value); if(!m) return; rows.insertAdjacentHTML('beforeend', row({name:m.name, desc:m.desc, price:m.price, veg:m.veg, card:m.card})); const first = rows.firstElementChild; if(first && !first.querySelector('[data-f=name]').value) first.remove(); e.target.value = ''; };
       f.querySelectorAll('[data-dur]').forEach(b => b.onclick = () => { const fr = f.elements.from.value || todayStr(); f.elements.to.value = addDays(fr, +b.dataset.dur - 1); });
      }});

@@ -1,4 +1,5 @@
-// Zwei Rollen. Chef: alles. Team: ansehen, Checklisten und Prep-Liste abhaken, eigener Frei-Wunsch, Bestellungen vorbereiten.
+// Zwei Rollen. Chef: alles. Team: ansehen, Checklisten und Prep-Liste abhaken, eigener Frei-Wunsch, Bestellungen vorbereiten;
+// seit Paket C auch Wareneingang, Schwund und Mitzählen in einer laufenden Inventur (genauer: ctests/c08_rollen.js).
 const L = require('./lib');
 (async () => { const b = await L.launch(); const {p} = await L.open(b, {vp:{width:1440, height:900}});
   await L.go(p, 'einstellungen');
@@ -23,11 +24,12 @@ const L = require('./lib');
   await p.evaluate(() => { const x = document.querySelector('#app [data-act="newMenu"]'); x.disabled = false; x.click(); }); await p.waitForTimeout(250);
   L.ok(await p.evaluate(() => !document.querySelector('#dlg').open) && /nur der Chef/.test(await L.toast(p)), '„+ Gericht“: gesperrt, mit Hinweis', await L.toast(p));
   await p.evaluate(() => menuReorder(S.menu[0].id, null)); L.ok(await p.evaluate(v => S.menu[0].price === v, pr), 'Preis unverändert');
-  await L.go(p, 'ware/bestand'); await p.evaluate(() => { const x = document.querySelector('#app [data-act="moveDlg"]'); x.disabled = false; x.click(); }); await p.waitForTimeout(250);
-  L.ok(await p.evaluate(() => !document.querySelector('#dlg').open), 'Lager buchen (Schwund, Wareneingang): für das Team gesperrt');
+  await L.go(p, 'ware/bestand'); await p.evaluate(() => { const x = document.querySelector('#app [data-act="moveDlg"][data-id^="out"]'); x.disabled = false; x.click(); }); await p.waitForTimeout(250);
+  L.ok(await p.evaluate(() => !document.querySelector('#dlg').open), 'Lager: Entnahme bleibt für das Team gesperrt (Wareneingang und Schwund sind seit Paket C erlaubt)');
   await L.go(p, 'ware/inventur'); await p.evaluate(() => { const x = document.querySelector('#app [data-act="invStart"]'); if(x){ x.disabled = false; x.click(); } }); await p.waitForTimeout(250); L.ok(await p.evaluate(() => !S.invDraft), 'Inventur starten: gesperrt');
   await L.go(p, 'ware/preise'); L.ok(await p.evaluate(() => document.querySelector('#app input[data-pp]').disabled), 'Preise: gesperrt');
   await L.go(p, 'einstellungen'); L.ok(await p.evaluate(() => document.querySelector('#s-target').disabled && !document.querySelector('#app [data-act="demoEmpty"]')), 'Einstellungen: Zielwert gesperrt, „Leer starten“ nicht angeboten');
+  await L.go(p, 'einstellungen/eigene-daten'); L.ok(await p.evaluate(() => { const b = document.querySelector('#app [data-act="leerAsk"]'); return !!b && b.disabled && /Nur ansehen/.test(document.querySelector('#app .ro-note').textContent); }), 'Eigene Daten: „Leer starten“ ist für das Team gesperrt');
   // erlaubt: Checkliste abhaken
   await L.go(p, 'checklisten'); await p.click('#app .ck-l'); await p.waitForTimeout(250); const ck0 = await p.evaluate(() => JSON.stringify(S.checks.runs).length);
   await p.click('#app .ck-c:not(.val)'); await p.waitForTimeout(250);

@@ -7,14 +7,14 @@ const covered = p => p.evaluate(() => { const bad = []; for(const [x, y] of [[0.
   L.ok(st.n === 6 && st.names.join('|') === 'Lieferanten|Preise|Basisrezepte|Rezepturen|Speisekarte|Kasse', 'sechs Schritte', st.names);
   L.ok(new RegExp('^Einrichtung ' + st.pct + ' %').test(st.line) && /weiter$/.test(st.line) && !st.navHas, 'Heute zeigt die Zeile „Einrichtung ' + st.pct + ' % … weiter“; in der Navigation steht sie nicht', st.line);
   await p.click('#app .einr-line'); await p.waitForTimeout(250);
-  const v = await p.evaluate(() => ({hash:location.hash, h1:document.querySelector('#app h1').childNodes[0].textContent, rows:[...document.querySelectorAll('#app .au-row')].map(r => ({name:r.querySelector('.au-t b').textContent, metric:r.querySelector('.au-p span').textContent, btns:r.querySelectorAll('button').length, done:r.classList.contains('done')})), text:document.querySelector('#app').textContent, back:document.querySelector('#app .back').textContent.trim()}));
+  const v = await p.evaluate(() => ({hash:location.hash, h1:document.querySelector('#app h1').childNodes[0].textContent, rows:[...document.querySelectorAll('#app .au-row')].map(r => ({name:r.querySelector('.au-t b').textContent, metric:r.querySelector('.au-p span').textContent, btns:r.querySelectorAll('.au-a button').length, alt:r.querySelectorAll('.au-t [data-act="datenOpen"]').length, done:r.classList.contains('done')})), text:document.querySelector('#app').textContent, back:document.querySelector('#app .back').textContent.trim()}));
   L.ok(v.hash === '#einrichtung' && v.h1 === 'Einrichtung' && v.back === 'Heute', 'Zeile öffnet „Einrichtung“, zurück geht es nach „Heute“', v.hash);
-  L.ok(v.rows.length === 6 && v.rows.every(r => r.btns === 1 && /\d/.test(r.metric)), 'jeder Schritt: echte Zahl und genau ein Knopf', v.rows.map(r => r.metric));
+  L.ok(v.rows.length === 6 && v.rows.every(r => r.btns === 1 && /\d/.test(r.metric)) && v.rows.map(r => r.alt).join('') === '010110', 'jeder Schritt: echte Zahl und genau ein Knopf; bei Preisen, Rezepturen und Speisekarte dazu der Verweis „aus Datei importieren“ (Paket C)', v.rows.map(r => r.metric));
   L.ok(!/Stempel|Stufe|Talstation|Gipfel|Aufgabe|Vollbetrieb|Rohbau/.test(v.text), 'keine Stempel, Stufen oder Aufgaben auf der Seite');
   const real = await p.evaluate(() => { const prods = S.products.filter(x => !x.noStock); return {conf:prods.filter(x => !x.priceDemo).length, all:prods.length, withCard:S.menu.filter(m => m.card && C(m.card)).length, menu:S.menu.length}; });
   L.ok(v.rows[1].metric === `${real.conf} von ${real.all} Preisen bestätigt` && v.rows[3].metric === `${real.withCard} von ${real.menu} Gerichten haben eine Rezeptur`, 'die Zahlen stimmen mit den Daten überein', [v.rows[1].metric, v.rows[3].metric]);
   // Knopf führt an die Stelle
-  await p.click('#app .au-row:nth-child(2) button'); await p.waitForTimeout(300); L.ok(await p.evaluate(() => view.tab === 'pcheck' && !document.querySelector('#gd')), 'Knopf bei „Preise“ führt in den Preis-Check, ohne Rundgang');
+  await p.click('#app .au-row:nth-child(2) .au-a button'); await p.waitForTimeout(300); L.ok(await p.evaluate(() => view.tab === 'pcheck' && !document.querySelector('#gd')), 'Knopf bei „Preise“ führt in den Preis-Check, ohne Rundgang');
   await p.evaluate(() => pcLeave());
   // auch aus den Einstellungen und der Schnellsuche
   await L.go(p, 'einstellungen'); await p.click('#app .gd-panel [data-act="goTab"][data-id="einr"]'); await p.waitForTimeout(200); L.ok(await p.evaluate(() => view.tab === 'einr'), 'erreichbar aus den Einstellungen');
@@ -34,6 +34,7 @@ const covered = p => p.evaluate(() => { const bad = []; for(const [x, y] of [[0.
   // alles fertig: Zeile verschwindet
   await p.evaluate(() => { S.suppliers.forEach(s => { s.email = s.email || 'a@b.at'; if(!s.orderDays.length) s.orderDays = [1]; if(!s.deliveryDays.length) s.deliveryDays = [2]; });
     const anyCard = S.cards.find(c => c.type === 'dish'); S.menu.forEach(m => { if(!(m.card && C(m.card))) m.card = anyCard.id; });
+    S.products.forEach(x => { if(prodAlgState(x) === 'open') x.algNone = true; });   /* Paket C: vollständig heißt, jede Zutat hat eine Allergenangabe */
     S.cards.filter(c => c.type === 'semi').forEach(c => { if(!c.items.length) c.items = [{ref:'p:' + S.products[0].id, qty:100, net:''}]; c.items.forEach(i => { if(!refObj(i.ref)) i.ref = 'p:' + S.products[0].id; if(!(+i.qty > 0)) i.qty = 100; }); if(!(+c.yieldG > 0)) c.yieldG = 1000; });
     const d = todayStr(); S.salesDays[d] = S.salesDays[d] || [[S.menu[0].id, 1, 10]]; S.salesReal[d] = 1; save(); go('dash'); });
   await p.waitForTimeout(500);

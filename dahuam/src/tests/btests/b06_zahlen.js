@@ -5,14 +5,16 @@ const eurN = s => +String(s).replace(/[^\d,.-]/g, '').replace(/\./g, '').replace
   // ---------- Allergene ----------
   // Lage herstellen, in der die Karte von heute weniger zeigt als die ganze Liste: ein Gericht ohne Allergene ausblenden
   await p.evaluate(() => { const m = S.menu.find(x => !hasAlg(x) && !x.hidden); m.hidden = true; save(); });
-  const want = await p.evaluate(() => ({all:S.menu.filter(m => !(m.card && C(m.card)) && !algList(m.alg).length).length, withAlg:S.menu.length - S.menu.filter(m => !(m.card && C(m.card)) && !algList(m.alg).length).length, fn:noAlgCount()}));
+  /* Paket C: „ohne Allergenangabe“ heißt jetzt auch: Rezeptur vorhanden, aber eine Zutat ist nicht gepflegt. Hier unabhängig nachgerechnet. */
+  const want = await p.evaluate(() => { const walk = (x, d) => !x || d > 6 || !x.items.length || x.items.some(it => { const r = refObj(it.ref); if(!r) return true; return r.t === 'p' ? !(algList(r.o.alg).length || r.o.algNone === true) : walk(r.o, d + 1); });
+    const open = S.menu.filter(m => { const c = m.card && C(m.card); return c ? walk(c, 0) : !(algList(m.alg).length || m.algNone); }).length; return {all:open, withAlg:S.menu.length - open, fn:noAlgCount()}; });
   L.ok(want.all === want.fn && want.all > 0, 'eine gemeinsame Funktion zählt: ' + want.all + ' Gerichte ohne Allergenangabe', want);
   await L.go(p, 'heute'); const dash = await p.evaluate(() => { const r = [...document.querySelectorAll('#app .rw')].find(x => /ohne Allergenangabe/.test(x.textContent)); return r ? +r.querySelector('.rw-lead').textContent.trim() : null; });
   await L.go(p, 'speisekarte'); const chip = await p.evaluate(() => +document.querySelector('#app [data-act="sec"][data-id="noalg"] small').textContent);
   await p.click('#app [data-act="sec"][data-id="noalg"]'); await p.waitForTimeout(250); const rows = await p.evaluate(() => document.querySelectorAll('#app table.lt-menu tbody tr.row').length);
   await L.go(p, 'speisekarte/gaestekarte'); const guest = await p.evaluate(() => { const n = document.querySelector('#app .alg-miss'); return n ? {txt:n.textContent.replace(/\s+/g, ' '), all:+n.querySelector('b').textContent.match(/\d+/)[0], onCard:+((n.textContent.match(/, (\d+) davon auf dieser Karte/) || [])[1] || NaN)} : null; });
   await L.go(p, 'einrichtung'); const st = await p.evaluate(() => { const s = stations().find(x => x.k === 'menu'); return s.total - s.done; });
-  L.ok(dash === want.all && chip === want.all && rows === want.all && guest && guest.all === want.all && st === want.all, 'Heute, Filter „Ohne Allergene“, gefilterte Liste, Gästekarte und Einrichtung nennen dieselbe Zahl', {dash, chip, rows, guest:guest && guest.all, einrichtung:st, soll:want.all});
+  L.ok(dash === want.all && chip === want.all && rows === want.all && guest && guest.all === want.all && st === want.all, 'Heute, Filter „Allergene offen“, gefilterte Liste, Gästekarte und Einrichtung nennen dieselbe Zahl', {dash, chip, rows, guest:guest && guest.all, einrichtung:st, soll:want.all});
   const onCard = await p.evaluate(() => { const d = view.gdate || todayStr(); return guestItems(curSeasonKey(), d).filter(m => !hasAlg(m)).length; });
   L.ok(guest.onCard === onCard && onCard < want.all && /ausgeblendet oder gerade nicht in Saison/.test(guest.txt), 'die Gästekarte sagt dazu, wie viele davon auf der Karte von heute stehen und warum es weniger sind', guest.txt);
   // ---------- Schwund ----------

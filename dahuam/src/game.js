@@ -41,7 +41,7 @@ function stations(){
     {k:'prices', no:2, name:'Preise', ico:'tag', done:confirmed, total:prods.length, pct:pct(confirmed, prods.length),
       metric: `${confirmed} von ${prods.length} Preisen bestätigt`,
       wozu:'Jede Zutat braucht Ihren echten Einkaufspreis. Erst dann stimmt der Wareneinsatz.',
-      act: confirmed < prods.length ? {l:`Preis-Check starten · ${prods.length-confirmed} offen`, a:'pcStart', id:''} : {l:'Preise ansehen', a:'goTab', id:'products'}},
+      act: confirmed < prods.length ? {l:`Preis-Check starten · ${prods.length-confirmed} offen`, a:'pcStart', id:''} : {l:'Preise ansehen', a:'goTab', id:'products'}, alt:{l:'Artikelliste aus Datei importieren', id:'prod'}},
     {k:'semi', no:3, name:'Basisrezepte', ico:'pot', done:semiOk, total:semis.length, pct: semis.length ? pct(semiOk, semis.length) : 0,
       metric: semis.length ? `${semiOk} von ${semis.length} Basisrezepten vollständig (Zutaten + Ausbeute)` : 'Noch kein Basisrezept',
       wozu:'Teig, Fond, Dressing: einmal als Charge anlegen, in vielen Gerichten verwenden.',
@@ -49,11 +49,11 @@ function stations(){
     {k:'recipes', no:4, name:'Rezepturen', ico:'cards', done:withCard, total:S.menu.length, pct:pct(withCard, S.menu.length),
       metric: `${withCard} von ${S.menu.length} Gerichten haben eine Rezeptur`,
       wozu:'Was in ein Gericht kommt. Daraus rechnet die App Wareneinsatz und Allergene.',
-      act: nextDish ? {l:`Rezeptur anlegen: ${nextDish.name}`, a:'newCardFor', id:nextDish.id} : {l:'Rezepturen ansehen', a:'goTab', id:'cards'}},
+      act: nextDish ? {l:`Rezeptur anlegen: ${nextDish.name}`, a:'newCardFor', id:nextDish.id} : {l:'Rezepturen ansehen', a:'goTab', id:'cards'}, alt:{l:'Rezepturen aus Datei importieren', id:'rec'}},
     {k:'menu', no:5, name:'Speisekarte', ico:'menu', done:withAlg, total:S.menu.length, pct:pct(withAlg, S.menu.length),
-      metric: `${withAlg} von ${S.menu.length} Gerichten mit Allergenangabe`,
+      metric: `${withAlg} von ${S.menu.length} Gerichten mit vollständiger Allergenangabe`,
       wozu:'Preise, Allergene, Saison: Was die Gäste sehen, in Österreich mit Allergenpflicht.',
-      act: noAlg ? {l:'Allergene ergänzen', a:'goMenu', id:'noalg'} : {l:'Gästekarte ansehen', a:'goGuest', id:''}},
+      act: noAlg ? {l:`Allergene ergänzen · ${S.menu.length - withAlg} offen`, a:'goMenu', id:'noalg'} : {l:'Gästekarte ansehen', a:'goGuest', id:''}, alt:{l:'Speisekarte aus Datei importieren', id:'menu'}},
     {k:'sales', no:6, name:'Kasse', ico:'report', done:realDays ? 1 : 0, total:1, pct: realDays ? 100 : 0,
       metric: `${realDays} ${realDays === 1 ? 'Verkaufstag' : 'Verkaufstage'} aus Ihrer Kasse importiert`,
       wozu:'Was wurde verkauft, was hat es gebracht? Mit Kassendaten wird aus Kalkulation Wissen.',
@@ -72,7 +72,7 @@ function renderEinrichtung(){
   const row = s => { const st = s.pct >= 100 ? 'done' : (nx && nx.k === s.k) ? 'active' : 'open';
     return `<li class="au-row ${st}">
       <span class="au-n">${s.pct>=100 ? ico('check') : s.no}</span>
-      <span class="au-t"><b>${esc(s.name)}</b><small>${esc(s.wozu)}</small></span>
+      <span class="au-t"><b>${esc(s.name)}</b><small>${esc(s.wozu)}</small>${s.alt && s.pct < 100 ? `<small class="ed-links"><button type="button" class="link" data-act="datenOpen" data-id="${s.alt.id}">${esc(s.alt.l)}</button></small>` : ''}</span>
       <span class="au-p"><span>${esc(s.metric)}</span><span class="au-m"><i style="width:${s.pct}%"></i></span></span>
       <span class="au-a"><button type="button" class="btn sm ${st==='active'?'primary':''}" data-act="${s.act.a}" data-id="${esc(s.act.id)}">${esc(s.act.l)}</button></span>
     </li>`; };
@@ -157,7 +157,7 @@ function renderPriceCheck(){
   const head = `<div class="page-h"><div><h1>Preis-Check</h1></div>
     <div class="row-btns">${pc && pc.hist && pc.hist.length ? `<button type="button" class="btn" data-act="pcBack">${ico('arrow')}Zurück</button>` : ''}<button type="button" class="btn" data-act="pcEnd" title="${esc(pcFromLabel())}">Beenden</button></div></div>`;
   if(!pc){ const n = S.products.filter(p=>p.priceDemo && !p.noStock).length;
-    return head + emptyHtml('tag', n ? `${n} Preise warten auf Bestätigung` : 'Alle Preise sind bestätigt', n ? 'Wir gehen Produkt für Produkt durch: echten Einkaufspreis eintippen oder den Richtwert bestätigen.' : 'Neue Preise übernehmen Sie beim Wareneingang oder direkt in der Preisliste.', n ? `<button type="button" class="btn primary" data-act="pcStart">${ico('tag')}Preis-Check starten</button>` : `<button type="button" class="btn" data-act="goTab" data-id="products">Zu den Preisen</button>`); }
+    return head + emptyHtml('tag', n ? `${n} Preise warten auf Bestätigung` : 'Alle Preise sind bestätigt', n ? 'Wir gehen Artikel für Artikel durch: echten Einkaufspreis eintippen oder den Richtwert bestätigen.' : 'Neue Preise übernehmen Sie beim Wareneingang oder direkt in der Preisliste.', n ? `<button type="button" class="btn primary" data-act="pcStart">${ico('tag')}Preis-Check starten</button>` : `<button type="button" class="btn" data-act="goTab" data-id="products">Zu den Preisen</button>`); }
   const total = pc.q.length, i = pc.i;
   const prog = `<div class="pc-prog"><div class="pc-prog-t"><b>${Math.min(i,total)} von ${total}</b><span>${pc.saved} eingetragen · ${pc.confirmed} bestätigt · ${pc.skipped} übersprungen</span></div><div class="meter au-meter"><i style="width:${total?Math.min(100,i/total*100):100}%"></i></div></div>`;
   const fb = pc.last ? `<div class="pc-fb ${pc.last.changed?'chg':'ok'}">${ico('check')}<div><b>${esc(pc.last.name)}</b> ${pc.last.changed ? `${eur(pc.last.old)} → <b>${eur(pc.last.nw)}</b> je ${esc(pc.last.unit)}` : `${eur(pc.last.nw)} je ${esc(pc.last.unit)} bestätigt`}
@@ -178,11 +178,12 @@ function renderPriceCheck(){
     <div class="pc-sup">${ico('truck')}<span>${esc(supName(p))}${p.artNo?` · Art.-Nr. ${esc(p.artNo)}`:''}${p.pack?` · ${esc(p.pack)}`:''}</span><span class="pc-count">Nr. ${i+1}</span></div>
     <h2 class="pc-name">${esc(p.name)}</h2>
     <div class="pc-grid">
-      <div class="pc-ex"><small>Richtwert</small><b>${eur(p.price)}</b><span>je ${esc(unitTxt)}${p.unit==='Stk'&&p.pieceG?` · ${num(p.pieceG)} g`:''} · exkl. MwSt.</span></div>
-      <label class="pc-in"><span>Ihr Einkaufspreis je ${esc(p.unit)}</span><span class="pc-field"><em>€</em><input id="pcIn" class="num-in" type="text" inputmode="decimal" data-num="self" placeholder="${num2(p.price)}" autocomplete="off" aria-describedby="pcMsg"></span><small>Netto, wie auf der Rechnung. Leer lassen, wenn der Richtwert stimmt.</small><span class="pc-msg" id="pcMsg" role="alert" ${pc.msg?'':'hidden'}>${pc.msg||''}</span></label>
+      <div class="pc-ex ${+p.price > 0 ? '' : 'none'}"><small>${+p.price > 0 ? 'Richtwert' : 'Preis fehlt'}</small><b>${+p.price > 0 ? eur(p.price) : '—'}</b><span>je ${esc(unitTxt)}${p.unit==='Stk'&&p.pieceG?` · ${num(p.pieceG)} g`:''} · exkl. MwSt.</span></div>
+      <label class="pc-in"><span>Ihr Einkaufspreis je ${esc(p.unit)}</span><span class="pc-field"><em>€</em><input id="pcIn" class="num-in" type="text" inputmode="decimal" data-num="self" placeholder="${+p.price > 0 ? num2(p.price) : '0,00'}" autocomplete="off" aria-describedby="pcMsg"></span><small>${+p.price > 0 ? 'Netto, wie auf der Rechnung. Leer lassen, wenn der Richtwert stimmt.' : 'Netto, wie auf der Rechnung. Für diesen Artikel gibt es noch keinen Preis.'}</small><span class="pc-msg" id="pcMsg" role="alert" ${pc.msg?'':'hidden'}>${pc.msg||''}</span></label>
     </div>
     <div class="pc-uses">${uses.length || semis.length ? `<b>Steckt in:</b> ${uses.slice(0,6).map(x=>`<span>${esc(dishLabel(x.m))} <em class="${fcClass(x.k.fc)}">${num(x.k.fc,1)} %</em></span>`).join('')}${semis.map(c=>`<span>${esc(c.name)} <em>Basisrezept</em></span>`).join('')}${uses.length>6?`<span class="muted">+${uses.length-6} weitere</span>`:''}` : '<span class="muted">Noch in keiner Rezeptur verwendet.</span>'}</div>
-    <div class="pc-acts">${pc.hist && pc.hist.length ? `<button type="button" class="btn" data-act="pcBack">${ico('arrow')}Zurück</button>` : ''}<button type="button" class="btn" data-act="pcSkip">Überspringen<kbd>Esc</kbd></button><span class="sp"></span><button type="button" class="btn" data-act="pcOk">${ico('check')}Richtwert stimmt</button><button type="button" class="btn primary" data-act="pcSave">Übernehmen<kbd>↵</kbd></button></div>
+    <p class="pc-alg ${prodAlgState(p)}">Allergene: ${prodAlgState(p) === 'has' ? `<b>${esc(algClean(p.alg).join(' '))}</b>` : prodAlgState(p) === 'none' ? 'keine (bestätigt)' : '<b>nicht gepflegt</b>'} · <button type="button" class="link" data-act="pcAlg" data-id="${p.id}">${prodAlgState(p) === 'open' ? 'eintragen' : 'ändern'}</button></p>
+    <div class="pc-acts">${pc.hist && pc.hist.length ? `<button type="button" class="btn" data-act="pcBack">${ico('arrow')}Zurück</button>` : ''}<button type="button" class="btn" data-act="pcSkip">Überspringen<kbd>Esc</kbd></button><span class="sp"></span>${+p.price > 0 ? `<button type="button" class="btn" data-act="pcOk">${ico('check')}Richtwert stimmt</button>` : ''}<button type="button" class="btn primary" data-act="pcSave">Übernehmen<kbd>↵</kbd></button></div>
   </section>${fb}`;
 }
 
@@ -190,13 +191,14 @@ function renderPriceCheck(){
 function tellerHints(c){
   const h = []; const t = totals(c);
   const demo = [...demoPriceLines(c)];
-  if(c.items.some(it => !refObj(it.ref))) h.push({cls:'bad', t:`${c.items.filter(it=>!refObj(it.ref)).length} Zutat ohne Auswahl`, a:'tellerTable', id:'', l:'Zur Tabelle'});
+  if(!c.items.some(it => refObj(it.ref))) h.push({cls:'', t:'Noch keine Zutaten. Sie können ein Rezept als Text einfügen: eine Zutat je Zeile', a:'recPaste', id:c.id, l:'Rezeptur einfügen'});
+  else if(c.items.some(it => !refObj(it.ref))) h.push({cls:'bad', t:`${c.items.filter(it=>!refObj(it.ref)).length} Zutat ohne Auswahl`, a:'tellerTable', id:'', l:'Zur Tabelle'});
   if(demo.length) h.push({cls:'warn', t:`${demo.length} ${demo.length===1?'Zutat hat':'Zutaten haben'} noch einen Richtwert-Preis: ${demo.slice(0,3).map(id=>P(id)?.name).filter(Boolean).join(', ')}${demo.length>3?' …':''}`, a:'pcFor', id:demo.join(','), l:'Preise prüfen'});
   if(!(+c.yieldG > 0)) h.push({cls:'warn', t:c.type==='semi' ? 'Ausbeute der Charge fehlt (Gramm)' : 'Portionsgewicht fehlt (Gramm)', a:'focusEl', id:'cf-yieldG', l:'Eintragen'});
   if(!(c.img && IMG[c.img])) h.push({cls:'', t:'Kein Foto', a:'photoCard', id:c.id, l:'Foto'});
   if(!(c.steps||[]).some(s=>s.t && s.t.trim())) h.push({cls:'', t:'Zubereitung noch leer', a:'focusEl', id:'st-0', l:'Schritt schreiben'});
   if(c.type==='dish' && !S.menu.some(m=>m.card===c.id)) h.push({cls:'', t:'Noch nicht auf der Speisekarte', a:'toMenu', id:c.id, l:'Auf die Karte'});
-  if(c.items.length && !t.alg.size) h.push({cls:'', t:'Keine Allergene erkannt, Produktdaten prüfen', a:'goTab', id:'products', l:'Produkte'});
+  { const ai = algInfo({card:c.id}); if(c.items.length && ai.open.length) h.push({cls:'', t:`Allergene unvollständig: bei ${plural(ai.open.length, 'Artikel', 'Artikeln')} fehlt die Angabe`, a:'pFilter', id:'noalg', l:'Artikel pflegen'}); }
   return h;
 }
 function tellerHtml(c){
@@ -227,10 +229,10 @@ function tellerHtml(c){
     <div class="panel-h"><h2>${ico('plate')}Teller · Zutaten ${c.type==='semi'?'pro Charge':'pro Portion'}</h2></div>
     <div class="teller">${plate}
       <div class="tl-tiles">${c.items.map((it,i)=>tile({i,it,l:t.lines[i]})).join('')}
-        <button type="button" class="ti ti-add" data-act="tellerPick">${ico('plus')}<b>Zutat</b><small>Produkt oder Basisrezept</small></button></div>
+        <button type="button" class="ti ti-add" data-act="tellerPick">${ico('plus')}<b>Zutat</b><small>Artikel oder Basisrezept</small></button></div>
     </div>
     <div class="teller-f"><span class="kv-inline"><span>Brutto <b>${num(t.gross)} g</b></span><span>Netto <b>${num(t.net)} g</b></span><span>Fertig <b>${num(t.out)} g</b></span><span>Wareneinsatz <b>${eur(t.cost)}</b></span></span></div>
-    ${moreOpts('teller', `<button type="button" class="btn sm" data-act="addLine">${ico('plus')}Leere Zeile</button><button type="button" class="btn sm" data-act="tellerMode" data-id="table">Als Tabelle bearbeiten (Brutto, Netto, Fertig)</button><button type="button" class="btn sm" data-act="dupCard" data-id="${c.id}">${ico('copy')}Rezeptur duplizieren</button>`)}
+    ${moreOpts('teller', `<button type="button" class="btn sm" data-act="addLine">${ico('plus')}Leere Zeile</button><button type="button" class="btn sm" data-act="recPaste" data-id="${c.id}">Rezeptur einfügen</button><button type="button" class="btn sm" data-act="tellerMode" data-id="table">Als Tabelle bearbeiten (Brutto, Netto, Fertig)</button><button type="button" class="btn sm" data-act="dupCard" data-id="${c.id}">${ico('copy')}Rezeptur duplizieren</button>`)}
     ${hints.length ? `<ul class="hints">${hints.map(h=>`<li class="${h.cls}"><span>${esc(h.t)}</span><button type="button" class="btn sm" data-act="${h.a}" data-id="${esc(h.id)}">${esc(h.l)}</button></li>`).join('')}</ul>` : `<div class="teller-ok muted sm">${ico('check')}Vollständig: Zutaten, Preise, Foto, Zubereitung.</div>`}
   </section>`;
 }
@@ -248,8 +250,8 @@ function tellerPickDialog(c){
   const tileP = p => `<button type="button" class="pk ${used.has('p:'+p.id)?'used':''}" data-pick="p:${p.id}" data-s="${esc((p.name+' '+supName(p)).toLowerCase())}"><b>${esc(p.name)}</b><small>${eur(p.price)} / ${esc(p.unit)}${p.priceDemo?' · Richtwert':''}</small>${used.has('p:'+p.id)?'<i>am Teller</i>':''}</button>`;
   const tileC = x => { const tt = totals(x); const y = +x.yieldG || tt.out; return `<button type="button" class="pk semi ${used.has('c:'+x.id)?'used':''}" data-pick="c:${x.id}" data-s="${esc(x.name.toLowerCase())} basisrezept"><b>${esc(x.name)}</b><small>Basisrezept · ${y ? eur(tt.cost/y*1000)+' / kg' : 'ohne Ausbeute'}</small>${used.has('c:'+x.id)?'<i>am Teller</i>':''}</button>`; };
   openDialog('Zutat auf den Teller', `<label class="search pk-s">${ico('search')}<input id="pkIn" placeholder="Zutat suchen …" autocomplete="off"></label>
-    <div class="pk-wrap">${cs.length ? `<div class="pk-g">Basisrezepte</div><div class="pk-grid">${cs.map(tileC).join('')}</div>` : ''}<div class="pk-g">Produkte</div><div class="pk-grid">${ps.map(tileP).join('')}</div>
-    <p class="hint pk-empty" hidden>Nichts gefunden. <button type="button" class="link" id="pkNew">Neues Produkt anlegen</button></p></div>`, null,
+    <div class="pk-wrap">${cs.length ? `<div class="pk-g">Basisrezepte</div><div class="pk-grid">${cs.map(tileC).join('')}</div>` : ''}<div class="pk-g">Artikel</div><div class="pk-grid">${ps.map(tileP).join('')}</div>
+    <p class="hint pk-empty" hidden>Nichts gefunden. <button type="button" class="link" id="pkNew">Neuen Artikel anlegen</button></p></div>`, null,
     {cancel:'Schließen', after: f => {
       const inp = f.querySelector('#pkIn'); setTimeout(()=>inp.focus(), 30);
       const filter = () => { const q = inp.value.trim().toLowerCase(); let n = 0; f.querySelectorAll('.pk').forEach(b => { const on = !q || b.dataset.s.includes(q); b.hidden = !on; if(on) n++; }); f.querySelectorAll('.pk-g').forEach(g => { const grid = g.nextElementSibling; g.hidden = ![...grid.children].some(x=>!x.hidden); }); f.querySelector('.pk-empty').hidden = n > 0; };

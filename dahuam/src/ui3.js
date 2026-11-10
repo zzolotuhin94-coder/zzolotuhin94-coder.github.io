@@ -38,12 +38,12 @@ function renderMenuCalc(){
   const sCol = (SORTS.menu && SORTS.menu.col) || '';
   const more = moreOpts('menu', `<label class="f inl">Sortieren<select data-sel="msort" aria-label="Sortieren">${MENU_SORTS.map(([k,l]) => `<option value="${k}" ${sCol===k?'selected':''}>${l}</option>`).join('')}</select></label><button type="button" class="btn sm" data-act="secDlg">Kategorien verwalten</button>`);
   let h = `<div class="toolbar"><label class="search">${ico('search')}<input id="mq" type="search" placeholder="Gericht, Zutat oder Kategorie" value="${esc(view.q)}" autocomplete="off"></label></div>
-  <div class="toolbar filters">${seg('sec', f, [['all','Alle',all.length],['over','Über Ziel',cnt(x=>x.k.fc!=null&&x.k.fc>S.settings.target)],['none','Ohne Rezeptur',cnt(x=>x.k.cost==null)],['noalg','Ohne Allergene',noAlgCount()],['nophoto','Ohne Foto',cnt(x=>!menuImg(x.m))]])}<select class="sel-cat" data-sel="sec" aria-label="Kategorie"><option value="all">Alle Kategorien</option>${secList().filter(s=>all.some(x=>x.m.section===s)).map(s=>`<option value="${esc(s)}" ${f===s?'selected':''}>${esc(s)} (${cnt(x=>x.m.section===s)})</option>`).join('')}<optgroup label="Saison">${SEASONS.map(([k,l])=>`<option value="${k}" ${f===k?'selected':''}>Nur ${l} (${cnt(x=>x.m.seasons.includes(k))})</option>`).join('')}</optgroup></select></div>`;
+  <div class="toolbar filters">${seg('sec', f, [['all','Alle',all.length],['over','Über Ziel',cnt(x=>x.k.fc!=null&&x.k.fc>S.settings.target)],['none','Ohne Rezeptur',cnt(x=>x.k.cost==null)],['noalg','Allergene offen',noAlgCount()],['nophoto','Ohne Foto',cnt(x=>!menuImg(x.m))]])}<select class="sel-cat" data-sel="sec" aria-label="Kategorie"><option value="all">Alle Kategorien</option>${secList().filter(s=>all.some(x=>x.m.section===s)).map(s=>`<option value="${esc(s)}" ${f===s?'selected':''}>${esc(s)} (${cnt(x=>x.m.section===s)})</option>`).join('')}<optgroup label="Saison">${SEASONS.map(([k,l])=>`<option value="${k}" ${f===k?'selected':''}>Nur ${l} (${cnt(x=>x.m.seasons.includes(k))})</option>`).join('')}</optgroup></select></div>`;
   if(!shown.length) return h + `<div class="panel empty">Keine Gerichte für diesen Filter.</div>` + more;
   const sorted = applySort('menu', shown, {name:x=>x.m.name, price:x=>+x.m.price, fc:x=>x.k.fc, margin:x=>x.k.margin});
   const grouped = !sCol; const drag = menuDragOk();
   const row = ({m,k}) => { const img = menuImg(m); const st = [];
-    if(!hasAlg(m)) st.push('<span class="open" title="Allergene fehlen"><i></i>Allergene</span>'); if(m.hidden) st.push('<span>ausgeblendet</span>'); if(m.top) st.push('<span class="top" title="Empfehlung des Hauses">★</span>');
+    if(!hasAlg(m)) st.push(`<span class="open" title="${esc('Allergene unvollständig: ' + algWhy(m))}"><i></i>Allergene</span>`); if(m.hidden) st.push('<span>ausgeblendet</span>'); if(m.top) st.push('<span class="top" title="Empfehlung des Hauses">★</span>');
     const when = [m.seasons.length ? m.seasons.map(seasonName).join(', ') : '', m.days && m.days.length ? hkDays(m) : ''].filter(Boolean).join(' · ');
     const calc = k.c ? `<td class="r hide-m">${k.cost!=null?eur(k.cost):'<span class="lt-muted">—</span>'}</td>
       <td class="r"><span class="lt-fc ${fcClass(k.fc)}"><i></i>${k.fc!=null?num(k.fc,1)+' %':'—'}</span></td>
@@ -65,7 +65,7 @@ function renderMenuCalc(){
 }
 /* Kategorien der Karte: umbenennen, ordnen, anlegen, leere löschen */
 function secDialog(){
-  const draw = () => { const secs = secList(); return `<p class="dlg-p">Die Überschriften Ihrer Karte, in dieser Reihenfolge. Den Namen ändern Sie direkt im Feld.</p><ul class="sec-list">${secs.map((s,si) => { const n = S.menu.filter(m=>m.section===s).length; return `<li><input class="lay-name" data-secname="${si}" value="${esc(s)}" aria-label="Kategoriename"><span class="muted sm">${n}</span>
+  const draw = () => { const secs = secList(); const sv = S.settings.secVat || (S.settings.secVat = {}); const vS = num(+S.settings.vat||0,1), vG = num(+vatRate({vat:'g'})||0,1); return `<p class="dlg-p">Die Überschriften Ihrer Karte, in dieser Reihenfolge. Den Namen ändern Sie direkt im Feld. Der Steuersatz gilt für alle Gerichte der Kategorie.</p><ul class="sec-list">${secs.map((s,si) => { const n = S.menu.filter(m=>m.section===s).length; return `<li><input class="lay-name" data-secname="${si}" value="${esc(s)}" aria-label="Kategoriename"><select class="sm-sel sec-vat" data-secvat="${si}" aria-label="Steuersatz ${esc(s)}"><option value="s">Speisen ${vS} %</option><option value="g" ${sv[s]==='g'?'selected':''}>Getränke ${vG} %</option></select><span class="muted sm">${n}</span>
       <button type="button" class="icon-btn" data-sd="up" data-i="${si}" ${si===0?'disabled':''} aria-label="${esc(s)} nach oben">${ico('up')}</button><button type="button" class="icon-btn" data-sd="down" data-i="${si}" ${si===secs.length-1?'disabled':''} aria-label="${esc(s)} nach unten">${ico('down')}</button>
       <button type="button" class="icon-btn danger" data-sd="del" data-i="${si}" ${n?'disabled title="Nur leere Kategorien lassen sich löschen"':''} aria-label="${esc(s)} löschen">${ico('trash')}</button></li>`; }).join('')}</ul>
     <button type="button" class="btn sm" data-sd="add">${ico('plus')}Kategorie</button>`; };
@@ -74,10 +74,10 @@ function secDialog(){
     f.addEventListener('click', e => { const b = e.target.closest('[data-sd]'); if(!b) return; if(!roGate()) return; const s = S.settings.sections; secList(); const i = +b.dataset.i;
       if(b.dataset.sd === 'up' && i > 0) [s[i-1], s[i]] = [s[i], s[i-1]];
       else if(b.dataset.sd === 'down' && i < s.length-1) [s[i+1], s[i]] = [s[i], s[i+1]];
-      else if(b.dataset.sd === 'del'){ if(S.menu.some(m=>m.section===s[i])) return; s.splice(i,1); }
+      else if(b.dataset.sd === 'del'){ if(S.menu.some(m=>m.section===s[i])) return; if(S.settings.secVat) delete S.settings.secVat[s[i]]; s.splice(i,1); }
       else if(b.dataset.sd === 'add'){ let n = 'Neue Kategorie', k = 2; while(s.includes(n)) n = 'Neue Kategorie '+k++; s.push(n); }
       save(); redraw(); if(b.dataset.sd === 'add'){ const inp = f.querySelector(`[data-secname="${s.length-1}"]`); if(inp){ inp.focus(); inp.select(); } } });
-    f.addEventListener('change', e => { if(e.target.dataset.secname != null) setTimeout(redraw, 0); });
+    f.addEventListener('change', e => { if(e.target.dataset.secname != null) setTimeout(redraw, 0); if(e.target.dataset.secvat != null){ if(!roGate()){ redraw(); return; } const nm = secList()[+e.target.dataset.secvat]; const sv = S.settings.secVat || (S.settings.secVat = {}); if(e.target.value === 'g') sv[nm] = 'g'; else delete sv[nm]; save(); toast(`${nm}: ${e.target.value === 'g' ? 'Getränke' : 'Speisen'}`); } });
     $('#dlg').addEventListener('close', () => render(), {once:true});
   }});
 }

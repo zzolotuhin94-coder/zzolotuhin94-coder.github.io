@@ -1,5 +1,5 @@
 import os, sys, json, hashlib
-APP_VERSION = '1.2.0'   # Paket B: Aufräumen
+APP_VERSION = '1.3.0'   # Paket C: Eigene Daten
 SITE = '/home/user/zzolotuhin94-coder.github.io/dahuam/'
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 R = lambda f: open(f, encoding='utf-8').read()
@@ -7,9 +7,9 @@ R = lambda f: open(f, encoding='utf-8').read()
 # Reihenfolge zählt: spätere Dateien bauen auf früheren auf.
 JS_BEFORE = ['script_de.js', 'store.js']          # Rechenkern, Speicher
 JS_MODULES = ['season.js', 'season2.js', 'season3.js', 'einkauf.js', 'menu2.js', 'cloud.js', 'ui3.js', 'sales.js', 'report.js', 'menu3.js', 'prices.js',
-              'game.js', 'drag.js', 'polish.js', 'pdf.js', 'hauskarte.js', 'fixes.js', 'guide_txt.js', 'guide.js', 'vorbereitung.js', 'team.js', 'nav.js', 'reliab.js']
+              'game.js', 'drag.js', 'polish.js', 'pdf.js', 'allergen.js', 'hauskarte.js', 'fixes.js', 'guide_txt.js', 'guide.js', 'vorbereitung.js', 'team.js', 'nav.js', 'reliab.js', 'daten.js']
 CSS_MODULES = ['season.css', 'einkauf.css', 'menu2.css', 'ui3.css', 'report.css', 'menu3.css', 'prices.css', 'game.css', 'drag.css', 'polish.css',
-               'hauskarte.css', 'fixes.css', 'guide.css', 'plus.css', 'team.css', 'reliab.css', 'nav.css']
+               'hauskarte.css', 'fixes.css', 'guide.css', 'plus.css', 'team.css', 'reliab.css', 'nav.css', 'daten.css']
 start = '/* ---------- Start ---------- */'
 a, b = R('ui2.js').split(start)                   # ui2.js: Oberfläche; der Start-Block läuft erst nach allen Modulen
 js = '\n'.join([R(f) for f in JS_BEFORE] + [a] + [R(f) for f in JS_MODULES] + [start + b])

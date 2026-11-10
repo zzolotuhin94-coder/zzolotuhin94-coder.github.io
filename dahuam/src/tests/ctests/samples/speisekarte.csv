@@ -1,0 +1,36 @@
+﻿Kategorie;Gericht;Variante;Beschreibung;Preis;vegetarisch/vegan;Saison;Allergene;Empfehlung;Wochentage
+Suppen;Frittatensuppe;;Rindsuppe, Kräuterfrittaten;6,50;;;A C G L;;
+Suppen;Kürbiscremesuppe;;"Kernöl; geröstete Kerne";7,20;vegetarisch;Herbst, Winter;G;;
+Suppen;Gulaschsuppe;;Mit Gebäck;7,90;;;A;;
+Suppen;Leberknödelsuppe;;;6,90;;;A C G;;
+Vorspeisen;Beef Tatar;klein;Toast, Butter;14,50;;;A C G M;;
+Vorspeisen;Beef Tatar;groß;Toast, Butter;19,80;;;A C G M;;
+Vorspeisen;Gebackener Emmentaler;;Preiselbeeren, Sauce Tartare;11,90;vegetarisch;;A C G;;
+Hauptspeisen;Wiener Schnitzel;vom Schwein;Petersilkartoffeln;18,90;;;A C G;ja;
+Hauptspeisen;Wiener Schnitzel;vom Kalb;Petersilkartoffeln;26,90;;;A C G;;
+Hauptspeisen;Zwiebelrostbraten;;Braterdäpfel, Röstzwiebel;27,50;;;A G M;;
+Hauptspeisen;Tafelspitz;;"Apfelkren, Schnittlauchsauce; Rösterdäpfel";24,00;;;;;So
+Hauptspeisen;Käsespätzle;;Röstzwiebel, grüner Salat;15,90;vegetarisch;;A C G;x;
+Hauptspeisen;Gemüsecurry;;Basmatireis, Kokosmilch;16,50;vegan;;keine;;
+Hauptspeisen;Backhendl;;Erdäpfel-Vogerlsalat;19,90;;Sommer;A C G;;
+Hauptspeisen;Forelle Müllerin;;Petersilerdäpfel, Mandelbutter;25,20;;;A D G H;;Fr
+Hauptspeisen;Rindsgulasch;;Semmelknödel;18,50;;Herbst, Winter;A C G;;
+Desserts;Apfelstrudel;;Mit Schlagobers;5,90;vegetarisch;;A C G O;;
+Desserts;Kaiserschmarren;;Zwetschkenröster;13,80;vegetarisch;;A C G;ja;
+Desserts;Topfenknödel;;Butterbrösel, Marillenröster;9,50;vegetarisch;;A C G;;
+Desserts;Eispalatschinke;;Vanilleeis, Schokosauce;8,90;vegetarisch;Sommer;A C G;;
+Kinder;Kinderschnitzel;;Pommes;9,90;;;A C G;;
+Kinder;Nudeln mit Tomatensauce;;;7,50;vegan;;A;;
+Getränke;Mineralwasser 0,33 l;;;3,40;vegan;;keine;;
+Getränke;Apfelsaft gespritzt;0,3 l;;3,60;vegan;;keine;;
+Getränke;Apfelsaft gespritzt;0,5 l;;4,90;vegan;;keine;;
+Getränke;Zillertal Bier;0,5 l;Vom Fass;5,20;vegan;;A;;
+Getränke;Grüner Veltliner;1/8 l;;4,80;;;O;;
+Getränke;Espresso;;;2,90;vegan;;keine;;
+Getränke;Cappuccino;;;3,90;vegetarisch;;G;;
+Getränke;Hausgemachter Eistee;;Zitrone, Minze;4,20;vegan;Sommer;keine;;
+Hauptspeisen;Tagesfisch;;nach Angebot;Tagespreis;;;;;
+Desserts;;;ohne Namen;4,00;;;;;
+Suppen;Frittatensuppe;;steht schon oben;6,90;;;;;
+Desserts;Sachertorte;;;;;;;;
+Hauptspeisen;Grillteller;;Für zwei;38,00;;;A X;;
