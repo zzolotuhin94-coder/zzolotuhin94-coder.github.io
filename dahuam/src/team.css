@@ -467,3 +467,11 @@
   #dlgForm[data-tm] .tog,#dlgForm[data-tm] .btn.sm{min-height:42px}
   #dlgForm[data-tm] .link{min-height:40px}
 }
+
+/* Küche / Service */
+.tm-t .tm-grp th,.tm-mini .tm-grp th{text-align:left;font:600 11px/1 var(--f-ui, inherit);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:16px 12px 7px;background:transparent;border-bottom:1px solid var(--line)}
+.tm-t .tm-grp th span{margin-left:8px;font-weight:500;letter-spacing:0;opacity:.75}
+.tm-mini .tm-grp th{padding:12px 2px 5px}
+.tm-dl .tm-dgrp{list-style:none;font-weight:600;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:14px 0 6px;border-bottom:1px solid var(--line)}
+.tm-print .tp-g th{text-align:left;font-size:9pt;letter-spacing:.08em;text-transform:uppercase;padding-top:8pt;border-left:0;border-right:0;background:none}
+@media (max-width:700px){ .tm-dept{order:5;width:100%} .tm-dept button{flex:1} }

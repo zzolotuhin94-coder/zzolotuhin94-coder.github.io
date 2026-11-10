@@ -2736,6 +2736,14 @@ body.gd-help #app *,body.gd-help .side *,body.gd-help .bottom *,body.gd-help .to
   #dlgForm[data-tm] .link{min-height:40px}
 }
 
+/* Küche / Service */
+.tm-t .tm-grp th,.tm-mini .tm-grp th{text-align:left;font:600 11px/1 var(--f-ui, inherit);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:16px 12px 7px;background:transparent;border-bottom:1px solid var(--line)}
+.tm-t .tm-grp th span{margin-left:8px;font-weight:500;letter-spacing:0;opacity:.75}
+.tm-mini .tm-grp th{padding:12px 2px 5px}
+.tm-dl .tm-dgrp{list-style:none;font-weight:600;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:14px 0 6px;border-bottom:1px solid var(--line)}
+.tm-print .tp-g th{text-align:left;font-size:9pt;letter-spacing:.08em;text-transform:uppercase;padding-top:8pt;border-left:0;border-right:0;background:none}
+@media (max-width:700px){ .tm-dept{order:5;width:100%} .tm-dept button{flex:1} }
+
 /* ---------- Paket A: Zuverlässigkeit ---------- */
 html.booting .shell,html.booting .bottom,html.booting #pal{visibility:hidden}
 html.rel-recover .side nav,html.rel-recover .side-help,html.rel-recover .bottom,html.rel-recover .kbd-btn,html.rel-recover .side-foot,html.rel-recover .topbar .theme-btn{visibility:hidden}
@@ -3523,7 +3531,7 @@ function usage(ref){ return S.cards.filter(c => c.items.some(i => i.ref === ref)
    Ohne IndexedDB: localStorage wie früher, aber Fehler werden sichtbar.
    ===================================================================== */
 const APP_SCHEMA = 2;                       // Datenformat; ohne Angabe = 1 (vor Paket A)
-const APP_VERSION = '1.4.0', APP_BUILD = 'ff450352f4';
+const APP_VERSION = '1.4.0', APP_BUILD = '1fd7e55512';
 function schemaNewer(d){ return !!d && typeof d === 'object' && +d.schema > APP_SCHEMA; }
 
 const STORE = (() => {
@@ -9182,6 +9190,16 @@ palData = function(){
 
 const TM_AREAS = [['kueche','Küche'],['service','Service'],['bar','Bar'],['abwasch','Abwasch']];
 const TM_AREA = Object.fromEntries(TM_AREAS);
+/* Zwei Pläne: Küche (mit Abwasch) und Service (mit Bar) */
+const TM_DEPTS = [['kueche','Küche',['kueche','abwasch']],['service','Service',['service','bar']]];
+function tmDeptOf(area){ return area === 'service' || area === 'bar' ? 'service' : 'kueche'; }
+function tmDeptName(d){ const x = TM_DEPTS.find(y => y[0] === d); return x ? x[1] : ''; }
+function tmDeptAreas(d){ const x = TM_DEPTS.find(y => y[0] === d); return x ? x[2] : TM_AREAS.map(a => a[0]); }
+function tmDept(){ const v = tmView(); if(v.dept === undefined){ let d = ''; try { d = localStorage.getItem('dahuam202_dienst_bereich') || ''; } catch(e){} v.dept = d === 'kueche' || d === 'service' ? d : 'all'; } return v.dept; }
+/* Personen eines Plans: wer dort hingehört, dazu wer in dieser Woche dort aushilft */
+function tmDeptPeople(ppl, W, d){ if(d === 'all') return ppl; const ar = tmDeptAreas(d); const help = new Set(); for(let i = 0; i < 7; i++) tmShifts(dAdd(W, i)).forEach(s => { if(ar.includes(s.area)) help.add(s.pid); }); return ppl.filter(p => tmDeptOf(p.area) === d || help.has(p.id)); }
+/* Gruppen für die Anzeige: bei „Alle“ zwei Blöcke mit Überschrift */
+function tmGroups(ppl, d){ if(d !== 'all') return [['', ppl]]; return TM_DEPTS.map(([k, l]) => [l, ppl.filter(p => tmDeptOf(p.area) === k)]).filter(g => g[1].length); }
 const TM_ABS = {urlaub:'Urlaub', krank:'Krank', wunsch:'Kann nicht'};
 const TM_WD = ['Mo','Di','Mi','Do','Fr','Sa','So'];
 const TM_NCOL = 8;
@@ -9426,7 +9444,7 @@ function tmRowPeople(W){
 }
 /* Besetzung eines Tages je Bereich (Personen, nicht Dienste) */
 function tmStaff(D){ const o = {}; TM_AREAS.forEach(([k]) => { o[k] = new Set(); }); tmShifts(D).forEach(s => { if(o[s.area]) o[s.area].add(s.pid); }); const r = {}; TM_AREAS.forEach(([k]) => { r[k] = o[k].size; }); return r; }
-function tmGaps(D, W){ if(tmClosed(D) || !tmWeekCount(W || tmMonday(D))) return []; const s = tmStaff(D); return ['kueche','service'].filter(k => !s[k]).map(k => TM_AREA[k]); }
+function tmGaps(D, W, d){ if(tmClosed(D) || !tmWeekCount(W || tmMonday(D))) return []; const s = tmStaff(D); return ['kueche','service'].filter(k => !d || d === 'all' || d === k).filter(k => !s[k]).map(k => TM_AREA[k]); }
 /* Hinweise für eine Woche. Nie eine Sperre. */
 function tmHints(W){
   const st = tmS(); const out = [];
@@ -9479,34 +9497,34 @@ function tmPatternSave(W, name){ const st = tmS(); const days = [0,1,2,3,4,5,6].
 function tmPatternApply(W, id){ const pt = tmS().patterns.find(x => x.id === id); if(!pt) return null; const list = []; pt.days.forEach((l, i) => l.forEach(s => list.push([i, s]))); return tmSetWeek(W, list); }
 
 /* ---------- Text für WhatsApp, Druck ---------- */
-function tmDayLine(D){
-  const sh = tmShifts(D); if(!sh.length) return tmClosed(D) ? 'Ruhetag' : 'niemand eingeteilt';
+function tmDayLine(D, d){
+  const ar = tmDeptAreas(d || 'all'); const sh = tmShifts(D).filter(s => ar.includes(s.area)); if(!sh.length) return tmClosed(D) ? 'Ruhetag' : 'niemand eingeteilt';
   const parts = [];
   TM_AREAS.forEach(([k, l]) => { const list = sh.filter(s => s.area === k).sort((a, b) => tmMin(a.parts[0][0]) - tmMin(b.parts[0][0]) || (tmPerson(a.pid) || {name:''}).name.localeCompare((tmPerson(b.pid) || {name:''}).name, 'de'));
     if(list.length) parts.push(`${l} – ${list.map(s => `${(tmPerson(s.pid) || {name:'?'}).name} ${tmPartsTxt(s.parts, true)}${s.note ? ` (${s.note})` : ''}`).join(', ')}`); });
   return parts.join(' · ');
 }
-function tmWeekText(W){
-  const lines = [`Dienstplan KW ${tmKw(W)} (${tmDm(W)}–${tmDm(dAdd(W, 6))})`];
-  for(let i = 0; i < 7; i++){ const D = dAdd(W, i); lines.push(`${tmDayTxt(D)}: ${tmDayLine(D)}`); }
+function tmWeekText(W, d){
+  const lines = [`Dienstplan${d && d !== 'all' ? ' ' + tmDeptName(d) : ''} KW ${tmKw(W)} (${tmDm(W)}–${tmDm(dAdd(W, 6))})`];
+  for(let i = 0; i < 7; i++){ const D = dAdd(W, i); lines.push(`${tmDayTxt(D)}: ${tmDayLine(D, d)}`); }
   return lines.join('\n');
 }
-function tmPrintHtml(W){
-  const ppl = tmRowPeople(W); const days = [0,1,2,3,4,5,6].map(i => dAdd(W, i)); const dense = ppl.length > 12 ? 'd3' : ppl.length > 8 ? 'd2' : '';
+function tmPrintHtml(W, d){
+  d = d || 'all'; const ppl = tmDeptPeople(tmRowPeople(W), W, d); const ar = tmDeptAreas(d); const days = [0,1,2,3,4,5,6].map(i => dAdd(W, i)); const dense = ppl.length > 12 ? 'd3' : ppl.length > 8 ? 'd2' : '';
   const cell = (p, D) => { const sh = tmShiftsOf(p.id, D), ab = tmAbsOf(p.id, D);
     return sh.map(s => `<div class="tp-s"><b>${s.parts.map(x => esc(tmPartTxt(x))).join('<br>')}</b>${s.area !== p.area || s.note ? `<small>${esc([s.area !== p.area ? TM_AREA[s.area] : '', s.note].filter(Boolean).join(' · '))}</small>` : ''}</div>`).join('') + (ab && !sh.length ? `<span class="tp-a">${ab.t === 'urlaub' ? 'Urlaub' : 'abwesend'}</span>` : ''); };
   return `<div class="tm-print ${dense}"><div class="meta"><span>${esc(S.settings.name)}</span><span>Stand ${fmtDate(new Date().toISOString())}, ${tmNowHm()} Uhr</span></div>
-    <h1>Dienstplan · KW ${tmKw(W)}</h1><p class="tp-sub">${esc(tmRangeTxt(W))}</p>
+    <h1>Dienstplan${d !== 'all' ? ' ' + tmDeptName(d) : ''} · KW ${tmKw(W)}</h1><p class="tp-sub">${esc(tmRangeTxt(W))}</p>
     <table><thead><tr><th></th>${days.map(D => `<th class="${tmClosed(D) ? 'cl' : ''}"><b>${tmWdShort(D)}</b> ${tmDm(D)}${tmClosed(D) ? '<small>Ruhetag</small>' : ''}</th>`).join('')}</tr></thead>
-    <tbody>${ppl.map(p => `<tr><th><b>${esc(p.name)}</b><small>${TM_AREA[p.area]}</small></th>${days.map(D => `<td class="${tmClosed(D) ? 'cl' : ''}">${cell(p, D)}</td>`).join('')}</tr>`).join('')}</tbody>
-    <tfoot><tr><th>Besetzung</th>${days.map(D => { const s = tmStaff(D); return `<td class="${tmClosed(D) ? 'cl' : ''}">${TM_AREAS.filter(([k]) => s[k]).map(([k, l]) => `${l} ${s[k]}`).join('<br>')}</td>`; }).join('')}</tr></tfoot></table></div>`;
+    <tbody>${tmGroups(ppl, d).map(([gl, gp]) => (gl ? `<tr class="tp-g"><th colspan="8">${gl}</th></tr>` : '') + gp.map(p => `<tr><th><b>${esc(p.name)}</b><small>${TM_AREA[p.area]}</small></th>${days.map(D => `<td class="${tmClosed(D) ? 'cl' : ''}">${cell(p, D)}</td>`).join('')}</tr>`).join('')).join('')}</tbody>
+    <tfoot><tr><th>Besetzung</th>${days.map(D => { const s = tmStaff(D); return `<td class="${tmClosed(D) ? 'cl' : ''}">${TM_AREAS.filter(([k]) => s[k] && ar.includes(k)).map(([k, l]) => `${l} ${s[k]}`).join('<br>')}</td>`; }).join('')}</tr></tfoot></table></div>`;
 }
 function tmPrint(){
-  const W = tmView().w; if(!tmRowPeople(W).length){ toast('Noch kein Team, kein Plan zum Drucken'); return; }
-  const el = $('#print'); PDF_NAME = pdfFileName(`Dienstplan-KW${String(tmKw(W)).padStart(2, '0')}-${W}`); el.classList.remove('hs-print'); el.classList.add('land'); el.innerHTML = tmPrintHtml(W); document.body.classList.remove('print-menu', 'print-report'); window.print();
+  const W = tmView().w; const d = tmDept(); if(!tmDeptPeople(tmRowPeople(W), W, d).length){ toast('Noch kein Team, kein Plan zum Drucken'); return; }
+  const el = $('#print'); PDF_NAME = pdfFileName(`Dienstplan-${d !== 'all' ? tmDeptName(d) + '-' : ''}KW${String(tmKw(W)).padStart(2, '0')}-${W}`); el.classList.remove('hs-print'); el.classList.add('land'); el.innerHTML = tmPrintHtml(W, d); document.body.classList.remove('print-menu', 'print-report'); window.print();
 }
 function tmCopyText(){
-  const txt = tmWeekText(tmView().w);
+  const txt = tmWeekText(tmView().w, tmDept());
   const fb = () => tmDialog('Dienstplan als Text', `<p class="dlg-p">Text markieren, kopieren und in WhatsApp einfügen.</p><textarea class="code" readonly id="tmTxt" rows="9">${esc(txt)}</textarea>`, null, {cancel:'Schließen', after:() => $('#tmTxt').select()});
   let pr = null; try { pr = navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(txt) : null; } catch(e){ pr = null; }
   if(pr) pr.then(() => toast('Dienstplan kopiert. In WhatsApp einfügen.'), fb); else fb();
@@ -9533,20 +9551,21 @@ function tmShiftChip(s, p, D, hm, ro){
   return `<button type="button" class="tm-sh c${p.color}${hint ? ' hint' : ''}" data-act="tmEdit" data-id="${D}|${s.id}" aria-label="${esc(label)}"${hint ? ` title="${esc('Hinweis: ' + hint.join('; '))}"` : ''}><b>${s.parts.map(x => `<span>${tmPartTxt(x)}</span>`).join('')}</b>${sub ? `<small>${esc(sub)}</small>` : ''}${hint ? '<i class="tm-mk" aria-hidden="true"></i>' : ''}</button>`;
 }
 function tmAbsChip(a, p, D){ return `<button type="button" class="tm-ab ${a.t}" data-act="tmAbs" data-id="${p.id}|${D}" aria-label="${esc(`${p.name}, ${tmDayTxt(D)}: ${TM_ABS[a.t]}${a.note ? ', ' + a.note : ''}`)}"${a.note ? ` title="${esc(a.note)}"` : ''}>${TM_ABS[a.t]}${a.note ? `<small>${esc(a.note)}</small>` : ''}</button>`; }
-function tmStaffHtml(D, W){ const s = tmStaff(D); const gaps = tmGaps(D, W); return TM_AREAS.filter(([k]) => s[k]).map(([k, l]) => `<span>${l} <b>${s[k]}</b></span>`).join('') + gaps.map(g => `<span class="gap">${g} fehlt</span>`).join(''); }
-function tmWeekTable(W, ppl, hm, ro){
+function tmStaffHtml(D, W, d){ const s = tmStaff(D); const gaps = tmGaps(D, W, d); const ar = tmDeptAreas(d || 'all'); return TM_AREAS.filter(([k]) => s[k] && ar.includes(k)).map(([k, l]) => `<span>${l} <b>${s[k]}</b></span>`).join('') + gaps.map(g => `<span class="gap">${g} fehlt</span>`).join(''); }
+function tmWeekTable(W, ppl, hm, ro, d){
   const days = [0,1,2,3,4,5,6].map(i => dAdd(W, i)); const t = todayStr(); const meP = tmMePerson();
   const head = days.map(D => `<th scope="col" class="${D === t ? 'today' : ''} ${tmClosed(D) ? 'closed' : ''}"><b>${tmWdShort(D)}</b><span>${tmDm(D)}</span>${tmClosed(D) ? '<small>Ruhetag</small>' : ''}</th>`).join('');
-  const rows = ppl.map(p => { const wk = hm.get(p.id + '|');
+  const row = p => { const wk = hm.get(p.id + '|');
     const h = tmWeekHours(p.id, W);
     return `<tr class="${p.active ? '' : 'off'}"><th scope="row"><div class="tm-pc"><i class="tm-dot c${p.color}"></i><b class="tm-name">${esc(p.name)}</b><b class="tm-hv" data-help="tm_stunden">${tmH(h)}</b><small class="tm-ar">${TM_AREA[p.area]}${p.active ? '' : ' · nicht mehr aktiv'}</small><small class="tm-hs">${p.target ? `von ${tmH(p.target)} Std.` : 'Std.'}</small>${wk ? `<small class="tm-wk" title="${esc('Hinweis: ' + wk.join('; '))}"><i class="tm-mk" aria-hidden="true"></i>über ${TM_RULES.weekMax} Std.</small>` : ''}</div></th>
       ${days.map(D => { const sh = tmShiftsOf(p.id, D), ab = tmAbsOf(p.id, D); const can = !ro || (meP && meP.id === p.id);
-        return `<td class="${D === t ? 'today' : ''} ${tmClosed(D) ? 'closed' : ''}" data-act="tmAdd" data-id="${p.id}|${D}">${sh.map(s => tmShiftChip(s, p, D, hm, ro)).join('')}${ab ? tmAbsChip(ab, p, D) : ''}${can ? `<button type="button" class="tm-plus" data-act="tmAdd" data-id="${p.id}|${D}" aria-label="${esc(ro ? `Frei-Wunsch für ${tmDayTxt(D)} eintragen` : `Dienst für ${p.name} am ${tmDayTxt(D)} eintragen`)}">${ico('plus')}</button>` : ''}</td>`; }).join('')}</tr>`; }).join('');
+        return `<td class="${D === t ? 'today' : ''} ${tmClosed(D) ? 'closed' : ''}" data-act="tmAdd" data-id="${p.id}|${D}">${sh.map(s => tmShiftChip(s, p, D, hm, ro)).join('')}${ab ? tmAbsChip(ab, p, D) : ''}${can ? `<button type="button" class="tm-plus" data-act="tmAdd" data-id="${p.id}|${D}" aria-label="${esc(ro ? `Frei-Wunsch für ${tmDayTxt(D)} eintragen` : `Dienst für ${p.name} am ${tmDayTxt(D)} eintragen`)}">${ico('plus')}</button>` : ''}</td>`; }).join('')}</tr>`; };
+  const rows = tmGroups(ppl, d || 'all').map(([gl, gp]) => (gl ? `<tr class="tm-grp"><th scope="colgroup" colspan="8">${gl}<span>${gp.length}</span></th></tr>` : '') + gp.map(row).join('')).join('');
   return `<div class="tm-wrap"><table class="tm-t"><thead><tr><th scope="col" class="tm-corner">${ppl.length} ${ppl.length === 1 ? 'Person' : 'Personen'}</th>${head}</tr></thead><tbody>${rows}</tbody>
-    <tfoot><tr><th scope="row">Besetzung</th>${days.map(D => `<td class="${tmClosed(D) ? 'closed' : ''}" data-help="tm_besetzung">${tmStaffHtml(D, W)}</td>`).join('')}</tr></tfoot></table></div>`;
+    <tfoot><tr><th scope="row">Besetzung</th>${days.map(D => `<td class="${tmClosed(D) ? 'closed' : ''}" data-help="tm_besetzung">${tmStaffHtml(D, W, d)}</td>`).join('')}</tr></tfoot></table></div>`;
 }
 /* Handy: Woche auf einen Blick, sieben schmale Spalten */
-function tmWeekMini(W, ppl, hm, ro){
+function tmWeekMini(W, ppl, hm, ro, d){
   const days = [0,1,2,3,4,5,6].map(i => dAdd(W, i)); const t = todayStr();
   const cell = (p, D) => { const sh = tmShiftsOf(p.id, D), ab = tmAbsOf(p.id, D); const hint = hm.get(p.id + '|' + D);
     let inner = '', lab = `${p.name}, ${tmDayTxt(D)}: `;
@@ -9555,24 +9574,25 @@ function tmWeekMini(W, ppl, hm, ro){
     else lab += 'frei';
     return `<td class="${D === t ? 'today' : ''} ${tmClosed(D) ? 'closed' : ''}"><button type="button" class="tm-mb" data-act="tmDay" data-id="${D}" aria-label="${esc(lab)}">${inner}${hint ? '<i class="tm-mk" aria-hidden="true"></i>' : ''}</button></td>`; };
   return `<table class="tm-mini"><thead><tr><th></th>${days.map(D => `<th class="${D === t ? 'today' : ''} ${tmClosed(D) ? 'closed' : ''}"><b>${tmWdShort(D)}</b><span>${dParse(D).getDate()}.</span></th>`).join('')}</tr></thead>
-    <tbody>${ppl.map(p => `<tr><th scope="row"><b>${esc(p.name)}</b><small>${tmH(tmWeekHours(p.id, W))} Std.</small></th>${days.map(D => cell(p, D)).join('')}</tr>`).join('')}</tbody>
-    <tfoot><tr><th scope="row">Leute</th>${days.map(D => { const n = new Set(tmShifts(D).map(s => s.pid)).size; const g = tmGaps(D, W).length; return `<td class="${tmClosed(D) ? 'closed' : ''}"><span class="${g ? 'gap' : ''}">${n || (tmClosed(D) ? '' : '–')}</span></td>`; }).join('')}</tr></tfoot></table>
+    <tbody>${tmGroups(ppl, d || 'all').map(([gl, gp]) => (gl ? `<tr class="tm-grp"><th colspan="8">${gl}</th></tr>` : '') + gp.map(p => `<tr><th scope="row"><b>${esc(p.name)}</b><small>${tmH(tmWeekHours(p.id, W))} Std.</small></th>${days.map(D => cell(p, D)).join('')}</tr>`).join('')).join('')}</tbody>
+    <tfoot><tr><th scope="row">Leute</th>${days.map(D => { const ar = tmDeptAreas(d || 'all'); const n = new Set(tmShifts(D).filter(s => ar.includes(s.area)).map(s => s.pid)).size; const g = tmGaps(D, W, d).length; return `<td class="${tmClosed(D) ? 'closed' : ''}"><span class="${g ? 'gap' : ''}">${n || (tmClosed(D) ? '' : '–')}</span></td>`; }).join('')}</tr></tfoot></table>
     <p class="hint tm-mini-h">Tippen Sie auf einen Tag, um ihn zu öffnen.</p>`;
 }
 /* Handy: ein Tag je Bildschirm */
-function tmDayView(W, D, ppl, hm, ro){
+function tmDayView(W, D, ppl, hm, ro, d){
   const days = [0,1,2,3,4,5,6].map(i => dAdd(W, i)); const t = todayStr(); const meP = tmMePerson();
   const strip = `<div class="tm-days" role="tablist" aria-label="Tag wählen">${days.map(x => `<button type="button" role="tab" aria-selected="${x === D}" class="${x === D ? 'on' : ''} ${tmClosed(x) ? 'closed' : ''} ${x === t ? 'today' : ''}" data-act="tmDay" data-id="${x}"><b>${tmWdShort(x)}</b><small>${dParse(x).getDate()}.</small>${tmShifts(x).length ? '<i aria-hidden="true"></i>' : ''}</button>`).join('')}</div>`;
   const dLong = dParse(D).toLocaleDateString('de-AT', {weekday:'long', day:'numeric', month:'long'});
-  const rows = ppl.map(p => { const sh = tmShiftsOf(p.id, D), ab = tmAbsOf(p.id, D); const can = !ro || (meP && meP.id === p.id);
+  const drow = p => { const sh = tmShiftsOf(p.id, D), ab = tmAbsOf(p.id, D); const can = !ro || (meP && meP.id === p.id);
     return `<li class="tm-dr ${sh.length ? '' : 'free'}"><span class="tm-pn"><i class="tm-dot c${p.color}"></i><span><b>${esc(p.name)}</b><small>${TM_AREA[p.area]}</small></span></span>
       <span class="tm-dc">${sh.map(s => tmShiftChip(s, p, D, hm, ro)).join('')}${ab ? tmAbsChip(ab, p, D) : ''}${!sh.length && !ab ? '<span class="tm-free">frei</span>' : ''}</span>
-      ${can ? `<button type="button" class="tm-plus" data-act="tmAdd" data-id="${p.id}|${D}" aria-label="${esc(ro ? `Frei-Wunsch für ${tmDayTxt(D)} eintragen` : `Dienst für ${p.name} am ${tmDayTxt(D)} eintragen`)}">${ico('plus')}</button>` : '<span class="tm-plus-sp"></span>'}</li>`; }).join('');
+      ${can ? `<button type="button" class="tm-plus" data-act="tmAdd" data-id="${p.id}|${D}" aria-label="${esc(ro ? `Frei-Wunsch für ${tmDayTxt(D)} eintragen` : `Dienst für ${p.name} am ${tmDayTxt(D)} eintragen`)}">${ico('plus')}</button>` : '<span class="tm-plus-sp"></span>'}</li>`; };
+  const rows = tmGroups(ppl, d || 'all').map(([gl, gp]) => (gl ? `<li class="tm-dgrp">${gl}</li>` : '') + gp.map(drow).join('')).join('');
   const dh = [...hm.entries()].filter(([k]) => k.endsWith('|' + D));
   return `<div class="tm-dayview" data-day="${D}">${strip}
     <h2 class="day-h tm-dh">${esc(dLong)}<span>${tmClosed(D) ? 'Ruhetag' : ''}</span></h2>
     <ul class="tm-dl">${rows}</ul>
-    <p class="tm-dstaff" data-help="tm_besetzung">${tmStaffHtml(D, W) || (tmClosed(D) ? '<span>Ruhetag, niemand eingeteilt</span>' : '<span>Noch niemand eingeteilt</span>')}</p>
+    <p class="tm-dstaff" data-help="tm_besetzung">${tmStaffHtml(D, W, d) || (tmClosed(D) ? '<span>Ruhetag, niemand eingeteilt</span>' : '<span>Noch niemand eingeteilt</span>')}</p>
     ${dh.length ? `<ul class="tm-dhints">${dh.map(([k, tx]) => `<li><i class="tm-mk" aria-hidden="true"></i><span><b>${esc((tmPerson(k.split('|')[0]) || {name:'?'}).name)}</b> ${esc(tx.join('; '))}</span></li>`).join('')}</ul><p class="hint">Hinweis, keine Rechtsprüfung.</p>` : ''}
   </div>`;
 }
@@ -9582,8 +9602,8 @@ function tmHintsHtml(hints){
     <ul class="rows">${hints.map(h => { const p = tmPerson(h.pid) || {name:'?'}; return `<li class="rw"><span class="rw-lead">${h.D ? tmDayTxt(h.D) : 'Woche'}</span><span class="rw-main"><b>${esc(p.name)}</b><small>${esc(h.txt)}</small></span><span class="rw-meta"></span><span class="rw-act"></span></li>`; }).join('')}</ul>
     <p class="hint">Die App schaut nur auf vier einfache Grenzen: ${TM_RULES.rest} Std. Ruhe zwischen zwei Arbeitstagen, höchstens ${TM_RULES.dayMax} Std. am Tag, höchstens ${TM_RULES.rowMax} Tage in Folge, höchstens ${TM_RULES.weekMax} Std. in der Woche. Sie können trotzdem alles so planen. Was für Ihren Betrieb gilt, sagt Ihnen Ihre Steuerberatung oder die Wirtschaftskammer.</p></section>`;
 }
-function tmMonthHtml(ym){
-  const rows = tmMonthStats(ym); const [y, m] = ym.split('-').map(Number);
+function tmMonthHtml(ym, d){
+  const rows = tmMonthStats(ym).filter(r => !d || d === 'all' || tmDeptOf(r.p.area) === d); const [y, m] = ym.split('-').map(Number);
   if(!rows.length) return '<p class="tm-empty">Noch kein Team angelegt.</p>';
   return `<div class="lt-wrap tm-month"><table class="lt"><thead><tr><th>Person</th><th class="r">Dienste</th><th class="r">Stunden</th><th class="r hide-m">Soll ca.</th><th class="r">Differenz</th><th class="r hide-m">Urlaub</th><th class="r hide-m">Krank</th></tr></thead>
     <tbody>${rows.map(r => `<tr><td><div class="lt-n"><span><b>${esc(r.p.name)}</b><small>${TM_AREA[r.p.area]}${r.p.target ? ` · ${tmH(r.p.target)} Std. je Woche` : ''}</small></span></div></td><td class="r">${num(r.n)}</td><td class="r"><b>${tmH(r.h)}</b></td><td class="r hide-m">${r.soll != null ? tmH(r.soll) : '<span class="lt-muted">—</span>'}</td><td class="r">${r.diff != null ? `${r.diff > 0.004 ? '+' : r.diff < -0.004 ? '−' : ''}${tmH(Math.abs(r.diff))}` : '<span class="lt-muted">—</span>'}</td><td class="r hide-m">${r.urlaub ? num(r.urlaub) + ' T.' : '<span class="lt-muted">—</span>'}</td><td class="r hide-m">${r.krank ? num(r.krank) + ' T.' : '<span class="lt-muted">—</span>'}</td></tr>`).join('')}</tbody></table></div>
@@ -9602,15 +9622,17 @@ function renderDienst(){
   const cur = v.pm;
   const seg = modes.length ? `<div class="seg tm-modes" role="group" aria-label="Ansicht">${modes.map(([k, l]) => `<button type="button" class="${cur === k ? 'on' : ''}" data-act="tmMode" data-id="${k}" aria-pressed="${cur === k}">${l}</button>`).join('')}</div>` : '';
   const mine = month ? '' : `<button type="button" class="chip tm-mine ${v.mine ? 'on' : ''}" data-act="tmMine" aria-pressed="${!!v.mine}">Mein Dienst</button>`;
-  const bar = `<div class="tm-bar">${nav}${seg}${mine}</div>`;
+  const dept = tmDept();
+  const dseg = `<div class="seg tm-dept" role="group" aria-label="Plan wählen" data-help="tm_bereich">${[['all','Alle'], ...TM_DEPTS].map(([k, l]) => `<button type="button" class="${dept === k ? 'on' : ''}" data-act="tmDept" data-id="${k}" aria-pressed="${dept === k}">${l}</button>`).join('')}</div>`;
+  const bar = `<div class="tm-bar">${nav}${dseg}${seg}${mine}</div>`;
   const btns = month ? '' : `<button type="button" class="btn" data-act="tmText">Text kopieren</button><button type="button" class="btn primary" data-pdf="tmPrint">${ico('download')}Als PDF speichern</button>`;
   const more = moreOpts('dienst', month ? `<button type="button" class="btn sm" data-act="tmMode" data-id="week">Zurück zur Woche</button>` : `${ro ? '' : `<button type="button" class="btn sm" data-act="tmTeam">Team verwalten</button><button type="button" class="btn sm" data-act="tmCopyPrev">Vorwoche kopieren</button><button type="button" class="btn sm" data-act="tmPatterns">Wochenvorlagen</button>`}<button type="button" class="btn sm" data-act="tmMode" data-id="month">Stunden im Monat</button>`);
-  if(month) return head('') + bar + tmMonthHtml(v.month) + more;
-  let ppl = tmRowPeople(W); let mineNote = '';
+  if(month) return head('') + bar + tmMonthHtml(v.month, dept) + more;
+  let ppl = tmDeptPeople(tmRowPeople(W), W, dept); let mineNote = '';
   if(v.mine){ if(meP) ppl = ppl.filter(p => p.id === meP.id); else { v.mine = false; } }
   if(v.mine && meP){ const n = tmWeekCount(W, s => s.pid === meP.id); mineNote = `<p class="tm-mine-n">${n ? `${esc(meP.name)}: ${plural(n, 'Dienst', 'Dienste')}, ${tmH(tmWeekHours(meP.id, W))} Std. in dieser Woche.` : `${esc(meP.name)}: in dieser Woche kein Dienst.`}</p>`; }
-  const hints = tmHints(W).filter(h => !v.mine || (meP && h.pid === meP.id)); const hm = tmHintMap(hints);
-  const body = phone ? (v.pm === 'week' ? tmWeekMini(W, ppl, hm, ro) : tmDayView(W, v.day, ppl, hm, ro)) : tmWeekTable(W, ppl, hm, ro);
+  const inPlan = new Set(ppl.map(p => p.id)); const hints = tmHints(W).filter(h => inPlan.has(h.pid) && (!v.mine || (meP && h.pid === meP.id))); const hm = tmHintMap(hints);
+  const body = !ppl.length ? `<p class="tm-empty">Im Plan ${tmDeptName(dept)} steht noch niemand. Den Bereich einer Person stellen Sie unter „Team verwalten“ ein.</p>` : phone ? (v.pm === 'week' ? tmWeekMini(W, ppl, hm, ro, dept) : tmDayView(W, v.day, ppl, hm, ro, dept)) : tmWeekTable(W, ppl, hm, ro, dept);
   const roNote = ro ? `<p class="hint tm-ro">Den Plan ändert der Chef. ${meP ? 'Einen Frei-Wunsch tragen Sie selbst ein: Tippen Sie in Ihrer Zeile auf das Plus.' : 'Tippen Sie auf „Mein Dienst“ und wählen Sie Ihren Namen, dann können Sie Frei-Wünsche eintragen.'}</p>` : '';
   const acts = phone ? `<div class="tm-acts">${btns}</div>` : '';
   return head(phone ? '' : btns) + bar + mineNote + body + roNote + (phone && v.pm === 'day' ? '' : tmHintsHtml(hints)) + acts + more;
@@ -9995,6 +10017,7 @@ document.addEventListener('click', e => {
     case 'tmNext': tmShiftMove(1); render(); break;
     case 'tmToday': v.w = tmMonday(todayStr()); v.day = todayStr(); v.month = todayStr().slice(0, 7); render(); break;
     case 'tmMode': if(id === 'month'){ v.mode = 'month'; v.month = dAdd(v.w, 3).slice(0, 7); } else { v.mode = 'week'; if(id === 'day' || id === 'week') v.pm = tmPhone() ? id : v.pm; } render(); break;
+    case 'tmDept': { v.dept = id === 'kueche' || id === 'service' ? id : 'all'; try { localStorage.setItem('dahuam202_dienst_bereich', v.dept); } catch(e){} render(); break; }
     case 'tmMine': { if(v.mine){ v.mine = false; render(); break; } const on = () => { v.mine = true; render(); }; if(tmMePerson()) on(); else tmWhoDlg(on); break; }
     case 'tmDay': v.day = id; v.pm = 'day'; render(); break;
     case 'tmAdd': { e.stopPropagation(); const [pid, D] = id.split('|'); tmShiftDlg(pid, D); break; }
@@ -10043,6 +10066,7 @@ H('tm_zelle','Dienst eintragen','Tippen Sie auf das Feld einer Person an einem T
 H('tm_dienst','Ein Dienst','Ein eingetragener Dienst mit Beginn und Ende. Ein Tipp öffnet ihn zum Ändern oder Löschen. Ein Punkt in der Ecke zeigt einen Hinweis an.');
 H('tm_abw','Abwesenheit','Urlaub, Krank oder „Kann nicht“. Die Person fehlt an diesem Tag. Wer sie trotzdem einteilt, wird vorher gefragt.');
 H('tm_stunden','Stunden in der Woche','Die Arbeitsstunden dieser Person in der Woche, ohne unbezahlte Pause. Dahinter steht das Soll, wenn Sie eines eingetragen haben.');
+H('tm_bereich','Küche oder Service','Zwei Pläne in einem: Küche (mit Abwasch) und Service (mit Bar). „Alle“ zeigt beide untereinander. PDF und Text gelten für den Plan, den Sie gerade sehen.');
 H('tm_besetzung','Besetzung','Wie viele Leute an diesem Tag je Bereich eingeteilt sind. Fehlt an einem offenen Tag die Küche oder der Service, steht es hier.');
 H('tm_hinweise','Hinweise','Die App meldet zu wenig Ruhe, sehr lange Tage, viele Tage in Folge und sehr volle Wochen. Das ist ein Hinweis, keine Rechtsprüfung. Nichts wird gesperrt.');
 H('tm_mein','Mein Dienst','Zeigt nur Ihre eigene Zeile. Beim ersten Mal wählen Sie Ihren Namen. Noch ein Tipp zeigt wieder alle.');
