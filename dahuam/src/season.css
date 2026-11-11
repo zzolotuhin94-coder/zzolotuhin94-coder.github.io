@@ -1,0 +1,168 @@
+/* ===== Saisonkarten: Typo und Farben laufen über Variablen je Saison ===== */
+.g-paper{font-family:var(--gfb,"Figtree",sans-serif);position:relative;overflow:hidden}
+.g-paper .g-title,.g-paper .g-n{font-family:var(--gfd)}
+.g-paper .g-d{font-family:var(--gfd)}
+.g-paper .g-sub,.g-paper .g-h,.g-paper .g-p,.g-paper .g-top,.g-paper .g-mark-logo,.g-paper .g-foot{font-family:var(--gfb)}
+.g-paper .g-row .lead{border-bottom-color:var(--gr,currentColor);opacity:1}
+.g-paper .g-ph{border-color:var(--gr)}
+.g-paper .g-h::before,.g-paper .g-h::after{background:var(--gr);opacity:1}
+.g-paper .g-foot{border-top-color:var(--gr)}
+.g-paper .g-p .cur{opacity:0;font-size:0}
+.g-orn{width:28px;height:28px;fill:none;stroke:var(--ga);stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;display:block;margin:0 auto 12px}
+.g-orn.top{width:34px;height:34px;margin-bottom:16px}
+.g-foot .g-orn{margin:0 auto 12px;opacity:.8}
+.g-h-orn{display:none;width:20px;height:20px;fill:none;stroke:var(--ga);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.g-cover{display:block;width:calc(100% + 2*clamp(20px,6vw,68px));max-width:none;margin:calc(-1*clamp(28px,6vw,64px)) calc(-1*clamp(20px,6vw,68px)) clamp(24px,4vw,36px);aspect-ratio:16/6;object-fit:cover}
+.g-days{font-weight:inherit;font-style:normal;color:var(--ga)}
+.g-stand{font-size:11px;opacity:.7;margin-top:6px!important}
+.g-paper.g-modern .g-d{font-family:var(--gfb)}
+.g-paper.g-modern .g-title{font-family:var(--gfd)}
+
+/* Pulverschnee (Winter) */
+.g-th-winter .g-title{font-weight:600}
+.g-th-winter .g-title{font-style:italic;font-weight:500}
+.g-th-winter .g-h{font:700 12px var(--gfb);letter-spacing:.3em;color:var(--ga)}
+.g-th-winter .g-n{font-weight:600;font-size:21px}
+.g-th-winter .g-p{font-weight:700;font-variant-numeric:tabular-nums;color:var(--gi)}
+.g-th-winter .g-d{font-style:italic;font-weight:400;font-size:16px}
+/* Bärlauch (Frühling) */
+.g-th-fruehling .g-title{font-style:normal;font-weight:400}
+.g-th-fruehling .g-h{flex-wrap:wrap;justify-content:flex-start;gap:10px;font:400 26px/1.1 var(--gfd);letter-spacing:0;text-transform:none;color:var(--ga)}
+.g-th-fruehling .g-h::before{display:none}
+.g-th-fruehling .g-h::after{flex:0 0 100%;max-width:40px;height:1px;background:var(--ga);margin-top:2px}
+.g-th-fruehling .g-h-orn{display:block}
+.g-th-fruehling .g-row .lead{border-bottom-style:solid;border-bottom-width:1px;transform:translateY(-6px)}
+.g-th-fruehling .g-p{color:var(--ga);font-weight:600}
+.g-th-fruehling .g-n{font-weight:400;font-size:20px}
+.g-th-fruehling .g-d{font-family:var(--gfb);font-style:normal;font-size:14px}
+/* Almrausch (Sommer) */
+.g-th-sommer .g-title{font-weight:800}
+.g-th-sommer .g-h{justify-content:flex-start;font:800 15px var(--gfd);letter-spacing:.12em;color:var(--gi)}
+.g-th-sommer .g-h::before,.g-th-sommer .g-h::after{display:none}
+.g-th-sommer .g-h span{box-shadow:inset 0 -6px 0 var(--ga);padding:0 2px}
+.g-th-sommer .g-p{font-weight:500;color:var(--gi)}
+.g-th-sommer.g-modern .g-item{border-color:var(--gr)}
+
+/* Lärchengold (Herbst) */
+.g-th-herbst .g-title{font-style:normal;font-weight:700;letter-spacing:.02em}
+.g-th-herbst .g-h{position:relative;justify-content:flex-start;gap:10px;font:700 18px var(--gfd);letter-spacing:.08em;text-transform:none;color:var(--gi);border-top:1px solid var(--gr);padding-top:9px}
+.g-th-herbst .g-h::before{content:"";position:absolute;left:0;right:0;top:2px;height:3px;flex:none;background:var(--gr)}
+.g-th-herbst .g-h::after{display:none}
+.g-th-herbst .g-h-orn{display:block}
+.g-th-herbst .g-n{font-family:"Alegreya",Georgia,serif;font-weight:500;font-size:20px;font-variant:small-caps;font-feature-settings:normal}
+.g-th-herbst .g-d{font-family:"Alegreya",Georgia,serif;font-style:italic}
+.g-th-herbst .g-p{color:var(--ga);font-weight:500;font-variant-numeric:oldstyle-nums}
+.g-th-herbst .g-p .cur{opacity:.6;font-size:inherit}
+
+/* ===== Aktionen: Einleger (Tagesblatt) ===== */
+.g-special{--sy:#f2c14e;margin:0 0 clamp(26px,5vw,38px);padding:22px 24px;border-radius:4px;background:var(--gi);color:var(--gp);break-inside:avoid}
+.g-sp-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px;margin-bottom:14px}
+.g-sp-title{margin:0;font:800 26px/1 "Big Shoulders Display",var(--gfb);text-transform:uppercase;letter-spacing:.06em;color:var(--sy)}
+.g-sp-date{font:600 12px var(--gfb);text-transform:uppercase;letter-spacing:.08em;opacity:.85}
+.g-sp-note{flex-basis:100%;margin:0;font:italic 400 15px var(--gfd);opacity:.8}
+.g-sp-list{display:flex;flex-direction:column;gap:12px}
+.g-special .g-item{flex-direction:row;border:0;border-radius:0;text-align:left;align-items:flex-start}
+.g-special .g-txt{padding:0}
+.g-special .g-row{justify-content:flex-start}
+.g-special .g-row .lead{display:block;border-bottom:1px dotted currentColor;opacity:.35;transform:translateY(-5px)}
+.g-special .g-n{color:inherit}
+.g-special .g-p{color:var(--sy);border:1px solid var(--sy);border-radius:999px;padding:2px 9px;font-weight:600}
+.g-special .g-p .cur{opacity:0;font-size:0}
+.g-special .g-d,.g-special .g-a{color:inherit;opacity:.75}
+.g-special .g-mark,.g-special .g-days{color:var(--sy)}
+.g-sp-saison{background:transparent;color:var(--gi);border:1.5px solid var(--ga);--sy:var(--ga)}
+.g-sp-festlich{--sy:#d8b45a;background:#1d1a16;color:#f3ead8;outline:1px solid #d8b45a;outline-offset:-6px}
+.g-sp-festlich .g-sp-title{font:italic 500 32px/1 "Cormorant Garamond",Georgia,serif;text-transform:none;letter-spacing:0}
+
+.g-tk .g-sp-title{font-size:clamp(34px,6vw,52px);text-align:center;flex-basis:100%}
+.g-tk-festlich .g-sp-title{font-size:clamp(40px,7vw,60px)}
+.g-tk .g-sp-date{flex-basis:100%;text-align:center}
+.g-tk .g-sp-note{text-align:center}
+.g-tk .g-sp-list{gap:18px;margin-top:10px}
+.g-tk .g-n{font-size:21px}
+.g-tk{max-width:620px}
+.tk-label{max-width:860px;margin:28px auto 10px;font:600 12px var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.g-closed{display:flex;gap:10px;align-items:center;max-width:860px;margin:0 auto 12px;padding:10px 14px;border-radius:12px;background:var(--warn-bg);color:var(--warn);font-weight:600;font-size:14px}
+
+/* ===== Werkzeuge Gästekarte ===== */
+@media (min-width:1001px){.guest-wrap{grid-template-columns:330px minmax(0,1fr)}}
+.guest-tools{gap:14px;max-height:calc(100vh - 32px);overflow:auto;padding-bottom:4px}
+.guest-tools .panel{display:flex;flex-direction:column;gap:12px}
+.guest-tools .panel-h{margin-bottom:0}
+.sm-link{font-size:13px;font-family:var(--f-body)}
+.chips-row.tight{padding-bottom:2px;margin-bottom:0}
+.chip.sm,.chips-row.tight .chip{padding:4px 10px;font-size:12.5px}
+.fields.two{grid-template-columns:1fr 1fr}
+
+.clr{display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}
+.clr input{width:34px;height:34px;padding:2px;border-radius:10px;cursor:pointer}
+
+.warn-box,.ok-box{display:flex;gap:10px;align-items:flex-start;border-radius:12px;padding:10px 12px;font-size:13px}
+.warn-box{background:var(--bad-bg);color:var(--bad)}
+.warn-box span{flex:1;color:var(--fg)}
+.warn-box .ico{color:var(--bad)}
+.ok-box{background:var(--good-bg);color:var(--good);font-weight:600}
+.seg small{font-family:var(--f-body)!important}
+
+/* ===== Saison & Aktionen ===== */
+.tl-wrap{overflow-x:auto}
+.tline{position:relative;min-width:720px;padding-bottom:6px}
+.tl-months{display:grid;grid-template-columns:repeat(12,1fr);font:600 11.5px var(--f-body);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.tl-months span{border-left:1px solid var(--line);padding:0 0 6px 6px}
+.tl-track{position:relative;height:46px;background:var(--surface-2);border-radius:12px;margin-top:2px}
+.tl-bar{position:absolute;top:6px;bottom:6px;border:0;border-radius:8px;background:var(--p);color:var(--c);box-shadow:inset 0 0 0 2px var(--c);cursor:pointer;font:700 12.5px var(--f-body);overflow:hidden;white-space:nowrap;padding:0 8px;text-align:left;transition:transform .15s}
+.tl-bar:hover{transform:translateY(-2px)}
+.tl-today{position:absolute;top:-6px;bottom:-6px;width:2px;background:var(--fg);border-radius:2px}
+.tl-today::after{content:"Heute";position:absolute;top:-16px;left:50%;transform:translateX(-50%);font:700 10px var(--f-body);text-transform:uppercase;letter-spacing:.06em}
+.tl-pins{position:relative;height:64px}
+.tl-pin{position:absolute;top:6px;transform:translateX(-6px);border:0;background:none;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:4px;max-width:120px}
+.tl-pin i{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--surface)}
+.tl-pin.past i{background:var(--muted)}
+.tl-pin.live i{background:var(--good);box-shadow:0 0 0 3px var(--surface),0 0 0 6px color-mix(in srgb,var(--good) 30%,transparent)}
+.tl-pin span{font-size:11.5px;font-weight:600;line-height:1.2;text-align:left;color:var(--fg)}
+.tl-pin:nth-child(even){top:34px}
+.plan-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:18px;align-items:start;margin-top:4px}
+@media (max-width:1100px){.plan-grid{grid-template-columns:minmax(0,1fr)}}
+.sp-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.sp-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;min-width:0}
+.sp-card.live{border-color:var(--good)}
+.sp-card.past{opacity:.65}
+.sp-card h3{margin:0;font:700 17px/1.2 var(--f-display)}
+.sp-card p{margin:0}
+.sp-top{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.sp-st{font:700 11px var(--f-body);text-transform:uppercase;letter-spacing:.06em;padding:4px 8px;border-radius:999px}
+.sp-st.live{background:var(--good);color:var(--surface)} .sp-st.soon{background:var(--accent-soft);color:var(--accent)} .sp-st.past{background:var(--surface-2);color:var(--muted)}
+.sp-items{list-style:none;margin:0;padding:0;font-size:13.5px}
+.sp-items li{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-top:1px dashed var(--line)}
+.sp-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:auto}
+.sp-foot .icon-btn{width:30px;height:30px}
+.pad-x{padding-left:18px;padding-right:18px} .pad-b{padding-bottom:16px}
+table.matrix{min-width:560px}
+table.matrix .c{text-align:center;width:84px}
+.sdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.chk{display:inline-grid;place-items:center;cursor:pointer}
+.chk input{position:absolute;opacity:0;pointer-events:none}
+.chk span{width:22px;height:22px;border-radius:7px;border:1.5px solid var(--line);background:var(--surface);display:grid;place-items:center;transition:background .12s,border-color .12s}
+.chk input:checked + span{background:var(--accent);border-color:var(--accent)}
+.chk input:checked + span::after{content:"";width:10px;height:6px;border:2px solid var(--accent-fg);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.chk input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+/* Aktion-Dialog */
+#spRows{display:flex;flex-direction:column;gap:10px}
+.sp-row{display:grid;grid-template-columns:minmax(0,1fr) 90px 34px;gap:6px;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+.sp-row .wide{grid-column:1/-1}
+.sp-row select{grid-column:span 1}
+.sp-row select:last-of-type{grid-column:2/-1}
+.sm-sel{padding:6px 10px;font-size:13px;max-width:240px}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.days .algc span{justify-content:center;padding:7px 4px}
+.algs.seasons{grid-template-columns:repeat(4,1fr)}
+.algs.seasons .algc span{justify-content:center}
+details.alg-det summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted);padding:4px 0}
+details.alg-det[open] summary{margin-bottom:8px}
+.seg{max-width:100%;overflow-x:auto;scrollbar-width:none}.seg button{flex:none;white-space:nowrap}.seg::-webkit-scrollbar{display:none}
+.chk,.tog{position:relative}
+.f input,.f select,.f textarea{width:100%;min-width:0}
+.plan-grid .tbl-wrap{max-height:min(640px,70vh);overflow:auto}
+table.matrix thead th{position:sticky;top:0;z-index:1}
+.warn-box{flex-wrap:wrap}
+.warn-box span{flex:1 1 180px}

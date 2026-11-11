@@ -1,0 +1,123 @@
+
+/* ===================== Hilfe: Rundgang, „Was ist das?“, „So geht’s hier“ ===================== */
+/* Maßstab wie im Feinschliff: Radien 6/8, eine Linie statt Kasten, Gold nur als Markierung */
+
+/* ---------- Rundgang: Lichtkegel und Karte ---------- */
+.gd{position:fixed;inset:0;z-index:400;pointer-events:none}
+.gd-b{position:fixed;pointer-events:auto;background:transparent}
+.gd-hole{position:fixed;border-radius:8px;box-shadow:0 0 0 200vmax rgba(22,24,26,.58);outline:2px solid var(--gold);pointer-events:none}
+.gd-hole.none{outline:0;border-radius:0}
+.gd-hole.off{display:none}
+.gd-hole.open{animation:gdPulse 1.8s ease-in-out infinite}
+
+@keyframes gdPulse{0%,100%{outline-offset:0}50%{outline-offset:4px}}
+.gd-move .gd-hole{transition:left .32s cubic-bezier(.2,.8,.2,1),top .32s cubic-bezier(.2,.8,.2,1),width .32s cubic-bezier(.2,.8,.2,1),height .32s cubic-bezier(.2,.8,.2,1)}
+.gd-move .gd-card{transition:left .32s cubic-bezier(.2,.8,.2,1),top .32s cubic-bezier(.2,.8,.2,1)}
+.gd-card{position:fixed;left:12px;top:12px;pointer-events:auto;box-sizing:border-box;width:min(348px,calc(100vw - 24px));background:var(--surface);color:var(--fg);border:1px solid var(--line-strong);border-radius:10px;box-shadow:0 20px 48px -14px rgba(0,0,0,.5);padding:14px 16px 12px;font-family:var(--f-body);outline:0}
+.gd-top{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.gd-n{margin-left:auto;font-variant-numeric:tabular-nums}
+.gd-mark{width:18px;height:18px;flex:none;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.gd-mark .post{stroke:currentColor}
+.gd-mark .board{stroke:var(--gold);fill:color-mix(in srgb,var(--gold) 26%,transparent)}
+.gd-card h3{font:500 23px/1.15 var(--f-display);letter-spacing:.005em;margin:8px 0 5px}
+.gd-card p{margin:0;font-size:14.5px;line-height:1.5;text-wrap:pretty}
+
+
+
+.gd-f{display:flex;align-items:center;gap:8px;margin-top:14px}
+.gd-skip{border:0;background:none;padding:0;min-height:36px;color:var(--muted);font:500 13px var(--f-body);cursor:pointer;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line-strong)}
+.gd-skip:hover{color:var(--fg)}
+.gd-dots{display:flex;gap:4px;flex:1;justify-content:center;min-width:0}
+
+.gd-dots i{width:5px;height:5px;border-radius:50%;background:var(--line-strong);flex:none}
+.gd-dots i.d{background:var(--gold)}
+.gd-dots i.on{background:var(--fg);transform:scale(1.25)}
+.gd-card .btn.sm{min-height:36px;padding:0 14px}
+.gd-card.nudge{animation:gdNudge .32s ease-out}
+@keyframes gdNudge{0%,100%{transform:none}30%{transform:translateY(-4px)}60%{transform:translateY(2px)}}
+
+.gd-live{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+:root[data-theme="dark"] .gd-hole{box-shadow:0 0 0 200vmax rgba(0,0,0,.66)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .gd-hole{box-shadow:0 0 0 200vmax rgba(0,0,0,.66)}}
+@media (max-width:900px){.gd-card .btn.sm,.gd-skip{min-height:40px}.gd-card h3{font-size:21px}}
+@media (prefers-reduced-motion:reduce){.gd-move .gd-hole,.gd-move .gd-card{transition:none}.gd-hole.open,.gd-card.nudge{animation:none}}
+
+/* ---------- Fragezeichen am Titel, Brotkrumen ---------- */
+.wozu-q{cursor:pointer}
+.crumb{display:flex;align-items:center;gap:8px;min-width:0;margin-bottom:10px}
+.crumb .back{margin-bottom:0;flex:none}
+.crumb-sep{color:var(--muted)}
+.crumb-here{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--fg);font-weight:600;font-size:14px}
+.crumb .sp{flex:1}
+.crumb-q{display:inline-flex;align-items:center;gap:6px;flex:none;border:0;background:none;padding:0 2px;min-height:36px;color:var(--muted);font:500 13px var(--f-body);cursor:pointer}
+.crumb-q .ico{width:16px;height:16px}
+.crumb-q:hover{color:var(--fg)}
+@media (max-width:900px){.crumb-q{min-height:40px;min-width:40px;justify-content:flex-end}.crumb-q span{display:none}.crumb-q .ico{width:20px;height:20px}}
+
+/* ---------- Seitenleiste unten, Kopf am Handy ---------- */
+.side-help{margin-top:auto;display:flex;flex-direction:column;gap:2px;padding-top:10px;border-top:1px solid color-mix(in srgb,var(--side-fg) 10%,transparent)}
+.side-help + .side-foot{margin-top:0}
+.side-help ~ .side-foot{margin-top:0}
+.sh-i{display:flex;align-items:center;gap:12px;width:100%;border:0;background:transparent;color:var(--side-muted);padding:7px 12px;border-radius:6px;cursor:pointer;font:500 13.5px var(--f-body);text-align:left}
+.sh-i:hover{background:var(--side-2);color:var(--side-fg)}
+.sh-i .ico,.sh-i .gd-mark{width:18px;height:18px;flex:none}
+.sh-i span{flex:1}
+.sh-sw{width:26px;height:14px;border-radius:7px;background:color-mix(in srgb,var(--side-fg) 20%,transparent);position:relative;flex:none;transition:background .15s}
+.sh-sw::after{content:"";position:absolute;left:2px;top:2px;width:10px;height:10px;border-radius:50%;background:var(--side-fg);transition:transform .15s}
+.sh-i[aria-pressed="true"]{color:var(--side-fg)}
+.sh-i[aria-pressed="true"] .sh-sw{background:var(--gold)}
+.sh-i[aria-pressed="true"] .sh-sw::after{transform:translateX(12px)}
+.topbar .theme-btn[data-act="helpMode"][aria-pressed="true"]{background:var(--gold);color:#1f2326}
+
+/* ---------- Hilfe-Modus ---------- */
+body.gd-help #app,body.gd-help .side,body.gd-help .bottom,body.gd-help .topbar{cursor:help}
+body.gd-help #app *,body.gd-help .side *,body.gd-help .bottom *,body.gd-help .topbar *{cursor:help}
+@media (hover:hover){body.gd-help [data-help]:hover{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px}}
+.gd-helpbar{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:130;display:flex;align-items:center;gap:10px;max-width:calc(100vw - 24px);box-sizing:border-box;background:var(--side);color:var(--side-fg);border:1px solid color-mix(in srgb,var(--gold) 55%,transparent);border-radius:8px;padding:6px 6px 6px 12px;font-size:13.5px;line-height:1.35;box-shadow:var(--float)}
+.gd-helpbar .ico{width:18px;height:18px;flex:none;color:var(--gold)}
+.gd-helpbar b{font-weight:600}
+.gd-helpbar .btn{flex:none;min-height:34px;background:transparent;color:var(--side-fg);border-color:color-mix(in srgb,var(--side-fg) 28%,transparent)}
+.gd-bub{position:fixed;left:10px;top:10px;z-index:410;box-sizing:border-box;width:max-content;max-width:min(320px,calc(100vw - 20px));background:var(--side);color:var(--side-fg);border-radius:8px;padding:10px 12px 11px;font-size:13.5px;line-height:1.45;box-shadow:0 14px 36px -12px rgba(0,0,0,.55);opacity:0;transition:opacity .14s}
+.gd-bub.in{opacity:1}
+.gd-bub{border:1px solid color-mix(in srgb,var(--gold) 50%,transparent)}
+.gd-bub::before{border-left:1px solid color-mix(in srgb,var(--gold) 50%,transparent);border-top:1px solid color-mix(in srgb,var(--gold) 50%,transparent)}
+.gd-bub.up::before{border:0;border-right:1px solid color-mix(in srgb,var(--gold) 50%,transparent);border-bottom:1px solid color-mix(in srgb,var(--gold) 50%,transparent)}
+.gd-bub.side::before{border:0;border-left:1px solid color-mix(in srgb,var(--gold) 50%,transparent);border-bottom:1px solid color-mix(in srgb,var(--gold) 50%,transparent)}
+.gd-bub b{display:block;font:500 17px/1.2 var(--f-display);letter-spacing:.01em;color:var(--gold-hi,var(--gold));margin-bottom:3px}
+.gd-bub p{margin:0;text-wrap:pretty}
+.gd-bub small{display:block;margin-top:6px;font-size:12px;color:var(--side-muted)}
+
+.gd-bub::before{content:"";position:absolute;width:10px;height:10px;background:var(--side);transform:rotate(45deg)}
+.gd-bub.down::before{top:-6px;left:calc(var(--ax,24px) - 5px)}
+.gd-bub.up::before{bottom:-6px;left:calc(var(--ax,24px) - 5px)}
+.gd-bub.side::before{left:-6px;top:calc(var(--ay,20px) - 5px)}
+@media (max-width:900px){.gd-helpbar{bottom:calc(74px + env(safe-area-inset-bottom,0px));width:calc(100vw - 24px)}.gd-helpbar span{flex:1}.gd-helpbar .btn{min-height:40px}}
+
+/* ---------- Erster Start ---------- */
+
+/* ---------- Aufbau: Aufgaben ---------- */
+
+
+
+
+/* ---------- Begriffe ---------- */
+
+/* ---------- Einstellungen: Hilfe ---------- */
+.gd-panel{margin-bottom:16px}
+.gd-rows{list-style:none;margin:0;padding:0}
+.gd-rows li{display:flex;align-items:center;justify-content:space-between;gap:10px 20px;padding:11px 0;border-top:1px solid var(--line)}
+.gd-rows li:first-child{border-top:0;padding-top:4px}
+.gd-r-t{min-width:0}
+.gd-r-t b{display:block;font-weight:600;font-size:14.5px}
+.gd-r-t small{display:block;font-size:13px;color:var(--muted);line-height:1.4;margin-top:1px;text-wrap:pretty}
+.gd-rows .seg{flex:none}
+.gd-rows .row-btns{flex:none;flex-wrap:nowrap}
+.gd-panel .hint{margin-top:6px}
+.gd-panel .hint .link{font-family:var(--f-body);font-weight:500;color:var(--muted)}
+@media (max-width:700px){.gd-rows li{flex-wrap:wrap}.gd-rows .btn.sm,.gd-rows .seg button{min-height:40px}.gd-rows .seg{height:auto}.gd-r-t{flex:1 1 200px}}
+
+
+@media print{.gd,.gd-bub,.gd-helpbar,.side-help,.crumb-q,.wozu-q{display:none!important}}
+/* Handy: neue Bedienelemente mindestens 40 px */
+
+@media (max-width:900px){.topbar .theme-btn{width:40px;height:40px}.gd-panel .btn.sm{min-height:40px}.gd-panel .hint .link{min-height:40px}}

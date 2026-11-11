@@ -1,0 +1,131 @@
+/* ===================== Rezept für Küche und Service (Paket D2) ===================== */
+.rz-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;max-width:860px}
+.rz-bar .rz-sw{flex:1;min-width:0}
+.rz-bar > .btn{flex:none}
+.rz{max-width:860px}
+.rz-h{display:flex;gap:20px;align-items:center;margin:6px 0 20px}
+.rz-h > div{min-width:0}
+.rz-h h1{margin:0;font:500 40px/1.08 var(--f-display);letter-spacing:.005em;overflow-wrap:anywhere}
+.rz-h .eyebrow{color:var(--muted);margin-bottom:4px;font-size:13.5px}
+.rz-ph{width:132px;height:132px;object-fit:cover;border-radius:var(--r);flex:none;background:var(--surface-2)}
+.rz-sec{margin-top:26px}
+.rz-sec h2{display:flex;align-items:baseline;gap:12px;margin:0 0 6px;padding-bottom:8px;border-bottom:1px solid var(--line-strong);font:600 14px/1.2 var(--f-body);color:var(--muted)}
+.rz-sec h2 span{font-weight:500;color:var(--fg)}
+.rz-none{margin:12px 0 0;color:var(--muted);font-size:16px}
+
+/* Portionen */
+.rz-n{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.rz-chips{display:inline-flex;align-items:center;gap:6px}
+.rz-chips button{min-width:62px;height:52px;padding:0 12px;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--surface);color:var(--fg);font:500 21px/1 var(--f-display);font-variant-numeric:tabular-nums;cursor:pointer}
+.rz-chips button.on{background:var(--fg);border-color:var(--fg);color:var(--bg)}
+.rz-chips small{margin-left:6px;font-size:14px;color:var(--muted)}
+.rz-free{display:inline-flex;align-items:center;gap:8px;font-size:15px;color:var(--muted)}
+#app .rz-free input{width:92px;height:52px;min-height:52px;text-align:right;font:500 21px/1 var(--f-display)!important;font-variant-numeric:tabular-nums}
+
+/* Zutaten und Schritte: groß, antippen streicht durch */
+.rz-ing,.rz-steps{list-style:none;margin:0;padding:0}
+.rz-ing li{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;border-bottom:1px solid var(--line)}
+.rz-i,.rz-step{display:grid;gap:18px;align-items:baseline;width:100%;border:0;background:none;color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+.rz-i{grid-template-columns:132px minmax(0,1fr);min-height:58px;padding:10px 0;font-size:21px;line-height:1.25}
+.rz-q{text-align:right;font:500 23px/1.15 var(--f-display);font-variant-numeric:tabular-nums;white-space:nowrap}
+.rz-q small,.rz-t small{display:block;font:400 13px/1.3 var(--f-body);color:var(--muted)}
+.rz-t{min-width:0;overflow-wrap:anywhere}
+.rz-open{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0 4px 0 14px;border:0;background:none;color:var(--accent);font:600 14.5px/1 var(--f-body);cursor:pointer}
+.rz-open .ico{width:16px;height:16px}
+.rz-steps li{border-bottom:1px solid var(--line)}
+.rz-step{grid-template-columns:34px minmax(0,1fr);padding:14px 0;font-size:21px;line-height:1.42}
+.rz-sn{font:500 25px/1.15 var(--f-display);color:var(--accent);font-variant-numeric:tabular-nums}
+.rz-st{min-width:0;overflow-wrap:anywhere}
+.rz-sp{display:block;max-width:min(100%,420px);margin:0 0 14px 52px;border-radius:var(--r)}
+.rz-ing li.done .rz-q,.rz-ing li.done .rz-t,.rz-steps li.done .rz-st{color:var(--faint);text-decoration:line-through;text-decoration-thickness:1.5px}
+.rz-steps li.done .rz-sn{color:var(--faint)}
+.rz-i:focus-visible,.rz-step:focus-visible,.rz-open:focus-visible,.rz-chips button:focus-visible,.sv-rb:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.rz-alg{display:flex;flex-wrap:wrap;gap:4px 16px;margin:26px 0 0;font-size:17px;line-height:1.4}
+.rz-alg .rz-al{flex-basis:100%;font:600 14px/1.2 var(--f-body);color:var(--muted)}
+.rz-alg em{font-style:normal;color:var(--bad);font-weight:600}
+
+/* Service */
+.sv-desc{margin:8px 0 0;font-size:17.5px;line-height:1.4;color:var(--muted)}
+.sv-prices{list-style:none;margin:0;padding:0;border-top:1px solid var(--line-strong)}
+.sv-prices li{display:flex;justify-content:space-between;gap:16px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--line);font-size:17px}
+.sv-prices b{font:500 22px/1 var(--f-display)}
+.sv-b{margin-top:22px}
+.sv-b h2{margin:0 0 5px;font:600 14px/1.2 var(--f-body);color:var(--muted)}
+.sv-parts,.sv-note,.sv-none{margin:0;font-size:19px;line-height:1.45;overflow-wrap:anywhere}
+.sv-note{white-space:pre-line}
+.sv-al{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:2px 18px;font-size:19px;line-height:1.5}
+.sv-al b{display:inline-block;min-width:24px;font-weight:600;color:var(--accent)}
+.sv-ask{margin:0;font-size:19px;line-height:1.4;font-weight:600;color:var(--bad)}
+.sv-sure{margin:8px 0 2px;font-size:14px;color:var(--muted)}
+.sv-ed{border:0;margin:0 0 14px;padding:0;display:grid;gap:2px}
+.sv-ed legend{padding:0;margin-bottom:6px;font-weight:600;font-size:13.5px}
+.sv-ed .tog{min-height:38px}
+
+/* Service-Liste */
+.sv-tools{max-width:980px}
+.sv-f{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted)}
+.sv-f select{min-height:var(--ctl,36px)}
+.sv-fact{max-width:980px}
+.sv-list{list-style:none;margin:0;padding:0;max-width:980px;border-top:1px solid var(--line-strong)}
+.sv-sec{padding:20px 0 6px;font:600 13px/1.2 var(--f-body);color:var(--muted);border-bottom:1px solid var(--line)}
+.sv-sec:first-child{padding-top:12px}
+.sv-r{border-bottom:1px solid var(--line)}
+.sv-rb{display:grid;grid-template-columns:minmax(0,1fr) 150px 84px;gap:16px;align-items:center;width:100%;min-height:58px;padding:9px 0;border:0;background:none;color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+.sv-n b{display:block;font-weight:500;font-size:16.5px;line-height:1.25}
+.sv-n small{display:block;margin-top:1px;font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.sv-rb:hover .sv-n b{text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px}
+.sv-ls{font-weight:600;font-size:14px;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.sv-ls.none{font-weight:400;letter-spacing:0;color:var(--muted)}
+.sv-q{font-size:13.5px;color:var(--muted)}
+.sv-p{text-align:right;font-size:15px}
+.sv-d{padding:0 0 18px;max-width:760px}
+.sv-d .sv-b:first-child{margin-top:4px}
+.sv-d .link{margin-top:14px;min-height:40px}
+.rz-more{margin-top:14px}
+
+/* Küchen-Rezept als PDF */
+#print .rz-print{font:13px/1.45 var(--f-body);color:#000}
+#print .rz-print.rz-print .meta{display:flex;justify-content:space-between;font-size:11px;color:#555;margin-bottom:10px}
+#print .rz-print.rz-print h1{margin:0;font:600 30px/1.1 var(--f-display)}
+#print .rz-print.rz-print .rk-sub{margin:26px 0 0;padding-top:12px;border-top:1.5px solid #000;font:600 20px/1.15 var(--f-display)}
+#print .rz-print.rz-print .rk-for{margin:3px 0 0;font-size:14px;color:#333}
+#print .rz-print.rz-print table{width:100%;border-collapse:collapse;margin-top:12px}
+#print .rz-print.rz-print th{text-align:left;font-size:11px;font-weight:600;color:#444;padding:4px 10px 4px 0;border:0;border-bottom:1.5px solid #000;background:none;text-transform:none;letter-spacing:0}
+#print .rz-print.rz-print td{padding:6px 10px 6px 0;border:0;border-bottom:1px solid #d5d5d5;font-size:15px;vertical-align:top}
+#print .rz-print.rz-print th.r,#print .rz-print.rz-print td.r{width:150px;text-align:right;padding-right:22px;white-space:nowrap;font-variant-numeric:tabular-nums}
+#print .rz-print.rz-print td.r{font-weight:600}
+#print .rz-print.rz-print .pr-steps-h{margin:18px 0 4px;font:600 13px/1.2 var(--f-body);color:#444}
+#print .rz-print.rz-print .pr-steps{margin:0;padding-left:22px;font-size:15px;line-height:1.5}
+#print .rz-print.rz-print .pr-steps li{margin-bottom:6px}
+#print .rz-print.rz-print .rk-alg{margin:14px 0 0;font-size:13px}
+
+@media (max-width:1100px){ .rz-ph{width:108px;height:108px} }
+@media (max-width:700px){
+  .rz-bar{flex-direction:column;align-items:stretch;gap:0;margin-bottom:12px}
+  .rz-bar > .btn{align-self:flex-start;min-height:44px}
+  .rz-h{gap:14px;margin-bottom:16px}
+  .rz-h h1{font-size:30px}
+  .rz-ph{width:76px;height:76px}
+  .rz-chips button{min-width:54px;height:48px;font-size:19px}
+  #app .rz-free input{width:84px;height:48px;min-height:48px}
+  .rz-i{grid-template-columns:92px minmax(0,1fr);gap:14px;font-size:18px}
+  .rz-q{font-size:20px}
+  .rz-step{grid-template-columns:26px minmax(0,1fr);gap:12px;font-size:18px}
+  .rz-sn{font-size:21px}
+  .rz-sp{margin-left:38px;max-width:calc(100% - 38px)}
+  .rz-open{padding-left:8px}
+  .sv-parts,.sv-note,.sv-none,.sv-al,.sv-ask{font-size:17px}
+  .sv-al{grid-template-columns:1fr}
+  .sv-tools .search{flex:1 1 100%}
+  .sv-f{width:100%}
+  .sv-f select{flex:1;min-height:44px}
+  .sv-rb{grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;min-height:60px}
+  .sv-a{grid-column:1;grid-row:2}
+  .sv-p{grid-column:2;grid-row:1}
+}
+/* Tablet in der Küche: große Tippflächen */
+@media (hover:none), (pointer:coarse), (max-width:1100px){
+  .rz-bar > .btn{min-height:44px}
+  .sv-f select{min-height:44px}
+  #app .sv-tools .search input{min-height:44px}
+}
