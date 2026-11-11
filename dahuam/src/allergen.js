@@ -126,11 +126,12 @@ function abPages(){
   const out = pages.map(pg => pg.outerHTML); host.innerHTML = '';
   return {pages:out, nDishes:dishes.length, nOpen, cols, date};
 }
-async function abExportPdf(){
-  const r = abPages(); const el = $('#print'); const name = pdfFileName(`Allergen-Blatt-${S.settings.name.split(' ')[0]}-${r.date}`);
+/* Fertige A4-Blätter (.ab-page) als PDF speichern: ein Blatt je Seite. Gibt die Seitenzahl zurück (0 = fehlgeschlagen). */
+async function a4Pdf(pagesHtml, name){
+  const el = $('#print'); let n = 0;
   toast('PDF wird erstellt …');
   try {
-    await pdfLibs(); el.className = ''; el.classList.add('pdf', 'ab-print'); el.innerHTML = r.pages.join('');
+    await pdfLibs(); el.className = ''; el.classList.add('pdf', 'ab-print'); el.innerHTML = pagesHtml.join('');
     if(document.fonts && document.fonts.ready) await document.fonts.ready;
     await new Promise(x => requestAnimationFrame(() => requestAnimationFrame(x)));
     const pages = [...el.querySelectorAll('.ab-page')]; const {jsPDF} = window.jspdf; const pdf = new jsPDF({unit:'pt', format:'a4', compress:true});
@@ -141,9 +142,14 @@ async function abExportPdf(){
     }
     const ok = await saveFile(name, pdf.output('blob'));
     if(ok) toast(`PDF erstellt: ${name} (${pages.length} ${pages.length === 1 ? 'Seite' : 'Seiten'})`);
-    window.__abLast = {name, pages:pages.length, dishes:r.nDishes, open:r.nOpen};
+    n = pages.length;
   } catch(e){ toast('PDF fehlgeschlagen: ' + (e.message || e)); }
   finally { el.classList.remove('pdf', 'ab-print'); el.innerHTML = ''; }
+  return n;
+}
+async function abExportPdf(){
+  const r = abPages(); const name = pdfFileName(`Allergen-Blatt-${S.settings.name.split(' ')[0]}-${r.date}`);
+  const n = await a4Pdf(r.pages, name); if(n) window.__abLast = {name, pages:n, dishes:r.nDishes, open:r.nOpen};
 }
 function abDialog(){
   const r = abPages();

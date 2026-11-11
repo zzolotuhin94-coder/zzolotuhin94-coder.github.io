@@ -21,6 +21,7 @@ const SUB_LINE = {
   menu:'Preis, Wareneinsatz und Allergene je Gericht. Preis direkt in der Zeile ändern.',
   'menu/guest':'Gästekarte ansehen, gestalten und als PDF speichern.',
   'menu/plan':'Saisonzeiten festlegen und Aktionen planen. Die Gästekarte wechselt von selbst.',
+  'menu/service':'Für den Service: was heute auf der Karte steht, was am Teller ist und welche Allergene drin sind.',
   cards:'Zutaten, Mengen, Zubereitung. Daraus kommen Wareneinsatz und Allergene.',
   stock:'Was ist im Haus und was ist es wert?',
   'stock/inventur':'Zählen, Differenz sehen, Bestand übernehmen.',
@@ -267,7 +268,7 @@ const RUNDGANG = [
 const HOWTO = {
   dash:['Oben steht, was heute zu bestellen ist und welche Lieferung kommt.', 'Der Knopf rechts in jeder Zeile führt direkt hin.', 'Unter „Offen“ steht, was an der Karte noch fehlt.'],
   vorb:['Oben wählen Sie den Tag: heute, morgen oder später in der Woche.', 'Die Prep-Liste zeigt, was vorzukochen und herzurichten ist. Ein Tipp hakt ab.', 'Die Prognose darunter können Sie überschreiben, zum Beispiel bei einer Reservierung.', 'Fehlt Ware, legen Sie sie mit einem Tipp in die Bestellung.'],
-  checkl:['Jeden Tag gibt es frische Listen. Tippen Sie auf eine Liste und dann auf jeden erledigten Punkt.', 'Manche Punkte brauchen eine Zahl, zum Beispiel die Temperatur im Kühlhaus.', 'Im Verlauf sehen Sie die letzten 14 Tage, auch als PDF.'],
+  checkl:['Jeden Tag gibt es frische Listen. Tippen Sie auf eine Liste und dann auf jeden erledigten Punkt.', 'Manche Punkte brauchen eine Zahl, zum Beispiel die Temperatur im Kühlhaus.', 'Darunter steht die Eigenkontrolle: Reinigungsplan, Frittieröl, Temperatur der Lieferungen.', 'Im Verlauf sehen Sie die letzten 14 Tage und speichern die Monatsmappe als PDF.'],
   menu:['Eine Zeile je Gericht: Preis, Wareneinsatz und was übrig bleibt.', 'Den Preis ändern Sie direkt in der Zeile.', 'Am Griff links ziehen Sie ein Gericht an eine andere Stelle seiner Kategorie.', '„Ohne Rezeptur“ und „Allergene offen“ zeigen, wo noch etwas fehlt.'],
   guest:['So sehen die Gäste die Karte. Es zählt der gewählte Tag: Saison, Wochentag, Aktionen.', 'Links wählen Sie den Stil und die Texte.', '„Als PDF speichern“ macht eine Datei zum Drucken oder Verschicken.'],
   plan:['Die vier Balken sind Ihre Saisonen. Ein Tipp ändert, von wann bis wann eine gilt.', 'Eine Aktion ist eine eigene kleine Karte für ein paar Tage, zum Beispiel Wildwochen.', 'Welches Gericht in welcher Saison gilt, stellen Sie beim Gericht ein.'],

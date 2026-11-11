@@ -250,7 +250,7 @@ function receiveForm(o, hasCold){
     </tbody></table></div>
     <div class="panel-f recv-f">
       <label class="f">Lieferschein-Nr.<input id="rNo" value="${esc(o.receiptDraft?.noteNo||'')}" placeholder="z. B. LS 2240"></label>
-      ${hasCold?`<label class="f">Temperatur Kühlware<input id="rTemp" value="${esc(o.receiptDraft?.temp||'')}" placeholder="z. B. 3,5 °C"></label>`:''}
+      ${ekRecvFields(o)}
       <div class="f">Foto Lieferschein<div class="row-btns">${o.receiptDraft?.photo && IMG[o.receiptDraft.photo] ? `<img class="ls-th" src="${IMG[o.receiptDraft.photo]}" alt="">` : ''}<button type="button" class="btn sm" data-act="rPhoto" data-id="${o.id}">${ico('camera')}${o.receiptDraft?.photo?'Ändern':'Aufnehmen'}</button></div></div>
       <span class="sp"></span><button type="button" class="btn" data-act="rCancel">Abbrechen</button><button type="button" class="btn primary" data-act="rBook" data-id="${o.id}">Einbuchen</button>
     </div>
@@ -302,6 +302,23 @@ function delayDialog(o){
 }
 function printOrder(o){ $('#print').innerHTML = `<pre style="font:12pt/1.5 'JetBrains Mono',monospace;white-space:pre-wrap">${esc(orderText(o))}</pre>`; document.body.classList.remove('print-menu'); window.print(); }
 
+/* Wareneingang einer Bestellung einbuchen. ek: Temperatur der Lieferung für die Eigenkontrolle (oder null) */
+function ordBook(o, ek){
+      const r = o.receiptDraft || {}; r.noteNo = $('#rNo')?.value || r.noteNo || '';
+      const diffs = [], priceUp = []; const date = new Date().toISOString();
+      o.lines.forEach(l => { const p = P(l.pid); if(l.delivered == null || l.delivered === '') l.delivered = l.n; l.delivered = +l.delivered; if(l.invPrice == null || l.invPrice === '') l.invPrice = l.price; l.invPrice = +l.invPrice;
+        if(!l.ls || l.ls==='ok'){ l.ls = l.delivered === 0 ? 'missing' : l.delivered < l.n ? 'short' : 'ok'; }
+        if(p && l.delivered > 0) receiveIn(p, l.delivered*l.f, l.invPrice/l.f, `${o.no}${r.noteNo?' · '+r.noteNo:''}`, date);
+        if(l.ls !== 'ok') diffs.push(`${p?p.name:'?'}: ${LSTAT[l.ls]} (bestellt ${num(l.n,2)} × ${l.ou}, geliefert ${num(l.delivered,2)})`);
+        if(l.price && (l.invPrice/l.price-1)*100 > 3) priceUp.push(`${p?p.name:'?'}: ${eur(l.price)} → ${eur(l.invPrice)}`); });
+      o.lines.forEach(l => { l.pf = linePfand(l); }); const pfSum = orderPfand(o, true);
+      o.receipt = {date, noteNo:r.noteNo, temp:'', photo:r.photo||'', checkedBy:me().id}; delete o.receiptDraft;
+      if(ek){ const rec = ekLogWe({...ek, sup:o.supplier, order:o.id, ref:o.no}); o.receipt.temp = ekWeTxt(rec); o.receipt.ek = rec.id; }   // Eigenkontrolle: Temperatur dieser Lieferung
+      if(pfSum > 0){ o.receipt.pfand = pfSum; lgAdd(o.supplier, pfSum, `Lieferung ${o.no}`, date).order = o.id; }
+      if(diffs.length || priceUp.length){ o.status = 'complaint'; o.complaint = {status:'open', text:`Sehr geehrte Damen und Herren,\n\nbei der Lieferung zu ${o.no}${r.noteNo?' (Lieferschein '+r.noteNo+')':''} vom ${fmtDate(date)} gab es folgende Abweichungen:\n${[...diffs, ...priceUp.map(x=>'Preis abweichend: '+x)].map(x=>'• '+x).join('\n')}\n\nBitte um Gutschrift bzw. Nachlieferung.\n\nDanke und freundliche Grüße`}; }
+      else o.status = 'delivered';
+      view.recv = null; save(); render(); toast((o.status==='complaint' ? `Eingebucht · ${diffs.length + priceUp.length} Abweichungen, Reklamation vorbereitet` : `Eingebucht · ${o.lines.length} Positionen, alles in Ordnung`) + (pfSum > 0 ? ` · Pfand ${eur(pfSum)} beim Leergut vermerkt` : ''));
+}
 /* ---------- Ereignisse ---------- */
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if(!el) return;
@@ -326,22 +343,10 @@ document.addEventListener('click', e => {
     case 'rCancel': view.recv = null; render(); break;
     case 'rAll': { const o = ORD(id); o.lines.forEach(l => { l.delivered = l.n; l.ls = 'ok'; }); save(); render(); break; }
     case 'rPhoto': { const o = ORD(id); pickImage(data => { o.receiptDraft = o.receiptDraft || {}; if(o.receiptDraft.photo) imgDel(o.receiptDraft.photo); const iid = uid('img'); imgPut(iid, data); o.receiptDraft.photo = iid; save(); render(); toast('Lieferschein fotografiert'); }); break; }
-    case 'rBook': { const o = ORD(id); const r = o.receiptDraft || {}; r.noteNo = $('#rNo')?.value || r.noteNo || ''; r.temp = $('#rTemp')?.value || r.temp || '';
-      const diffs = [], priceUp = []; const date = new Date().toISOString();
-      o.lines.forEach(l => { const p = P(l.pid); if(l.delivered == null || l.delivered === '') l.delivered = l.n; l.delivered = +l.delivered; if(l.invPrice == null || l.invPrice === '') l.invPrice = l.price; l.invPrice = +l.invPrice;
-        if(!l.ls || l.ls==='ok'){ l.ls = l.delivered === 0 ? 'missing' : l.delivered < l.n ? 'short' : 'ok'; }
-        if(p && l.delivered > 0) receiveIn(p, l.delivered*l.f, l.invPrice/l.f, `${o.no}${r.noteNo?' · '+r.noteNo:''}`, date);
-        if(l.ls !== 'ok') diffs.push(`${p?p.name:'?'}: ${LSTAT[l.ls]} (bestellt ${num(l.n,2)} × ${l.ou}, geliefert ${num(l.delivered,2)})`);
-        if(l.price && (l.invPrice/l.price-1)*100 > 3) priceUp.push(`${p?p.name:'?'}: ${eur(l.price)} → ${eur(l.invPrice)}`); });
-      o.lines.forEach(l => { l.pf = linePfand(l); }); const pfSum = orderPfand(o, true);
-      o.receipt = {date, noteNo:r.noteNo, temp:r.temp, photo:r.photo||'', checkedBy:me().id}; delete o.receiptDraft;
-      if(pfSum > 0){ o.receipt.pfand = pfSum; lgAdd(o.supplier, pfSum, `Lieferung ${o.no}`, date).order = o.id; }
-      if(diffs.length || priceUp.length){ o.status = 'complaint'; o.complaint = {status:'open', text:`Sehr geehrte Damen und Herren,\n\nbei der Lieferung zu ${o.no}${r.noteNo?' (Lieferschein '+r.noteNo+')':''} vom ${fmtDate(date)} gab es folgende Abweichungen:\n${[...diffs, ...priceUp.map(x=>'Preis abweichend: '+x)].map(x=>'• '+x).join('\n')}\n\nBitte um Gutschrift bzw. Nachlieferung.\n\nDanke und freundliche Grüße`}; }
-      else o.status = 'delivered';
-      view.recv = null; save(); render(); toast((o.status==='complaint' ? `Eingebucht · ${diffs.length + priceUp.length} Abweichungen, Reklamation vorbereitet` : `Eingebucht · ${o.lines.length} Positionen, alles in Ordnung`) + (pfSum > 0 ? ` · Pfand ${eur(pfSum)} beim Leergut vermerkt` : '')); break; }
+    case 'rBook': { const o = ORD(id); const r = o.receiptDraft = o.receiptDraft || {}; r.noteNo = $('#rNo')?.value || r.noteNo || ''; ekRecvCheck(o, ek => ordBook(o, ek)); break; }
     case 'cCopy': { const o = ORD(id); navigator.clipboard?.writeText(o.complaint.text).then(()=>toast('Reklamation kopiert'), ()=>{}); break; }
     case 'supEdit': supplierDialog(id ? SUP(id) : null); break;
-    case 'userSwitch': S.settings.currentUser = id; save(); render(); toast(`Angemeldet als ${whoLabel(me())}`); break;
+    case 'userSwitch': S.settings.currentUser = id; view.cv = null; save(); render(); toast(`Angemeldet als ${whoLabel(me())}`); break;
   }
 });
 document.addEventListener('change', e => {
@@ -355,7 +360,7 @@ document.addEventListener('change', e => {
   if(t.dataset.rs != null && o){ o.lines[+t.dataset.rs].ls = t.value; save(); return; }
   if(t.dataset.cst){ ORD(t.dataset.cst).complaint.status = t.value; if(t.value==='closed' || t.value==='credit') ORD(t.dataset.cst).status = t.value==='closed' ? 'delivered' : 'complaint'; save(); render(); toast('Reklamation: '+CSTAT[t.value]); return; }
   if(t.dataset.ctext){ ORD(t.dataset.ctext).complaint.text = t.value; save(); return; }
-  if(t.id === 'rNo' || t.id === 'rTemp'){ const oo = ORD(view.recv) || o; if(!oo) return; const r = oo.receiptDraft = oo.receiptDraft || {}; r[t.id==='rNo'?'noteNo':'temp'] = t.value; save(); return; }
+  if(t.id === 'rNo' || t.id === 'rTemp' || t.id === 'rTempT' || t.id === 'rOk'){ const oo = ORD(view.recv) || o; if(!oo) return; const r = oo.receiptDraft = oo.receiptDraft || {}; if(t.id === 'rOk') r.cond = t.checked ? '' : 'no'; else r[{rNo:'noteNo', rTemp:'temp', rTempT:'tempT'}[t.id]] = t.value; save(); return; }
   if(t.dataset.us === 'addr'){ S.settings[t.dataset.k] = t.value; save(); return; }
 });
 

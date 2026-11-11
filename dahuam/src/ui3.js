@@ -113,7 +113,8 @@ const CARD_SORTS = [['','Gerichte zuerst, nach Name'],['name','Name'],['cat','Ka
 function renderCards(){
   const q = view.q.trim().toLowerCase();
   const ofType = (c, t) => t === 'all' || (t === 'drink' ? !!c.drink && c.type === 'dish' : c.type === t && !(t === 'dish' && c.drink));
-  const list0 = S.cards.filter(c => ofType(c, view.ctype) && (!q || (c.name+' '+c.category).toLowerCase().includes(q)));
+  const mode = rzMode(null);   // Kalkulation · Küche · Service: so öffnet die Liste eine Rezeptur; Preise stehen nur in der Kalkulation
+  const list0 = S.cards.filter(c => ofType(c, view.ctype) && (mode !== 'service' || c.type !== 'semi') && (!q || (c.name+' '+c.category).toLowerCase().includes(q)));
   const n = t => S.cards.filter(c => ofType(c, t)).length; const dk = view.ctype === 'drink';
   const rows = list0.map(c => { const t = totals(c); const mk = S.menu.filter(m => m.card === c.id).map(menuCalc)[0]; return {c, t, mk}; });
   const sorted = applySort('cards', rows.sort((a,b)=> a.c.type===b.c.type ? byName(a.c,b.c) : (a.c.type==='semi'?1:-1)), {name:x=>x.c.name, cat:x=>x.c.category||'', cost:x=>x.t.cost, fc:x=>x.mk?x.mk.fc:null, items:x=>x.c.items.length});
@@ -121,9 +122,17 @@ function renderCards(){
   const more = moreOpts('cards', `<label class="f inl">Sortieren<select data-sel="csort" aria-label="Sortieren">${CARD_SORTS.map(([k,l]) => `<option value="${k}" ${sCol===k?'selected':''}>${l}</option>`).join('')}</select></label><button type="button" class="btn sm" data-act="newCard" data-id="semi">${ico('plus')}Basisrezept</button><button type="button" class="btn sm" data-act="newCard" data-id="${dk ? 'dish' : 'drink'}">${ico('plus')}${dk ? 'Rezeptur' : 'Schankrezeptur'}</button>`);
   let h = `<div class="page-h"><div><h1>Rezepte</h1></div>
     <div class="row-btns"><button type="button" class="btn primary" data-act="newCard" data-id="${dk ? 'drink' : 'dish'}">${ico('plus')}${dk ? 'Schankrezeptur' : 'Rezeptur'}</button></div></div>
+  ${rzSwitch(null)}
   <div class="toolbar"><label class="search">${ico('search')}<input id="cq" type="search" placeholder="Rezeptur suchen" value="${esc(view.q)}" autocomplete="off"></label>
     ${seg('ctype', view.ctype, [['all','Alle',n('all')],['dish','Gerichte',n('dish')],['semi','Basisrezepte',n('semi')]].concat(n('drink') || dk ? [['drink','Getränke',n('drink')]] : []))}</div>`;
   if(!sorted.length) return h + `<div class="panel empty">Keine Rezepturen gefunden.</div>` + more;
+  if(mode !== 'kalk') return h + `<div class="lt-wrap"><table class="lt rz-lt"><thead><tr><th>Rezeptur</th><th class="hide-m">Kategorie</th>${mode === 'service' ? '<th>Allergene</th><th class="r">Preis</th>' : ''}</tr></thead><tbody>
+    ${sorted.map(({c}) => { const m0 = mode === 'service' ? menuSorted().find(m => m.card === c.id) : null; return `<tr class="row" data-act="openCard" data-id="${c.id}">
+      <td><div class="lt-n">${c.img&&IMG[c.img]?`<img src="${IMG[c.img]}" alt="">`:''}<span><b>${esc(c.name)}</b><small>${c.type==='semi'?'Basisrezept':c.drink?'Getränk':'Gericht'}${c.drink ? (+c.yieldG > 0 ? ' · ' + volTxt(+c.yieldG) : '') : +c.yieldG > 0 ? ` · ${rzAmount(+c.yieldG, 'g')}` : ''}</small></span></div></td>
+      <td class="hide-m lt-muted">${esc(c.category||'—')}</td>
+      ${mode === 'service' ? `<td>${svAlgShort(algInfo({card:c.id}))}</td><td class="r">${m0 ? eur(m0.price) : '<span class="lt-muted">nicht auf der Karte</span>'}</td>` : ''}</tr>`; }).join('')}
+  </tbody></table></div>
+  ${mode === 'service' ? `<p class="fact rz-more">Auch Gerichte ohne Rezeptur: <button type="button" class="link" data-act="svGo">Service-Liste mit allem, was heute auf der Karte steht</button></p>` : ''}${more}`;
   return h + `<div class="lt-wrap"><table class="lt"><thead><tr><th>Rezeptur</th><th class="hide-m">Kategorie</th><th class="r hide-m">Zutaten</th><th class="r">Wareneinsatz</th><th class="r">in %</th><th class="hide-m"></th></tr></thead><tbody>
     ${sorted.map(({c,t,mk}) => `<tr class="row" data-act="openCard" data-id="${c.id}">
       <td><div class="lt-n">${c.img&&IMG[c.img]?`<img src="${IMG[c.img]}" alt="">`:''}<span><b>${esc(c.name)}</b><small>${c.type==='semi'?'Basisrezept · ':''}Nr. ${c.no||'—'}${c.drink ? (+c.yieldG > 0 ? ' · ' + volTxt(+c.yieldG) : '') : ` · ${(c.steps||[]).length} Schritte${+c.yieldG > 0 ? ` · ${num(c.yieldG)} g` : ''}`}</small></span></div></td>

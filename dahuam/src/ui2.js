@@ -53,6 +53,7 @@ function seed(){
   plusMigrate(d);
   teamMigrate(d);
   barDemo(d); barMigrate(d);
+  rzMigrate(d); ekMigrate(d);
   return d;
 }
 
@@ -83,6 +84,7 @@ function migrate(d){
   plusMigrate(d);
   teamMigrate(d);
   barMigrate(d);
+  rzMigrate(d); ekMigrate(d);
   return d;
 }
 
@@ -201,6 +203,7 @@ function render(){
   const wEl = $('#whoami'); if(wEl){ const u = me(); wEl.innerHTML = `<b>${esc(u.name)}</b><small>${ROLES[u.role]}${cloudReady()?' · Cloud':''}</small>`; }
   pendingRender = false;
   if(kbdSel){ const el = document.querySelector(kbdSel); kbdSel = null; if(el) el.focus({preventScroll:true}); }
+  rzAfter();
 }
 let kbdSel = null, ptrDown = false, pendingRender = false;
 function softRender(){ if(ptrDown){ pendingRender = true; return; } setTimeout(() => { const id = document.activeElement && document.activeElement.id; render(); if(id){ const n = document.getElementById(id); if(n){ n.focus({preventScroll:true}); if(n.matches('input.num-in') && n.select) n.select(); } } }, 0); }
@@ -254,6 +257,7 @@ function cardAlgPanel(c){
       </section>`;
 }
 function renderCard(c){
+  { const mode = rzMode(c); if(mode === 'kueche') return rzKitchenHtml(c); if(mode === 'service') return svCardHtml(c); }
   if(c.drink && c.type === 'dish') return renderDrinkCard(c);
   const t = totals(c);
   const per100 = c.yieldG ? t.cost / c.yieldG * 100 : 0;
@@ -279,6 +283,7 @@ function renderCard(c){
       <td><button type="button" class="icon-btn" data-act="delLine" data-id="${i}" title="Zeile entfernen" aria-label="Zeile entfernen">${ico('x')}</button></td></tr>`; }).join('');
 
   return `<button type="button" class="back" data-act="backCards">${ico('arrow')}Alle Rezepturen</button>
+  ${rzSwitch(c)}
   <div class="hero">
     <div class="hero-ph">${photo(c.img, c.name, c.category)}<button type="button" class="ph-btn big" data-act="photoCard" data-id="${c.id}">${ico('camera')}<span>${c.img&&IMG[c.img]?'Foto ändern':'Foto hinzufügen'}</span></button>${c.img&&IMG[c.img]?`<button type="button" class="ph-btn del" data-act="photoCardDel" data-id="${c.id}" aria-label="Foto entfernen">${ico('x')}</button>`:''}</div>
     <div class="hero-main">
@@ -609,13 +614,16 @@ function moveDlg(arg){
     </div>
     ${type==='waste'?`<label class="f">Grund<select name="note">${WASTE.map(w=>`<option>${w}</option>`).join('')}</select></label>`:`<label class="f">${type==='in'?'Lieferschein / Notiz':'Notiz'}<input name="note" placeholder="${type==='in'?'z. B. Lieferschein 2240':'z. B. für Mise en place'}"></label>`}
     ${type==='in' && canEditAll()?`<div class="togs"><label class="tog"><input type="checkbox" name="upd" checked><span></span>Preis in die Kalkulation übernehmen (gleitender Durchschnitt)</label></div>`:''}
+    ${type==='in' ? ekMoveFields(p0) : ''}
     <div id="mvWarn"></div>`,
     (fd, f) => { const p = P(fd.get('pid')); if(!p) return false; const u = mu(p); const n = +fd.get('qty'); const q = Math.round(n*u.f*1000)/1000;
       if(!(q > 0)) return dlgErr('qty', 'Bitte eine Menge größer als 0 eingeben.');
       if(dateTooFar(fd.get('date'))) return dlgErr('date', 'Das Datum liegt in der Zukunft. Buchungen sind höchstens für morgen möglich.');
       const date = fd.get('date') ? new Date(fd.get('date')+'T12:00:00').toISOString() : null; let pfTxt = '';
+      const ek = type==='in' ? ekMoveRead(fd, f, p) : null; if(ek === false) return false;   // Eigenkontrolle: Temperatur der Lieferung, freiwillig
       if(type==='in'){ const old = p.price; const pr = fd.get('price')==='' || fd.get('price') == null ? p.price : +fd.get('price')/u.f; if(fd.get('upd') && Math.abs(pr - p.price) > 1e-9){ const s0 = Math.max(0, +p.stock||0); p.price = prRound(p, (s0*p.price + q*pr)/(s0+q)); } addMove('in', p.id, q, fd.get('note'), pr, date); if(old !== p.price) S.moves[0].prevPrice = old;
-        const pf = isDrink(p) && p.supplier ? Math.round(n*(+p.pfand||0)*100)/100 : 0; if(pf > 0){ S.moves[0].lg = lgAdd(p.supplier, pf, `${p.name}: ${num(n,2)} × ${u.word}`, date).id; pfTxt = ` · Pfand ${eur(pf)} beim Leergut vermerkt`; } }
+        const pf = isDrink(p) && p.supplier ? Math.round(n*(+p.pfand||0)*100)/100 : 0; if(pf > 0){ S.moves[0].lg = lgAdd(p.supplier, pf, `${p.name}: ${num(n,2)} × ${u.word}`, date).id; pfTxt = ` · Pfand ${eur(pf)} beim Leergut vermerkt`; }
+        if(ek) S.moves[0].ek = ekLogWe({...ek, sup:p.supplier || '', mv:S.moves[0].id, ref:p.name, d:fd.get('date') || ''}).id; }
       else { const st = +p.stock||0; const key = p.id+':'+q;
         if(q > st + 1e-9 && f.dataset.force !== key){
           $('#mvWarn').innerHTML = `<div class="warn-box dlg-warn" role="alert">${ico('spark')}<span><b>Mehr als der Bestand.</b> Im Lager sind ${esc(qtyFmt(st,p))}, gebucht würden ${esc(qtyFmt(q,p))}. Der Bestand ginge auf ${esc(qtyFmt(st-q,p))}. Bitte Menge prüfen oder zuerst den Wareneingang buchen.</span><button type="button" class="btn sm" id="mvForce">Trotzdem buchen</button></div>`;
@@ -623,7 +631,7 @@ function moveDlg(arg){
           return false; }
         addMove(type, p.id, -q, fd.get('note'), null, date); }
       moveDlg.last = `${MOVE[type]}: ${p.name} ${type==='in'?'+':'−'}${qtyFmt(q,p)}` + (type==='in' ? ` · Ø-Preis ${eur(p.price*priceUnit(p).f)}${isDrink(p) ? ' je ' + priceUnit(p).word : ''}${pfTxt}` : (+p.stock||0) < 0 ? ` · Bestand jetzt ${qtyFmt(+p.stock||0,p)}` : ''); },
-    {ok:'Buchen', done:()=>moveDlg.last, after: f => { const s = f.querySelector('#mvPid'); const clr = () => { $('#mvWarn').innerHTML = ''; delete f.dataset.force; }; s.onchange = () => { const p = P(s.value); f.querySelector('#mvUnit').textContent = lbl(p); const pl = f.querySelector('#mvPLbl'); if(pl) pl.textContent = plbl(p); const pr = f.querySelector('#mvPrice'); if(pr && p) pr.value = num2(p.price*mu(p).f); clr(); }; f.elements.qty.addEventListener('input', clr); }});
+    {ok:'Buchen', done:()=>moveDlg.last, after: f => { const s = f.querySelector('#mvPid'); const clr = () => { $('#mvWarn').innerHTML = ''; delete f.dataset.force; }; s.onchange = () => { const p = P(s.value); f.querySelector('#mvUnit').textContent = lbl(p); const pl = f.querySelector('#mvPLbl'); if(pl) pl.textContent = plbl(p); const pr = f.querySelector('#mvPrice'); if(pr && p) pr.value = num2(p.price*mu(p).f); const eb = f.querySelector('#mvEk'); if(eb) eb.outerHTML = ekMoveFields(p); clr(); }; f.elements.qty.addEventListener('input', clr); }});
 }
 
 const DEMO_SALES_OPT = ['Beispielverkäufe löschen (empfohlen)', 'Beispielverkäufe behalten'];
@@ -735,6 +743,7 @@ function palData(){
     sec('Heute', NAV_DESC.dash, ()=>go('dash')), sec('Vorbereitung', NAV_DESC.vorb, ()=>go('vorb')), sec('Checklisten', NAV_DESC.checkl, ()=>go('checkl')),
     sec('Speisekarte', NAV_DESC.menu, ()=>{ view.mtab='calc'; go('menu'); }),
     sec('Gästekarte', 'Speisekarte: ansehen, gestalten, als PDF speichern', ()=>{ view.mtab='guest'; go('menu'); }),
+    sec('Service-Liste', 'Speisekarte: was heute auf der Karte steht, mit Allergenen', ()=>{ view.mtab='service'; go('menu'); }),
     sec('Saison & Aktionen', 'Speisekarte', ()=>{ view.mtab='plan'; go('menu'); }),
     sec('Rezepte', NAV_DESC.cards, ()=>go('cards')),
     ...WARE_TABS.map(w => sec(w[1], w[0] === 'bestand' ? 'Ware: ' + NAV_DESC.ware : 'Ware', ()=>wareGo(w[0]))),

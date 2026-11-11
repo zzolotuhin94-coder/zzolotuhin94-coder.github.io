@@ -2683,11 +2683,11 @@ body.gd-help #app *,body.gd-help .side *,body.gd-help .bottom *,body.gd-help .to
 /* ---------- Druck / PDF ---------- */
 #print.pdf.land{width:1123px;padding:34px 40px}
 #print .tm-print{font:14px/1.35 var(--f-body);color:#000}
-#print .tm-print.tm-print .meta,#print .ck-print.ck-print .meta{display:flex;justify-content:space-between;font-size:11px;color:#555;margin-bottom:6px}
+#print .tm-print.tm-print .meta{display:flex;justify-content:space-between;font-size:11px;color:#555;margin-bottom:6px}
 #print .tm-print.tm-print h1{margin:0;font:600 34px/1.1 var(--f-display);letter-spacing:.01em}
 #print .tm-print.tm-print .tp-sub{margin:2px 0 14px;font-size:15px;color:#333}
 #print .tm-print.tm-print table{width:100%;border-collapse:collapse;table-layout:fixed}
-#print .tm-print.tm-print th,#print .ck-print.ck-print th{text-transform:none;letter-spacing:0;color:#000;background:none;white-space:normal}
+#print .tm-print.tm-print th{text-transform:none;letter-spacing:0;color:#000;background:none;white-space:normal}
 #print .tm-print.tm-print th,#print .tm-print.tm-print td{border:1px solid #9a9a9a;padding:7px 8px;vertical-align:top;text-align:left}
 #print .tm-print.tm-print thead th{font:400 14px/1.3 var(--f-body);border-bottom:2px solid #000;background:#f2f2f2}
 #print .tm-print.tm-print tbody th,#print .tm-print.tm-print tfoot th{font:400 14px/1.3 var(--f-body)}
@@ -2704,18 +2704,6 @@ body.gd-help #app *,body.gd-help .side *,body.gd-help .bottom *,body.gd-help .to
 #print .tm-print.tm-print tfoot th,#print .tm-print.tm-print tfoot td{font-size:12px;font-weight:400;color:#333;border-top:2px solid #000}
 #print .tm-print.d2 tbody td{height:44px} #print .tm-print.d2 .tp-s b{font-size:14px} #print .tm-print.d2 tbody th b{font-size:18px}
 #print .tm-print.d3 tbody td{height:32px;padding:4px 6px} #print .tm-print.d3 .tp-s b{font-size:12.5px} #print .tm-print.d3 tbody th b{font-size:15px} #print .tm-print.d3 tbody th small{display:none}
-#print .ck-print{font:12px/1.4 var(--f-body);color:#000}
-#print .ck-print.ck-print h1{margin:0 0 2px;font:600 26px/1.15 var(--f-display);letter-spacing:.01em}
-#print .ck-print.ck-print .cp-sub{margin:0 0 10px;font-size:12px;color:#444}
-#print .ck-print.ck-print table{width:100%;border-collapse:collapse}
-#print .ck-print.ck-print thead th{text-align:left;font-size:11px;font-weight:600;color:#444;padding:4px 8px 4px 0;border-bottom:1.5px solid #000}
-#print .ck-print.ck-print td{padding:4px 8px 4px 0;border-bottom:1px solid #d5d5d5;vertical-align:top}
-#print .ck-print.ck-print td:first-child{width:21%;font-weight:600}
-#print .ck-print.ck-print td:nth-child(2){width:15%}
-#print .ck-print.ck-print td:nth-child(3){width:22%}
-#print .ck-print.ck-print .cp-n{white-space:nowrap;font-variant-numeric:tabular-nums}
-#print .ck-print.ck-print .cp-d th{text-align:left;padding:12px 0 3px;font:600 15px/1.2 var(--f-display);border-bottom:1px solid #000}
-#print .ck-print.ck-print .cp-o{color:#555}
 
 /* ---------- Seitenleiste: mit dem neuen Bereich auch auf niedrigen Bildschirmen ganz sichtbar ---------- */
 .side .nav-slot{min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--side-fg) 18%,transparent) transparent}
@@ -2738,7 +2726,7 @@ body.gd-help #app *,body.gd-help .side *,body.gd-help .bottom *,body.gd-help .to
 
 /* Küche / Service */
 .tm-t .tm-grp th,.tm-mini .tm-grp th{text-align:left;font:600 11px/1 var(--f-ui, inherit);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:16px 12px 7px;background:transparent;border-bottom:1px solid var(--line)}
-.tm-t .tm-grp th span{margin-left:8px;font-weight:500;letter-spacing:0;opacity:.75}
+.tm-t .tm-grp th span{margin-left:8px;font-weight:500;letter-spacing:0}
 .tm-mini .tm-grp th{padding:12px 2px 5px}
 .tm-dl .tm-dgrp{list-style:none;font-weight:600;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:14px 0 6px;border-bottom:1px solid var(--line)}
 .tm-print .tp-g th{text-align:left;font-size:9pt;letter-spacing:.08em;text-transform:uppercase;padding-top:8pt;border-left:0;border-right:0;background:none}
@@ -3176,6 +3164,229 @@ tr.pf-row td{color:var(--muted);font-weight:400;border-top:0;padding-top:0}
   .inv-l li.bar .inv-t button{flex:none;width:42px}
   .inv-l li.bar .inv-d{grid-column:4;grid-row:1}
 }
+/* ===================== Rezept für Küche und Service (Paket D2) ===================== */
+.rz-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;max-width:860px}
+.rz-bar .rz-sw{flex:1;min-width:0}
+.rz-bar > .btn{flex:none}
+.rz{max-width:860px}
+.rz-h{display:flex;gap:20px;align-items:center;margin:6px 0 20px}
+.rz-h > div{min-width:0}
+.rz-h h1{margin:0;font:500 40px/1.08 var(--f-display);letter-spacing:.005em;overflow-wrap:anywhere}
+.rz-h .eyebrow{color:var(--muted);margin-bottom:4px;font-size:13.5px}
+.rz-ph{width:132px;height:132px;object-fit:cover;border-radius:var(--r);flex:none;background:var(--surface-2)}
+.rz-sec{margin-top:26px}
+.rz-sec h2{display:flex;align-items:baseline;gap:12px;margin:0 0 6px;padding-bottom:8px;border-bottom:1px solid var(--line-strong);font:600 14px/1.2 var(--f-body);color:var(--muted)}
+.rz-sec h2 span{font-weight:500;color:var(--fg)}
+.rz-none{margin:12px 0 0;color:var(--muted);font-size:16px}
+
+/* Portionen */
+.rz-n{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.rz-chips{display:inline-flex;align-items:center;gap:6px}
+.rz-chips button{min-width:62px;height:52px;padding:0 12px;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--surface);color:var(--fg);font:500 21px/1 var(--f-display);font-variant-numeric:tabular-nums;cursor:pointer}
+.rz-chips button.on{background:var(--fg);border-color:var(--fg);color:var(--bg)}
+.rz-chips small{margin-left:6px;font-size:14px;color:var(--muted)}
+.rz-free{display:inline-flex;align-items:center;gap:8px;font-size:15px;color:var(--muted)}
+#app .rz-free input{width:92px;height:52px;min-height:52px;text-align:right;font:500 21px/1 var(--f-display)!important;font-variant-numeric:tabular-nums}
+
+/* Zutaten und Schritte: groß, antippen streicht durch */
+.rz-ing,.rz-steps{list-style:none;margin:0;padding:0}
+.rz-ing li{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;border-bottom:1px solid var(--line)}
+.rz-i,.rz-step{display:grid;gap:18px;align-items:baseline;width:100%;border:0;background:none;color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+.rz-i{grid-template-columns:132px minmax(0,1fr);min-height:58px;padding:10px 0;font-size:21px;line-height:1.25}
+.rz-q{text-align:right;font:500 23px/1.15 var(--f-display);font-variant-numeric:tabular-nums;white-space:nowrap}
+.rz-q small,.rz-t small{display:block;font:400 13px/1.3 var(--f-body);color:var(--muted)}
+.rz-t{min-width:0;overflow-wrap:anywhere}
+.rz-open{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0 4px 0 14px;border:0;background:none;color:var(--accent);font:600 14.5px/1 var(--f-body);cursor:pointer}
+.rz-open .ico{width:16px;height:16px}
+.rz-steps li{border-bottom:1px solid var(--line)}
+.rz-step{grid-template-columns:34px minmax(0,1fr);padding:14px 0;font-size:21px;line-height:1.42}
+.rz-sn{font:500 25px/1.15 var(--f-display);color:var(--accent);font-variant-numeric:tabular-nums}
+.rz-st{min-width:0;overflow-wrap:anywhere}
+.rz-sp{display:block;max-width:min(100%,420px);margin:0 0 14px 52px;border-radius:var(--r)}
+.rz-ing li.done .rz-q,.rz-ing li.done .rz-t,.rz-steps li.done .rz-st{color:var(--faint);text-decoration:line-through;text-decoration-thickness:1.5px}
+.rz-steps li.done .rz-sn{color:var(--faint)}
+.rz-i:focus-visible,.rz-step:focus-visible,.rz-open:focus-visible,.rz-chips button:focus-visible,.sv-rb:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.rz-alg{display:flex;flex-wrap:wrap;gap:4px 16px;margin:26px 0 0;font-size:17px;line-height:1.4}
+.rz-alg .rz-al{flex-basis:100%;font:600 14px/1.2 var(--f-body);color:var(--muted)}
+.rz-alg em{font-style:normal;color:var(--bad);font-weight:600}
+
+/* Service */
+.sv-desc{margin:8px 0 0;font-size:17.5px;line-height:1.4;color:var(--muted)}
+.sv-prices{list-style:none;margin:0;padding:0;border-top:1px solid var(--line-strong)}
+.sv-prices li{display:flex;justify-content:space-between;gap:16px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--line);font-size:17px}
+.sv-prices b{font:500 22px/1 var(--f-display)}
+.sv-b{margin-top:22px}
+.sv-b h2{margin:0 0 5px;font:600 14px/1.2 var(--f-body);color:var(--muted)}
+.sv-parts,.sv-note,.sv-none{margin:0;font-size:19px;line-height:1.45;overflow-wrap:anywhere}
+.sv-note{white-space:pre-line}
+.sv-al{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:2px 18px;font-size:19px;line-height:1.5}
+.sv-al b{display:inline-block;min-width:24px;font-weight:600;color:var(--accent)}
+.sv-ask{margin:0;font-size:19px;line-height:1.4;font-weight:600;color:var(--bad)}
+.sv-sure{margin:8px 0 2px;font-size:14px;color:var(--muted)}
+.sv-ed{border:0;margin:0 0 14px;padding:0;display:grid;gap:2px}
+.sv-ed legend{padding:0;margin-bottom:6px;font-weight:600;font-size:13.5px}
+.sv-ed .tog{min-height:38px}
+
+/* Service-Liste */
+.sv-tools{max-width:980px}
+.sv-f{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted)}
+.sv-f select{min-height:var(--ctl,36px)}
+.sv-fact{max-width:980px}
+.sv-list{list-style:none;margin:0;padding:0;max-width:980px;border-top:1px solid var(--line-strong)}
+.sv-sec{padding:20px 0 6px;font:600 13px/1.2 var(--f-body);color:var(--muted);border-bottom:1px solid var(--line)}
+.sv-sec:first-child{padding-top:12px}
+.sv-r{border-bottom:1px solid var(--line)}
+.sv-rb{display:grid;grid-template-columns:minmax(0,1fr) 150px 84px;gap:16px;align-items:center;width:100%;min-height:58px;padding:9px 0;border:0;background:none;color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+.sv-n b{display:block;font-weight:500;font-size:16.5px;line-height:1.25}
+.sv-n small{display:block;margin-top:1px;font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.sv-rb:hover .sv-n b{text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px}
+.sv-ls{font-weight:600;font-size:14px;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.sv-ls.none{font-weight:400;letter-spacing:0;color:var(--muted)}
+.sv-q{font-size:13.5px;color:var(--muted)}
+.sv-p{text-align:right;font-size:15px}
+.sv-d{padding:0 0 18px;max-width:760px}
+.sv-d .sv-b:first-child{margin-top:4px}
+.sv-d .link{margin-top:14px;min-height:40px}
+.rz-more{margin-top:14px}
+
+/* Küchen-Rezept als PDF */
+#print .rz-print{font:13px/1.45 var(--f-body);color:#000}
+#print .rz-print.rz-print .meta{display:flex;justify-content:space-between;font-size:11px;color:#555;margin-bottom:10px}
+#print .rz-print.rz-print h1{margin:0;font:600 30px/1.1 var(--f-display)}
+#print .rz-print.rz-print .rk-sub{margin:26px 0 0;padding-top:12px;border-top:1.5px solid #000;font:600 20px/1.15 var(--f-display)}
+#print .rz-print.rz-print .rk-for{margin:3px 0 0;font-size:14px;color:#333}
+#print .rz-print.rz-print table{width:100%;border-collapse:collapse;margin-top:12px}
+#print .rz-print.rz-print th{text-align:left;font-size:11px;font-weight:600;color:#444;padding:4px 10px 4px 0;border:0;border-bottom:1.5px solid #000;background:none;text-transform:none;letter-spacing:0}
+#print .rz-print.rz-print td{padding:6px 10px 6px 0;border:0;border-bottom:1px solid #d5d5d5;font-size:15px;vertical-align:top}
+#print .rz-print.rz-print th.r,#print .rz-print.rz-print td.r{width:150px;text-align:right;padding-right:22px;white-space:nowrap;font-variant-numeric:tabular-nums}
+#print .rz-print.rz-print td.r{font-weight:600}
+#print .rz-print.rz-print .pr-steps-h{margin:18px 0 4px;font:600 13px/1.2 var(--f-body);color:#444}
+#print .rz-print.rz-print .pr-steps{margin:0;padding-left:22px;font-size:15px;line-height:1.5}
+#print .rz-print.rz-print .pr-steps li{margin-bottom:6px}
+#print .rz-print.rz-print .rk-alg{margin:14px 0 0;font-size:13px}
+
+@media (max-width:1100px){ .rz-ph{width:108px;height:108px} }
+@media (max-width:700px){
+  .rz-bar{flex-direction:column;align-items:stretch;gap:0;margin-bottom:12px}
+  .rz-bar > .btn{align-self:flex-start;min-height:44px}
+  .rz-h{gap:14px;margin-bottom:16px}
+  .rz-h h1{font-size:30px}
+  .rz-ph{width:76px;height:76px}
+  .rz-chips button{min-width:54px;height:48px;font-size:19px}
+  #app .rz-free input{width:84px;height:48px;min-height:48px}
+  .rz-i{grid-template-columns:92px minmax(0,1fr);gap:14px;font-size:18px}
+  .rz-q{font-size:20px}
+  .rz-step{grid-template-columns:26px minmax(0,1fr);gap:12px;font-size:18px}
+  .rz-sn{font-size:21px}
+  .rz-sp{margin-left:38px;max-width:calc(100% - 38px)}
+  .rz-open{padding-left:8px}
+  .sv-parts,.sv-note,.sv-none,.sv-al,.sv-ask{font-size:17px}
+  .sv-al{grid-template-columns:1fr}
+  .sv-tools .search{flex:1 1 100%}
+  .sv-f{width:100%}
+  .sv-f select{flex:1;min-height:44px}
+  .sv-rb{grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;min-height:60px}
+  .sv-a{grid-column:1;grid-row:2}
+  .sv-p{grid-column:2;grid-row:1}
+}
+/* Tablet in der Küche: große Tippflächen */
+@media (hover:none), (pointer:coarse), (max-width:1100px){
+  .rz-bar > .btn{min-height:44px}
+  .sv-f select{min-height:44px}
+  #app .sv-tools .search input{min-height:44px}
+}
+/* ===================== Eigenkontrolle (Paket D2) ===================== */
+.ek-h{margin:34px 0 8px;font:600 13px/1.2 var(--f-body);color:var(--muted)}
+.ek-lists,.ek-tpls,.ek-log,.ek-stat{list-style:none;margin:0;padding:0;max-width:860px;border-top:1px solid var(--line-strong)}
+.ek-l{display:grid;grid-template-columns:minmax(0,1fr) 22px;gap:18px;align-items:center;width:100%;min-height:62px;padding:10px 0;border:0;border-bottom:1px solid var(--line);background:none;color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+.ek-l:hover .ck-ln b{text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px}
+.ek-l.done .ck-go{color:var(--good)}
+.ek-l .ck-ln b{font-size:18px}
+.ek-tpls li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.ek-tpls .ck-ln b{font-size:18px}
+.ek-stat{border-top:0;margin-bottom:22px}
+.ek-stat li{padding:2px 0 10px}
+.ek-stat .ek-rm b{font:500 24px/1.2 var(--f-display)}
+.ek-stat .ek-rm small{font-size:14px}
+.ek-log li{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;border-bottom:1px solid var(--line)}
+.ek-log li > .ek-rd{grid-column:auto}
+.ek-log li:not(:has(.ek-r)){grid-template-columns:96px minmax(0,1fr) auto;gap:14px;min-height:54px;padding:7px 0}
+.ek-r{display:grid;grid-template-columns:96px minmax(0,1fr);gap:14px;align-items:center;width:100%;min-height:56px;padding:8px 0;border:0;background:none;color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+.ek-r:hover .ek-rm b{text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px}
+.ek-rd b,.ek-rm b{display:block;font-weight:500;font-size:15.5px;line-height:1.3}
+.ek-rd b{font-variant-numeric:tabular-nums}
+.ek-rd small,.ek-rm small{display:block;margin-top:1px;font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.ek-rm s{color:var(--faint);font-weight:400}
+.ek-log li.out .ek-rm b{color:var(--bad)}
+.ek-log li.out .ek-rm b s{color:var(--faint)}
+/* Temperatur-Feld: Wareneingang und Dialoge */
+.ek-tf small{display:block;margin-top:4px;font-size:12px;font-weight:400;color:var(--muted)}
+.ek-tin{display:flex;align-items:center;gap:7px;color:var(--muted);font-weight:400}
+.ek-tin input{width:96px;text-align:right;font-variant-numeric:tabular-nums}
+.recv-f .ek-ok{align-self:center;min-height:var(--ctl,36px)}
+.ek-mv{display:grid;gap:10px;margin-top:4px}
+.ek-mv[hidden]{display:none}
+.ek-res{border:0;margin:0;padding:0}
+.ek-res legend{padding:0;margin-bottom:6px;font-weight:600;font-size:13.5px}
+/* Reinigungsplan bearbeiten */
+.ek-ed{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:8px}
+.ek-er{display:grid;grid-template-columns:minmax(0,1fr) 130px 128px 124px 34px;gap:8px;align-items:center}
+.ek-er [hidden]{display:none}
+.ek-md{display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--muted)}
+.ek-md input{width:52px;text-align:right}
+.ek-er select[name="when"]:has(option[value="daily"]:checked){grid-column:3/5}
+@media (max-width:700px){
+  .ek-h{margin-top:28px}
+  .ek-l{grid-template-columns:minmax(0,1fr) 18px;gap:12px;min-height:64px}
+  .ek-r{grid-template-columns:74px minmax(0,1fr);gap:10px}
+  .ek-log li:not(:has(.ek-r)){grid-template-columns:74px minmax(0,1fr) auto;gap:10px}
+  .ek-tpls li .btn{min-height:40px}
+  .ek-er{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+  .ek-er input[name="t"]{grid-column:1/3}
+  .ek-er .icon-btn{grid-column:3;grid-row:1}
+  .ek-er input[name="area"]{grid-column:1/-1}
+  .ek-er select[name="when"]{grid-column:1}
+  .ek-er select[name="when"]:has(option[value="daily"]:checked){grid-column:1/3}
+  .ek-er select[name="wd"],.ek-er .ek-md{grid-column:2/4}
+  .ek-er input,.ek-er select{min-height:42px}
+  .recv-f .ek-tf{flex:1 1 140px}
+}
+/* Monatsmappe: Blätter wie das Allergen-Blatt */
+.mp-page{font-size:11.5px}
+.mp-page .ab-body{padding-top:4px}
+.mp-sec{margin-top:14px}
+.mp-sec h2{margin:0 0 4px;font:700 14px/1.2 var(--f-body);color:#111}
+.mp-sec h2 span{margin-left:8px;font-weight:400;font-size:11px;color:#555}
+.mp-t{width:100%;border-collapse:collapse;table-layout:fixed}
+.mp-t th{padding:5px 8px 5px 0;text-align:left;vertical-align:bottom;font:600 10.5px/1.25 var(--f-body);color:#111;background:none;border-bottom:1px solid #111;text-transform:none;letter-spacing:0;white-space:normal;overflow-wrap:anywhere}
+.mp-t th small{display:block;font-weight:400;color:#555}
+.mp-t td{padding:4px 8px 4px 0;vertical-align:top;border-bottom:1px solid #d6d6d6;line-height:1.3;overflow-wrap:anywhere}
+.mp-t td small{display:block;font-size:10px;color:#555}
+.mp-t .mp-d{width:62px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.mp-t .mp-n{width:92px;font-variant-numeric:tabular-nums}
+.mp-t .mp-v b{font-weight:600;font-variant-numeric:tabular-nums}
+.mp-t .mp-v small{display:inline;margin-left:3px}
+.mp-t .mp-v.out b{font-weight:800}
+.mp-t .gap,.mp-t td.gap,.mp-t .mp-gap td{color:#777;font-style:italic}
+.mp-t .mp-gap .mp-d{font-style:normal;color:#111}
+.mp-t .mp-v.na{color:#aaa}
+.mp-ck .mp-t tr.cp-d td{border-top:1px solid #9a9a9a}
+.mp-ck .mp-t td:nth-child(2){width:138px;font-weight:600}
+.mp-ck .mp-t .cp-n{width:128px;font-variant-numeric:tabular-nums}
+.mp-ck .mp-t td:nth-child(4){width:172px}
+.mp-ck .mp-t .cp-o{color:#444;font-size:10.5px}
+.mp-cl .mp-t td:nth-child(2){width:120px}
+.mp-cl .mp-t td:nth-child(3){width:250px}
+.mp-we .mp-t td:nth-child(5){width:110px}
+.mp-we .mp-t td:nth-child(6),.mp-oil .mp-t td:nth-child(4){width:150px}
+.mp-dev .mp-t td:nth-child(2){width:170px}
+.mp-dev .mp-t td:nth-child(5){width:110px}
+.mp-empty{margin:4px 0 0;color:#555}
+.mp-note{margin:6px 0 0;font-size:10px;color:#555}
+@media (hover:none), (pointer:coarse), (max-width:1100px){
+  #app[data-view="checkl"] .ck-rh .btn{min-height:44px}
+  .ek-log .icon-btn{min-width:44px;min-height:44px}
+}
 
 .m-only{display:none}@media (max-width:900px){.m-only{display:flex}}
 .rc:focus-visible{outline-offset:-3px}
@@ -3531,7 +3742,7 @@ function usage(ref){ return S.cards.filter(c => c.items.some(i => i.ref === ref)
    Ohne IndexedDB: localStorage wie früher, aber Fehler werden sichtbar.
    ===================================================================== */
 const APP_SCHEMA = 2;                       // Datenformat; ohne Angabe = 1 (vor Paket A)
-const APP_VERSION = '1.4.0', APP_BUILD = '1fd7e55512';
+const APP_VERSION = '1.5.0', APP_BUILD = 'dc3f094f36';
 function schemaNewer(d){ return !!d && typeof d === 'object' && +d.schema > APP_SCHEMA; }
 
 const STORE = (() => {
@@ -4076,6 +4287,7 @@ function seed(){
   plusMigrate(d);
   teamMigrate(d);
   barDemo(d); barMigrate(d);
+  rzMigrate(d); ekMigrate(d);
   return d;
 }
 
@@ -4106,6 +4318,7 @@ function migrate(d){
   plusMigrate(d);
   teamMigrate(d);
   barMigrate(d);
+  rzMigrate(d); ekMigrate(d);
   return d;
 }
 
@@ -4224,6 +4437,7 @@ function render(){
   const wEl = $('#whoami'); if(wEl){ const u = me(); wEl.innerHTML = `<b>${esc(u.name)}</b><small>${ROLES[u.role]}${cloudReady()?' · Cloud':''}</small>`; }
   pendingRender = false;
   if(kbdSel){ const el = document.querySelector(kbdSel); kbdSel = null; if(el) el.focus({preventScroll:true}); }
+  rzAfter();
 }
 let kbdSel = null, ptrDown = false, pendingRender = false;
 function softRender(){ if(ptrDown){ pendingRender = true; return; } setTimeout(() => { const id = document.activeElement && document.activeElement.id; render(); if(id){ const n = document.getElementById(id); if(n){ n.focus({preventScroll:true}); if(n.matches('input.num-in') && n.select) n.select(); } } }, 0); }
@@ -4277,6 +4491,7 @@ function cardAlgPanel(c){
       </section>`;
 }
 function renderCard(c){
+  { const mode = rzMode(c); if(mode === 'kueche') return rzKitchenHtml(c); if(mode === 'service') return svCardHtml(c); }
   if(c.drink && c.type === 'dish') return renderDrinkCard(c);
   const t = totals(c);
   const per100 = c.yieldG ? t.cost / c.yieldG * 100 : 0;
@@ -4302,6 +4517,7 @@ function renderCard(c){
       <td><button type="button" class="icon-btn" data-act="delLine" data-id="${i}" title="Zeile entfernen" aria-label="Zeile entfernen">${ico('x')}</button></td></tr>`; }).join('');
 
   return `<button type="button" class="back" data-act="backCards">${ico('arrow')}Alle Rezepturen</button>
+  ${rzSwitch(c)}
   <div class="hero">
     <div class="hero-ph">${photo(c.img, c.name, c.category)}<button type="button" class="ph-btn big" data-act="photoCard" data-id="${c.id}">${ico('camera')}<span>${c.img&&IMG[c.img]?'Foto ändern':'Foto hinzufügen'}</span></button>${c.img&&IMG[c.img]?`<button type="button" class="ph-btn del" data-act="photoCardDel" data-id="${c.id}" aria-label="Foto entfernen">${ico('x')}</button>`:''}</div>
     <div class="hero-main">
@@ -4632,13 +4848,16 @@ function moveDlg(arg){
     </div>
     ${type==='waste'?`<label class="f">Grund<select name="note">${WASTE.map(w=>`<option>${w}</option>`).join('')}</select></label>`:`<label class="f">${type==='in'?'Lieferschein / Notiz':'Notiz'}<input name="note" placeholder="${type==='in'?'z. B. Lieferschein 2240':'z. B. für Mise en place'}"></label>`}
     ${type==='in' && canEditAll()?`<div class="togs"><label class="tog"><input type="checkbox" name="upd" checked><span></span>Preis in die Kalkulation übernehmen (gleitender Durchschnitt)</label></div>`:''}
+    ${type==='in' ? ekMoveFields(p0) : ''}
     <div id="mvWarn"></div>`,
     (fd, f) => { const p = P(fd.get('pid')); if(!p) return false; const u = mu(p); const n = +fd.get('qty'); const q = Math.round(n*u.f*1000)/1000;
       if(!(q > 0)) return dlgErr('qty', 'Bitte eine Menge größer als 0 eingeben.');
       if(dateTooFar(fd.get('date'))) return dlgErr('date', 'Das Datum liegt in der Zukunft. Buchungen sind höchstens für morgen möglich.');
       const date = fd.get('date') ? new Date(fd.get('date')+'T12:00:00').toISOString() : null; let pfTxt = '';
+      const ek = type==='in' ? ekMoveRead(fd, f, p) : null; if(ek === false) return false;   // Eigenkontrolle: Temperatur der Lieferung, freiwillig
       if(type==='in'){ const old = p.price; const pr = fd.get('price')==='' || fd.get('price') == null ? p.price : +fd.get('price')/u.f; if(fd.get('upd') && Math.abs(pr - p.price) > 1e-9){ const s0 = Math.max(0, +p.stock||0); p.price = prRound(p, (s0*p.price + q*pr)/(s0+q)); } addMove('in', p.id, q, fd.get('note'), pr, date); if(old !== p.price) S.moves[0].prevPrice = old;
-        const pf = isDrink(p) && p.supplier ? Math.round(n*(+p.pfand||0)*100)/100 : 0; if(pf > 0){ S.moves[0].lg = lgAdd(p.supplier, pf, `${p.name}: ${num(n,2)} × ${u.word}`, date).id; pfTxt = ` · Pfand ${eur(pf)} beim Leergut vermerkt`; } }
+        const pf = isDrink(p) && p.supplier ? Math.round(n*(+p.pfand||0)*100)/100 : 0; if(pf > 0){ S.moves[0].lg = lgAdd(p.supplier, pf, `${p.name}: ${num(n,2)} × ${u.word}`, date).id; pfTxt = ` · Pfand ${eur(pf)} beim Leergut vermerkt`; }
+        if(ek) S.moves[0].ek = ekLogWe({...ek, sup:p.supplier || '', mv:S.moves[0].id, ref:p.name, d:fd.get('date') || ''}).id; }
       else { const st = +p.stock||0; const key = p.id+':'+q;
         if(q > st + 1e-9 && f.dataset.force !== key){
           $('#mvWarn').innerHTML = `<div class="warn-box dlg-warn" role="alert">${ico('spark')}<span><b>Mehr als der Bestand.</b> Im Lager sind ${esc(qtyFmt(st,p))}, gebucht würden ${esc(qtyFmt(q,p))}. Der Bestand ginge auf ${esc(qtyFmt(st-q,p))}. Bitte Menge prüfen oder zuerst den Wareneingang buchen.</span><button type="button" class="btn sm" id="mvForce">Trotzdem buchen</button></div>`;
@@ -4646,7 +4865,7 @@ function moveDlg(arg){
           return false; }
         addMove(type, p.id, -q, fd.get('note'), null, date); }
       moveDlg.last = `${MOVE[type]}: ${p.name} ${type==='in'?'+':'−'}${qtyFmt(q,p)}` + (type==='in' ? ` · Ø-Preis ${eur(p.price*priceUnit(p).f)}${isDrink(p) ? ' je ' + priceUnit(p).word : ''}${pfTxt}` : (+p.stock||0) < 0 ? ` · Bestand jetzt ${qtyFmt(+p.stock||0,p)}` : ''); },
-    {ok:'Buchen', done:()=>moveDlg.last, after: f => { const s = f.querySelector('#mvPid'); const clr = () => { $('#mvWarn').innerHTML = ''; delete f.dataset.force; }; s.onchange = () => { const p = P(s.value); f.querySelector('#mvUnit').textContent = lbl(p); const pl = f.querySelector('#mvPLbl'); if(pl) pl.textContent = plbl(p); const pr = f.querySelector('#mvPrice'); if(pr && p) pr.value = num2(p.price*mu(p).f); clr(); }; f.elements.qty.addEventListener('input', clr); }});
+    {ok:'Buchen', done:()=>moveDlg.last, after: f => { const s = f.querySelector('#mvPid'); const clr = () => { $('#mvWarn').innerHTML = ''; delete f.dataset.force; }; s.onchange = () => { const p = P(s.value); f.querySelector('#mvUnit').textContent = lbl(p); const pl = f.querySelector('#mvPLbl'); if(pl) pl.textContent = plbl(p); const pr = f.querySelector('#mvPrice'); if(pr && p) pr.value = num2(p.price*mu(p).f); const eb = f.querySelector('#mvEk'); if(eb) eb.outerHTML = ekMoveFields(p); clr(); }; f.elements.qty.addEventListener('input', clr); }});
 }
 
 const DEMO_SALES_OPT = ['Beispielverkäufe löschen (empfohlen)', 'Beispielverkäufe behalten'];
@@ -4758,6 +4977,7 @@ function palData(){
     sec('Heute', NAV_DESC.dash, ()=>go('dash')), sec('Vorbereitung', NAV_DESC.vorb, ()=>go('vorb')), sec('Checklisten', NAV_DESC.checkl, ()=>go('checkl')),
     sec('Speisekarte', NAV_DESC.menu, ()=>{ view.mtab='calc'; go('menu'); }),
     sec('Gästekarte', 'Speisekarte: ansehen, gestalten, als PDF speichern', ()=>{ view.mtab='guest'; go('menu'); }),
+    sec('Service-Liste', 'Speisekarte: was heute auf der Karte steht, mit Allergenen', ()=>{ view.mtab='service'; go('menu'); }),
     sec('Saison & Aktionen', 'Speisekarte', ()=>{ view.mtab='plan'; go('menu'); }),
     sec('Rezepte', NAV_DESC.cards, ()=>go('cards')),
     ...WARE_TABS.map(w => sec(w[1], w[0] === 'bestand' ? 'Ware: ' + NAV_DESC.ware : 'Ware', ()=>wareGo(w[0]))),
@@ -5155,14 +5375,15 @@ function curSeasonKey(){ return view.gseason || seasonFor(view.gdate || todayStr
 
 /* ---------- Speisekarte: Gerichte · Gästekarte · Saison & Aktionen ---------- */
 function renderMenu(){
-  if(!['calc','guest','plan'].includes(view.mtab)) view.mtab = 'calc';
+  if(!['calc','guest','plan','service'].includes(view.mtab)) view.mtab = 'calc';
   const live = S.specials.filter(sp => spStatus(sp)[0]==='live').length; const t = view.mtab;
   const btns = t === 'guest' ? `${FRAMED ? '' : `<button type="button" class="btn" data-act="printMenu">${ico('print')}Drucken</button>`}<button type="button" class="btn primary" data-pdf="printMenu">${ico('download')}Als PDF speichern</button>`
     : t === 'plan' ? `<button type="button" class="btn primary" data-act="newSpecial">${ico('plus')}Aktion</button>`
+    : t === 'service' ? `<button type="button" class="btn" data-act="algSheet">${ico('download')}Allergen-Blatt</button>`
     : `<button type="button" class="btn primary" data-act="newMenu">${ico('plus')}Gericht</button>`;
   const head = `<div class="page-h"><div><h1>Speisekarte</h1></div><div class="row-btns">${btns}</div></div>
-  <div class="toolbar tabs">${seg('mtab', t, [['calc','Gerichte',S.menu.length],['guest','Gästekarte'],['plan','Saison & Aktionen', live?'läuft':null]])}</div>`;
-  return head + (t==='guest' ? renderGuest() : t==='plan' ? renderPlan() : renderMenuCalc());
+  <div class="toolbar tabs">${seg('mtab', t, [['calc','Gerichte',S.menu.length],['guest','Gästekarte'],['plan','Saison & Aktionen', live?'läuft':null],['service','Service']])}</div>`;
+  return head + (t==='guest' ? renderGuest() : t==='plan' ? renderPlan() : t==='service' ? renderService() : renderMenuCalc());
 }
 
 function parseMD(v){ const m = String(v).trim().match(/^(\d{1,2})\.(\d{1,2})\.?$/); if(!m) return null; const d = +m[1], mo = +m[2]; if(mo<1||mo>12||d<1||d>31) return null; return `${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
@@ -5450,7 +5671,7 @@ function receiveForm(o, hasCold){
     </tbody></table></div>
     <div class="panel-f recv-f">
       <label class="f">Lieferschein-Nr.<input id="rNo" value="${esc(o.receiptDraft?.noteNo||'')}" placeholder="z. B. LS 2240"></label>
-      ${hasCold?`<label class="f">Temperatur Kühlware<input id="rTemp" value="${esc(o.receiptDraft?.temp||'')}" placeholder="z. B. 3,5 °C"></label>`:''}
+      ${ekRecvFields(o)}
       <div class="f">Foto Lieferschein<div class="row-btns">${o.receiptDraft?.photo && IMG[o.receiptDraft.photo] ? `<img class="ls-th" src="${IMG[o.receiptDraft.photo]}" alt="">` : ''}<button type="button" class="btn sm" data-act="rPhoto" data-id="${o.id}">${ico('camera')}${o.receiptDraft?.photo?'Ändern':'Aufnehmen'}</button></div></div>
       <span class="sp"></span><button type="button" class="btn" data-act="rCancel">Abbrechen</button><button type="button" class="btn primary" data-act="rBook" data-id="${o.id}">Einbuchen</button>
     </div>
@@ -5502,6 +5723,23 @@ function delayDialog(o){
 }
 function printOrder(o){ $('#print').innerHTML = `<pre style="font:12pt/1.5 'JetBrains Mono',monospace;white-space:pre-wrap">${esc(orderText(o))}</pre>`; document.body.classList.remove('print-menu'); window.print(); }
 
+/* Wareneingang einer Bestellung einbuchen. ek: Temperatur der Lieferung für die Eigenkontrolle (oder null) */
+function ordBook(o, ek){
+      const r = o.receiptDraft || {}; r.noteNo = $('#rNo')?.value || r.noteNo || '';
+      const diffs = [], priceUp = []; const date = new Date().toISOString();
+      o.lines.forEach(l => { const p = P(l.pid); if(l.delivered == null || l.delivered === '') l.delivered = l.n; l.delivered = +l.delivered; if(l.invPrice == null || l.invPrice === '') l.invPrice = l.price; l.invPrice = +l.invPrice;
+        if(!l.ls || l.ls==='ok'){ l.ls = l.delivered === 0 ? 'missing' : l.delivered < l.n ? 'short' : 'ok'; }
+        if(p && l.delivered > 0) receiveIn(p, l.delivered*l.f, l.invPrice/l.f, `${o.no}${r.noteNo?' · '+r.noteNo:''}`, date);
+        if(l.ls !== 'ok') diffs.push(`${p?p.name:'?'}: ${LSTAT[l.ls]} (bestellt ${num(l.n,2)} × ${l.ou}, geliefert ${num(l.delivered,2)})`);
+        if(l.price && (l.invPrice/l.price-1)*100 > 3) priceUp.push(`${p?p.name:'?'}: ${eur(l.price)} → ${eur(l.invPrice)}`); });
+      o.lines.forEach(l => { l.pf = linePfand(l); }); const pfSum = orderPfand(o, true);
+      o.receipt = {date, noteNo:r.noteNo, temp:'', photo:r.photo||'', checkedBy:me().id}; delete o.receiptDraft;
+      if(ek){ const rec = ekLogWe({...ek, sup:o.supplier, order:o.id, ref:o.no}); o.receipt.temp = ekWeTxt(rec); o.receipt.ek = rec.id; }   // Eigenkontrolle: Temperatur dieser Lieferung
+      if(pfSum > 0){ o.receipt.pfand = pfSum; lgAdd(o.supplier, pfSum, `Lieferung ${o.no}`, date).order = o.id; }
+      if(diffs.length || priceUp.length){ o.status = 'complaint'; o.complaint = {status:'open', text:`Sehr geehrte Damen und Herren,\n\nbei der Lieferung zu ${o.no}${r.noteNo?' (Lieferschein '+r.noteNo+')':''} vom ${fmtDate(date)} gab es folgende Abweichungen:\n${[...diffs, ...priceUp.map(x=>'Preis abweichend: '+x)].map(x=>'• '+x).join('\n')}\n\nBitte um Gutschrift bzw. Nachlieferung.\n\nDanke und freundliche Grüße`}; }
+      else o.status = 'delivered';
+      view.recv = null; save(); render(); toast((o.status==='complaint' ? `Eingebucht · ${diffs.length + priceUp.length} Abweichungen, Reklamation vorbereitet` : `Eingebucht · ${o.lines.length} Positionen, alles in Ordnung`) + (pfSum > 0 ? ` · Pfand ${eur(pfSum)} beim Leergut vermerkt` : ''));
+}
 /* ---------- Ereignisse ---------- */
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if(!el) return;
@@ -5526,22 +5764,10 @@ document.addEventListener('click', e => {
     case 'rCancel': view.recv = null; render(); break;
     case 'rAll': { const o = ORD(id); o.lines.forEach(l => { l.delivered = l.n; l.ls = 'ok'; }); save(); render(); break; }
     case 'rPhoto': { const o = ORD(id); pickImage(data => { o.receiptDraft = o.receiptDraft || {}; if(o.receiptDraft.photo) imgDel(o.receiptDraft.photo); const iid = uid('img'); imgPut(iid, data); o.receiptDraft.photo = iid; save(); render(); toast('Lieferschein fotografiert'); }); break; }
-    case 'rBook': { const o = ORD(id); const r = o.receiptDraft || {}; r.noteNo = $('#rNo')?.value || r.noteNo || ''; r.temp = $('#rTemp')?.value || r.temp || '';
-      const diffs = [], priceUp = []; const date = new Date().toISOString();
-      o.lines.forEach(l => { const p = P(l.pid); if(l.delivered == null || l.delivered === '') l.delivered = l.n; l.delivered = +l.delivered; if(l.invPrice == null || l.invPrice === '') l.invPrice = l.price; l.invPrice = +l.invPrice;
-        if(!l.ls || l.ls==='ok'){ l.ls = l.delivered === 0 ? 'missing' : l.delivered < l.n ? 'short' : 'ok'; }
-        if(p && l.delivered > 0) receiveIn(p, l.delivered*l.f, l.invPrice/l.f, `${o.no}${r.noteNo?' · '+r.noteNo:''}`, date);
-        if(l.ls !== 'ok') diffs.push(`${p?p.name:'?'}: ${LSTAT[l.ls]} (bestellt ${num(l.n,2)} × ${l.ou}, geliefert ${num(l.delivered,2)})`);
-        if(l.price && (l.invPrice/l.price-1)*100 > 3) priceUp.push(`${p?p.name:'?'}: ${eur(l.price)} → ${eur(l.invPrice)}`); });
-      o.lines.forEach(l => { l.pf = linePfand(l); }); const pfSum = orderPfand(o, true);
-      o.receipt = {date, noteNo:r.noteNo, temp:r.temp, photo:r.photo||'', checkedBy:me().id}; delete o.receiptDraft;
-      if(pfSum > 0){ o.receipt.pfand = pfSum; lgAdd(o.supplier, pfSum, `Lieferung ${o.no}`, date).order = o.id; }
-      if(diffs.length || priceUp.length){ o.status = 'complaint'; o.complaint = {status:'open', text:`Sehr geehrte Damen und Herren,\n\nbei der Lieferung zu ${o.no}${r.noteNo?' (Lieferschein '+r.noteNo+')':''} vom ${fmtDate(date)} gab es folgende Abweichungen:\n${[...diffs, ...priceUp.map(x=>'Preis abweichend: '+x)].map(x=>'• '+x).join('\n')}\n\nBitte um Gutschrift bzw. Nachlieferung.\n\nDanke und freundliche Grüße`}; }
-      else o.status = 'delivered';
-      view.recv = null; save(); render(); toast((o.status==='complaint' ? `Eingebucht · ${diffs.length + priceUp.length} Abweichungen, Reklamation vorbereitet` : `Eingebucht · ${o.lines.length} Positionen, alles in Ordnung`) + (pfSum > 0 ? ` · Pfand ${eur(pfSum)} beim Leergut vermerkt` : '')); break; }
+    case 'rBook': { const o = ORD(id); const r = o.receiptDraft = o.receiptDraft || {}; r.noteNo = $('#rNo')?.value || r.noteNo || ''; ekRecvCheck(o, ek => ordBook(o, ek)); break; }
     case 'cCopy': { const o = ORD(id); navigator.clipboard?.writeText(o.complaint.text).then(()=>toast('Reklamation kopiert'), ()=>{}); break; }
     case 'supEdit': supplierDialog(id ? SUP(id) : null); break;
-    case 'userSwitch': S.settings.currentUser = id; save(); render(); toast(`Angemeldet als ${whoLabel(me())}`); break;
+    case 'userSwitch': S.settings.currentUser = id; view.cv = null; save(); render(); toast(`Angemeldet als ${whoLabel(me())}`); break;
   }
 });
 document.addEventListener('change', e => {
@@ -5555,7 +5781,7 @@ document.addEventListener('change', e => {
   if(t.dataset.rs != null && o){ o.lines[+t.dataset.rs].ls = t.value; save(); return; }
   if(t.dataset.cst){ ORD(t.dataset.cst).complaint.status = t.value; if(t.value==='closed' || t.value==='credit') ORD(t.dataset.cst).status = t.value==='closed' ? 'delivered' : 'complaint'; save(); render(); toast('Reklamation: '+CSTAT[t.value]); return; }
   if(t.dataset.ctext){ ORD(t.dataset.ctext).complaint.text = t.value; save(); return; }
-  if(t.id === 'rNo' || t.id === 'rTemp'){ const oo = ORD(view.recv) || o; if(!oo) return; const r = oo.receiptDraft = oo.receiptDraft || {}; r[t.id==='rNo'?'noteNo':'temp'] = t.value; save(); return; }
+  if(t.id === 'rNo' || t.id === 'rTemp' || t.id === 'rTempT' || t.id === 'rOk'){ const oo = ORD(view.recv) || o; if(!oo) return; const r = oo.receiptDraft = oo.receiptDraft || {}; if(t.id === 'rOk') r.cond = t.checked ? '' : 'no'; else r[{rNo:'noteNo', rTemp:'temp', rTempT:'tempT'}[t.id]] = t.value; save(); return; }
   if(t.dataset.us === 'addr'){ S.settings[t.dataset.k] = t.value; save(); return; }
 });
 
@@ -6047,7 +6273,8 @@ const CARD_SORTS = [['','Gerichte zuerst, nach Name'],['name','Name'],['cat','Ka
 function renderCards(){
   const q = view.q.trim().toLowerCase();
   const ofType = (c, t) => t === 'all' || (t === 'drink' ? !!c.drink && c.type === 'dish' : c.type === t && !(t === 'dish' && c.drink));
-  const list0 = S.cards.filter(c => ofType(c, view.ctype) && (!q || (c.name+' '+c.category).toLowerCase().includes(q)));
+  const mode = rzMode(null);   // Kalkulation · Küche · Service: so öffnet die Liste eine Rezeptur; Preise stehen nur in der Kalkulation
+  const list0 = S.cards.filter(c => ofType(c, view.ctype) && (mode !== 'service' || c.type !== 'semi') && (!q || (c.name+' '+c.category).toLowerCase().includes(q)));
   const n = t => S.cards.filter(c => ofType(c, t)).length; const dk = view.ctype === 'drink';
   const rows = list0.map(c => { const t = totals(c); const mk = S.menu.filter(m => m.card === c.id).map(menuCalc)[0]; return {c, t, mk}; });
   const sorted = applySort('cards', rows.sort((a,b)=> a.c.type===b.c.type ? byName(a.c,b.c) : (a.c.type==='semi'?1:-1)), {name:x=>x.c.name, cat:x=>x.c.category||'', cost:x=>x.t.cost, fc:x=>x.mk?x.mk.fc:null, items:x=>x.c.items.length});
@@ -6055,9 +6282,17 @@ function renderCards(){
   const more = moreOpts('cards', `<label class="f inl">Sortieren<select data-sel="csort" aria-label="Sortieren">${CARD_SORTS.map(([k,l]) => `<option value="${k}" ${sCol===k?'selected':''}>${l}</option>`).join('')}</select></label><button type="button" class="btn sm" data-act="newCard" data-id="semi">${ico('plus')}Basisrezept</button><button type="button" class="btn sm" data-act="newCard" data-id="${dk ? 'dish' : 'drink'}">${ico('plus')}${dk ? 'Rezeptur' : 'Schankrezeptur'}</button>`);
   let h = `<div class="page-h"><div><h1>Rezepte</h1></div>
     <div class="row-btns"><button type="button" class="btn primary" data-act="newCard" data-id="${dk ? 'drink' : 'dish'}">${ico('plus')}${dk ? 'Schankrezeptur' : 'Rezeptur'}</button></div></div>
+  ${rzSwitch(null)}
   <div class="toolbar"><label class="search">${ico('search')}<input id="cq" type="search" placeholder="Rezeptur suchen" value="${esc(view.q)}" autocomplete="off"></label>
     ${seg('ctype', view.ctype, [['all','Alle',n('all')],['dish','Gerichte',n('dish')],['semi','Basisrezepte',n('semi')]].concat(n('drink') || dk ? [['drink','Getränke',n('drink')]] : []))}</div>`;
   if(!sorted.length) return h + `<div class="panel empty">Keine Rezepturen gefunden.</div>` + more;
+  if(mode !== 'kalk') return h + `<div class="lt-wrap"><table class="lt rz-lt"><thead><tr><th>Rezeptur</th><th class="hide-m">Kategorie</th>${mode === 'service' ? '<th>Allergene</th><th class="r">Preis</th>' : ''}</tr></thead><tbody>
+    ${sorted.map(({c}) => { const m0 = mode === 'service' ? menuSorted().find(m => m.card === c.id) : null; return `<tr class="row" data-act="openCard" data-id="${c.id}">
+      <td><div class="lt-n">${c.img&&IMG[c.img]?`<img src="${IMG[c.img]}" alt="">`:''}<span><b>${esc(c.name)}</b><small>${c.type==='semi'?'Basisrezept':c.drink?'Getränk':'Gericht'}${c.drink ? (+c.yieldG > 0 ? ' · ' + volTxt(+c.yieldG) : '') : +c.yieldG > 0 ? ` · ${rzAmount(+c.yieldG, 'g')}` : ''}</small></span></div></td>
+      <td class="hide-m lt-muted">${esc(c.category||'—')}</td>
+      ${mode === 'service' ? `<td>${svAlgShort(algInfo({card:c.id}))}</td><td class="r">${m0 ? eur(m0.price) : '<span class="lt-muted">nicht auf der Karte</span>'}</td>` : ''}</tr>`; }).join('')}
+  </tbody></table></div>
+  ${mode === 'service' ? `<p class="fact rz-more">Auch Gerichte ohne Rezeptur: <button type="button" class="link" data-act="svGo">Service-Liste mit allem, was heute auf der Karte steht</button></p>` : ''}${more}`;
   return h + `<div class="lt-wrap"><table class="lt"><thead><tr><th>Rezeptur</th><th class="hide-m">Kategorie</th><th class="r hide-m">Zutaten</th><th class="r">Wareneinsatz</th><th class="r">in %</th><th class="hide-m"></th></tr></thead><tbody>
     ${sorted.map(({c,t,mk}) => `<tr class="row" data-act="openCard" data-id="${c.id}">
       <td><div class="lt-n">${c.img&&IMG[c.img]?`<img src="${IMG[c.img]}" alt="">`:''}<span><b>${esc(c.name)}</b><small>${c.type==='semi'?'Basisrezept · ':''}Nr. ${c.no||'—'}${c.drink ? (+c.yieldG > 0 ? ' · ' + volTxt(+c.yieldG) : '') : ` · ${(c.steps||[]).length} Schritte${+c.yieldG > 0 ? ` · ${num(c.yieldG)} g` : ''}`}</small></span></div></td>
@@ -7318,6 +7553,7 @@ document.addEventListener('click', e => {
   const a = b.dataset.pdf, id = b.dataset.id;
   if(a === 'printMenu'){ const k = typeof curSeasonKey === 'function' ? curSeasonKey() : ''; PDF_NAME = pdfFileName(`Speisekarte-${S.settings.name.split(' ')[0]}-${k ? seasonName(k) : ''}-${view.gdate || todayStr()}`); printMenu(); }
   if(a === 'rpPrint'){ const r = rpRange(view.rp); PDF_NAME = pdfFileName(`Auswertung-${r.from}-${r.to}`); rpPrint(); }
+  if(a === 'printKueche'){ printKitchen(id); }
   if(a === 'printCard'){ const c = C(id); PDF_NAME = pdfFileName('Rezeptur-' + (c ? c.name : id)); printCard(id); }
   if(a === 'printSpecial'){ const sp = S.specials.find(x => x.id === id); PDF_NAME = pdfFileName('Tageskarte-' + (sp ? sp.name : '')); $('#print').innerHTML = tageskarteHtml(sp); document.body.classList.add('print-menu'); window.print(); }
 }, true);
@@ -7454,11 +7690,12 @@ function abPages(){
   const out = pages.map(pg => pg.outerHTML); host.innerHTML = '';
   return {pages:out, nDishes:dishes.length, nOpen, cols, date};
 }
-async function abExportPdf(){
-  const r = abPages(); const el = $('#print'); const name = pdfFileName(`Allergen-Blatt-${S.settings.name.split(' ')[0]}-${r.date}`);
+/* Fertige A4-Blätter (.ab-page) als PDF speichern: ein Blatt je Seite. Gibt die Seitenzahl zurück (0 = fehlgeschlagen). */
+async function a4Pdf(pagesHtml, name){
+  const el = $('#print'); let n = 0;
   toast('PDF wird erstellt …');
   try {
-    await pdfLibs(); el.className = ''; el.classList.add('pdf', 'ab-print'); el.innerHTML = r.pages.join('');
+    await pdfLibs(); el.className = ''; el.classList.add('pdf', 'ab-print'); el.innerHTML = pagesHtml.join('');
     if(document.fonts && document.fonts.ready) await document.fonts.ready;
     await new Promise(x => requestAnimationFrame(() => requestAnimationFrame(x)));
     const pages = [...el.querySelectorAll('.ab-page')]; const {jsPDF} = window.jspdf; const pdf = new jsPDF({unit:'pt', format:'a4', compress:true});
@@ -7469,9 +7706,14 @@ async function abExportPdf(){
     }
     const ok = await saveFile(name, pdf.output('blob'));
     if(ok) toast(`PDF erstellt: ${name} (${pages.length} ${pages.length === 1 ? 'Seite' : 'Seiten'})`);
-    window.__abLast = {name, pages:pages.length, dishes:r.nDishes, open:r.nOpen};
+    n = pages.length;
   } catch(e){ toast('PDF fehlgeschlagen: ' + (e.message || e)); }
   finally { el.classList.remove('pdf', 'ab-print'); el.innerHTML = ''; }
+  return n;
+}
+async function abExportPdf(){
+  const r = abPages(); const name = pdfFileName(`Allergen-Blatt-${S.settings.name.split(' ')[0]}-${r.date}`);
+  const n = await a4Pdf(r.pages, name); if(n) window.__abLast = {name, pages:n, dishes:r.nDishes, open:r.nOpen};
 }
 function abDialog(){
   const r = abPages();
@@ -8219,6 +8461,7 @@ const SUB_LINE = {
   menu:'Preis, Wareneinsatz und Allergene je Gericht. Preis direkt in der Zeile ändern.',
   'menu/guest':'Gästekarte ansehen, gestalten und als PDF speichern.',
   'menu/plan':'Saisonzeiten festlegen und Aktionen planen. Die Gästekarte wechselt von selbst.',
+  'menu/service':'Für den Service: was heute auf der Karte steht, was am Teller ist und welche Allergene drin sind.',
   cards:'Zutaten, Mengen, Zubereitung. Daraus kommen Wareneinsatz und Allergene.',
   stock:'Was ist im Haus und was ist es wert?',
   'stock/inventur':'Zählen, Differenz sehen, Bestand übernehmen.',
@@ -8465,7 +8708,7 @@ const RUNDGANG = [
 const HOWTO = {
   dash:['Oben steht, was heute zu bestellen ist und welche Lieferung kommt.', 'Der Knopf rechts in jeder Zeile führt direkt hin.', 'Unter „Offen“ steht, was an der Karte noch fehlt.'],
   vorb:['Oben wählen Sie den Tag: heute, morgen oder später in der Woche.', 'Die Prep-Liste zeigt, was vorzukochen und herzurichten ist. Ein Tipp hakt ab.', 'Die Prognose darunter können Sie überschreiben, zum Beispiel bei einer Reservierung.', 'Fehlt Ware, legen Sie sie mit einem Tipp in die Bestellung.'],
-  checkl:['Jeden Tag gibt es frische Listen. Tippen Sie auf eine Liste und dann auf jeden erledigten Punkt.', 'Manche Punkte brauchen eine Zahl, zum Beispiel die Temperatur im Kühlhaus.', 'Im Verlauf sehen Sie die letzten 14 Tage, auch als PDF.'],
+  checkl:['Jeden Tag gibt es frische Listen. Tippen Sie auf eine Liste und dann auf jeden erledigten Punkt.', 'Manche Punkte brauchen eine Zahl, zum Beispiel die Temperatur im Kühlhaus.', 'Darunter steht die Eigenkontrolle: Reinigungsplan, Frittieröl, Temperatur der Lieferungen.', 'Im Verlauf sehen Sie die letzten 14 Tage und speichern die Monatsmappe als PDF.'],
   menu:['Eine Zeile je Gericht: Preis, Wareneinsatz und was übrig bleibt.', 'Den Preis ändern Sie direkt in der Zeile.', 'Am Griff links ziehen Sie ein Gericht an eine andere Stelle seiner Kategorie.', '„Ohne Rezeptur“ und „Allergene offen“ zeigen, wo noch etwas fehlt.'],
   guest:['So sehen die Gäste die Karte. Es zählt der gewählte Tag: Saison, Wochentag, Aktionen.', 'Links wählen Sie den Stil und die Texte.', '„Als PDF speichern“ macht eine Datei zum Drucken oder Verschicken.'],
   plan:['Die vier Balken sind Ihre Saisonen. Ein Tipp ändert, von wann bis wann eine gilt.', 'Eine Aktion ist eine eigene kleine Karte für ein paar Tage, zum Beispiel Wildwochen.', 'Welches Gericht in welcher Saison gilt, stellen Sie beim Gericht ein.'],
@@ -8684,7 +8927,7 @@ function injectWozu(){
    Hilfe-Modus „Was ist das?“ und die Erklär-Blase
    ===================================================================== */
 let HELP_ON = false; let BUB = null;
-const HELP_PASS = '[data-tab],[data-act="goTab"],[data-act="goMenu"],[data-act="goStock"],[data-act="goBuyTab"],[data-act="goReportTab"],[data-act="mtab"],[data-act="stab"],[data-act="rpTab"],[data-act="ctype"],[data-act="sec"],[data-act="pFilter"],[data-act="loc"],[data-act="ofilter"],[data-act="backCards"],[data-act="ordBack"],[data-act="openCard"],[data-act="ordOpen"],[data-act="theme"],[data-act="rpUnit"],[data-act="rpStep"],[data-act="rpToday"],[data-act="mehr"],[data-act="mehrClose"],[data-act="guideHere"],[data-act="howClose"],[data-act="wtab"],[data-act="ttab"],summary';
+const HELP_PASS = '[data-tab],[data-act="goTab"],[data-act="goMenu"],[data-act="goStock"],[data-act="goBuyTab"],[data-act="goReportTab"],[data-act="mtab"],[data-act="stab"],[data-act="rpTab"],[data-act="ctype"],[data-act="sec"],[data-act="pFilter"],[data-act="loc"],[data-act="ofilter"],[data-act="backCards"],[data-act="ordBack"],[data-act="openCard"],[data-act="ordOpen"],[data-act="theme"],[data-act="rpUnit"],[data-act="rpStep"],[data-act="rpToday"],[data-act="mehr"],[data-act="mehrClose"],[data-act="guideHere"],[data-act="howClose"],[data-act="wtab"],[data-act="ttab"],[data-act="rzView"],summary';
 function helpApply(scope){
   const root = scope || document;
   root.querySelectorAll('#app th, #app .t-l, #app .panel-h h2, #app .hero small, #app .kv > span:nth-child(odd), #app .fcw small, #app .pc-ex small, #app .ring small, #app dt').forEach(el => {
@@ -9354,6 +9597,7 @@ function tmDemoRemove(){
   t.patterns = t.patterns.filter(p => !p.demo);
   Object.keys(c.runs).forEach(D => { Object.keys(c.runs[D]).forEach(k => { if(c.runs[D][k].demo) delete c.runs[D][k]; }); if(!Object.keys(c.runs[D]).length) delete c.runs[D]; });
   const today = isoDate(new Date()); c.templates.forEach(tp => { if(tp.since < today) tp.since = today; });
+  ekDemoRemove();
   t.demo = false;
 }
 
@@ -9386,7 +9630,7 @@ function teamMigrate(d){
     x.items = (Array.isArray(x.items) ? x.items : []).filter(i => obj(i) && i.id && String(i.t || '').trim()).map(i => { if(i.val && !(obj(i.val) && isFinite(+i.val.min) && isFinite(+i.val.max))) delete i.val; return i; });
     if(!Array.isArray(x.old)) x.old = []; return x; });
   if(!obj(c.runs)) c.runs = {};
-  const cutR = dAdd(today, -CK_KEEP_RUNS);
+  const cutR = dAdd(today, -Math.max(CK_KEEP_RUNS, EK_KEEP_DAYS));   // Eigenkontrolle: mindestens 13 Monate
   Object.keys(c.runs).forEach(D => { if(!TM_DATE.test(D) || D < cutR || !obj(c.runs[D])){ delete c.runs[D]; return; } Object.keys(c.runs[D]).forEach(k => { const r = c.runs[D][k]; if(!obj(r) || !obj(r.items)) delete c.runs[D][k]; }); if(!Object.keys(c.runs[D]).length) delete c.runs[D]; });
   // Beispieldaten: Beispiel-Team dazu, solange noch die Beispieldaten laufen und es noch kein Team gab
   if(fresh && d.demo){ try { tmDemo(d); } catch(e){ console.warn('Team-Beispiel:', e); } }
@@ -9850,7 +10094,7 @@ function ckRunHtml(tp, D){
   const run = ckRun(D, tp.id) || {items:{}}; const pr = ckProg(tp, D);
   const row = it => { const r = run.items[it.id]; const on = !!r;
     if(it.val){ const bad = on && r.out;
-      return `<li class="ck-i val ${on ? 'on' : ''} ${bad ? 'out' : ''}" data-item="${it.id}"><label class="ck-vl" for="ckv-${it.id}"><span class="ck-box" aria-hidden="true">${ico('check')}</span><span class="ck-t"><span>${esc(it.t)}</span><small>${on ? `${esc(r.b)}, ${r.a} Uhr · ` : ''}erlaubt ${esc(ckRangeTxt(it.val))}${bad && r.note ? ` · <span class="ck-note">${esc(r.note)}</span>` : ''}</small></span></label>
+      return `<li class="ck-i val ${on ? 'on' : ''} ${bad ? 'out' : ''}" data-item="${it.id}"><label class="ck-vl" for="ckv-${it.id}"><span class="ck-box" aria-hidden="true">${ico('check')}</span><span class="ck-t"><span>${esc(it.t)}</span><small>${on ? `${esc(r.b)}, ${r.a} Uhr · ` : ''}erlaubt ${esc(ckRangeTxt(it.val))}${bad && r.note ? ` · <span class="ck-note">${esc(r.note)}</span>` : ''}${on && r.prev && r.prev.length ? ` · korrigiert, vorher <s>${r.prev.map(x => ckVal(x.v)).join(', ')} ${esc(it.val.unit || '')}</s>` : ''}</small></span></label>
         <span class="ck-vin"><input id="ckv-${it.id}" class="num-in ck-v" type="text" inputmode="${+it.val.min < 0 ? 'text' : 'decimal'}" data-num="self" data-ckv="${it.id}" value="${on ? ckVal(r.v) : ''}" placeholder="–" autocomplete="off" aria-label="${esc(it.t)}, Wert in ${esc(it.val.unit || '')}"><span>${esc(it.val.unit || '')}</span></span>
 </li>`; }
     return `<li class="ck-i ${on ? 'on' : ''}" data-item="${it.id}"><button type="button" role="checkbox" aria-checked="${on}" class="ck-c" data-act="ckChk" data-id="${it.id}"><span class="ck-box" aria-hidden="true">${ico('check')}</span><span class="ck-t"><span>${esc(it.t)}</span>${on ? `<small>${esc(r.b)}, ${r.a} Uhr</small>` : ''}</span></button></li>`; };
@@ -9863,12 +10107,12 @@ function ckRunHtml(tp, D){
 }
 function ckHistDays(n){ const t = ckToday(); const out = []; for(let k = 0; k < (n || 14); k++) out.push(dAdd(t, -k)); return out; }
 function ckHistDetail(D){
-  const due = ckDue(D); if(!due.length) return '<p class="ck-hd-none">An diesem Tag war keine Liste fällig.</p>';
+  const due = ckDue(D); const ek = ekHistDetail(D); if(!due.length) return ek || '<p class="ck-hd-none">An diesem Tag war keine Liste fällig.</p>';
   return due.map(tp => { const run = ckRun(D, tp.id) || {items:{}}; const pr = ckProg(tp, D);
     // erledigte Punkte in der Reihenfolge der Liste, dazu Punkte, die es in der Liste nicht mehr gibt
     const ids = tp.items.map(i => i.id).concat(Object.keys(run.items).filter(id => !tp.items.some(i => i.id === id)));
     return `<div class="ck-hd"><h3>${esc(tp.name)}<span>${pr.done} von ${pr.total} · ${ckStateTxt(pr)}</span></h3><ul>${ids.map(id => { const r = run.items[id]; const it = tp.items.find(i => i.id === id) || (tp.old || []).find(i => i.id === id);
-      return `<li class="${r ? 'on' : 'miss'} ${r && r.out ? 'out' : ''}"><span class="ck-hs" aria-hidden="true">${r ? ico('check') : ''}</span><span class="ck-ht">${esc(ckItemLabel(tp, id))}${r && r.note ? `<small>${esc(r.note)}</small>` : ''}</span>${it && it.val ? `<span class="ck-hv">${it.val ? ckSpark(tp, it, D) : ''}<b>${r && r.v != null ? `${ckVal(r.v)} ${esc(it.val.unit || '')}` : '–'}</b></span>` : ''}<span class="ck-hw">${r ? `${esc(r.b)} · ${r.a}` : pr.over ? 'offen geblieben' : 'offen'}</span></li>`; }).join('')}</ul></div>`; }).join('');
+      return `<li class="${r ? 'on' : 'miss'} ${r && r.out ? 'out' : ''}"><span class="ck-hs" aria-hidden="true">${r ? ico('check') : ''}</span><span class="ck-ht">${esc(ckItemLabel(tp, id))}${r && r.note ? `<small>${esc(r.note)}</small>` : ''}${r && r.prev && r.prev.length ? `<small>korrigiert, vorher ${r.prev.map(x => `${ckVal(x.v)} (${esc(x.b)}, ${x.a})`).join(', ')}</small>` : ''}</span>${it && it.val ? `<span class="ck-hv">${it.val ? ckSpark(tp, it, D) : ''}<b>${r && r.v != null ? `${ckVal(r.v)} ${esc(it.val.unit || '')}` : '–'}</b></span>` : ''}<span class="ck-hw">${r ? `${esc(r.b)} · ${r.a}` : pr.over ? 'offen geblieben' : 'offen'}</span></li>`; }).join('')}</ul></div>`; }).join('') + ek;
 }
 function ckHistHtml(){
   const days = ckHistDays(14); const c = ckS(); const today = ckToday();
@@ -9881,38 +10125,42 @@ function ckHistHtml(){
     return `<li class="ck-hr ${open ? 'open' : ''} ${tmClosed(D) ? 'closed' : ''}"><button type="button" class="ck-hb" data-act="ckHist" data-id="${D}" aria-expanded="${open}"><span class="ck-hday"><b>${D === today ? 'Heute' : tmDayTxt(D)}</b>${!due.length ? `<small>${tmClosed(D) ? 'Ruhetag' : 'nichts fällig'}</small>` : ''}</span><span class="ck-hcs" style="--n:${tps.length}">${cells}</span></button>${open ? `<div class="ck-hdw">${ckHistDetail(D)}</div>` : ''}</li>`; }).join('');
   return `<div class="ck-hhead"><span class="ck-hday"></span><span class="ck-hcs" style="--n:${tps.length}">${tps.map(tp => `<span>${esc(tp.name)}</span>`).join('')}</span></div>
     <ul class="ck-hist">${rows}</ul>
-    <div class="ck-hpdf"><label class="f">Monat<select data-ckmonth="1" aria-label="Monat für das PDF">${months.map(m => `<option value="${m}" ${m === mSel ? 'selected' : ''}>${MONTHS[+m.slice(5) - 1]} ${m.slice(0, 4)}</option>`).join('')}</select></label><button type="button" class="btn" data-pdf="ckPrint">${ico('download')}Als PDF speichern</button></div>`;
+    <div class="ck-hpdf"><label class="f">Monat<select data-ckmonth="1" aria-label="Monat für das PDF">${months.map(m => `<option value="${m}" ${m === mSel ? 'selected' : ''}>${MONTHS[+m.slice(5) - 1]} ${m.slice(0, 4)}</option>`).join('')}</select></label><button type="button" class="btn" data-pdf="ckPrint">${ico('download')}Monatsmappe als PDF</button></div>`;
 }
 function ckTplListHtml(){
   const c = ckS(); const list = c.templates.filter(t => !t.deleted);
   return `<ul class="ck-tpls">${list.map(tp => { const nv = tp.items.filter(i => i.val).length;
     return `<li class="${tp.active ? '' : 'off'}"><span class="ck-ln"><b>${esc(tp.name)}</b><small>${tp.when === 'weekly' ? `jede Woche am ${DAYNAME[tp.wd]}` : 'jeden Öffnungstag'} · ${plural(tp.items.length, 'Punkt', 'Punkte')}${nv ? `, davon ${plural(nv, 'Messwert', 'Messwerte')}` : ''}${tp.active ? '' : ' · ausgeschaltet'}${tp.sug ? ' · Vorschlag, bitte anpassen' : ''}</small></span><button type="button" class="btn sm" data-act="ckTplEdit" data-id="${tp.id}">Bearbeiten</button></li>`; }).join('')}</ul>
     <button type="button" class="btn" data-act="ckTplNew">${ico('plus')}Neue Liste</button>
+    ${ekTplHtml()}
     <p class="hint ck-tph">Die Listen sind Vorschläge für eine kleine Küche. Passen Sie sie an Ihren Betrieb an. Sie ersetzen keine behördlich verlangten Aufzeichnungen.</p>`;
 }
 function renderCheckl(){
   const c = ckS(); const v = view.ck || (view.ck = {tab:'heute'}); const D = ckToday(); const ro = !canEditAll();
   if(v.tab === 'vorlagen' && ro) v.tab = 'heute';
+  if(v.ek) return ekPageHtml(v.ek, D);
   if(v.run){ const tp = ckTpl(v.run); if(tp && ckDue(D).includes(tp)) return ckRunHtml(tp, D); v.run = null; }
   const due = ckDue(D); const nDone = due.filter(tp => ckProg(tp, D).full).length; const dLong = dParse(D).toLocaleDateString('de-AT', {weekday:'long', day:'numeric', month:'long'});
   const sub = v.tab === 'verlauf' ? 'Die letzten 14 Tage. Tippen Sie auf einen Tag.' : v.tab === 'vorlagen' ? 'Was auf den Listen steht und wann sie fällig sind.' : `${dLong}${due.length ? ` · ${nDone} von ${due.length} ${due.length === 1 ? 'Liste' : 'Listen'} fertig` : ''}`;
   const tabs = [['heute','Heute'],['verlauf','Verlauf']].concat(ro ? [] : [['vorlagen','Vorlagen']]);
   return `<div class="page-h"><div><h1>Checklisten</h1><p class="sub">${esc(sub)}</p></div></div>
     <div class="toolbar ck-tabs"><div class="seg" role="tablist">${tabs.map(([k, l]) => `<button type="button" role="tab" aria-selected="${v.tab === k}" class="${v.tab === k ? 'on' : ''}" data-act="ckTab" data-id="${k}">${l}</button>`).join('')}</div></div>
-    ${v.tab === 'verlauf' ? ckHistHtml() : v.tab === 'vorlagen' ? ckTplListHtml() : ckOverviewHtml(D)}`;
+    ${v.tab === 'verlauf' ? ckHistHtml() : v.tab === 'vorlagen' ? ckTplListHtml() : ckOverviewHtml(D) + ekOverviewHtml(D)}`;
 }
 /* Messwert eintragen: im Bereich sofort, außerhalb mit kurzer Notiz */
 function ckValueInput(inp){
   const v0 = view.ck; const D = ckToday(); const tp = ckTpl(v0.run); if(!tp) return; const it = tp.items.find(i => i.id === inp.dataset.ckv); if(!it || !it.val) return;
   const run = ckRun(D, tp.id); const old = run && run.items[it.id]; const raw = inp.value.trim().replace(/[−–]/g, '-').replace(/\s|°|C$/gi, '');
-  if(raw === ''){ if(old){ ckSet(D, tp, it, null); render(); toast('Wert gelöscht', {action:() => { ckSet(D, tp, it, old); render(); }}); } else inp.value = ''; return; }
+  if(raw === ''){ if(old && !canEditAll()){ inp.value = ckVal(old.v); toast('Einen eingetragenen Wert löscht nur der Chef. Ein falscher Wert lässt sich überschreiben.'); return; } if(old){ ckSet(D, tp, it, null); render(); toast('Wert gelöscht', {action:() => { ckSet(D, tp, it, old); render(); }}); } else inp.value = ''; return; }
   const v = /^-?\d+([.,]\d+)?$/.test(raw) ? numParse(raw) : NaN;
   if(!isFinite(v) || Math.abs(v) > 999){ inp.value = old ? ckVal(old.v) : ''; inp.classList.add('bad-in'); setTimeout(() => inp.classList.remove('bad-in'), 1600); toast('Bitte eine Zahl eingeben, zum Beispiel 3,5 oder -18.'); return; }
   if(old && Math.abs(old.v - v) < 1e-9) { inp.value = ckVal(old.v); return; }
-  const fin = rec => { const full = ckSet(D, tp, it, rec); render(); if(full) toast(`${tp.name}: alles erledigt`); };
-  if(ckInRange(it.val, v)){ fin(ckRec({v})); return; }
+  // Korrektur: der alte Wert bleibt am Eintrag stehen
+  const prev = old ? {prev:(old.prev || []).concat([{v:old.v, b:old.b, a:old.a}]).slice(-6)} : {};
+  const fin = rec => { const full = ckSet(D, tp, it, rec); render(); if(full) toast(`${tp.name}: alles erledigt`); else if(old) toast('Korrektur gespeichert. Der alte Wert bleibt sichtbar.'); };
+  if(ckInRange(it.val, v)){ fin(ckRec({v, ...prev})); return; }
   tmDialog('Wert außerhalb des Bereichs', `<p class="dlg-p"><b>${esc(it.t)}: ${ckVal(v)} ${esc(it.val.unit || '')}</b><br>Erlaubt sind ${esc(ckRangeTxt(it.val))}. Was haben Sie getan?</p><label class="f">Kurze Notiz<input name="note" maxlength="120" placeholder="z. B. Tür war offen, Chef informiert" autocomplete="off"></label>`,
-    (fd, f) => { const note = String(fd.get('note') || '').trim(); if(note.length < 3) return dlgErr(f.elements.note, 'Bitte kurz notieren, was getan wurde.'); setTimeout(() => { const full = ckSet(D, tp, it, ckRec({v, out:1, note})); render(); toast(full ? `${tp.name}: alles erledigt` : 'Wert mit Notiz gespeichert'); }, 0); },
+    (fd, f) => { const note = String(fd.get('note') || '').trim(); if(note.length < 3) return dlgErr(f.elements.note, 'Bitte kurz notieren, was getan wurde.'); setTimeout(() => { const full = ckSet(D, tp, it, ckRec({v, out:1, note, ...prev})); render(); toast(full ? `${tp.name}: alles erledigt` : 'Wert mit Notiz gespeichert'); }, 0); },
     {ok:'Mit Notiz speichern', toast:false});
   $('#dlg').addEventListener('close', () => { if(!ckRun(D, tp.id) || !(ckRun(D, tp.id).items[it.id] && Math.abs(ckRun(D, tp.id).items[it.id].v - v) < 1e-9)) setTimeout(() => { if(view.tab === 'checkl') render(); }, 60); }, {once:true});
 }
@@ -9962,22 +10210,7 @@ function ckTplDlg(id){
       if(isNew) f.querySelector('[data-ckadd]').click(), f.elements.name.focus();
     }});
 }
-function ckPrintHtml(ym){
-  const c = ckS(); const [y, m] = ym.split('-').map(Number); const nDays = new Date(y, m, 0).getDate(); const today = ckToday(); const days = [];
-  for(let d = 1; d <= nDays; d++){ const D = `${ym}-${String(d).padStart(2, '0')}`; if(D > today) break; const due = ckDue(D); if(due.length) days.push([D, due]); }
-  const body = days.map(([D, due]) => `<tbody><tr class="cp-d"><th colspan="4">${esc(dParse(D).toLocaleDateString('de-AT', {weekday:'long', day:'numeric', month:'long'}))}</th></tr>${due.map(tp => { const run = ckRun(D, tp.id) || {items:{}}; const pr = ckProg(tp, D);
-    const recs = Object.values(run.items); const who = [...new Set(recs.map(r => r.b))].join(', '); const times = recs.map(r => r.a).sort(); const first = times[0], last = times[times.length - 1];
-    const vals = Object.keys(run.items).filter(id => run.items[id].v != null).map(id => { const r = run.items[id]; const it = tp.items.find(i => i.id === id) || (tp.old || []).find(i => i.id === id); return `${esc(ckItemLabel(tp, id))}: <b>${ckVal(r.v)} ${esc(it && it.val ? it.val.unit || '' : '')}</b>${r.out ? ` (außerhalb${r.note ? ': ' + esc(r.note) : ''})` : ''}`; });
-    const open = pr.full ? [] : tp.items.filter(i => !run.items[i.id]).map(i => esc(i.t));
-    return `<tr><td>${esc(tp.name)}</td><td class="cp-n">${pr.done} von ${pr.total}${pr.full ? '' : pr.over ? ' · nicht fertig' : ' · offen'}</td><td>${who ? `${esc(who)}${first ? `, ${first}${last !== first ? '–' + last : ''} Uhr` : ''}` : '–'}</td><td>${vals.join('; ')}${vals.length && open.length ? '<br>' : ''}${open.length ? `<span class="cp-o">Offen: ${open.join('; ')}</span>` : ''}</td></tr>`; }).join('')}</tbody>`).join('');
-  return `<div class="ck-print"><div class="meta"><span>${esc(S.settings.name)}</span><span>Erstellt ${fmtDate(new Date().toISOString())}</span></div>
-    <h1>Checklisten · ${MONTHS[m - 1]} ${y}</h1><p class="cp-sub">Wer was wann abgehakt hat, mit den eingetragenen Messwerten. Eigene Aufzeichnung des Betriebs.</p>
-    ${days.length ? `<table><thead><tr><th>Liste</th><th>Erledigt</th><th>Wer, wann</th><th>Messwerte und Offenes</th></tr></thead>${body}</table>` : '<p>In diesem Monat war keine Liste fällig.</p>'}</div>`;
-}
-function ckPrint(){
-  const sel = document.querySelector('#app [data-ckmonth]'); const ym = (sel && sel.value) || view.ck.month || ckToday().slice(0, 7);
-  const el = $('#print'); PDF_NAME = pdfFileName('Checklisten-' + ym); el.classList.remove('hs-print', 'land'); el.innerHTML = ckPrintHtml(ym); document.body.classList.remove('print-menu', 'print-report'); window.print();
-}
+/* Der Monat als PDF: die Monatsmappe (ckPrint, ckPrintHtml) steht in eigen.js */
 
 /* =====================================================================
    Heute: Team-Zeilen im Tagesblatt
@@ -9991,6 +10224,7 @@ function tmDashHtml(){
     rows.push(dayRow(n ? num(n) : '–', 'Heute im Dienst', n ? list : tmClosed(t) ? 'Ruhetag, niemand eingeteilt' : 'Noch niemand eingeteilt', gaps.length ? `<span class="tm-gapt">${gaps.join(' und ')} fehlt</span>` : '', `<button type="button" class="btn sm" data-act="tmGo">Dienstplan</button>`, 'tm-dash-who')); }
   ckDue(D).forEach(tp => { const pr = ckProg(tp, D);
     rows.push(dayRow(pr.full ? ico('check') : `${pr.done}/${pr.total}`, esc(tp.name), `${pr.done} von ${pr.total} erledigt${pr.last ? ` · zuletzt ${esc(pr.last.b)}, ${pr.last.a} Uhr` : ''}`, pr.out ? `<span class="bad-t">${pr.out} ${pr.out === 1 ? 'Wert' : 'Werte'} außerhalb</span>` : '', `<button type="button" class="btn sm" data-act="ckGo" data-id="${tp.id}">${pr.full ? 'Ansehen' : 'Abhaken'}</button>`, pr.full ? 'past ck-dash' : 'ck-dash')); });
+  { const ek = ekDashRow(D); if(ek) rows.push(ek); }
   if(!rows.length) return '';
   return daySec('Team', D !== t ? 'Checklisten noch vom Vortag, bis 5 Uhr früh' : 'Dienst und Checklisten', rows.join('')).replace('<section class="day-sec">', '<section class="day-sec tm-dash">');
 }
@@ -10027,10 +10261,10 @@ document.addEventListener('click', e => {
     case 'tmCopyPrev': tmCopyPrev(v.w); break;
     case 'tmPatterns': tmPatternsDlg(); break;
     case 'tmText': tmCopyText(); break;
-    case 'ckGo': view.ck.tab = 'heute'; view.ck.run = id || null; go('checkl'); break;
-    case 'ckTab': view.ck.tab = id; view.ck.run = null; render(); break;
-    case 'ckOpen': view.ck.run = id; render(); window.scrollTo({top:0}); break;
-    case 'ckBack': view.ck.run = null; render(); window.scrollTo({top:0}); break;
+    case 'ckGo': view.ck.tab = 'heute'; view.ck.run = id || null; view.ck.ek = null; go('checkl'); break;
+    case 'ckTab': view.ck.tab = id; view.ck.run = null; view.ck.ek = null; render(); break;
+    case 'ckOpen': view.ck.run = id; view.ck.ek = null; render(); window.scrollTo({top:0}); break;
+    case 'ckBack': view.ck.run = null; view.ck.ek = null; render(); window.scrollTo({top:0}); break;
     case 'ckChk': ckToggle(id); break;
     case 'ckHist': view.ck.hist = view.ck.hist === id ? null : id; render(); break;
     case 'ckTplEdit': ckTplDlg(id); break;
@@ -10101,7 +10335,7 @@ palData = function(){
 
 /* Wer den Bereich verlässt, kommt beim nächsten Mal wieder zur Übersicht der Listen */
 const _goTeam = go;
-go = function(tab, card){ if(tab !== 'checkl' && view.ck) view.ck.run = null; return _goTeam(tab, card === undefined ? null : card); };
+go = function(tab, card){ if(tab !== 'checkl' && view.ck){ view.ck.run = null; view.ck.ek = null; } return _goTeam(tab, card === undefined ? null : card); };
 /* Fortschritt der laufenden Liste klebt genau unter der oberen Leiste */
 const _renderTeam = render;
 render = function(){
@@ -10202,8 +10436,8 @@ const DATEN_HASH = {menu:'speisekarte', prod:'artikel', rec:'rezepturen', team:'
 function hashWant(){
   const t = view.tab;
   if(t === 'daten') return 'einstellungen/eigene-daten' + (view.daten && DATEN_HASH[view.daten.imp] ? '/' + DATEN_HASH[view.daten.imp] : '');
-  if(t === 'cards') return 'rezepte' + (view.card ? '/' + view.card : '');
-  if(t === 'menu') return 'speisekarte' + ({guest:'/gaestekarte', plan:'/saison'}[view.mtab] || '');
+  if(t === 'cards'){ const c = view.card ? C(view.card) : null; const m = c ? rzMode(c) : ''; return 'rezepte' + (c ? '/' + view.card + (m !== rzDefault() ? '/' + RZ_HASH[m] : '') : ''); }
+  if(t === 'menu') return 'speisekarte' + ({guest:'/gaestekarte', plan:'/saison', service:'/service'}[view.mtab] || '');
   if(t === 'stock') return 'ware/' + (['inventur','buchungen'].includes(view.stab) ? view.stab : 'bestand');
   if(t === 'buy') return 'ware/' + (view.stab === 'lieferanten' ? 'lieferanten' : 'bestellen');
   return HASH[t] || 'heute';
@@ -10216,8 +10450,8 @@ function hashParse(h){
     case 'heute': case 'dash': return {tab:'dash'};
     case 'vorbereitung': case 'vorb': return {tab:'vorb'};
     case 'checklisten': case 'checkl': return {tab:'checkl'};
-    case 'speisekarte': case 'menu': return {tab:'menu', mtab: b === 'gaestekarte' ? 'guest' : b === 'saison' ? 'plan' : 'calc'};
-    case 'rezepte': case 'cards': return {tab:'cards', card: b && C(b) ? b : null};
+    case 'speisekarte': case 'menu': return {tab:'menu', mtab: b === 'gaestekarte' ? 'guest' : b === 'saison' ? 'plan' : b === 'service' ? 'service' : 'calc'};
+    case 'rezepte': case 'cards': { const [cid, mode] = b.split('/'); const cv = Object.keys(RZ_HASH).find(k => RZ_HASH[k] === mode) || null; return {tab:'cards', card: cid && C(cid) ? cid : null, cv: cid && C(cid) ? cv : undefined}; }
     case 'labor': return {tab:'cards'};
     case 'ware': { const w = WARE_TABS.find(x => x[0] === b); if(b === 'preis-check') return {tab:'pcheck'}; return w ? {tab:w[2], stab:w[3] || null} : {tab:'stock', stab:'bestand'}; }
     case 'stock': return {tab:'stock', stab:'bestand'};
@@ -10236,8 +10470,8 @@ function fromHash(){
   let h = ''; try { h = decodeURIComponent(location.hash.slice(1)); } catch(e){ h = location.hash.slice(1); }
   if(!h) return;
   const r = hashParse(h); if(!r){ hashSync(); return; }
-  const same = r.tab === view.tab && (r.tab !== 'cards' || (r.card || null) === (view.card || null)) && (!r.stab || r.stab === view.stab) && (!r.mtab || r.mtab === view.mtab) && (r.tab !== 'daten' || (r.imp || '') === (view.daten ? view.daten.imp : ''));
-  if(!same){ view = {...view, tab:r.tab, card:r.card || null, q:'', sim:null, daten:null}; if(r.tab === 'daten' && r.imp){ datenOpen(r.imp); hashSync(); return; } if(r.stab) view.stab = r.stab; if(r.mtab) view.mtab = r.mtab; view.order = null; view.recv = null; render(); }
+  const same = r.tab === view.tab && (r.tab !== 'cards' || ((r.card || null) === (view.card || null) && (r.cv === undefined || !r.card || (r.cv || rzDefault()) === rzMode(C(r.card))))) && (!r.stab || r.stab === view.stab) && (!r.mtab || r.mtab === view.mtab) && (r.tab !== 'daten' || (r.imp || '') === (view.daten ? view.daten.imp : ''));
+  if(!same){ view = {...view, tab:r.tab, card:r.card || null, q:'', sim:null, daten:null}; if(r.tab === 'daten' && r.imp){ datenOpen(r.imp); hashSync(); return; } if(r.stab) view.stab = r.stab; if(r.mtab) view.mtab = r.mtab; if(r.tab === 'cards' && r.cv !== undefined) view.cv = r.cv; view.order = null; view.recv = null; render(); }
   hashSync();
 }
 
@@ -11595,6 +11829,7 @@ function renderDrinkCard(c){
       <td><button type="button" class="icon-btn" data-act="delLine" data-id="${i}" title="Zeile entfernen" aria-label="Zeile entfernen">${ico('x')}</button></td></tr>`; }).join('');
   const onCard = menus.map(m => { const k = menuCalc(m); const v = menuVol(m); return `<li><button type="button" data-act="editMenu" data-id="${m.id}"><span class="dk-on-n"><b>${esc(v ? volTxt(v) : m.vlabel || m.name)}</b>${m.vlabel && v && m.vlabel !== volTxt(v) ? `<small>${esc(m.vlabel)}</small>` : !v && !m.vlabel ? `<small>${esc(m.section)}</small>` : ''}</span><span class="mono">${eur(m.price)}</span><span class="mono dk-on-c">${eur(k.cost)}</span><span class="lt-fc ${fcClass(k.fc)}"><i></i>${k.fc != null ? num(k.fc, 1) + ' %' : '—'}</span></button></li>`; }).join('');
   return `<button type="button" class="back" data-act="backCards">${ico('arrow')}Alle Rezepturen</button>
+  ${rzSwitch(c)}
   <div class="hero">
     <div class="hero-ph">${photo(c.img, c.name, c.category)}<button type="button" class="ph-btn big" data-act="photoCard" data-id="${c.id}">${ico('camera')}<span>${c.img && IMG[c.img] ? 'Foto ändern' : 'Foto hinzufügen'}</span></button>${c.img && IMG[c.img] ? `<button type="button" class="ph-btn del" data-act="photoCardDel" data-id="${c.id}" aria-label="Foto entfernen">${ico('x')}</button>` : ''}</div>
     <div class="hero-main">
@@ -11818,6 +12053,660 @@ function barMigrate(d){
   (d.menu || []).forEach(m => { if(m.vol != null && m.vol !== '' && !(+m.vol > 0)) m.vol = ''; });
   return d;
 }
+
+/* =====================================================================
+   Rezept für Küche und Service (Paket D2)
+   Dieselbe Rezeptur, drei Ansichten: Kalkulation (Chef, wie bisher) · Küche · Service.
+   Küche:   Mengen für n Portionen, große Schrift, Basisrezepte zum Aufklappen, antippen zum Abhaken
+            (wird nicht gespeichert), Bildschirm bleibt an. Keine Preise.
+   Service: was am Teller ist, Allergene ausgeschrieben, Preis laut Karte, Service-Hinweis.
+            Dazu die Service-Liste unter „Speisekarte“: alles, was heute auf der Karte steht.
+   Gespeichert wird nur an der Rezeptur: c.svHide (Zeilen, die der Service nicht nennt) und c.svNote.
+   ===================================================================== */
+const RZ_MODES = [['kalk', 'Kalkulation'], ['kueche', 'Küche'], ['service', 'Service']];
+const RZ_HASH = {kalk:'kalkulation', kueche:'kueche', service:'service'};
+/* Grundzutaten, die der Service ohne eigene Auswahl des Chefs nicht aufzählt */
+const SV_BASIC = /^(salz|pfeffer|wasser)(\s|,|$)/i;
+const SV_NOTE_MAX = 300;
+
+function rzDefault(){ return canEditAll() ? 'kalk' : 'kueche'; }
+/* Ansicht einer Rezeptur. Basisrezepte stehen nicht auf der Karte: statt „Service“ gilt dort „Küche“. */
+function rzMode(c){ let m = RZ_HASH[view.cv] ? view.cv : rzDefault(); if(c && c.type === 'semi' && m === 'service') m = 'kueche'; return m; }
+function rzSwitch(c){ const semi = c && c.type === 'semi'; return `<div class="toolbar tabs rz-sw">${seg('rzView', rzMode(c), semi ? RZ_MODES.slice(0, 2) : RZ_MODES)}</div>`; }
+function rzMigrate(d){
+  if(!d || typeof d !== 'object' || !d.settings || d.settings.d2V) return d;
+  (d.cards || []).forEach(c => { if(!c || typeof c !== 'object') return; if(typeof c.svNote !== 'string') c.svNote = '';
+    if(!Array.isArray(c.svHide)) c.svHide = (c.items || []).filter(it => { const p = String(it.ref || '').startsWith('p:') ? (d.products || []).find(x => x.id === it.ref.slice(2)) : null; return p && SV_BASIC.test(p.name); }).map(it => it.ref); });
+  d.settings.d2V = 1; return d;
+}
+
+/* ---------- Mengen ---------- */
+function rzRound(q){ return q < 10 ? Math.round(q * 10) / 10 : Math.round(q); }
+/* g → kg und ml → l ab 1000; Stück bleibt Stück; Getränke in cl (oder so, wie die Schankrezeptur geschrieben ist) */
+function rzAmount(q, unit, opt){
+  q = fin(+q); if(!(q > 0)) return '';
+  if(unit === 'Stk') return num(Math.round(q * 100) / 100, 2) + ' Stk';
+  const r = rzRound(q); const big = v => num(Math.round(v / 10) / 100, 2);
+  if(unit === 'ml'){
+    if(opt && opt.drink){ if(r >= 1000 || (opt.u === 'l' && r >= 100)) return big(r) + ' l'; if(opt.u === 'ml' || r < 10) return num(r, 1) + ' ml'; return num(Math.round(r) / 10, 1) + ' cl'; }
+    return r >= 1000 ? big(r) + ' l' : num(r, 1) + ' ml';
+  }
+  return r >= 1000 ? big(r) + ' kg' : num(r, 1) + ' g';
+}
+/* Zeilen einer Rezeptur für den Faktor f (Portionen, Gläser oder Chargen) */
+function rzLines(c, f){
+  const t = totals(c);
+  return c.items.map((it, i) => { const l = t.lines[i]; const r = refObj(it.ref); if(!r) return null; const q = (+it.qty || 0) * f; const liquid = l.unit === 'ml';
+    const frac = l.unit === 'Stk' && Math.abs(q - Math.round(q)) > 1e-6 && +r.o.pieceG > 0;
+    return {i, ref:it.ref, name:r.o.name, sub:r.t === 'c' ? r.o : null, q, unit:l.unit, txt:rzAmount(q, l.unit, c.drink && liquid ? {drink:true, u:drinkU(it)} : null), approx:frac ? 'ca. ' + rzAmount(q * r.o.pieceG, 'g') : ''}; }).filter(Boolean);
+}
+function rzYield(c){ return +c.yieldG > 0 ? +c.yieldG : c.type === 'semi' ? totals(c).out : 0; }
+function rzWord(c, n){ const one = Math.abs(n - 1) < 1e-9; return c.type === 'semi' ? (one ? 'Charge' : 'Chargen') : c.drink ? (one ? 'Glas' : 'Gläser') : (one ? 'Portion' : 'Portionen'); }
+function rzNTxt(n){ return num(Math.round(n * 100) / 100, 2); }
+/* „für 5 Portionen“ · „für 750 g (0,45 Chargen)“ */
+function rzForTxt(c, n){ const y = rzYield(c);
+  if(c.type === 'semi') return y > 0 ? `für ${rzAmount(y * n, 'g')}${Math.abs(n - 1) < 1e-9 ? ' (1 Charge)' : ` (${rzNTxt(n)} ${rzWord(c, n)})`}` : `für ${rzNTxt(n)} ${rzWord(c, n)}`;
+  return `für ${rzNTxt(n)} ${rzWord(c, n)}`; }
+function rzState(c){ if(!view.rz || view.rz.id !== c.id) view.rz = {id:c.id, n:1, stack:[]}; if(!(view.rz.n > 0)) view.rz.n = 1; if(!Array.isArray(view.rz.stack)) view.rz.stack = []; return view.rz; }
+const RZ_TICKS = new Map();
+function rzTicks(id){ if(!RZ_TICKS.has(id)) RZ_TICKS.set(id, new Set()); return RZ_TICKS.get(id); }
+
+/* ---------- Küche ---------- */
+function rzAlgHtml(c){
+  const ai = algInfo({card:c.id}); const names = ai.letters.map(a => `<span><b>${esc(a)}</b> ${esc(ALG[a] || a)}</span>`).join('');
+  if(ai.state === 'open') return `<p class="rz-alg open"><b class="rz-al">Allergene</b>${names}<em>Angabe unvollständig${ai.open.length ? ` (${ai.open.slice(0, 4).map(p => esc(p.name)).join(', ')}${ai.open.length > 4 ? ' …' : ''})` : ''}</em></p>`;
+  return `<p class="rz-alg"><b class="rz-al">Allergene</b>${names || '<span>keine</span>'}</p>`;
+}
+function rzStepperHtml(c, st){
+  const semi = c.type === 'semi', y = rzYield(c); const chips = semi ? [[0.5, '½'], [1, '1'], [2, '2'], [3, '3']] : [[1, '×1'], [2, '×2'], [5, '×5'], [10, '×10']];
+  const free = semi && y > 0 ? `<label class="rz-free">ergibt<input id="rzY" class="num-in" type="text" inputmode="decimal" data-num="self" data-rzy="1" value="${numIn(Math.round(y * st.n * 10) / 10)}" aria-label="Menge in Gramm"><span>g</span></label>`
+    : `<label class="rz-free"><input id="rzN" class="num-in" type="text" inputmode="decimal" data-num="self" data-rzn="1" value="${numIn(Math.round(st.n * 100) / 100)}" aria-label="Anzahl ${semi ? 'Chargen' : c.drink ? 'Gläser' : 'Portionen'}"><span>${rzWord(c, st.n)}</span></label>`;
+  return `<div class="rz-n" role="group" aria-label="${semi ? 'Menge' : c.drink ? 'Gläser' : 'Portionen'}"><span class="rz-chips">${chips.map(([k, l]) => `<button type="button" class="${Math.abs(st.n - k) < 1e-9 ? 'on' : ''}" data-act="rzN" data-id="${k}" aria-pressed="${Math.abs(st.n - k) < 1e-9}">${l}</button>`).join('')}${semi ? '<small>Chargen</small>' : ''}</span>${free}</div>`;
+}
+function rzKitchenHtml(c){
+  const st = rzState(c); const lines = rzLines(c, st.n); const ticks = rzTicks(c.id); const steps = (c.steps || []).filter(s => (s.t && s.t.trim()) || (s.img && IMG[s.img]));
+  const up = st.stack.length ? C(st.stack[st.stack.length - 1].id) : null;
+  const ing = lines.map(l => `<li class="${ticks.has('z' + l.i) ? 'done' : ''}"><button type="button" class="rz-i" data-act="rzTick" data-id="z${l.i}" aria-pressed="${ticks.has('z' + l.i)}"><span class="rz-q">${l.txt || '–'}${l.approx ? `<small>${l.approx}</small>` : ''}</span><span class="rz-t">${esc(l.name)}${l.sub ? '<small>Basisrezept</small>' : ''}</span></button>${l.sub ? `<button type="button" class="rz-open" data-act="rzOpen" data-id="${l.i}" aria-label="Basisrezept ${esc(l.name)} öffnen">Rezept${ico('arrow', 'flip')}</button>` : ''}</li>`).join('');
+  const stp = steps.map((s, i) => `<li class="${ticks.has('s' + i) ? 'done' : ''}"><button type="button" class="rz-step" data-act="rzTick" data-id="s${i}" aria-pressed="${ticks.has('s' + i)}"><span class="rz-sn">${i + 1}</span><span class="rz-st">${esc(s.t)}</span></button>${s.img && IMG[s.img] ? `<img class="rz-sp" src="${IMG[s.img]}" alt="Schritt ${i + 1}" loading="lazy">` : ''}</li>`).join('');
+  const y = rzYield(c); const kind = c.type === 'semi' ? 'Basisrezept' : c.drink ? 'Getränk' : 'Gericht';
+  const per = c.type === 'semi' ? (y > 0 ? `1 Charge ergibt ${rzAmount(y, 'g')}` : '') : c.drink ? (y > 0 ? `1 Glas · ${volTxt(y)}` : '') : (y > 0 ? `1 Portion · ${rzAmount(y, 'g')}` : '');
+  return `${up ? `<button type="button" class="back" data-act="rzUp">${ico('arrow')}Zurück zu ${esc(up.name)}</button>` : `<button type="button" class="back" data-act="backCards">${ico('arrow')}Alle Rezepturen</button>`}
+  <div class="rz-bar">${rzSwitch(c)}<button type="button" class="btn" data-pdf="printKueche" data-id="${c.id}">${ico('download')}Als PDF</button></div>
+  <article class="rz rz-k">
+    <header class="rz-h">${c.img && IMG[c.img] ? `<img class="rz-ph" src="${IMG[c.img]}" alt="${esc(c.name)}">` : ''}<div><div class="eyebrow">${kind}${c.category ? ' · ' + esc(c.category) : ''}${per ? ' · ' + per : ''}</div><h1>${esc(c.name)}</h1></div></header>
+    ${rzStepperHtml(c, st)}
+    <section class="rz-sec"><h2>${c.drink ? 'Ins Glas' : 'Zutaten'}<span>${esc(rzForTxt(c, st.n))}</span></h2>${ing ? `<ul class="rz-ing">${ing}</ul>` : '<p class="rz-none">Für diese Rezeptur sind noch keine Zutaten eingetragen.</p>'}</section>
+    ${stp ? `<section class="rz-sec"><h2>Zubereitung</h2><ol class="rz-steps">${stp}</ol></section>` : c.drink ? '' : '<section class="rz-sec"><h2>Zubereitung</h2><p class="rz-none">Noch keine Schritte eingetragen.</p></section>'}
+    ${rzAlgHtml(c)}
+  </article>`;
+}
+/* Basisrezept aus einer Zeile öffnen: genau so viel, wie das Gericht gerade braucht */
+function rzOpenSub(i){
+  const c = C(view.card); if(!c) return; const st = rzState(c); const l = rzLines(c, st.n).find(x => x.i === +i); if(!l || !l.sub) return;
+  const y = rzYield(l.sub); const n = y > 0 && l.q > 0 ? l.q / y : 1;
+  view.rz = {id:l.sub.id, n, stack:st.stack.concat([{id:c.id, n:st.n}])}; view.card = l.sub.id; render(); hashSync(); window.scrollTo({top:0});
+}
+function rzUp(){ const st = view.rz; const p = st && st.stack && st.stack[st.stack.length - 1]; if(!p || !C(p.id)){ go('cards'); return; } view.rz = {id:p.id, n:p.n, stack:st.stack.slice(0, -1)}; view.card = p.id; render(); hashSync(); window.scrollTo({top:0}); }
+function rzSetN(n){ const c = C(view.card); if(!c) return; if(!(n > 0) || n > 9999){ toast('Bitte eine Zahl größer als 0 eingeben, zum Beispiel 4 oder 2,5.'); render(); return; } rzState(c).n = n; render(); }
+
+/* Bildschirm bleibt an, solange die Küchen-Ansicht offen ist. Lehnt das Gerät ab, geht alles andere trotzdem. */
+let RZ_WL = null, RZ_WL_BUSY = false;
+function rzKitchenOpen(){ const c = view.tab === 'cards' && view.card ? C(view.card) : null; return !!c && rzMode(c) === 'kueche'; }
+async function rzWake(on){
+  try {
+    if(!on){ if(RZ_WL){ const l = RZ_WL; RZ_WL = null; await l.release(); } return; }
+    if(RZ_WL || RZ_WL_BUSY || !navigator.wakeLock || document.visibilityState !== 'visible') return;
+    RZ_WL_BUSY = true; const l = await navigator.wakeLock.request('screen'); RZ_WL = l;
+    if(l && l.addEventListener) l.addEventListener('release', () => { if(RZ_WL === l) RZ_WL = null; });
+    if(!rzKitchenOpen()){ RZ_WL = null; await l.release(); }
+  } catch(e){ /* nicht erlaubt oder nicht vorhanden */ } finally { if(on) RZ_WL_BUSY = false; }
+}
+function rzAfter(){ const on = rzKitchenOpen(); if(!on){ if(RZ_TICKS.size) RZ_TICKS.clear(); if(view.rz && !(view.tab === 'cards' && view.card)) view.rz = null; } rzWake(on); }
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible' && rzKitchenOpen()) rzWake(true); });
+
+/* ---------- Küchen-Rezept als PDF: Mengen für die gewählte Zahl, ohne Preise ---------- */
+function rzPrintBlock(c, n, depth, seen){
+  const lines = rzLines(c, n); const steps = (c.steps || []).filter(s => s.t && s.t.trim());
+  const ai = algInfo({card:c.id}); const alg = (ai.letters.map(a => `${a} ${ALG[a] || ''}`).join(', ') || (ai.state === 'open' ? '' : 'keine')) + (ai.state === 'open' ? (ai.letters.length ? ' · ' : '') + 'Angabe unvollständig' : '');
+  let h = `<div class="rk-b">${depth ? `<h2 class="rk-sub">Basisrezept: ${esc(c.name)}</h2>` : `<h1>${esc(c.name)}</h1>`}
+    <p class="rk-for">${depth ? '' : `${c.type === 'semi' ? 'Basisrezept' : c.drink ? 'Getränk' : 'Gericht'}${c.category ? ' · ' + esc(c.category) : ''} · `}${esc(rzForTxt(c, n))}</p>
+    ${!depth && c.img && IMG[c.img] ? `<img class="pr-ph" src="${IMG[c.img]}" alt="">` : ''}
+    <table class="rk-t"><thead><tr><th class="r">Menge</th><th>Zutat</th></tr></thead><tbody>${lines.map(l => `<tr><td class="r">${l.txt || '–'}${l.approx ? ` (${l.approx})` : ''}</td><td>${esc(l.name)}${l.sub ? ' (Basisrezept)' : ''}</td></tr>`).join('')}</tbody></table>
+    ${steps.length ? `<h3 class="pr-steps-h">Zubereitung</h3><ol class="pr-steps">${steps.map(s => `<li>${esc(s.t)}</li>`).join('')}</ol>` : ''}
+    <p class="rk-alg"><b>Allergene:</b> ${esc(alg)}</p></div>`;
+  if(depth < 3) lines.forEach(l => { if(!l.sub || seen.has(l.sub.id)) return; seen.add(l.sub.id); const y = rzYield(l.sub); h += rzPrintBlock(l.sub, y > 0 && l.q > 0 ? l.q / y : 1, depth + 1, seen); });
+  return h;
+}
+function rzPrintHtml(c, n){ return `<div class="rz-print"><div class="meta"><span>${esc(S.settings.name)}</span><span>Rezept für die Küche · ${fmtDate(new Date().toISOString())}</span></div>${rzPrintBlock(c, n, 0, new Set([c.id]))}</div>`; }
+function printKitchen(id){
+  const c = C(id); if(!c) return; const n = view.rz && view.rz.id === c.id && view.rz.n > 0 ? view.rz.n : 1;
+  const el = $('#print'); el.classList.remove('hs-print', 'land'); el.innerHTML = rzPrintHtml(c, n); document.body.classList.remove('print-menu', 'print-report');
+  PDF_NAME = pdfFileName('Kueche-' + c.name.replace(/[„“”‚‘’«»]/g, '')); window.print();
+}
+
+/* ---------- Service ---------- */
+function svHidden(c){ return Array.isArray(c.svHide) ? c.svHide : (c.items || []).filter(it => { const r = refObj(it.ref); return r && r.t === 'p' && SV_BASIC.test(r.o.name); }).map(it => it.ref); }
+/* Zeilen der Rezeptur ohne Doppelte, in der Reihenfolge der Rezeptur */
+function svRefs(c){ const seen = new Set(); return (c.items || []).map(it => { const r = refObj(it.ref); if(!r || seen.has(it.ref)) return null; seen.add(it.ref); return {ref:it.ref, name:r.o.name}; }).filter(Boolean); }
+function svParts(c){ const hide = new Set(svHidden(c)); return svRefs(c).filter(x => !hide.has(x.ref)).map(x => x.name); }
+function svVeg(m){ return m && m.veg === 'vg' ? 'vegan' : m && m.veg === 'v' ? 'vegetarisch' : ''; }
+function svAlgHtml(ai, m){
+  const list = ai.letters.length ? `<ul class="sv-al">${ai.letters.map(a => `<li><b>${esc(a)}</b>${esc(ALG[a] || a)}</li>`).join('')}</ul>` : '';
+  if(ai.state === 'open') return `<p class="sv-ask">Angabe unvollständig – bitte in der Küche nachfragen.</p>${list ? `<p class="sv-sure">Sicher enthalten:</p>${list}` : ''}`;
+  if(ai.state === 'none') return `<p class="sv-none">${ai.src === 'recipe' ? 'Keine Allergene. Alle Zutaten sind geprüft.' : 'Keine Allergene' + (m && algStampText(m) ? ', ' + esc(algStampText(m)) : '') + '.'}</p>`;
+  return list;
+}
+/* Kurzform für eine Zeile: Buchstaben, „keine“ oder „nachfragen“ */
+function svAlgShort(ai){ return ai.state === 'open' ? '<span class="sv-q">nachfragen</span>' : ai.letters.length ? `<span class="sv-ls" title="${esc(ai.letters.map(a => ALG[a] || a).join(', '))}">${ai.letters.map(esc).join(' ')}</span>` : '<span class="sv-ls none">keine</span>'; }
+/* der Block, den der Service liest (Rezeptseite und aufgeklappte Zeile der Liste) */
+function svBodyHtml(m, c){
+  const ai = algInfo(m || {card:c.id}); const parts = c ? svParts(c) : []; const note = c && c.svNote ? String(c.svNote).trim() : '';
+  return `${parts.length ? `<section class="sv-b"><h2>${c.drink ? 'Im Glas' : 'Am Teller'}</h2><p class="sv-parts">${parts.map(esc).join(', ')}</p></section>` : ''}
+    <section class="sv-b"><h2>Allergene</h2>${svAlgHtml(ai, m)}</section>
+    ${note ? `<section class="sv-b"><h2>Service-Hinweis</h2><p class="sv-note">${esc(note)}</p></section>` : ''}`;
+}
+function svCardHtml(c){
+  const menus = menuSorted().filter(m => m.card === c.id); const m0 = menus[0] || null; const veg = svVeg(m0);
+  const price = m => `<li><span>${menus.length > 1 || dishLabel(m) !== c.name ? esc(dishLabel(m)) : 'Preis'}${c.drink && menuVol(m) && !m.vlabel ? ' · ' + volTxt(menuVol(m)) : ''}</span><b class="mono">${eur(m.price)}</b></li>`;
+  return `<button type="button" class="back" data-act="backCards">${ico('arrow')}Alle Rezepturen</button>
+  <div class="rz-bar">${rzSwitch(c)}${canEditAll() ? `<button type="button" class="btn" data-act="svEdit" data-id="${c.id}">${ico('edit')}Anpassen</button>` : ''}</div>
+  <article class="rz rz-s">
+    <header class="rz-h">${c.img && IMG[c.img] ? `<img class="rz-ph" src="${IMG[c.img]}" alt="${esc(c.name)}">` : ''}<div><div class="eyebrow">${m0 ? esc(m0.section) : 'Nicht auf der Karte'}${veg ? ' · ' + veg : ''}${c.drink && +c.yieldG > 0 ? ' · ' + volTxt(+c.yieldG) : ''}</div><h1>${esc(c.name)}</h1>${m0 && m0.desc ? `<p class="sv-desc">${esc(m0.desc)}</p>` : ''}</div></header>
+    ${menus.length ? `<ul class="sv-prices">${menus.map(price).join('')}</ul>` : ''}
+    ${svBodyHtml(m0 ? m0 : null, c)}
+  </article>`;
+}
+function svEditDlg(id){
+  const c = C(id); if(!c || !roGate()) return; const refs = svRefs(c); const hide = new Set(svHidden(c));
+  openDialog('Für den Service · ' + c.name, `<fieldset class="sv-ed"><legend>${c.drink ? 'Im Glas' : 'Am Teller'}: Was soll der Service nennen?</legend>
+      ${refs.length ? refs.map(x => `<label class="tog"><input type="checkbox" name="show" value="${esc(x.ref)}" ${hide.has(x.ref) ? '' : 'checked'}><span></span>${esc(x.name)}</label>`).join('') : '<p class="hint" style="margin:0">Die Rezeptur hat noch keine Zutaten.</p>'}</fieldset>
+    <label class="f">Service-Hinweis<textarea name="note" rows="3" maxlength="${SV_NOTE_MAX}" placeholder="z. B. Garstufe wählbar · Beilage tauschbar · dauert 20 Minuten">${esc(c.svNote || '')}</textarea></label>
+    <p class="hint">Allergene kommen immer aus der ganzen Rezeptur, auch von Zeilen, die hier ausgeblendet sind.</p>`,
+    fd => { const show = new Set(fd.getAll('show')); c.svHide = refs.filter(x => !show.has(x.ref)).map(x => x.ref); c.svNote = String(fd.get('note') || '').trim().slice(0, SV_NOTE_MAX); });
+}
+
+/* ---------- Service-Liste: alles, was heute auf der Karte steht ---------- */
+function svView(){ return view.sv || (view.sv = {q:'', f:'', open:null}); }
+function svRows(){
+  const date = todayStr(), k = seasonFor(date) || 'winter'; const items = guestItems(k, date); const rows = [];
+  for(const sec of secList()){ items.filter(m => m.section === sec).forEach(m => rows.push({id:m.id, sec, m, name:dishLabel(m), c:m.card ? C(m.card) : null})); }
+  specialsFor(date).forEach(sp => (sp.items || []).forEach((it, i) => rows.push({id:sp.id + ':' + i, sec:'Aktion · ' + sp.name, m:it, name:it.name, c:it.card ? C(it.card) : null})));
+  rows.forEach(r => { r.ai = algInfo(r.m); r.parts = r.c ? svParts(r.c) : []; });
+  return {rows, date};
+}
+/* „ohne X“: nur Gerichte mit vollständiger Angabe, die X nicht enthalten. Unvollständige fehlen und werden gezählt. */
+function svFilter(rows, a){
+  if(!a || !ALG[a]) return {list:rows, left:0};
+  return {list:rows.filter(r => r.ai.state !== 'open' && !r.ai.letters.includes(a)), left:rows.filter(r => r.ai.state === 'open' && !r.ai.letters.includes(a)).length};
+}
+function svRowHtml(r, open){
+  const m = r.m, c = r.c; const veg = svVeg(m); const vol = isDrinkEntry(m) && menuVol(m) && !m.vlabel ? volTxt(menuVol(m)) : '';
+  const sub = [m.desc, veg, vol].filter(Boolean).map(esc).join(' · ');
+  return `<li class="sv-r ${open ? 'open' : ''}"><button type="button" class="sv-rb" data-act="svOpen" data-id="${esc(r.id)}" aria-expanded="${open}"><span class="sv-n"><b>${esc(r.name)}</b>${sub ? `<small>${sub}</small>` : ''}</span><span class="sv-a">${svAlgShort(r.ai)}</span><span class="sv-p mono">${+m.price > 0 ? eur(m.price) : ''}</span></button>
+    ${open ? `<div class="sv-d">${svBodyHtml(m, c)}${c ? `<button type="button" class="link" data-act="svKueche" data-id="${c.id}">Rezept für die Küche</button>` : ''}</div>` : ''}</li>`;
+}
+function renderService(){
+  const v = svView(); const {rows, date} = svRows(); const q = v.q.trim().toLowerCase();
+  const f = svFilter(rows, v.f); const list = f.list.filter(r => !q || (r.name + ' ' + (r.m.desc || '') + ' ' + r.sec + ' ' + r.parts.join(' ')).toLowerCase().includes(q));
+  const dLong = dParse(date).toLocaleDateString('de-AT', {weekday:'long', day:'numeric', month:'long'});
+  const fact = v.f ? `Ohne ${esc(ALG[v.f])}: <b>${list.length}</b> ${list.length === 1 ? 'Gericht' : 'Gerichte'}${q ? ' zur Suche' : ''}.${f.left ? ` ${f.left === 1 ? '<b>1</b> weiteres fehlt' : `<b>${f.left}</b> weitere fehlen`} in dieser Liste, weil die Allergenangabe unvollständig ist: bitte in der Küche nachfragen.` : ''}`
+    : `Karte von heute, ${esc(dLong)} · ${rows.length} ${rows.length === 1 ? 'Eintrag' : 'Einträge'}`;
+  let body = '', sec = null;
+  list.forEach(r => { if(r.sec !== sec){ sec = r.sec; body += `<li class="sv-sec">${esc(sec)}</li>`; } body += svRowHtml(r, v.open === r.id); });
+  return `<div class="toolbar sv-tools"><label class="search">${ico('search')}<input id="svq" type="search" placeholder="Gericht oder Zutat suchen" value="${esc(v.q)}" autocomplete="off"></label>
+      <label class="sv-f"><span>Allergen</span><select data-svf="1" aria-label="Allergen-Filter"><option value="">alle zeigen</option>${Object.entries(ALG).map(([k, n]) => `<option value="${k}" ${v.f === k ? 'selected' : ''}>ohne ${esc(n)}</option>`).join('')}</select></label></div>
+    <p class="fact sv-fact">${fact}</p>
+    ${list.length ? `<ul class="sv-list">${body}</ul>` : `<section class="panel empty">${rows.length ? 'Kein Gericht passt.' : 'Heute steht nichts auf der Karte.'}</section>`}`;
+}
+
+/* ---------- Bedienung ---------- */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if(!el) return; const a = el.dataset.act, id = el.dataset.id;
+  if(!/^(rz|sv)[A-Z]/.test(a) || (document.body.classList.contains('gd-help') && a !== 'rzView')) return;
+  switch(a){
+    case 'rzView': view.cv = RZ_HASH[id] ? id : null; render(); hashSync(); break;
+    case 'rzN': rzSetN(+id); break;
+    case 'rzTick': { const c = C(view.card); if(!c) break; const t = rzTicks(c.id); const on = !t.has(id); if(on) t.add(id); else t.delete(id); el.closest('li').classList.toggle('done', on); el.setAttribute('aria-pressed', on); break; }
+    case 'rzOpen': rzOpenSub(id); break;
+    case 'rzUp': rzUp(); break;
+    case 'svEdit': svEditDlg(id); break;
+    case 'svOpen': { const v = svView(); v.open = v.open === id ? null : id; render(); break; }
+    case 'svKueche': view.cv = 'kueche'; go('cards', id); break;
+    case 'svGo': view.mtab = 'service'; go('menu'); break;
+  }
+});
+document.addEventListener('change', e => { const t = e.target; if(!t.dataset) return;
+  if(t.dataset.rzn){ rzSetN(numParse(t.value)); return; }
+  if(t.dataset.rzy){ const c = C(view.card); const y = c ? rzYield(c) : 0; const v = numParse(t.value); rzSetN(y > 0 ? v / y : NaN); return; }
+  if(t.dataset.svf){ const v = svView(); v.f = ALG[t.value] ? t.value : ''; v.open = null; render(); } });
+document.addEventListener('keydown', e => { const t = e.target; if(e.key === 'Enter' && t.matches && t.matches('#rzN,#rzY')){ e.preventDefault(); t.blur(); } });
+document.addEventListener('input', e => { const t = e.target; if(t.id !== 'svq') return; const v = svView(); v.q = t.value; v.open = null; const pos = t.selectionStart; render(); const n = $('#svq'); if(n){ n.focus(); try { n.setSelectionRange(pos, pos); } catch(err){} } });
+
+/* ---------- Hilfe ---------- */
+H('rz_ansicht','Kalkulation, Küche, Service','Dieselbe Rezeptur in drei Ansichten. Kalkulation: Preise und Wareneinsatz, hier ändert der Chef. Küche: Mengen und Schritte zum Kochen. Service: was am Teller ist und welche Allergene drin sind.');
+H('rz_portionen','Portionen','Tippen Sie auf ×2, ×5 oder ×10, oder tragen Sie eine Zahl ein. Alle Mengen rechnen sofort mit. Bei einem Basisrezept wählen Sie Chargen oder die Menge in Gramm.');
+H('rz_haken','Antippen zum Abhaken','Ein Tipp auf eine Zutat oder einen Schritt streicht sie durch, damit Sie wissen, wo Sie sind. Das wird nicht gespeichert.');
+H('rz_basis','Basisrezept öffnen','Zeigt das Basisrezept mit genau der Menge, die das Gericht gerade braucht. Oben geht es zurück zum Gericht.');
+H('rz_pdf','Rezept als PDF','Das Rezept für die Küche mit den Mengen für die gewählte Zahl, ohne Preise. Basisrezepte stehen darunter.');
+H('sv_liste','Service-Liste','Alles, was heute auf der Karte steht. Ein Tipp auf ein Gericht zeigt, was am Teller ist und welche Allergene drin sind.');
+H('sv_filter','Ohne ein Allergen','Zeigt nur Gerichte, die dieses Allergen sicher nicht enthalten. Gerichte mit unvollständiger Angabe fehlen in der Liste. Wie viele das sind, steht darüber.');
+H('sv_anpassen','Für den Service anpassen','Der Chef wählt, welche Zutaten der Service nennt, und schreibt einen kurzen Hinweis dazu, zum Beispiel zur Garstufe.');
+HELP_SEL.unshift(['#app .rz-sw','rz_ansicht'], ['#app .rz-n','rz_portionen'], ['#app .rz-i,#app .rz-step','rz_haken'], ['#app .rz-open','rz_basis'], ['#app [data-pdf="printKueche"]','rz_pdf'],
+  ['#app .sv-f','sv_filter'], ['#app .sv-rb,#app [data-act="svGo"]','sv_liste'], ['#app [data-act="svEdit"]','sv_anpassen'], ['#app .rz-alg,#app .sv-b','allergene']);
+
+/* =====================================================================
+   Eigenkontrolle (Paket D2): baut auf den Checklisten auf, eigener Zustand S.checks.ek.
+   Wareneingang-Temperatur · Frittieröl · Reinigungsplan · Monatsmappe als PDF.
+   Häkchen des Reinigungsplans liegen wie alle Häkchen in S.checks.runs[Tag] (Schlüssel ek_clean),
+   Temperaturen der Lieferungen und das Frittieröl in S.checks.ek.log.
+   Eine Hilfe zum Aufschreiben. Die App prüft nichts und verspricht nichts.
+   ===================================================================== */
+const EK_KEEP_DAYS = 400;            // Aufbewahrung: mindestens 13 Monate (13 Monate sind höchstens 397 Tage)
+const EK_RUN = 'ek_clean';
+const EK_RHY = {daily:'täglich', weekly:'wöchentlich', monthly:'monatlich'};
+const EK_LIMITS = {kuehl:4, tk:-18}; // Vorgabe, vom Chef änderbar: Kühlware höchstens +4 °C, Tiefkühlware höchstens −18 °C
+
+/* ---------- Zustand ---------- */
+function ekDefaults(){ return {v:1, limits:{...EK_LIMITS}, fryers:[{id:'fr_1', name:'Fritteuse'}], oilDays:'', clean:[], log:[]}; }
+function ekMigrate(d){
+  if(!d || typeof d !== 'object') return d;
+  const obj = x => !!x && typeof x === 'object' && !Array.isArray(x);
+  if(!obj(d.checks)) return d;
+  const c = d.checks; const fresh = !obj(c.ek); if(fresh) c.ek = ekDefaults();
+  const k = c.ek; const today = isoDate(new Date());
+  if(!obj(k.limits)) k.limits = {...EK_LIMITS};
+  ['kuehl', 'tk'].forEach(x => { if(!isFinite(+k.limits[x]) || k.limits[x] === '' || k.limits[x] == null) k.limits[x] = EK_LIMITS[x]; else k.limits[x] = +k.limits[x]; });
+  k.fryers = (Array.isArray(k.fryers) ? k.fryers : []).filter(f => obj(f) && f.id).map(f => { f.name = String(f.name || 'Fritteuse').slice(0, 30); return f; });
+  k.oilDays = +k.oilDays > 0 ? Math.min(365, Math.round(+k.oilDays)) : '';
+  k.clean = (Array.isArray(k.clean) ? k.clean : []).filter(t => obj(t) && t.id && String(t.t || '').trim()).map(t => { t.t = String(t.t).slice(0, 90); t.area = String(t.area || '').slice(0, 30); t.when = EK_RHY[t.when] ? t.when : 'weekly';
+    t.wd = t.when === 'weekly' ? (+t.wd >= 0 && +t.wd <= 6 ? +t.wd : 1) : null; t.md = t.when === 'monthly' ? Math.min(31, Math.max(1, Math.round(+t.md) || 1)) : null; if(!TM_DATE.test(t.since || '')) t.since = today; return t; });
+  const cut = dAdd(today, -EK_KEEP_DAYS);
+  k.log = (Array.isArray(k.log) ? k.log : []).filter(r => obj(r) && r.id && (r.k === 'we' || r.k === 'oil') && TM_DATE.test(r.d || '') && r.d >= cut);
+  if(fresh && d.demo && d.team && d.team.demo){ try { ekDemo(d); } catch(e){ console.warn('Eigenkontrolle-Beispiel:', e); } }
+  return d;
+}
+function ekS(){ const c = ckS(); if(!c.ek || !Array.isArray(c.ek.log)) ekMigrate(S); return c.ek; }
+/* Beispiel: erfundene Einträge der letzten zwei Wochen, als Beispiel markiert (gehen mit dem Beispiel-Team) */
+function ekDemo(d){
+  const k = d.checks.ek; const today = isoDate(new Date()); const since = dAdd(today, -15); const closed = (d.settings && d.settings.closed) || [];
+  const open = D => !closed.includes(dParse(D).getDay()) || ((d.team.shifts || {})[D] || []).length > 0;
+  k.oilDays = 7;
+  k.clean = [
+    {id:'ec_hand', t:'Handwaschbecken und Seifenspender reinigen', area:'Küche', when:'daily', wd:null, md:null, since, demo:true},
+    {id:'ec_schneid', t:'Aufschnittmaschine zerlegen und reinigen', area:'Küche', when:'weekly', wd:1, md:null, since, demo:true},
+    {id:'ec_abzug', t:'Dunstabzug: Filter reinigen', area:'Küche', when:'monthly', wd:null, md:1, since, demo:true},
+    {id:'ec_eis', t:'Eiswürfelmaschine reinigen', area:'Bar', when:'monthly', wd:null, md:15, since, demo:true},
+  ];
+  const runs = d.checks.runs; const tick = (D, id, due, b, a) => { const day = runs[D] = runs[D] || {}; const r = day[EK_RUN] = day[EK_RUN] || {items:{}, n:0, demo:true}; r.items[id] = {b, a, due}; };
+  let mondays = 0;
+  for(let i = 15; i >= 1; i--){ const D = dAdd(today, -i); if(!open(D)) continue;
+    if(i !== 5) tick(D, 'ec_hand', D, i % 2 ? 'Anna' : 'Lukas', '21:4' + (i % 10));
+    if(dParse(D).getDay() === 1 && i > 6){ tick(D, 'ec_schneid', D, 'Lukas', '14:20'); mondays++; }   // der jüngste Montag bleibt offen: so sieht „überfällig“ aus
+    if(+D.slice(8) === 1 || (+D.slice(8) === 2 && !open(dAdd(D, -1)))) tick(D, 'ec_abzug', D.slice(0, 8) + '01', 'Lukas', '15:05'); }
+  const sup = k2 => { const p = (d.products || []).find(x => x.loc === k2 && x.supplier); return p ? p.supplier : ''; };
+  const at = (D, hm) => D + 'T' + hm + ':00';
+  k.log = [
+    {id:'ek_d5', k:'oil', d:dAdd(today, -3), a:'15:10', at:at(dAdd(today, -3), '15:10'), b:'Lukas', fr:'fr_1', t:'check', res:'ok', demo:true},
+    {id:'ek_d4', k:'we', d:dAdd(today, -2), a:'07:55', at:at(dAdd(today, -2), '07:55'), b:'Anna', sup:sup('T') || sup('K'), kv:2.8, tv:-19, okc:true, note:'', out:0, lim:{...EK_LIMITS}, demo:true},
+    {id:'ek_d3', k:'we', d:dAdd(today, -6), a:'08:10', at:at(dAdd(today, -6), '08:10'), b:'Anna', sup:sup('K'), kv:6.5, tv:null, okc:true, note:'Fahrer darauf hingewiesen, Ware sofort eingekühlt. Nach 20 Minuten 3 °C.', out:1, lim:{...EK_LIMITS}, demo:true},
+    {id:'ek_d2', k:'oil', d:dAdd(today, -9), a:'22:30', at:at(dAdd(today, -9), '22:30'), b:'Lukas', fr:'fr_1', t:'wechsel', demo:true},
+    {id:'ek_d1', k:'we', d:dAdd(today, -9), a:'07:40', at:at(dAdd(today, -9), '07:40'), b:'Anna', sup:sup('K'), kv:3.2, tv:null, okc:true, note:'', out:0, lim:{...EK_LIMITS}, demo:true},
+  ];
+  k.demo = true;
+}
+function ekDemoRemove(){ const k = ekS(); k.clean = k.clean.filter(t => !t.demo); k.log = k.log.filter(r => !r.demo); if(k.demo){ k.oilDays = ''; k.demo = false; } }
+
+/* ---------- Kleines ---------- */
+function ekDayDiff(a, b){ return Math.round((dParse(b) - dParse(a)) / 864e5); }
+function ekT(v){ return v == null || v === '' ? '' : (num(v, 1) + ' °C').replace('-', '−'); }
+function ekLimTxt(v){ return `höchstens ${+v > 0 ? '+' : ''}${num(v, 1)} °C`.replace('-', '−'); }
+/* „3,5“, „+3,5 °C“, „−18“ → Zahl; leer → null; Unsinn → NaN */
+function ekTemp(raw){ const s = String(raw == null ? '' : raw).trim().replace(/[−–]/g, '-').replace(/\s|°|c$/gi, '').replace(/^\+/, ''); if(s === '') return null; const v = /^-?\d+([.,]\d+)?$/.test(s) ? numParse(s) : NaN; return isFinite(v) && Math.abs(v) <= 99 ? Math.round(v * 10) / 10 : NaN; }
+function ekWhenTxt(D, T){ const d = ekDayDiff(D, T); return d <= 0 ? 'heute' : d === 1 ? 'gestern' : `vor ${d} Tagen`; }
+function ekDateTxt(D){ return `${tmWdShort(D)} ${tmDm(D)}`; }
+function ekRec(extra){ const n = new Date(); return Object.assign({id:uid('ek'), d:isoDate(n), a:tmNowHm(), at:n.toISOString(), b:tmWhoName()}, extra || {}); }
+function ekSupName(id){ const s = id && typeof SUP === 'function' ? SUP(id) : null; return s ? s.name : ''; }
+function ekFryer(id){ return ekS().fryers.find(f => f.id === id) || null; }
+function ekFryerName(id){ const f = ekFryer(id); return f ? f.name : 'Fritteuse'; }
+
+/* ---------- Wareneingang-Temperatur ---------- */
+function ekWeOutWhy(kv, tv, okc, lim){ const w = []; if(kv != null && kv > +lim.kuehl + 1e-9) w.push(`Kühlware ${ekT(kv)} (Ihr Grenzwert: ${ekLimTxt(lim.kuehl)})`); if(tv != null && tv > +lim.tk + 1e-9) w.push(`Tiefkühlware ${ekT(tv)} (Ihr Grenzwert: ${ekLimTxt(lim.tk)})`); if(okc === false) w.push('Ware nicht in Ordnung'); return w; }
+function ekLogWe(x){ const k = ekS(); const r = ekRec({k:'we', sup:x.sup || '', order:x.order || '', mv:x.mv || '', ref:x.ref || '', kv:x.kv == null ? null : x.kv, tv:x.tv == null ? null : x.tv, okc:x.okc !== false, note:String(x.note || '').slice(0, 160), lim:{...k.limits}}); if(x.d) r.d = x.d;
+  r.out = ekWeOutWhy(r.kv, r.tv, r.okc, r.lim).length ? 1 : 0; k.log.unshift(r); return r; }
+function ekWeTxt(r){ return [r.kv != null ? 'Kühlware ' + ekT(r.kv) : '', r.tv != null ? 'Tiefkühlware ' + ekT(r.tv) : '', r.okc === false ? 'Ware nicht in Ordnung' : ''].filter(Boolean).join(' · ') || 'Ware in Ordnung'; }
+/* welche Felder eine Lieferung braucht: nur was aus Kühlhaus (K) oder Tiefkühler (T) dabei ist */
+function ekColdOf(pids){ const ps = pids.map(P).filter(Boolean); return {k:ps.some(p => p.loc === 'K'), t:ps.some(p => p.loc === 'T')}; }
+function ekFieldHtml(id, name, label, lim, val){ return `<label class="f ek-tf">${label}<span class="ek-tin"><input id="${id}" name="${name}" type="text" inputmode="text" autocomplete="off" value="${esc(val || '')}" placeholder="–" aria-label="${label}, in Grad Celsius"><span>°C</span></span><small>Ihr Grenzwert: ${esc(ekLimTxt(lim))}</small></label>`; }
+/* Felder im Wareneingang einer Bestellung: je Lieferung, nicht je Artikel; alles freiwillig */
+function ekRecvFields(o){
+  const cold = ekColdOf(o.lines.map(l => l.pid)); if(!cold.k && !cold.t) return ''; const dr = o.receiptDraft || {}; const lim = ekS().limits;
+  return `${cold.k ? ekFieldHtml('rTemp', 'rTemp', 'Temperatur Kühlware', lim.kuehl, dr.temp) : ''}${cold.t ? ekFieldHtml('rTempT', 'rTempT', 'Temperatur Tiefkühlware', lim.tk, dr.tempT) : ''}<label class="tog ek-ok"><input type="checkbox" id="rOk" ${dr.cond === 'no' ? '' : 'checked'}><span></span>Ware in Ordnung</label>`;
+}
+/* vor dem Einbuchen: Eingaben lesen; außerhalb Ihres Grenzwerts oder „nicht in Ordnung“ → kurze Notiz, dann weiter */
+function ekRecvCheck(o, done){
+  const dr = o.receiptDraft || {}; const read = (sel, old) => { const n = $(sel); return n ? n.value : (old || ''); };
+  const kv = ekTemp(read('#rTemp', dr.temp)), tv = ekTemp(read('#rTempT', dr.tempT)); const okEl = $('#rOk'); const okc = okEl ? okEl.checked : dr.cond !== 'no';
+  const bad = Number.isNaN(kv) ? '#rTemp' : Number.isNaN(tv) ? '#rTempT' : '';
+  if(bad){ const n = $(bad); if(n){ n.classList.add('bad-in'); n.focus(); setTimeout(() => n.classList.remove('bad-in'), 1800); } toast('Temperatur bitte als Zahl eingeben, zum Beispiel 3,5 oder -18. Oder das Feld leer lassen.'); return; }
+  if(kv == null && tv == null && okc){ done(null); return; }
+  const why = ekWeOutWhy(kv, tv, okc, ekS().limits);
+  if(!why.length){ done({kv, tv, okc}); return; }
+  tmDialog('Wareneingang: außerhalb Ihres Grenzwerts', `<p class="dlg-p"><b>${why.map(esc).join('<br>')}</b><br>Was haben Sie getan?</p><label class="f">Kurze Notiz<input name="note" maxlength="160" placeholder="z. B. Ware zurückgegeben, Chef informiert" autocomplete="off"></label>`,
+    (fd, f) => { const note = String(fd.get('note') || '').trim(); if(note.length < 3) return dlgErr(f.elements.note, 'Bitte kurz notieren, was getan wurde.'); setTimeout(() => done({kv, tv, okc, note}), 0); }, {ok:'Mit Notiz einbuchen', toast:false});
+}
+/* Lieferung ohne Bestellung (ein Artikel): Feld nur bei Kühl- oder Tiefkühlware */
+function ekMoveFields(p){
+  const cold = p ? ekColdOf([p.id]) : {k:false, t:false}; const lim = ekS().limits; const on = cold.k || cold.t;
+  return `<div id="mvEk" class="ek-mv" ${on ? '' : 'hidden'} data-kind="${cold.t ? 't' : 'k'}">${on ? ekFieldHtml('mvEkT', 'ekT', cold.t ? 'Temperatur Tiefkühlware' : 'Temperatur Kühlware', cold.t ? lim.tk : lim.kuehl, '') + `<label class="tog ek-ok"><input type="checkbox" name="ekOk" checked><span></span>Ware in Ordnung</label><label class="f ek-mvn" id="mvEkN" hidden>Was haben Sie getan?<input name="ekNote" maxlength="160" placeholder="z. B. Ware zurückgegeben, Chef informiert" autocomplete="off"></label>` : ''}</div>`;
+}
+/* liest die Felder; false = Dialog bleibt offen (Hinweis steht am Feld), null = nichts eingetragen, sonst der Eintrag */
+function ekMoveRead(fd, f, p){
+  const box = f.querySelector('#mvEk'); if(!box || box.hidden) return null; const t = box.dataset.kind === 't';
+  const v = ekTemp(fd.get('ekT')); if(Number.isNaN(v)) return dlgErr('ekT', 'Temperatur bitte als Zahl eingeben, zum Beispiel 3,5 oder -18. Oder das Feld leer lassen.');
+  const okc = !!fd.get('ekOk'); if(v == null && okc) return null;
+  const x = {kv:t ? null : v, tv:t ? v : null, okc, note:String(fd.get('ekNote') || '').trim()};
+  const why = ekWeOutWhy(x.kv, x.tv, okc, ekS().limits);
+  if(why.length && x.note.length < 3){ f.querySelector('#mvEkN').hidden = false; return dlgErr('ekNote', `${why.join(' · ')}. Bitte kurz notieren, was getan wurde.`); }
+  return x;
+}
+/* von Hand nachtragen oder korrigieren. Der alte Wert bleibt sichtbar. */
+function ekWeDlg(id){
+  const k = ekS(); const r = id ? k.log.find(x => x.id === id && x.k === 'we') : null; const lim = k.limits; const sups = (S.suppliers || []).filter(s => s.active !== false || (r && r.sup === s.id));
+  tmDialog(r ? 'Eintrag korrigieren' : 'Temperatur eintragen', `${r ? `<p class="dlg-p">${esc(ekDateTxt(r.d))}, ${esc(r.a)} Uhr · ${esc(r.b)}. Der bisherige Wert bleibt durchgestrichen sichtbar.</p>` : ''}
+    <label class="f">Lieferant<select name="sup"><option value="">ohne Angabe</option>${sups.map(s => `<option value="${s.id}" ${r && r.sup === s.id ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select></label>
+    <div class="fields">${ekFieldHtml('ekK', 'kv', 'Temperatur Kühlware', lim.kuehl, r && r.kv != null ? numIn(r.kv) : '')}${ekFieldHtml('ekTk', 'tv', 'Temperatur Tiefkühlware', lim.tk, r && r.tv != null ? numIn(r.tv) : '')}</div>
+    <label class="tog ek-ok"><input type="checkbox" name="okc" ${!r || r.okc !== false ? 'checked' : ''}><span></span>Ware in Ordnung</label>
+    <label class="f">Notiz<input name="note" maxlength="160" value="${esc(r ? r.note || '' : '')}" placeholder="bei Abweichung: was getan wurde" autocomplete="off"></label>`,
+    (fd, f) => { const kv = ekTemp(fd.get('kv')), tv = ekTemp(fd.get('tv')); if(Number.isNaN(kv)) return dlgErr('kv', 'Bitte eine Zahl eingeben, zum Beispiel 3,5.'); if(Number.isNaN(tv)) return dlgErr('tv', 'Bitte eine Zahl eingeben, zum Beispiel -18.');
+      const okc = !!fd.get('okc'), note = String(fd.get('note') || '').trim().slice(0, 160), sup = fd.get('sup') || '';
+      if(kv == null && tv == null && okc) return dlgErr('kv', 'Bitte eine Temperatur eintragen oder „Ware in Ordnung“ abwählen.');
+      const why = ekWeOutWhy(kv, tv, okc, lim); if(why.length && note.length < 3) return dlgErr('note', `${why.join(' · ')}. Bitte kurz notieren, was getan wurde.`);
+      if(!r){ ekLogWe({kv, tv, okc, note, sup}); return; }
+      if(r.kv === kv && r.tv === tv && r.okc === okc && (r.note || '') === note && (r.sup || '') === sup) return;
+      r.prev = (r.prev || []).concat([{kv:r.kv, tv:r.tv, okc:r.okc, note:r.note || '', sup:r.sup || '', b:r.cb || r.b, at:r.cat || r.at}]).slice(-8);
+      Object.assign(r, {kv, tv, okc, note, sup, cb:tmWhoName(), cat:new Date().toISOString(), lim:{...lim}}); r.out = why.length ? 1 : 0; },
+    {done:r ? 'Korrektur gespeichert' : 'Eingetragen', del: r && canEditAll() ? () => ask('Diesen Eintrag löschen? Er fehlt dann auch in der Monatsmappe.', () => { k.log = k.log.filter(x => x !== r); }) : null});
+}
+function ekCorrTxt(r){ return r.cb ? `korrigiert von ${r.cb} am ${fmtDate(r.cat)}` : ''; }
+function ekWePageHtml(){
+  const k = ekS(); const list = k.log.filter(r => r.k === 'we').sort((a, b) => String(b.at).localeCompare(String(a.at))).slice(0, 60);
+  const row = r => { const old = (r.prev || []).length ? r.prev[r.prev.length - 1] : null;
+    return `<li class="${r.out ? 'out' : ''}"><button type="button" class="ek-r" data-act="ekWeEdit" data-id="${r.id}"><span class="ek-rd"><b>${esc(ekDateTxt(r.d))}</b><small>${esc(r.a)} Uhr</small></span><span class="ek-rm"><b>${old ? `<s>${esc(ekWeTxt(old))}</s> ` : ''}${esc(ekWeTxt(r))}</b><small>${esc([ekSupName(r.sup) || r.ref || 'ohne Lieferant', r.b].filter(Boolean).join(' · '))}${r.note ? ` · <span class="ck-note">${esc(r.note)}</span>` : ''}${r.cb ? ` · ${esc(ekCorrTxt(r))}` : ''}</small></span></button></li>`; };
+  return `<button type="button" class="back" data-act="ckBack">${ico('arrow')}Alle Listen</button>
+    <div class="page-h ck-rh"><div><h1>Wareneingang</h1><p class="sub">Temperatur je Lieferung. Ihr Grenzwert: Kühlware ${esc(ekLimTxt(k.limits.kuehl))}, Tiefkühlware ${esc(ekLimTxt(k.limits.tk))}.</p></div><div class="row-btns"><button type="button" class="btn primary" data-act="ekWeNew">${ico('plus')}Temperatur eintragen</button></div></div>
+    ${list.length ? `<ul class="ek-log">${list.map(row).join('')}</ul>` : '<section class="panel empty">Noch kein Eintrag. Beim Einbuchen einer Lieferung mit Kühl- oder Tiefkühlware fragt die App nach der Temperatur.</section>'}`;
+}
+
+/* ---------- Frittieröl ---------- */
+function ekOilState(fr, D){
+  const k = ekS(); const log = k.log.filter(r => r.k === 'oil' && r.fr === fr.id).sort((a, b) => String(b.at).localeCompare(String(a.at)));
+  const ch = log.find(r => r.t === 'wechsel') || null; const chk = log.find(r => r.t === 'check' && (!ch || String(r.at) > String(ch.at))) || null;
+  const days = ch ? Math.max(0, ekDayDiff(ch.d, D)) : null; const I = +k.oilDays > 0 ? +k.oilDays : 0;
+  const byCheck = !!(chk && chk.res === 'wechseln'); const byDays = !!(ch && I && days >= I);
+  return {ch, chk, days, I, due:byCheck || byDays, byCheck, over:byDays ? days - I : 0};
+}
+function ekOilTxt(st, D){ return st.ch ? `letzter Wechsel ${ekWhenTxt(st.ch.d, D)}` : 'noch kein Wechsel eingetragen'; }
+function ekOilDueTxt(st){ return !st.due ? '' : st.byCheck ? 'geprüft: wechseln' : st.over === 0 ? 'Wechsel heute fällig' : `Wechsel seit ${st.over === 1 ? '1 Tag' : st.over + ' Tagen'} fällig`; }
+function ekOilDlg(kind){
+  const k = ekS(); if(!k.fryers.length) return; const D = isoDate(new Date());
+  tmDialog(kind === 'check' ? 'Öl geprüft' : 'Öl gewechselt', `${k.fryers.length > 1 ? `<label class="f">Fritteuse<select name="fr">${k.fryers.map(f => `<option value="${f.id}">${esc(f.name)}</option>`).join('')}</select></label>` : ''}
+    <label class="f">Datum<input name="d" type="date" max="${D}" value="${D}" required></label>
+    ${kind === 'check' ? `<fieldset class="ek-res"><legend>Ergebnis</legend><div class="togs"><label class="tog"><input type="radio" name="res" value="ok" checked><span></span>in Ordnung</label><label class="tog"><input type="radio" name="res" value="wechseln"><span></span>wechseln</label></div></fieldset>` : ''}`,
+    fd => { const d = String(fd.get('d') || ''); if(!TM_DATE.test(d) || d > D) return dlgErr('d', 'Bitte ein Datum bis heute wählen.');
+      const r = ekRec({k:'oil', fr:fd.get('fr') || k.fryers[0].id, t:kind === 'check' ? 'check' : 'wechsel'}); if(d !== r.d){ r.d = d; r.at = d + 'T23:59:00'; r.late = 1; } if(kind === 'check') r.res = fd.get('res') === 'wechseln' ? 'wechseln' : 'ok';
+      k.log.unshift(r); ekOilDlg.last = r.id; },
+    {toast:false});
+  $('#dlg').addEventListener('close', () => { const id = ekOilDlg.last; ekOilDlg.last = null; if(!id) return; setTimeout(() => toast('Eingetragen', {action:() => { k.log = k.log.filter(x => x.id !== id); save(); render(); }}), 30); }, {once:true});
+}
+function ekOilPageHtml(D){
+  const k = ekS(); const many = k.fryers.length > 1; const log = k.log.filter(r => r.k === 'oil').sort((a, b) => String(b.at).localeCompare(String(a.at))).slice(0, 40);
+  const stat = k.fryers.map(f => { const st = ekOilState(f, D); return `<li class="${st.due ? 'due' : ''}"><span class="ek-rm"><b>${many ? esc(f.name) + ': ' : ''}${esc(ekOilTxt(st, D).replace(/^l/, 'L').replace(/^n/, 'N'))}</b><small>${st.due ? `<span class="bad-t">${esc(ekOilDueTxt(st))}</span>` : st.I ? `nächster Wechsel ${st.ch ? 'in ' + (st.I - st.days === 1 ? '1 Tag' : (st.I - st.days) + ' Tagen') : 'nach dem ersten Eintrag'}` : ''}${st.chk && !st.byCheck ? `${st.due || st.I ? ' · ' : ''}geprüft ${esc(ekWhenTxt(st.chk.d, D))}: in Ordnung` : ''}</small></span></li>`; }).join('');
+  const row = r => `<li><span class="ek-rd"><b>${esc(ekDateTxt(r.d))}</b><small>${r.late ? 'nachgetragen' : esc(r.a) + ' Uhr'}</small></span><span class="ek-rm"><b>${r.t === 'wechsel' ? 'Öl gewechselt' : 'Öl geprüft: ' + (r.res === 'wechseln' ? 'wechseln' : 'in Ordnung')}</b><small>${esc([many ? ekFryerName(r.fr) : '', r.b].filter(Boolean).join(' · '))}</small></span>${canEditAll() ? `<button type="button" class="icon-btn" data-act="ekDel" data-id="${r.id}" aria-label="Eintrag löschen" title="Eintrag löschen">${ico('trash')}</button>` : ''}</li>`;
+  return `<button type="button" class="back" data-act="ckBack">${ico('arrow')}Alle Listen</button>
+    <div class="page-h ck-rh"><div><h1>Frittieröl</h1><p class="sub">${k.oilDays ? `Ihr Intervall: Wechsel alle ${k.oilDays === 1 ? '1 Tag' : k.oilDays + ' Tage'}.` : 'Kein Intervall festgelegt.'}</p></div>
+      <div class="row-btns"><button type="button" class="btn" data-act="ekOil" data-id="check">Öl geprüft</button><button type="button" class="btn primary" data-act="ekOil" data-id="wechsel">${ico('check')}Öl gewechselt</button></div></div>
+    <ul class="ek-stat">${stat}</ul>
+    ${log.length ? `<ul class="ek-log">${log.map(row).join('')}</ul>` : ''}`;
+}
+
+/* ---------- Reinigungsplan ---------- */
+function ekOpenDay(D){ return !tmClosed(D) || tmShifts(D).length > 0; }
+function ekMonthDay(ym, md){ const [y, m] = ym.split('-').map(Number); const n = new Date(y, m, 0).getDate(); return `${ym}-${String(Math.min(md, n)).padStart(2, '0')}`; }
+/* letzter Fälligkeitstag einer Aufgabe bis einschließlich D; null = (noch) nicht fällig */
+function ekLastDue(t, D){
+  if(t.off || (t.gone && D > t.gone)) return null; let d = null;
+  if(t.when === 'daily') d = ekOpenDay(D) ? D : null;
+  else if(t.when === 'weekly'){ d = D; for(let i = 0; i < 7 && dParse(d).getDay() !== t.wd; i++) d = dAdd(d, -1); }
+  else { d = ekMonthDay(D.slice(0, 7), t.md || 1); if(d > D) d = ekMonthDay(dAdd(D.slice(0, 8) + '01', -1).slice(0, 7), t.md || 1); }
+  return d && d >= (t.since || '') ? d : null;
+}
+/* Häkchen zu einer Fälligkeit: gesucht vom Tag D zurück bis zum Fälligkeitstag */
+function ekDoneRec(t, due, D){ const runs = ckS().runs; for(let d = D, i = 0; d >= due && i < 40; d = dAdd(d, -1), i++){ const r = runs[d] && runs[d][EK_RUN]; const x = r && r.items && r.items[t.id]; if(x && (!x.due || x.due === due)) return Object.assign({d}, x); } return null; }
+/* was am Küchentag D ansteht: fällig heute, überfällig (bleibt stehen, bis erledigt) oder heute erledigt */
+function ekCleanToday(D){
+  return ekS().clean.filter(t => !t.gone && !t.off).map(t => { const due = ekLastDue(t, D); if(!due) return null; const rec = ekDoneRec(t, due, D); if(rec && rec.d !== D) return null; return {t, due, rec, state:rec ? 'done' : due === D ? 'due' : 'over'}; }).filter(Boolean)
+    .sort((a, b) => (a.state === 'done') - (b.state === 'done') || a.due.localeCompare(b.due));
+}
+function ekRhyTxt(t){ return t.when === 'weekly' ? `jede Woche am ${DAYNAME[t.wd]}` : t.when === 'monthly' ? `jeden Monat am ${t.md}.` : 'jeden Öffnungstag'; }
+function ekCleanTick(id){
+  const D = ckToday(); const x = ekCleanToday(D).find(y => y.t.id === id); if(!x) return; const c = ckS();
+  const put = rec => { const day = c.runs[D] = c.runs[D] || {}; const run = day[EK_RUN] = day[EK_RUN] || {items:{}, n:0}; if(rec) run.items[id] = rec; else delete run.items[id]; delete run.demo; if(!Object.keys(run.items).length){ delete day[EK_RUN]; if(!Object.keys(day).length) delete c.runs[D]; } save(); render(); };
+  if(x.rec){ if(!canEditAll()){ toast(`Erledigt von ${x.rec.b}, ${x.rec.a} Uhr. Zurücknehmen kann das nur der Chef.`); return; } const old = c.runs[D][EK_RUN].items[id]; put(null); toast('Häkchen entfernt', {action:() => put(old)}); return; }
+  const y = window.scrollY; put(ckRec({due:x.due})); window.scrollTo(0, y); toast('Erledigt', {action:() => put(null)});
+}
+function ekCleanPageHtml(D){
+  const list = ekCleanToday(D); const done = list.filter(x => x.state === 'done').length; const pr = {done, total:list.length};
+  const dLong = dParse(D).toLocaleDateString('de-AT', {weekday:'long', day:'numeric', month:'long'});
+  const row = x => { const t = x.t, on = x.state === 'done';
+    return `<li class="ck-i ${on ? 'on' : ''}" data-item="${t.id}"><button type="button" role="checkbox" aria-checked="${on}" class="ck-c" data-act="ekTick" data-id="${t.id}"><span class="ck-box" aria-hidden="true">${ico('check')}</span><span class="ck-t"><span>${esc(t.t)}</span><small>${on ? `${esc(x.rec.b)}, ${x.rec.a} Uhr` : `${t.area ? esc(t.area) + ' · ' : ''}${EK_RHY[t.when]}${x.state === 'over' ? ` · <span class="bad-t">fällig seit ${esc(ekDateTxt(x.due))}</span>` : ''}`}</small></span></button></li>`; };
+  return `<button type="button" class="back" data-act="ckBack">${ico('arrow')}Alle Listen</button>
+    <div class="page-h ck-rh"><div><h1>Reinigungsplan</h1><p class="sub">${esc(dLong)}</p></div></div>
+    ${list.length ? `<div class="ck-sticky" id="ckSticky"><b id="ckProg">${pr.done} von ${pr.total}</b>${ckProgHtml(pr)}<span id="ckState">${done >= list.length ? 'fertig' : ''}</span></div><ul class="ck-items">${list.map(row).join('')}</ul>`
+      : `<section class="pl-closed ck-none"><h2>Heute steht nichts an</h2><p>${ekS().clean.some(t => !t.gone) ? 'Aufgaben erscheinen an ihrem Tag und bleiben stehen, bis sie erledigt sind.' : canEditAll() ? 'Legen Sie die Aufgaben unter „Vorlagen“ an.' : 'Der Chef legt die Aufgaben an.'}</p></section>`}`;
+}
+function ekCleanDlg(){
+  if(!roGate()) return; const k = ekS(); const cur = k.clean.filter(t => !t.gone); const areas = [...new Set(cur.map(t => t.area).concat(TM_AREAS.map(a => a[1]), ['Kühlhaus', 'Lager', 'Gastraum', 'WC']).filter(Boolean))];
+  const row = t => `<li class="ek-er" data-tid="${t.id || ''}"><input name="t" value="${esc(t.t || '')}" maxlength="90" placeholder="Was ist zu reinigen?" aria-label="Aufgabe">
+    <input name="area" value="${esc(t.area || '')}" maxlength="30" list="ekAreas" placeholder="Bereich" aria-label="Bereich">
+    <select name="when" aria-label="Rhythmus">${Object.entries(EK_RHY).map(([v, l]) => `<option value="${v}" ${t.when === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
+    <select name="wd" aria-label="Wochentag" ${t.when === 'weekly' ? '' : 'hidden'}>${[1, 2, 3, 4, 5, 6, 0].map(i => `<option value="${i}" ${t.wd === i ? 'selected' : ''}>${DAYNAME[i]}</option>`).join('')}</select>
+    <label class="ek-md" ${t.when === 'monthly' ? '' : 'hidden'}>am<input name="md" inputmode="numeric" value="${t.md || 1}" maxlength="2" aria-label="Tag im Monat">.</label>
+    <button type="button" class="icon-btn" data-ekdel="1" aria-label="Aufgabe entfernen" title="Entfernen">${ico('x')}</button></li>`;
+  tmDialog('Reinigungsplan', `<datalist id="ekAreas">${areas.map(a => `<option value="${esc(a)}">`).join('')}</datalist>
+    <ol class="ek-ed" id="ekEd">${cur.map(row).join('')}</ol>
+    <button type="button" class="btn sm" data-ekadd="1">${ico('plus')}Aufgabe</button>
+    <p class="hint">Eine Aufgabe erscheint an ihrem Tag bei den Checklisten und bleibt dort stehen, bis sie abgehakt ist. Tägliche Aufgaben gelten an Öffnungstagen.</p>`,
+    (fd, f) => { const today = ckToday(); const next = [];
+      for(const li of f.querySelectorAll('.ek-er')){ const g = n => li.querySelector(`[name="${n}"]`); const t = g('t').value.trim(); if(!t) continue; const when = EK_RHY[g('when').value] ? g('when').value : 'weekly';
+        const md = Math.round(numParse(g('md').value)); if(when === 'monthly' && !(md >= 1 && md <= 31)) return dlgErr(g('md'), 'Bitte einen Tag von 1 bis 31 eintragen.');
+        const x = {t, area:g('area').value.trim(), when, wd:when === 'weekly' ? +g('wd').value : null, md:when === 'monthly' ? md : null};
+        const old = li.dataset.tid ? k.clean.find(o => o.id === li.dataset.tid) : null;
+        // anderer Rhythmus = neue Aufgabe: was bisher erledigt wurde, bleibt unter der alten stehen
+        if(old && old.when === x.when && old.wd === x.wd && old.md === x.md){ Object.assign(old, x); delete old.demo; next.push(old); } else next.push({id:uid('ec'), ...x, since:today}); }
+      k.clean.forEach(o => { if(!o.gone && !next.includes(o)) o.gone = today; });
+      k.clean = k.clean.filter(o => o.gone).concat(next).slice(-120); },
+    {done:'Reinigungsplan gespeichert', after: f => { f.dataset.wide = '1';
+      f.onchange = e => { if(e.target.name !== 'when') return; const li = e.target.closest('.ek-er'); li.querySelector('[name="wd"]').hidden = e.target.value !== 'weekly'; li.querySelector('.ek-md').hidden = e.target.value !== 'monthly'; };
+      f.onclick = e => { if(e.target.closest('[data-ekadd]')){ $('#ekEd').insertAdjacentHTML('beforeend', row({id:'', t:'', area:'', when:'weekly', wd:1, md:1})); const i = $('#ekEd').lastElementChild.querySelector('[name="t"]'); i.focus(); i.scrollIntoView({block:'nearest'}); return; } const li = e.target.closest('.ek-er'); if(li && e.target.closest('[data-ekdel]')) li.remove(); };
+      if(!cur.length) f.querySelector('[data-ekadd]').click(); }});
+}
+/* Grenzwerte, Fritteusen, Intervall */
+function ekSetupDlg(){
+  if(!roGate()) return; const k = ekS();
+  tmDialog('Grenzwerte und Frittieröl', `<div class="fields"><label class="f">Kühlware höchstens, °C<input name="kuehl" inputmode="text" value="${numIn(k.limits.kuehl)}" required></label><label class="f">Tiefkühlware höchstens, °C<input name="tk" inputmode="text" value="${numIn(k.limits.tk)}" required></label></div>
+    <p class="hint" style="margin-top:0">Ihre eigenen Grenzwerte für den Wareneingang. Liegt eine Lieferung darüber, fragt die App nach einer Notiz.</p>
+    <label class="f">Fritteusen<input name="fryers" maxlength="140" value="${esc(k.fryers.map(f => f.name).join(', '))}" placeholder="z. B. Fritteuse links, Fritteuse rechts"></label>
+    <label class="f">Ölwechsel alle … Tage<input name="oilDays" class="num-in" type="text" inputmode="numeric" data-max="365" value="${k.oilDays || ''}" placeholder="leer = keine Erinnerung"></label>
+    <p class="hint" style="margin-top:0">Mehrere Fritteusen mit Komma trennen. Ohne Fritteuse das Feld leer lassen.</p>`,
+    fd => { const ku = ekTemp(fd.get('kuehl')), tk = ekTemp(fd.get('tk')); if(ku == null || Number.isNaN(ku)) return dlgErr('kuehl', 'Bitte eine Zahl eingeben, zum Beispiel 4.'); if(tk == null || Number.isNaN(tk)) return dlgErr('tk', 'Bitte eine Zahl eingeben, zum Beispiel -18.');
+      if(tk >= ku) return dlgErr('tk', 'Der Grenzwert für Tiefkühlware muss unter dem für Kühlware liegen.');
+      k.limits = {kuehl:ku, tk};
+      const names = [...new Set(String(fd.get('fryers') || '').split(',').map(s => s.trim().slice(0, 30)).filter(Boolean))].slice(0, 6);
+      { const old = k.fryers; const used = new Set(); k.fryers = names.map((n, i) => { const hit = old.find(f => f.name === n && !used.has(f.id)) || (names.length === old.length && !names.includes(old[i].name) && !used.has(old[i].id) ? old[i] : null); const id = hit ? hit.id : uid('fr'); used.add(id); return {id, name:n}; }); }   // umbenannt: die Einträge bleiben bei der Fritteuse
+      const od = Math.round(+fd.get('oilDays')); k.oilDays = od > 0 ? od : ''; },
+    {done:'Gespeichert'});
+}
+
+/* ---------- Übersicht bei den Checklisten, Zeile auf „Heute“ ---------- */
+function ekDue(D){
+  const k = ekS(); const cl = ekCleanToday(D); const open = cl.filter(x => x.state !== 'done'), over = open.filter(x => x.state === 'over');
+  const oil = k.fryers.map(f => ({f, st:ekOilState(f, D)})).filter(x => x.st.due);
+  return {cl, open, over, oil, any:open.length > 0 || oil.length > 0};
+}
+function ekCleanSub(d){ return d.open.length ? `${d.open.length} offen${d.over.length ? `, <span class="bad-t">${d.over.length === d.open.length ? '' : d.over.length + ' davon '}überfällig</span>` : ''}` : d.cl.length ? 'für heute erledigt' : 'heute steht nichts an'; }
+function ekOverviewHtml(D){
+  const k = ekS(); const d = ekDue(D); const rows = []; const T = isoDate(new Date());
+  const li = (id, name, sub, done) => `<li><button type="button" class="ek-l ${done ? 'done' : ''}" data-act="ekOpen" data-id="${id}"><span class="ck-ln"><b>${name}</b><small>${sub}</small></span><span class="ck-go" aria-hidden="true">${done ? ico('check') : ico('arrow', 'flip')}</span></button></li>`;
+  if(k.clean.some(t => !t.gone)) rows.push(li('clean', 'Reinigungsplan', ekCleanSub(d), d.cl.length > 0 && !d.open.length));
+  if(k.fryers.length){ const sts = k.fryers.map(f => ({f, st:ekOilState(f, T)})); const many = sts.length > 1;
+    rows.push(li('oil', 'Frittieröl', sts.map(x => `${many ? esc(x.f.name) + ': ' : ''}${esc(ekOilTxt(x.st, T))}${x.st.due ? ` · <span class="bad-t">${esc(ekOilDueTxt(x.st))}</span>` : ''}`).join(' · '), false)); }
+  const we = k.log.filter(r => r.k === 'we').sort((a, b) => String(b.at).localeCompare(String(a.at)))[0];
+  rows.push(li('we', 'Wareneingang', we ? `zuletzt ${esc(ekDateTxt(we.d))}: ${esc(ekWeTxt(we))}${we.out ? ' · <span class="bad-t">außerhalb</span>' : ''}` : 'noch keine Temperatur eingetragen', false));
+  return `<h2 class="ek-h">Eigenkontrolle</h2><ul class="ek-lists">${rows.join('')}</ul>`;
+}
+function ekTplHtml(){
+  const k = ekS(); const cur = k.clean.filter(t => !t.gone); const rh = [...new Set(cur.map(t => EK_RHY[t.when]))];
+  return `<h2 class="ek-h">Eigenkontrolle</h2><ul class="ek-tpls">
+    <li><span class="ck-ln"><b>Reinigungsplan</b><small>${cur.length ? `${plural(cur.length, 'Aufgabe', 'Aufgaben')} · ${rh.join(', ')}` : 'noch keine Aufgaben'}</small></span><button type="button" class="btn sm" data-act="ekCleanEdit">Bearbeiten</button></li>
+    <li><span class="ck-ln"><b>Grenzwerte und Frittieröl</b><small>Kühlware ${esc(ekLimTxt(k.limits.kuehl))} · Tiefkühlware ${esc(ekLimTxt(k.limits.tk))} · ${k.fryers.length ? (k.oilDays ? `Ölwechsel alle ${k.oilDays === 1 ? '1 Tag' : k.oilDays + ' Tage'}` : 'Ölwechsel ohne Erinnerung') : 'keine Fritteuse'}</small></span><button type="button" class="btn sm" data-act="ekSetup">Bearbeiten</button></li></ul>`;
+}
+/* „Heute“: höchstens eine ruhige Zeile, nur wenn etwas ansteht */
+function ekDashRow(D){
+  const d = ekDue(D); if(!d.any) return ''; const parts = [];
+  if(d.open.length) parts.push(`Reinigungsplan: ${d.open.length} offen${d.over.length ? `, ${d.over.length === d.open.length ? '' : d.over.length + ' davon '}überfällig` : ''}`);
+  if(d.oil.length) parts.push(`Frittieröl: ${d.oil.length > 1 ? d.oil.length + ' Fritteusen, ' : ''}${ekOilDueTxt(d.oil[0].st)}`);
+  return dayRow(String(d.open.length + d.oil.length), 'Eigenkontrolle', esc(parts.join(' · ')), '', `<button type="button" class="btn sm" data-act="ekOpen" data-id="${d.open.length ? 'clean' : 'oil'}">Öffnen</button>`, 'ek-dash');
+}
+function ekPageHtml(kind, D){ return kind === 'oil' ? ekOilPageHtml(isoDate(new Date())) : kind === 'we' ? ekWePageHtml() : ekCleanPageHtml(D); }
+/* Verlauf eines Tages: was zur Eigenkontrolle eingetragen wurde */
+function ekHistDetail(D){
+  const k = ekS(); const run = ckRun(D, EK_RUN); const rows = [];
+  if(run) Object.keys(run.items).forEach(id => { const r = run.items[id]; const t = k.clean.find(x => x.id === id); rows.push(`<li class="on"><span class="ck-hs" aria-hidden="true">${ico('check')}</span><span class="ck-ht">${esc(t ? t.t : 'Gelöschte Aufgabe')}${r.due && r.due !== D ? `<small>fällig war ${esc(ekDateTxt(r.due))}</small>` : ''}</span><span class="ck-hw">${esc(r.b)} · ${r.a}</span></li>`); });
+  k.log.filter(r => r.d === D).forEach(r => rows.push(`<li class="on ${r.out ? 'out' : ''}"><span class="ck-hs" aria-hidden="true">${ico('check')}</span><span class="ck-ht">${r.k === 'we' ? `Wareneingang${ekSupName(r.sup) ? ' ' + esc(ekSupName(r.sup)) : ''}: ${esc(ekWeTxt(r))}` : `${esc(ekFryerName(r.fr))}: ${r.t === 'wechsel' ? 'Öl gewechselt' : 'Öl geprüft, ' + (r.res === 'wechseln' ? 'wechseln' : 'in Ordnung')}`}${r.note ? `<small>${esc(r.note)}</small>` : ''}</span><span class="ck-hw">${esc(r.b)} · ${r.late ? 'nachgetragen' : r.a}</span></li>`));
+  return rows.length ? `<div class="ck-hd"><h3>Eigenkontrolle<span>${rows.length === 1 ? '1 Eintrag' : rows.length + ' Einträge'}</span></h3><ul>${rows.join('')}</ul></div>` : '';
+}
+
+/* ---------- Monatsmappe: feste A4-Blätter, Kopf auf jedem Blatt, keine geteilte Zeile ---------- */
+function ekMonthDays(ym){ const [y, m] = ym.split('-').map(Number); const n = new Date(y, m, 0).getDate(); const today = ckToday(); const out = []; for(let d = 1; d <= n; d++){ const D = `${ym}-${String(d).padStart(2, '0')}`; if(D > today) break; out.push(D); } return out; }
+/* Messwerte: alle Punkte mit Bereich, die in dem Monat auf einer fälligen Liste standen oder einen Eintrag haben */
+function ekTempCols(days){
+  const c = ckS(); const cols = [];
+  c.templates.forEach(tp => { tp.items.concat(tp.old || []).forEach(it => { if(!it.val) return; const cur = tp.items.includes(it);
+    const has = days.some(D => { const r = ckRun(D, tp.id); return r && r.items[it.id] && r.items[it.id].v != null; }); const due = cur && days.some(D => ckApplies(tp, D));
+    if(has || due) cols.push({tp, it, cur}); }); });
+  return cols;
+}
+function ekMappeBlocks(ym){
+  const c = ckS(), k = ekS(); const days = ekMonthDays(ym); const dev = []; const blocks = [];
+  const dayCell = D => `<td class="mp-d">${esc(ekDateTxt(D))}</td>`;
+  // 1 · Temperaturen: je Tag eine Zeile, auch ohne Eintrag
+  const cols = ekTempCols(days);
+  for(let i = 0; i < Math.max(1, cols.length); i += 4){ const part = cols.slice(i, i + 4);
+    const rows = days.map(D => `<tr>${dayCell(D)}${part.map(({tp, it, cur}) => { const run = ckRun(D, tp.id); const r = run && run.items[it.id];
+      if(r && r.v != null){ if(r.out) dev.push({D, what:`${tp.name}: ${it.t}`, val:`${ckVal(r.v)} ${it.val.unit || ''}`, lim:`erlaubt ${ckRangeTxt(it.val)}`, note:r.note || '', who:`${r.b}, ${r.a}`});
+        (r.prev || []).forEach(p => dev.push({D, what:`${tp.name}: ${it.t}`, val:`korrigiert: ${ckVal(p.v)} → ${ckVal(r.v)} ${it.val.unit || ''}`, lim:'', note:`zuerst eingetragen von ${p.b}, ${p.a} Uhr`, who:`${r.b}, ${r.a}`}));
+        return `<td class="mp-v ${r.out ? 'out' : ''}"><b>${ckVal(r.v).replace('-', '−')}${r.out ? ' !' : ''}</b> <small>${esc(r.b)} ${r.a}</small></td>`; }
+      return cur && ckApplies(tp, D) ? '<td class="mp-v gap">kein Eintrag</td>' : '<td class="mp-v na">·</td>'; }).join('')}</tr>`);
+    blocks.push({title:'Temperaturen' + (cols.length > 4 ? ` (${i / 4 + 1})` : ''), cls:'mp-temp', head:`<tr><th class="mp-d">Tag</th>${part.map(({tp, it}) => `<th>${esc(it.t)}<small>${esc(tp.name)} · ${esc(ckRangeTxt(it.val))}</small></th>`).join('')}</tr>`,
+      rows:cols.length ? rows : [], empty:'In den Checklisten gibt es keinen Messwert.', note:cols.length ? '„kein Eintrag“: Die Liste war fällig, der Wert wurde nicht eingetragen. · : an dem Tag nicht fällig. ! : außerhalb des Bereichs, siehe Abweichungen.' : ''}); }
+  // 2 · Wareneingang
+  const we = k.log.filter(r => r.k === 'we' && r.d.slice(0, 7) === ym).sort((a, b) => String(a.at).localeCompare(String(b.at)));
+  we.forEach(r => { if(r.out) dev.push({D:r.d, what:'Wareneingang' + (ekSupName(r.sup) ? ' ' + ekSupName(r.sup) : ''), val:ekWeTxt(r), lim:`Ihr Grenzwert: Kühlware ${ekLimTxt((r.lim || k.limits).kuehl)}, Tiefkühlware ${ekLimTxt((r.lim || k.limits).tk)}`, note:r.note || '', who:`${r.b}, ${r.a}`});
+    (r.prev || []).forEach(p => dev.push({D:r.d, what:'Wareneingang' + (ekSupName(r.sup) ? ' ' + ekSupName(r.sup) : ''), val:`korrigiert: ${ekWeTxt(p)} → ${ekWeTxt(r)}`, lim:'', note:`zuerst eingetragen von ${p.b}`, who:`${r.cb || r.b}, ${fmtDate(r.cat || r.at)}`})); });
+  blocks.push({title:'Wareneingang', cls:'mp-we', head:'<tr><th class="mp-d">Tag</th><th>Lieferant</th><th class="mp-n">Kühlware</th><th class="mp-n">Tiefkühlware</th><th>Zustand</th><th>Wer, wann</th></tr>',
+    rows:we.map(r => `<tr>${dayCell(r.d)}<td>${esc(ekSupName(r.sup) || r.ref || 'ohne Angabe')}</td><td class="mp-n">${r.kv != null ? esc(ekT(r.kv)) + (r.kv > +(r.lim || k.limits).kuehl ? ' !' : '') : '–'}</td><td class="mp-n">${r.tv != null ? esc(ekT(r.tv)) + (r.tv > +(r.lim || k.limits).tk ? ' !' : '') : '–'}</td><td>${r.okc === false ? 'nicht in Ordnung !' : 'in Ordnung'}</td><td>${esc(r.b)}, ${r.a}${r.cb ? ' · korrigiert' : ''}</td></tr>`),
+    empty:'In diesem Monat wurde keine Temperatur einer Lieferung eingetragen.'});
+  // 3 · Frittieröl
+  if(k.fryers.length || k.log.some(r => r.k === 'oil')){ const oil = k.log.filter(r => r.k === 'oil' && r.d.slice(0, 7) === ym).sort((a, b) => String(a.at).localeCompare(String(b.at)));
+    blocks.push({title:'Frittieröl', cls:'mp-oil', head:'<tr><th class="mp-d">Tag</th><th>Fritteuse</th><th>Eintrag</th><th>Wer, wann</th></tr>',
+      rows:oil.map(r => `<tr>${dayCell(r.d)}<td>${esc(ekFryerName(r.fr))}</td><td>${r.t === 'wechsel' ? 'Öl gewechselt' : 'Öl geprüft: ' + (r.res === 'wechseln' ? 'wechseln' : 'in Ordnung')}</td><td>${esc(r.b)}${r.late ? ', nachgetragen' : ', ' + r.a}</td></tr>`),
+      empty:'In diesem Monat wurde kein Ölwechsel und keine Prüfung eingetragen.'}); }
+  // 4 · Reinigungsplan
+  const recs = new Map(); Object.keys(c.runs).forEach(D => { const r = c.runs[D][EK_RUN]; if(r) Object.keys(r.items).forEach(id => { const x = r.items[id]; recs.set(id + '|' + (x.due || D), Object.assign({d:D}, x)); }); });
+  const tasks = k.clean.filter(t => days.some(D => ekLastDue(t, D) === D));
+  const cr = []; tasks.forEach(t => { const occ = days.filter(D => ekLastDue(t, D) === D); const head = `<td>${esc(t.t)}<small>${esc([t.area, ekRhyTxt(t)].filter(Boolean).join(' · '))}</small></td>`;
+    if(t.when === 'daily'){ const miss = occ.filter(D => !recs.get(t.id + '|' + D)); const who = [...new Set(occ.map(D => recs.get(t.id + '|' + D)).filter(Boolean).map(r => r.b))];
+      cr.push(`<tr>${head}<td>${occ.length === 1 ? '1 Öffnungstag' : occ.length + ' Öffnungstage'}</td><td>an ${occ.length - miss.length} von ${occ.length} Tagen${who.length ? ' · ' + esc(who.join(', ')) : ''}${miss.length ? `<small class="gap">nicht abgehakt: ${miss.map(tmDm).join(' ')}</small>` : ''}</td></tr>`); }
+    else occ.forEach(D => { const r = recs.get(t.id + '|' + D); cr.push(`<tr>${head}<td>${esc(ekDateTxt(D))}</td>${r ? `<td>${esc(ekDateTxt(r.d))} · ${esc(r.b)}, ${r.a}</td>` : '<td class="gap">nicht abgehakt</td>'}</tr>`); }); });
+  if(k.clean.length) blocks.push({title:'Reinigungsplan', cls:'mp-cl', head:'<tr><th>Aufgabe</th><th>Fällig</th><th>Erledigt</th></tr>', rows:cr, empty:'In diesem Monat war keine Aufgabe fällig.'});
+  // 5 · Checklisten Tag für Tag
+  const lr = []; days.forEach(D => { const due = ckDue(D); if(!due.length){ lr.push(`<tr class="cp-d mp-gap">${dayCell(D)}<td colspan="4">${tmClosed(D) ? 'Ruhetag, keine Liste fällig' : 'keine Liste fällig'}</td></tr>`); return; }
+    due.forEach((tp, i) => { const run = ckRun(D, tp.id) || {items:{}}; const pr = ckProg(tp, D); const rs = Object.values(run.items); const who = [...new Set(rs.map(r => r.b))].join(', '); const times = rs.map(r => r.a).sort(); const first = times[0], last = times[times.length - 1];
+      const open = pr.full ? [] : tp.items.filter(it => !run.items[it.id]).map(it => esc(it.t));
+      lr.push(`<tr class="${i ? '' : 'cp-d'}">${i ? '<td class="mp-d"></td>' : dayCell(D)}<td>${esc(tp.name)}</td><td class="cp-n">${pr.done} von ${pr.total}${pr.full ? '' : pr.over ? (pr.started ? ' · nicht fertig' : ' · nicht gemacht') : ' · offen'}</td><td>${who ? `${esc(who)}${first ? `, ${first}${last !== first ? '–' + last : ''} Uhr` : ''}` : '<span class="gap">kein Eintrag</span>'}</td><td class="cp-o">${open.length && pr.started ? 'Offen: ' + open.join('; ') : ''}</td></tr>`); }); });
+  blocks.push({title:'Checklisten', cls:'mp-ck', head:'<tr><th class="mp-d">Tag</th><th>Liste</th><th>Erledigt</th><th>Wer, wann</th><th>Offen geblieben</th></tr>', rows:lr, empty:'In diesem Monat war keine Liste fällig.'});
+  // 6 · Abweichungen auf einem eigenen Blatt
+  dev.sort((a, b) => a.D.localeCompare(b.D));
+  blocks.push({title:'Abweichungen und Korrekturen', cls:'mp-dev', page:true, head:'<tr><th class="mp-d">Tag</th><th>Was</th><th>Wert</th><th>Notiz</th><th>Wer, wann</th></tr>',
+    rows:dev.map(x => `<tr>${dayCell(x.D)}<td>${esc(x.what)}</td><td>${esc(x.val)}${x.lim ? `<small>${esc(x.lim)}</small>` : ''}</td><td>${esc(x.note) || '<span class="gap">keine Notiz</span>'}</td><td>${esc(x.who)}</td></tr>`), empty:'In diesem Monat wurde keine Abweichung eingetragen.'});
+  return {blocks, days, nDev:dev.length};
+}
+/* Blöcke auf Blätter verteilen (gemessen wie beim Allergen-Blatt) */
+function ekMappe(ym){
+  const {blocks, days, nDev} = ekMappeBlocks(ym); const [y, m] = ym.split('-').map(Number); const part = ym === ckToday().slice(0, 7);
+  const head = `<header class="ab-h"><div><b>${abU(S.settings.name)}</b><h1>Eigenkontrolle · ${MONTHS[m - 1]} ${y}</h1></div><div class="ab-meta"><span>${days.length ? `${tmDm(days[0])} bis ${tmDm(days[days.length - 1])}${part ? ' (laufender Monat)' : ''}` : 'noch keine Tage'}</span><span>erstellt am ${fmtDate(new Date().toISOString())} von ${esc(me().name)}</span><span class="ab-pn" data-ab-n="1"></span></div></header>`;
+  const foot = '<footer class="ab-f"><p>Eigene Aufzeichnung des Betriebs, erstellt mit der Küchen-App. Die Angaben stammen aus den Einträgen des Teams. Wo nichts eingetragen wurde, steht „kein Eintrag“.</p></footer>';
+  let host = document.getElementById('abMeasure'); if(!host){ host = document.createElement('div'); host.id = 'abMeasure'; host.className = 'ab-measure'; host.setAttribute('aria-hidden', 'true'); document.body.appendChild(host); }
+  host.innerHTML = ''; const pages = []; let body = null;
+  const newPage = () => { const p = document.createElement('article'); p.className = 'ab-page mp-page'; p.innerHTML = `${head}<div class="ab-body"></div>${foot}`; host.appendChild(p); pages.push(p); body = p.querySelector('.ab-body'); };
+  const fits = () => { const last = body.lastElementChild; return !last || last.getBoundingClientRect().bottom <= body.getBoundingClientRect().bottom - 4; };   // etwas Luft am Blattende
+  const open = (b, cont) => { const s = document.createElement('section'); s.className = 'mp-sec ' + b.cls; s.innerHTML = `<h2>${esc(b.title)}${cont ? '<span>Fortsetzung</span>' : ''}</h2>${b.rows.length ? `<table class="mp-t"><thead>${b.head}</thead><tbody></tbody></table>` : `<p class="mp-empty">${esc(b.empty)}</p>`}`; body.appendChild(s); return s; };
+  newPage();
+  blocks.forEach(b => {
+    if(b.page && body.children.length) newPage();
+    let sec = open(b, false), tb = sec.querySelector('tbody');
+    if(!b.rows.length){ if(!fits() && body.children.length > 1){ sec.remove(); newPage(); open(b, false); } return; }
+    const tmp = document.createElement('tbody');
+    // ein Abschnitt beginnt nicht mit weniger als drei Zeilen am Blattende
+    if(body.children.length > 1 && b.rows.length > 3){ tmp.innerHTML = b.rows.slice(0, 3).join(''); const probe = [...tmp.children]; probe.forEach(tr => tb.appendChild(tr)); const ok = fits(); probe.forEach(tr => tr.remove()); if(!ok){ sec.remove(); newPage(); sec = open(b, false); tb = sec.querySelector('tbody'); } }
+    b.rows.forEach((html, i) => { tmp.innerHTML = html; const tr = tmp.firstElementChild; tb.appendChild(tr);
+      if(fits()) return;
+      if(i === 0){ if(body.children.length > 1){ sec.remove(); newPage(); sec = open(b, false); tb = sec.querySelector('tbody'); tb.appendChild(tr); } return; }
+      tr.remove(); newPage(); sec = open(b, true); tb = sec.querySelector('tbody'); tb.appendChild(tr); });
+    if(b.note){ const n = document.createElement('p'); n.className = 'mp-note'; n.textContent = b.note; sec.appendChild(n); if(!fits()) n.remove(); }
+  });
+  pages.forEach((pg, i) => { pg.querySelector('[data-ab-n]').textContent = `Blatt ${i + 1} von ${pages.length}`; });
+  const out = pages.map(pg => pg.outerHTML); host.innerHTML = '';
+  return {pages:out, name:pdfFileName('Monatsmappe-' + ym), ym, days:days.length, nDev};
+}
+/* der ganze Monat als HTML (ein Blatt nach dem anderen) */
+function ckPrintHtml(ym){ return ekMappe(ym).pages.join(''); }
+/* „Als PDF speichern“ im Verlauf: die Monatsmappe */
+async function ckPrint(){
+  const sel = document.querySelector('#app [data-ckmonth]'); const ym = (sel && sel.value) || view.ck.month || ckToday().slice(0, 7);
+  // erst die Schriften laden lassen (ein Probedurchlauf zeigt dem Browser, welche gebraucht werden), dann messen: sonst stimmen die Zeilenhöhen nicht
+  ekMappe(ym); try { if(document.fonts && document.fonts.ready) await document.fonts.ready; } catch(e){}
+  const r = ekMappe(ym); const n = await a4Pdf(r.pages, r.name); window.__ekLast = {name:r.name, pages:n, ym, days:r.days, dev:r.nDev};
+}
+
+/* ---------- Bedienung ---------- */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if(!el) return; const a = el.dataset.act, id = el.dataset.id || '';
+  if(!/^ek[A-Z]/.test(a) || document.body.classList.contains('gd-help')) return;
+  const v = view.ck || (view.ck = {tab:'heute'});
+  switch(a){
+    case 'ekOpen': v.tab = 'heute'; v.run = null; v.ek = ['clean', 'oil', 'we'].includes(id) ? id : null; if(view.tab !== 'checkl') go('checkl'); else { render(); window.scrollTo({top:0}); } break;
+    case 'ekTick': ekCleanTick(id); break;
+    case 'ekOil': ekOilDlg(id === 'check' ? 'check' : 'wechsel'); break;
+    case 'ekWeNew': ekWeDlg(null); break;
+    case 'ekWeEdit': ekWeDlg(id); break;
+    case 'ekDel': { if(!roGate()) break; const k = ekS(); const r = k.log.find(x => x.id === id); if(r) ask('Diesen Eintrag löschen? Er fehlt dann auch in der Monatsmappe.', () => { k.log = k.log.filter(x => x !== r); }); break; }
+    case 'ekCleanEdit': ekCleanDlg(); break;
+    case 'ekSetup': ekSetupDlg(); break;
+  }
+});
+
+/* ---------- Hilfe ---------- */
+H('eigenkontrolle','Eigenkontrolle','Was Sie für sich selbst aufschreiben: Temperaturen, Reinigung, Frittieröl. Die App hilft beim Aufschreiben und Sammeln. Sie prüft nichts und ersetzt keine behördlich verlangten Aufzeichnungen.',1);
+H('ek_grenzwert','Ihr Grenzwert','Die Temperatur, die eine Lieferung höchstens haben darf. Den Wert legt der Chef unter „Vorlagen“ fest. Liegt eine Lieferung darüber, fragt die App nach einer kurzen Notiz.',1);
+H('ek_reinigung','Reinigungsplan','Aufgaben, die täglich, jede Woche oder jeden Monat anfallen. Sie erscheinen an ihrem Tag und bleiben stehen, bis jemand sie abhakt.');
+H('ek_oel','Frittieröl','Hier tragen Sie ein, wann das Öl gewechselt oder geprüft wurde. Die App zeigt, wie lange der letzte Wechsel her ist, und erinnert nach dem Intervall, das der Chef festgelegt hat.');
+H('ek_we','Wareneingang-Temperatur','Die Temperatur der Kühl- und Tiefkühlware bei der Lieferung. Sie tragen sie beim Einbuchen ein oder hier von Hand. Ein Tipp auf einen Eintrag korrigiert ihn, der alte Wert bleibt sichtbar.');
+H('ek_mappe','Monatsmappe','Ein PDF für den Ordner: Temperaturen, Wareneingang, Frittieröl, Reinigungsplan und Checklisten eines Monats, dazu alle Abweichungen auf einem eigenen Blatt. Tage ohne Eintrag bleiben sichtbar leer.');
+H('ek_einstellen','Eigenkontrolle einstellen','Der Chef legt hier die Aufgaben des Reinigungsplans, die Grenzwerte für den Wareneingang und das Intervall für den Ölwechsel fest.');
+HELP_SEL.unshift(['#app .ek-l[data-id="clean"],#app [data-act="ekTick"]','ek_reinigung'], ['#app .ek-l[data-id="oil"],#app [data-act="ekOil"],#app .ek-stat','ek_oel'], ['#app .ek-l[data-id="we"],#app [data-act="ekWeNew"],#app .ek-r','ek_we'],
+  ['#app .ek-tf,#app .ek-ok','ek_grenzwert'], ['#app .ek-tpls li','ek_einstellen'], ['#app .ek-dash,#app .ek-h','eigenkontrolle']);
+HELP.ck_pdf.t = 'Monatsmappe als PDF'; HELP.ck_pdf.x = HELP.ek_mappe.x;
 
 /* ---------- Start ---------- */
 function startApp(){

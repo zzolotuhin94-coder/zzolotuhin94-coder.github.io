@@ -1,7 +1,7 @@
 // Zwei Rollen. Chef: alles. Team: ansehen, Checklisten und Prep-Liste abhaken, eigener Frei-Wunsch, Bestellungen vorbereiten;
 // seit Paket C auch Wareneingang, Schwund und Mitzählen in einer laufenden Inventur (genauer: ctests/c08_rollen.js).
 const L = require('./lib');
-(async () => { const b = await L.launch(); const {p} = await L.open(b, {vp:{width:1440, height:900}});
+(async () => { const b = await L.launch(); const {p} = await L.open(b, {vp:{width:1440, height:900}, init:require('../teamtests/tlib').clock(2026, 11, 12, 10, 30)});   // feste Uhr (Donnerstag, 10:30): der Checklisten-Tag endet um 5 Uhr früh, nach Mitternacht wäre sonst am Ruhetag keine Liste fällig
   await L.go(p, 'einstellungen');
   const who = await p.evaluate(() => ({roles:Object.keys(ROLES).join(), users:[...document.querySelectorAll('#app .who-b')].map(x => x.textContent.replace(/\s+/g, ' ').trim()), txt:document.querySelector('#app').textContent}));
   L.ok(who.roles === 'chef,team' && who.users.length === 2 && /^Chef/.test(who.users[0]) && /^Team/.test(who.users[1]), 'zwei Rollen: Chef und Team', who.users);

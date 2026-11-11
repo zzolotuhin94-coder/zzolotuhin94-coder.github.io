@@ -1,8 +1,12 @@
 // Handy 390: keine Seitenbreite über 390, Tippflächen ≥ 40 px; „So geht’s hier“; Hilfe; Geschwindigkeit mit einem Jahr Daten
 const L=require('../fixtests/lib');const ok=L.ok;
+// feste Uhr: Dienstag, 10.11.2026, 10:30. Die Prep-Liste dieses Tests gilt für übermorgen (Donnerstag, 12.11.): ein offener Tag ohne Aktion.
+// Ohne feste Uhr hing das Ergebnis vom Wochentag ab: montags ist übermorgen Ruhetag (keine Zeilen), mittwochs und donnerstags
+// fällt übermorgen in das Beispiel-„Wildwochenende“ (Freitag bis Sonntag), das zwei Gerichte mehr in die Prognose bringt (74 statt 72).
+const CLOCK=require('../teamtests/tlib').clock(2026,11,10,10,30);
 (async()=>{
 // ---------- Desktop ----------
-{const {b,p,errs}=await L.open({});const ev=(f,a)=>p.evaluate(f,a);const w=ms=>p.waitForTimeout(ms);
+{const {b,p,errs}=await L.open({init:CLOCK});const ev=(f,a)=>p.evaluate(f,a);const w=ms=>p.waitForTimeout(ms);
 // ein volles Jahr: 250 Verkaufstage × 72 Gerichte, jedes Gericht mit Rezeptur
 const big=await ev(()=>{const cards=S.cards.filter(c=>c.type==='dish'&&!c.drink);/* D1: Schankrezepturen sind keine Küchen-Rezepturen */S.menu.forEach((m,i)=>{if(!m.card)m.card=cards[i%cards.length].id;m.seasons=[];m.days=[]});S.salesDays={};let d=todayStr(),n=0,k=0;while(n<250){d=dAdd(d,-1);if(dParse(d).getDay()===3)continue;S.salesDays[d]=S.menu.slice(0,72).map((m,i)=>{const q=1+((i*7+k*3)%9);return [m.id,q,q*m.price]});n++;k++;}save();return {days:Object.keys(S.salesDays).length,dishes:S.salesDays[d].length}});
 const time=async(tab,pre)=>{const out=[];for(let i=0;i<3;i++){out.push(await ev(([tab,pre])=>{go('menu');if(pre)eval(pre);save();/* leert den Zwischenspeicher */const t0=performance.now();go(tab);document.querySelector('#app').offsetHeight;return performance.now()-t0},[tab,pre]));}return Math.round(Math.min(...out));};
@@ -27,7 +31,7 @@ const hp=await ev(()=>{go('vorb');helpApply();const c=[...document.querySelector
 ok(['prognose','spanne','pl_menge','tagesfaktor','mise','prepliste','pl_abhaken','pl_tag','pdf'].every(k=>hp.v.includes(k))&&hp.bad===0&&hp.len.length===0,'help mode: new elements carry explanations; all texts 25–230 characters',hp.v);
 if(errs.length)console.log('errors desktop',JSON.stringify(errs));await b.close();if(errs.length)process.exitCode=1;}
 // ---------- Handy 390 ----------
-{const {b,p,errs}=await L.open({vp:{width:390,height:844},mobile:true,touch:true});const ev=(f,a)=>p.evaluate(f,a);const w=ms=>p.waitForTimeout(ms);
+{const {b,p,errs}=await L.open({vp:{width:390,height:844},mobile:true,touch:true,init:CLOCK});const ev=(f,a)=>p.evaluate(f,a);const w=ms=>p.waitForTimeout(ms);
 const sw=()=>ev(()=>[document.documentElement.scrollWidth,document.body.scrollWidth]);const bad=[];
 const small=()=>ev(()=>[...document.querySelectorAll('#app button,#app input,#app select,#app summary,#app [role=checkbox]')].filter(e=>e.closest('.pl-sec,.pl-days,.pl-how,.pl-dash,[data-pdf="plPrint"]')).filter(e=>{const r=e.getBoundingClientRect();return r.width>0&&r.height>0&&(r.height<39.5||r.width<39.5)}).map(e=>(e.dataset.act||e.className||e.tagName)+' '+Math.round(e.getBoundingClientRect().width)+'×'+Math.round(e.getBoundingClientRect().height)));
 const check=async(name)=>{await w(200);const s=await sw();if(s[0]!==390||s[1]!==390)bad.push(name+' '+s);const sm=await small();if(sm.length)bad.push(name+' klein: '+sm.slice(0,4).join(' | '));};

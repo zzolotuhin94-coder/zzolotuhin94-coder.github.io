@@ -173,6 +173,7 @@ function tmDemoRemove(){
   t.patterns = t.patterns.filter(p => !p.demo);
   Object.keys(c.runs).forEach(D => { Object.keys(c.runs[D]).forEach(k => { if(c.runs[D][k].demo) delete c.runs[D][k]; }); if(!Object.keys(c.runs[D]).length) delete c.runs[D]; });
   const today = isoDate(new Date()); c.templates.forEach(tp => { if(tp.since < today) tp.since = today; });
+  ekDemoRemove();
   t.demo = false;
 }
 
@@ -205,7 +206,7 @@ function teamMigrate(d){
     x.items = (Array.isArray(x.items) ? x.items : []).filter(i => obj(i) && i.id && String(i.t || '').trim()).map(i => { if(i.val && !(obj(i.val) && isFinite(+i.val.min) && isFinite(+i.val.max))) delete i.val; return i; });
     if(!Array.isArray(x.old)) x.old = []; return x; });
   if(!obj(c.runs)) c.runs = {};
-  const cutR = dAdd(today, -CK_KEEP_RUNS);
+  const cutR = dAdd(today, -Math.max(CK_KEEP_RUNS, EK_KEEP_DAYS));   // Eigenkontrolle: mindestens 13 Monate
   Object.keys(c.runs).forEach(D => { if(!TM_DATE.test(D) || D < cutR || !obj(c.runs[D])){ delete c.runs[D]; return; } Object.keys(c.runs[D]).forEach(k => { const r = c.runs[D][k]; if(!obj(r) || !obj(r.items)) delete c.runs[D][k]; }); if(!Object.keys(c.runs[D]).length) delete c.runs[D]; });
   // Beispieldaten: Beispiel-Team dazu, solange noch die Beispieldaten laufen und es noch kein Team gab
   if(fresh && d.demo){ try { tmDemo(d); } catch(e){ console.warn('Team-Beispiel:', e); } }
@@ -669,7 +670,7 @@ function ckRunHtml(tp, D){
   const run = ckRun(D, tp.id) || {items:{}}; const pr = ckProg(tp, D);
   const row = it => { const r = run.items[it.id]; const on = !!r;
     if(it.val){ const bad = on && r.out;
-      return `<li class="ck-i val ${on ? 'on' : ''} ${bad ? 'out' : ''}" data-item="${it.id}"><label class="ck-vl" for="ckv-${it.id}"><span class="ck-box" aria-hidden="true">${ico('check')}</span><span class="ck-t"><span>${esc(it.t)}</span><small>${on ? `${esc(r.b)}, ${r.a} Uhr · ` : ''}erlaubt ${esc(ckRangeTxt(it.val))}${bad && r.note ? ` · <span class="ck-note">${esc(r.note)}</span>` : ''}</small></span></label>
+      return `<li class="ck-i val ${on ? 'on' : ''} ${bad ? 'out' : ''}" data-item="${it.id}"><label class="ck-vl" for="ckv-${it.id}"><span class="ck-box" aria-hidden="true">${ico('check')}</span><span class="ck-t"><span>${esc(it.t)}</span><small>${on ? `${esc(r.b)}, ${r.a} Uhr · ` : ''}erlaubt ${esc(ckRangeTxt(it.val))}${bad && r.note ? ` · <span class="ck-note">${esc(r.note)}</span>` : ''}${on && r.prev && r.prev.length ? ` · korrigiert, vorher <s>${r.prev.map(x => ckVal(x.v)).join(', ')} ${esc(it.val.unit || '')}</s>` : ''}</small></span></label>
         <span class="ck-vin"><input id="ckv-${it.id}" class="num-in ck-v" type="text" inputmode="${+it.val.min < 0 ? 'text' : 'decimal'}" data-num="self" data-ckv="${it.id}" value="${on ? ckVal(r.v) : ''}" placeholder="–" autocomplete="off" aria-label="${esc(it.t)}, Wert in ${esc(it.val.unit || '')}"><span>${esc(it.val.unit || '')}</span></span>
 </li>`; }
     return `<li class="ck-i ${on ? 'on' : ''}" data-item="${it.id}"><button type="button" role="checkbox" aria-checked="${on}" class="ck-c" data-act="ckChk" data-id="${it.id}"><span class="ck-box" aria-hidden="true">${ico('check')}</span><span class="ck-t"><span>${esc(it.t)}</span>${on ? `<small>${esc(r.b)}, ${r.a} Uhr</small>` : ''}</span></button></li>`; };
@@ -682,12 +683,12 @@ function ckRunHtml(tp, D){
 }
 function ckHistDays(n){ const t = ckToday(); const out = []; for(let k = 0; k < (n || 14); k++) out.push(dAdd(t, -k)); return out; }
 function ckHistDetail(D){
-  const due = ckDue(D); if(!due.length) return '<p class="ck-hd-none">An diesem Tag war keine Liste fällig.</p>';
+  const due = ckDue(D); const ek = ekHistDetail(D); if(!due.length) return ek || '<p class="ck-hd-none">An diesem Tag war keine Liste fällig.</p>';
   return due.map(tp => { const run = ckRun(D, tp.id) || {items:{}}; const pr = ckProg(tp, D);
     // erledigte Punkte in der Reihenfolge der Liste, dazu Punkte, die es in der Liste nicht mehr gibt
     const ids = tp.items.map(i => i.id).concat(Object.keys(run.items).filter(id => !tp.items.some(i => i.id === id)));
     return `<div class="ck-hd"><h3>${esc(tp.name)}<span>${pr.done} von ${pr.total} · ${ckStateTxt(pr)}</span></h3><ul>${ids.map(id => { const r = run.items[id]; const it = tp.items.find(i => i.id === id) || (tp.old || []).find(i => i.id === id);
-      return `<li class="${r ? 'on' : 'miss'} ${r && r.out ? 'out' : ''}"><span class="ck-hs" aria-hidden="true">${r ? ico('check') : ''}</span><span class="ck-ht">${esc(ckItemLabel(tp, id))}${r && r.note ? `<small>${esc(r.note)}</small>` : ''}</span>${it && it.val ? `<span class="ck-hv">${it.val ? ckSpark(tp, it, D) : ''}<b>${r && r.v != null ? `${ckVal(r.v)} ${esc(it.val.unit || '')}` : '–'}</b></span>` : ''}<span class="ck-hw">${r ? `${esc(r.b)} · ${r.a}` : pr.over ? 'offen geblieben' : 'offen'}</span></li>`; }).join('')}</ul></div>`; }).join('');
+      return `<li class="${r ? 'on' : 'miss'} ${r && r.out ? 'out' : ''}"><span class="ck-hs" aria-hidden="true">${r ? ico('check') : ''}</span><span class="ck-ht">${esc(ckItemLabel(tp, id))}${r && r.note ? `<small>${esc(r.note)}</small>` : ''}${r && r.prev && r.prev.length ? `<small>korrigiert, vorher ${r.prev.map(x => `${ckVal(x.v)} (${esc(x.b)}, ${x.a})`).join(', ')}</small>` : ''}</span>${it && it.val ? `<span class="ck-hv">${it.val ? ckSpark(tp, it, D) : ''}<b>${r && r.v != null ? `${ckVal(r.v)} ${esc(it.val.unit || '')}` : '–'}</b></span>` : ''}<span class="ck-hw">${r ? `${esc(r.b)} · ${r.a}` : pr.over ? 'offen geblieben' : 'offen'}</span></li>`; }).join('')}</ul></div>`; }).join('') + ek;
 }
 function ckHistHtml(){
   const days = ckHistDays(14); const c = ckS(); const today = ckToday();
@@ -700,38 +701,42 @@ function ckHistHtml(){
     return `<li class="ck-hr ${open ? 'open' : ''} ${tmClosed(D) ? 'closed' : ''}"><button type="button" class="ck-hb" data-act="ckHist" data-id="${D}" aria-expanded="${open}"><span class="ck-hday"><b>${D === today ? 'Heute' : tmDayTxt(D)}</b>${!due.length ? `<small>${tmClosed(D) ? 'Ruhetag' : 'nichts fällig'}</small>` : ''}</span><span class="ck-hcs" style="--n:${tps.length}">${cells}</span></button>${open ? `<div class="ck-hdw">${ckHistDetail(D)}</div>` : ''}</li>`; }).join('');
   return `<div class="ck-hhead"><span class="ck-hday"></span><span class="ck-hcs" style="--n:${tps.length}">${tps.map(tp => `<span>${esc(tp.name)}</span>`).join('')}</span></div>
     <ul class="ck-hist">${rows}</ul>
-    <div class="ck-hpdf"><label class="f">Monat<select data-ckmonth="1" aria-label="Monat für das PDF">${months.map(m => `<option value="${m}" ${m === mSel ? 'selected' : ''}>${MONTHS[+m.slice(5) - 1]} ${m.slice(0, 4)}</option>`).join('')}</select></label><button type="button" class="btn" data-pdf="ckPrint">${ico('download')}Als PDF speichern</button></div>`;
+    <div class="ck-hpdf"><label class="f">Monat<select data-ckmonth="1" aria-label="Monat für das PDF">${months.map(m => `<option value="${m}" ${m === mSel ? 'selected' : ''}>${MONTHS[+m.slice(5) - 1]} ${m.slice(0, 4)}</option>`).join('')}</select></label><button type="button" class="btn" data-pdf="ckPrint">${ico('download')}Monatsmappe als PDF</button></div>`;
 }
 function ckTplListHtml(){
   const c = ckS(); const list = c.templates.filter(t => !t.deleted);
   return `<ul class="ck-tpls">${list.map(tp => { const nv = tp.items.filter(i => i.val).length;
     return `<li class="${tp.active ? '' : 'off'}"><span class="ck-ln"><b>${esc(tp.name)}</b><small>${tp.when === 'weekly' ? `jede Woche am ${DAYNAME[tp.wd]}` : 'jeden Öffnungstag'} · ${plural(tp.items.length, 'Punkt', 'Punkte')}${nv ? `, davon ${plural(nv, 'Messwert', 'Messwerte')}` : ''}${tp.active ? '' : ' · ausgeschaltet'}${tp.sug ? ' · Vorschlag, bitte anpassen' : ''}</small></span><button type="button" class="btn sm" data-act="ckTplEdit" data-id="${tp.id}">Bearbeiten</button></li>`; }).join('')}</ul>
     <button type="button" class="btn" data-act="ckTplNew">${ico('plus')}Neue Liste</button>
+    ${ekTplHtml()}
     <p class="hint ck-tph">Die Listen sind Vorschläge für eine kleine Küche. Passen Sie sie an Ihren Betrieb an. Sie ersetzen keine behördlich verlangten Aufzeichnungen.</p>`;
 }
 function renderCheckl(){
   const c = ckS(); const v = view.ck || (view.ck = {tab:'heute'}); const D = ckToday(); const ro = !canEditAll();
   if(v.tab === 'vorlagen' && ro) v.tab = 'heute';
+  if(v.ek) return ekPageHtml(v.ek, D);
   if(v.run){ const tp = ckTpl(v.run); if(tp && ckDue(D).includes(tp)) return ckRunHtml(tp, D); v.run = null; }
   const due = ckDue(D); const nDone = due.filter(tp => ckProg(tp, D).full).length; const dLong = dParse(D).toLocaleDateString('de-AT', {weekday:'long', day:'numeric', month:'long'});
   const sub = v.tab === 'verlauf' ? 'Die letzten 14 Tage. Tippen Sie auf einen Tag.' : v.tab === 'vorlagen' ? 'Was auf den Listen steht und wann sie fällig sind.' : `${dLong}${due.length ? ` · ${nDone} von ${due.length} ${due.length === 1 ? 'Liste' : 'Listen'} fertig` : ''}`;
   const tabs = [['heute','Heute'],['verlauf','Verlauf']].concat(ro ? [] : [['vorlagen','Vorlagen']]);
   return `<div class="page-h"><div><h1>Checklisten</h1><p class="sub">${esc(sub)}</p></div></div>
     <div class="toolbar ck-tabs"><div class="seg" role="tablist">${tabs.map(([k, l]) => `<button type="button" role="tab" aria-selected="${v.tab === k}" class="${v.tab === k ? 'on' : ''}" data-act="ckTab" data-id="${k}">${l}</button>`).join('')}</div></div>
-    ${v.tab === 'verlauf' ? ckHistHtml() : v.tab === 'vorlagen' ? ckTplListHtml() : ckOverviewHtml(D)}`;
+    ${v.tab === 'verlauf' ? ckHistHtml() : v.tab === 'vorlagen' ? ckTplListHtml() : ckOverviewHtml(D) + ekOverviewHtml(D)}`;
 }
 /* Messwert eintragen: im Bereich sofort, außerhalb mit kurzer Notiz */
 function ckValueInput(inp){
   const v0 = view.ck; const D = ckToday(); const tp = ckTpl(v0.run); if(!tp) return; const it = tp.items.find(i => i.id === inp.dataset.ckv); if(!it || !it.val) return;
   const run = ckRun(D, tp.id); const old = run && run.items[it.id]; const raw = inp.value.trim().replace(/[−–]/g, '-').replace(/\s|°|C$/gi, '');
-  if(raw === ''){ if(old){ ckSet(D, tp, it, null); render(); toast('Wert gelöscht', {action:() => { ckSet(D, tp, it, old); render(); }}); } else inp.value = ''; return; }
+  if(raw === ''){ if(old && !canEditAll()){ inp.value = ckVal(old.v); toast('Einen eingetragenen Wert löscht nur der Chef. Ein falscher Wert lässt sich überschreiben.'); return; } if(old){ ckSet(D, tp, it, null); render(); toast('Wert gelöscht', {action:() => { ckSet(D, tp, it, old); render(); }}); } else inp.value = ''; return; }
   const v = /^-?\d+([.,]\d+)?$/.test(raw) ? numParse(raw) : NaN;
   if(!isFinite(v) || Math.abs(v) > 999){ inp.value = old ? ckVal(old.v) : ''; inp.classList.add('bad-in'); setTimeout(() => inp.classList.remove('bad-in'), 1600); toast('Bitte eine Zahl eingeben, zum Beispiel 3,5 oder -18.'); return; }
   if(old && Math.abs(old.v - v) < 1e-9) { inp.value = ckVal(old.v); return; }
-  const fin = rec => { const full = ckSet(D, tp, it, rec); render(); if(full) toast(`${tp.name}: alles erledigt`); };
-  if(ckInRange(it.val, v)){ fin(ckRec({v})); return; }
+  // Korrektur: der alte Wert bleibt am Eintrag stehen
+  const prev = old ? {prev:(old.prev || []).concat([{v:old.v, b:old.b, a:old.a}]).slice(-6)} : {};
+  const fin = rec => { const full = ckSet(D, tp, it, rec); render(); if(full) toast(`${tp.name}: alles erledigt`); else if(old) toast('Korrektur gespeichert. Der alte Wert bleibt sichtbar.'); };
+  if(ckInRange(it.val, v)){ fin(ckRec({v, ...prev})); return; }
   tmDialog('Wert außerhalb des Bereichs', `<p class="dlg-p"><b>${esc(it.t)}: ${ckVal(v)} ${esc(it.val.unit || '')}</b><br>Erlaubt sind ${esc(ckRangeTxt(it.val))}. Was haben Sie getan?</p><label class="f">Kurze Notiz<input name="note" maxlength="120" placeholder="z. B. Tür war offen, Chef informiert" autocomplete="off"></label>`,
-    (fd, f) => { const note = String(fd.get('note') || '').trim(); if(note.length < 3) return dlgErr(f.elements.note, 'Bitte kurz notieren, was getan wurde.'); setTimeout(() => { const full = ckSet(D, tp, it, ckRec({v, out:1, note})); render(); toast(full ? `${tp.name}: alles erledigt` : 'Wert mit Notiz gespeichert'); }, 0); },
+    (fd, f) => { const note = String(fd.get('note') || '').trim(); if(note.length < 3) return dlgErr(f.elements.note, 'Bitte kurz notieren, was getan wurde.'); setTimeout(() => { const full = ckSet(D, tp, it, ckRec({v, out:1, note, ...prev})); render(); toast(full ? `${tp.name}: alles erledigt` : 'Wert mit Notiz gespeichert'); }, 0); },
     {ok:'Mit Notiz speichern', toast:false});
   $('#dlg').addEventListener('close', () => { if(!ckRun(D, tp.id) || !(ckRun(D, tp.id).items[it.id] && Math.abs(ckRun(D, tp.id).items[it.id].v - v) < 1e-9)) setTimeout(() => { if(view.tab === 'checkl') render(); }, 60); }, {once:true});
 }
@@ -781,22 +786,7 @@ function ckTplDlg(id){
       if(isNew) f.querySelector('[data-ckadd]').click(), f.elements.name.focus();
     }});
 }
-function ckPrintHtml(ym){
-  const c = ckS(); const [y, m] = ym.split('-').map(Number); const nDays = new Date(y, m, 0).getDate(); const today = ckToday(); const days = [];
-  for(let d = 1; d <= nDays; d++){ const D = `${ym}-${String(d).padStart(2, '0')}`; if(D > today) break; const due = ckDue(D); if(due.length) days.push([D, due]); }
-  const body = days.map(([D, due]) => `<tbody><tr class="cp-d"><th colspan="4">${esc(dParse(D).toLocaleDateString('de-AT', {weekday:'long', day:'numeric', month:'long'}))}</th></tr>${due.map(tp => { const run = ckRun(D, tp.id) || {items:{}}; const pr = ckProg(tp, D);
-    const recs = Object.values(run.items); const who = [...new Set(recs.map(r => r.b))].join(', '); const times = recs.map(r => r.a).sort(); const first = times[0], last = times[times.length - 1];
-    const vals = Object.keys(run.items).filter(id => run.items[id].v != null).map(id => { const r = run.items[id]; const it = tp.items.find(i => i.id === id) || (tp.old || []).find(i => i.id === id); return `${esc(ckItemLabel(tp, id))}: <b>${ckVal(r.v)} ${esc(it && it.val ? it.val.unit || '' : '')}</b>${r.out ? ` (außerhalb${r.note ? ': ' + esc(r.note) : ''})` : ''}`; });
-    const open = pr.full ? [] : tp.items.filter(i => !run.items[i.id]).map(i => esc(i.t));
-    return `<tr><td>${esc(tp.name)}</td><td class="cp-n">${pr.done} von ${pr.total}${pr.full ? '' : pr.over ? ' · nicht fertig' : ' · offen'}</td><td>${who ? `${esc(who)}${first ? `, ${first}${last !== first ? '–' + last : ''} Uhr` : ''}` : '–'}</td><td>${vals.join('; ')}${vals.length && open.length ? '<br>' : ''}${open.length ? `<span class="cp-o">Offen: ${open.join('; ')}</span>` : ''}</td></tr>`; }).join('')}</tbody>`).join('');
-  return `<div class="ck-print"><div class="meta"><span>${esc(S.settings.name)}</span><span>Erstellt ${fmtDate(new Date().toISOString())}</span></div>
-    <h1>Checklisten · ${MONTHS[m - 1]} ${y}</h1><p class="cp-sub">Wer was wann abgehakt hat, mit den eingetragenen Messwerten. Eigene Aufzeichnung des Betriebs.</p>
-    ${days.length ? `<table><thead><tr><th>Liste</th><th>Erledigt</th><th>Wer, wann</th><th>Messwerte und Offenes</th></tr></thead>${body}</table>` : '<p>In diesem Monat war keine Liste fällig.</p>'}</div>`;
-}
-function ckPrint(){
-  const sel = document.querySelector('#app [data-ckmonth]'); const ym = (sel && sel.value) || view.ck.month || ckToday().slice(0, 7);
-  const el = $('#print'); PDF_NAME = pdfFileName('Checklisten-' + ym); el.classList.remove('hs-print', 'land'); el.innerHTML = ckPrintHtml(ym); document.body.classList.remove('print-menu', 'print-report'); window.print();
-}
+/* Der Monat als PDF: die Monatsmappe (ckPrint, ckPrintHtml) steht in eigen.js */
 
 /* =====================================================================
    Heute: Team-Zeilen im Tagesblatt
@@ -810,6 +800,7 @@ function tmDashHtml(){
     rows.push(dayRow(n ? num(n) : '–', 'Heute im Dienst', n ? list : tmClosed(t) ? 'Ruhetag, niemand eingeteilt' : 'Noch niemand eingeteilt', gaps.length ? `<span class="tm-gapt">${gaps.join(' und ')} fehlt</span>` : '', `<button type="button" class="btn sm" data-act="tmGo">Dienstplan</button>`, 'tm-dash-who')); }
   ckDue(D).forEach(tp => { const pr = ckProg(tp, D);
     rows.push(dayRow(pr.full ? ico('check') : `${pr.done}/${pr.total}`, esc(tp.name), `${pr.done} von ${pr.total} erledigt${pr.last ? ` · zuletzt ${esc(pr.last.b)}, ${pr.last.a} Uhr` : ''}`, pr.out ? `<span class="bad-t">${pr.out} ${pr.out === 1 ? 'Wert' : 'Werte'} außerhalb</span>` : '', `<button type="button" class="btn sm" data-act="ckGo" data-id="${tp.id}">${pr.full ? 'Ansehen' : 'Abhaken'}</button>`, pr.full ? 'past ck-dash' : 'ck-dash')); });
+  { const ek = ekDashRow(D); if(ek) rows.push(ek); }
   if(!rows.length) return '';
   return daySec('Team', D !== t ? 'Checklisten noch vom Vortag, bis 5 Uhr früh' : 'Dienst und Checklisten', rows.join('')).replace('<section class="day-sec">', '<section class="day-sec tm-dash">');
 }
@@ -846,10 +837,10 @@ document.addEventListener('click', e => {
     case 'tmCopyPrev': tmCopyPrev(v.w); break;
     case 'tmPatterns': tmPatternsDlg(); break;
     case 'tmText': tmCopyText(); break;
-    case 'ckGo': view.ck.tab = 'heute'; view.ck.run = id || null; go('checkl'); break;
-    case 'ckTab': view.ck.tab = id; view.ck.run = null; render(); break;
-    case 'ckOpen': view.ck.run = id; render(); window.scrollTo({top:0}); break;
-    case 'ckBack': view.ck.run = null; render(); window.scrollTo({top:0}); break;
+    case 'ckGo': view.ck.tab = 'heute'; view.ck.run = id || null; view.ck.ek = null; go('checkl'); break;
+    case 'ckTab': view.ck.tab = id; view.ck.run = null; view.ck.ek = null; render(); break;
+    case 'ckOpen': view.ck.run = id; view.ck.ek = null; render(); window.scrollTo({top:0}); break;
+    case 'ckBack': view.ck.run = null; view.ck.ek = null; render(); window.scrollTo({top:0}); break;
     case 'ckChk': ckToggle(id); break;
     case 'ckHist': view.ck.hist = view.ck.hist === id ? null : id; render(); break;
     case 'ckTplEdit': ckTplDlg(id); break;
@@ -920,7 +911,7 @@ palData = function(){
 
 /* Wer den Bereich verlässt, kommt beim nächsten Mal wieder zur Übersicht der Listen */
 const _goTeam = go;
-go = function(tab, card){ if(tab !== 'checkl' && view.ck) view.ck.run = null; return _goTeam(tab, card === undefined ? null : card); };
+go = function(tab, card){ if(tab !== 'checkl' && view.ck){ view.ck.run = null; view.ck.ek = null; } return _goTeam(tab, card === undefined ? null : card); };
 /* Fortschritt der laufenden Liste klebt genau unter der oberen Leiste */
 const _renderTeam = render;
 render = function(){

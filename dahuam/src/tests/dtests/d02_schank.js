@@ -108,7 +108,7 @@ const L = require('./lib'); const fs = require('fs'); const near = (a, b, e = 1e
   L.ok(ir.g[0] === true && ir.g[1] === 'dish' && ir.g[2] === 250 && ir.g[3] === 'Getränke' && ir.g[4] === 'p:t_wein=125,p:t_soda=125' && near(ir.g[5], 1.05), 'Import: 12,5 cl = 125 ml, 125 ml, Ausbeute „0,25 l“ = 250 ml → Schankrezeptur zu € 1,05', ir.g);
   L.ok(ir.s[0] === true && ir.s[1] === '40,20,100,0.25' && near(ir.s[2], 1.6375), 'Import: 4 cl, 2 cl, 0,1 l, ¼ Stk → € 1,6375', ir.s);
   // ---------- Rollen ----------
-  await p.evaluate(() => go('cards', 'k_bier')); await L.team(p); await p.waitForTimeout(300);
+  await p.evaluate(() => { view.cv = 'kalk'; /* seit Paket D2 öffnet das Team ein Rezept in der Küchen-Ansicht; hier geht es um die Kalkulation */ go('cards', 'k_bier'); }); await L.team(p); await p.waitForTimeout(300);
   const ro = await p.evaluate(() => ({dq:document.querySelector('#dq-0').disabled, du:document.querySelector('#app [data-du="0"]').disabled, dref:document.querySelector('#dref-0').disabled, dy:document.querySelector('#dk-y').disabled, line:document.querySelector('#app [data-act=drinkLine]').disabled, size:document.querySelector('#app [data-act=drinkSize]').disabled, note:!!document.querySelector('#app .ro-note')}));
   L.ok(ro.dq && ro.du && ro.dref && ro.dy && ro.line && ro.size && ro.note, 'Team: Schankrezeptur nur ansehen (Artikel, Menge, Einheit, Ausschankmenge, „Artikel“, „Weitere Größe“ gesperrt)', ro);
   await L.go(p, 'rezepte'); L.ok(await p.evaluate(() => { const b = document.querySelector('#app [data-act=newCard]'); newCard('drink'); return b.disabled && !view.card; }), 'Team: keine neue Schankrezeptur');

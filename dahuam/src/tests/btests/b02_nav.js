@@ -7,7 +7,7 @@ const L = require('./lib');
     L.ok(await p.evaluate(() => view.tab === 'dash' && location.hash === '#heute' && document.querySelector('.side .nav-i.on').dataset.tab === 'dash'), 'Start auf „Heute“');
     // Unter-Reiter
     const tabs = async h => { await L.go(p, h); return p.evaluate(() => [...document.querySelectorAll('#app .toolbar.tabs .seg button')].map(x => x.childNodes[0].textContent.trim()).join('|')); };
-    L.ok(await tabs('speisekarte') === 'Gerichte|Gästekarte|Saison & Aktionen', 'Speisekarte: Gerichte · Gästekarte · Saison & Aktionen', await tabs('speisekarte'));
+    L.ok(await tabs('speisekarte') === 'Gerichte|Gästekarte|Saison & Aktionen|Service', 'Speisekarte: Gerichte · Gästekarte · Saison & Aktionen · Service (Paket D2: die Service-Liste ist ein Reiter, kein neuer Bereich)', await tabs('speisekarte'));
     L.ok(await tabs('ware/bestand') === 'Bestand|Bestellen|Lieferanten|Preise|Inventur|Buchungen', 'Ware: sechs Reiter', await tabs('ware/bestand'));
     L.ok(await tabs('team/dienstplan') === 'Dienstplan|Auswertung' && await tabs('team/auswertung') === 'Dienstplan|Auswertung', 'Team & Zahlen: Dienstplan · Auswertung');
     // ein Hauptknopf je Reiter

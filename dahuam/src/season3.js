@@ -1,13 +1,14 @@
 /* ---------- Speisekarte: Gerichte · Gästekarte · Saison & Aktionen ---------- */
 function renderMenu(){
-  if(!['calc','guest','plan'].includes(view.mtab)) view.mtab = 'calc';
+  if(!['calc','guest','plan','service'].includes(view.mtab)) view.mtab = 'calc';
   const live = S.specials.filter(sp => spStatus(sp)[0]==='live').length; const t = view.mtab;
   const btns = t === 'guest' ? `${FRAMED ? '' : `<button type="button" class="btn" data-act="printMenu">${ico('print')}Drucken</button>`}<button type="button" class="btn primary" data-pdf="printMenu">${ico('download')}Als PDF speichern</button>`
     : t === 'plan' ? `<button type="button" class="btn primary" data-act="newSpecial">${ico('plus')}Aktion</button>`
+    : t === 'service' ? `<button type="button" class="btn" data-act="algSheet">${ico('download')}Allergen-Blatt</button>`
     : `<button type="button" class="btn primary" data-act="newMenu">${ico('plus')}Gericht</button>`;
   const head = `<div class="page-h"><div><h1>Speisekarte</h1></div><div class="row-btns">${btns}</div></div>
-  <div class="toolbar tabs">${seg('mtab', t, [['calc','Gerichte',S.menu.length],['guest','Gästekarte'],['plan','Saison & Aktionen', live?'läuft':null]])}</div>`;
-  return head + (t==='guest' ? renderGuest() : t==='plan' ? renderPlan() : renderMenuCalc());
+  <div class="toolbar tabs">${seg('mtab', t, [['calc','Gerichte',S.menu.length],['guest','Gästekarte'],['plan','Saison & Aktionen', live?'läuft':null],['service','Service']])}</div>`;
+  return head + (t==='guest' ? renderGuest() : t==='plan' ? renderPlan() : t==='service' ? renderService() : renderMenuCalc());
 }
 
 function parseMD(v){ const m = String(v).trim().match(/^(\d{1,2})\.(\d{1,2})\.?$/); if(!m) return null; const d = +m[1], mo = +m[2]; if(mo<1||mo>12||d<1||d>31) return null; return `${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }

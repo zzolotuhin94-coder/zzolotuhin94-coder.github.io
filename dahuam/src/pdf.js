@@ -70,6 +70,7 @@ document.addEventListener('click', e => {
   const a = b.dataset.pdf, id = b.dataset.id;
   if(a === 'printMenu'){ const k = typeof curSeasonKey === 'function' ? curSeasonKey() : ''; PDF_NAME = pdfFileName(`Speisekarte-${S.settings.name.split(' ')[0]}-${k ? seasonName(k) : ''}-${view.gdate || todayStr()}`); printMenu(); }
   if(a === 'rpPrint'){ const r = rpRange(view.rp); PDF_NAME = pdfFileName(`Auswertung-${r.from}-${r.to}`); rpPrint(); }
+  if(a === 'printKueche'){ printKitchen(id); }
   if(a === 'printCard'){ const c = C(id); PDF_NAME = pdfFileName('Rezeptur-' + (c ? c.name : id)); printCard(id); }
   if(a === 'printSpecial'){ const sp = S.specials.find(x => x.id === id); PDF_NAME = pdfFileName('Tageskarte-' + (sp ? sp.name : '')); $('#print').innerHTML = tageskarteHtml(sp); document.body.classList.add('print-menu'); window.print(); }
 }, true);

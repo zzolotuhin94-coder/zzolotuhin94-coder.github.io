@@ -50,6 +50,7 @@ function renderDrinkCard(c){
       <td><button type="button" class="icon-btn" data-act="delLine" data-id="${i}" title="Zeile entfernen" aria-label="Zeile entfernen">${ico('x')}</button></td></tr>`; }).join('');
   const onCard = menus.map(m => { const k = menuCalc(m); const v = menuVol(m); return `<li><button type="button" data-act="editMenu" data-id="${m.id}"><span class="dk-on-n"><b>${esc(v ? volTxt(v) : m.vlabel || m.name)}</b>${m.vlabel && v && m.vlabel !== volTxt(v) ? `<small>${esc(m.vlabel)}</small>` : !v && !m.vlabel ? `<small>${esc(m.section)}</small>` : ''}</span><span class="mono">${eur(m.price)}</span><span class="mono dk-on-c">${eur(k.cost)}</span><span class="lt-fc ${fcClass(k.fc)}"><i></i>${k.fc != null ? num(k.fc, 1) + ' %' : '—'}</span></button></li>`; }).join('');
   return `<button type="button" class="back" data-act="backCards">${ico('arrow')}Alle Rezepturen</button>
+  ${rzSwitch(c)}
   <div class="hero">
     <div class="hero-ph">${photo(c.img, c.name, c.category)}<button type="button" class="ph-btn big" data-act="photoCard" data-id="${c.id}">${ico('camera')}<span>${c.img && IMG[c.img] ? 'Foto ändern' : 'Foto hinzufügen'}</span></button>${c.img && IMG[c.img] ? `<button type="button" class="ph-btn del" data-act="photoCardDel" data-id="${c.id}" aria-label="Foto entfernen">${ico('x')}</button>` : ''}</div>
     <div class="hero-main">

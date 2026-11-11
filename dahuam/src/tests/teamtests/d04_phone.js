@@ -77,7 +77,7 @@ await p.tap('#app .ck-hb[data-id="2026-11-08"]');await w(250);ok(await ev(()=>!!
 await ev(()=>{view.ck.tab='vorlagen';render()});await w(200);await check('checklist templates');
 await p.tap('#app [data-act="ckTplEdit"][data-id="ck_open_k"]');await w(300);await checkDlg('edit list dialog');await ev(()=>$('#dlg').close());
 // ---------- Heute ----------
-await ev(()=>go('dash'));await w(300);ok(await ev(()=>!!$('#app .tm-dash')&&document.querySelectorAll('#app .tm-dash .rw').length===5),'Heute on the phone has the team rows');
+await ev(()=>go('dash'));await w(300);ok(await ev(()=>!!$('#app .tm-dash')&&document.querySelectorAll('#app .tm-dash .rw').length===6&&document.querySelectorAll('#app .tm-dash .rw.ek-dash').length===1),'Heute on the phone has the team rows (seit Paket D2 dazu eine Zeile Eigenkontrolle, wenn etwas ansteht)');
 ok(await sw()===390,'Heute: page scrollWidth === 390',await sw());const sm=await small('#app .tm-dash');ok(sm.length===0,'Heute team rows: touch targets ≥ 40 px',sm);
 // ---------- eine Darstellung am Handy ----------
 await ev(()=>go('dienst'));await w(300);ok(await ev(()=>[...document.querySelectorAll('#app .tm-modes button')].map(x=>x.textContent).join()==='Tag,Woche'&&typeof setMode==='undefined'&&!!$('#app .tm-dl')),'phone: Tag and Woche as the two views; the month is under „Mehr Optionen“');await check('Dienstplan');

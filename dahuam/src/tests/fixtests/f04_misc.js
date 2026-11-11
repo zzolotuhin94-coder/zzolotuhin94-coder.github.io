@@ -76,7 +76,7 @@ const ro=async(tab,pre)=>{await ev(pre);await p.waitForTimeout(250);return ev(()
 let r=await ro('menu',()=>{view.mtab='calc';go('menu')});ok(/Chef/.test(r.note)&&r.nprice>10&&r.price===0&&r.btn===0,'team: Speisekarte read-only with one note',r);
 const m0=await ev(()=>S.menu[0].price);await ev(()=>{const i=document.querySelector('input.lt-price');i.disabled=false;i.value='99';i.dispatchEvent(new Event('change',{bubbles:true}))});await p.waitForTimeout(150);ok(await ev(()=>S.menu[0].price)===m0,'team: forced price change is refused');
 r=await ro('products',()=>go('products'));ok(/Chef/.test(r.note)&&r.price===0&&r.btn===0,'team: Preise read-only',r);
-r=await ro('card',()=>go('cards','dish_kaiser'));ok(/Chef/.test(r.note)&&r.inp===0&&r.btn===0,'team: Rezeptur read-only',r);
+r=await ro('card',()=>{view.cv='kalk';/* seit Paket D2 öffnet das Team ein Rezept in der Küchen-Ansicht; hier geht es um die Kalkulation */go('cards','dish_kaiser')});ok(/Chef/.test(r.note)&&r.inp===0&&r.btn===0,'team: Rezeptur read-only',r);
 r=await ro('setup',()=>go('setup'));ok(/Chef/.test(r.note)&&r.inp===0&&r.btn===0,'team: Einstellungen, Beispieldaten, Sicherung laden gesperrt',r);
 ok(await ev(()=>!document.querySelector('#app [data-act=export]').disabled&&[...document.querySelectorAll('.who-b')].every(b=>!b.disabled)),'team: backup export and user switch stay available');
 await ev(()=>{menuDialog(S.menu[0])});ok(!(await ev(()=>$('#dlg').open))&&/nur der Chef/.test(await toastT()),'team: edit dialog via palette refused');

@@ -195,7 +195,7 @@ function injectWozu(){
    Hilfe-Modus „Was ist das?“ und die Erklär-Blase
    ===================================================================== */
 let HELP_ON = false; let BUB = null;
-const HELP_PASS = '[data-tab],[data-act="goTab"],[data-act="goMenu"],[data-act="goStock"],[data-act="goBuyTab"],[data-act="goReportTab"],[data-act="mtab"],[data-act="stab"],[data-act="rpTab"],[data-act="ctype"],[data-act="sec"],[data-act="pFilter"],[data-act="loc"],[data-act="ofilter"],[data-act="backCards"],[data-act="ordBack"],[data-act="openCard"],[data-act="ordOpen"],[data-act="theme"],[data-act="rpUnit"],[data-act="rpStep"],[data-act="rpToday"],[data-act="mehr"],[data-act="mehrClose"],[data-act="guideHere"],[data-act="howClose"],[data-act="wtab"],[data-act="ttab"],summary';
+const HELP_PASS = '[data-tab],[data-act="goTab"],[data-act="goMenu"],[data-act="goStock"],[data-act="goBuyTab"],[data-act="goReportTab"],[data-act="mtab"],[data-act="stab"],[data-act="rpTab"],[data-act="ctype"],[data-act="sec"],[data-act="pFilter"],[data-act="loc"],[data-act="ofilter"],[data-act="backCards"],[data-act="ordBack"],[data-act="openCard"],[data-act="ordOpen"],[data-act="theme"],[data-act="rpUnit"],[data-act="rpStep"],[data-act="rpToday"],[data-act="mehr"],[data-act="mehrClose"],[data-act="guideHere"],[data-act="howClose"],[data-act="wtab"],[data-act="ttab"],[data-act="rzView"],summary';
 function helpApply(scope){
   const root = scope || document;
   root.querySelectorAll('#app th, #app .t-l, #app .panel-h h2, #app .hero small, #app .kv > span:nth-child(odd), #app .fcw small, #app .pc-ex small, #app .ring small, #app dt').forEach(el => {

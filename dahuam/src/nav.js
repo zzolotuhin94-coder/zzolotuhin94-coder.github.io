@@ -91,8 +91,8 @@ const DATEN_HASH = {menu:'speisekarte', prod:'artikel', rec:'rezepturen', team:'
 function hashWant(){
   const t = view.tab;
   if(t === 'daten') return 'einstellungen/eigene-daten' + (view.daten && DATEN_HASH[view.daten.imp] ? '/' + DATEN_HASH[view.daten.imp] : '');
-  if(t === 'cards') return 'rezepte' + (view.card ? '/' + view.card : '');
-  if(t === 'menu') return 'speisekarte' + ({guest:'/gaestekarte', plan:'/saison'}[view.mtab] || '');
+  if(t === 'cards'){ const c = view.card ? C(view.card) : null; const m = c ? rzMode(c) : ''; return 'rezepte' + (c ? '/' + view.card + (m !== rzDefault() ? '/' + RZ_HASH[m] : '') : ''); }
+  if(t === 'menu') return 'speisekarte' + ({guest:'/gaestekarte', plan:'/saison', service:'/service'}[view.mtab] || '');
   if(t === 'stock') return 'ware/' + (['inventur','buchungen'].includes(view.stab) ? view.stab : 'bestand');
   if(t === 'buy') return 'ware/' + (view.stab === 'lieferanten' ? 'lieferanten' : 'bestellen');
   return HASH[t] || 'heute';
@@ -105,8 +105,8 @@ function hashParse(h){
     case 'heute': case 'dash': return {tab:'dash'};
     case 'vorbereitung': case 'vorb': return {tab:'vorb'};
     case 'checklisten': case 'checkl': return {tab:'checkl'};
-    case 'speisekarte': case 'menu': return {tab:'menu', mtab: b === 'gaestekarte' ? 'guest' : b === 'saison' ? 'plan' : 'calc'};
-    case 'rezepte': case 'cards': return {tab:'cards', card: b && C(b) ? b : null};
+    case 'speisekarte': case 'menu': return {tab:'menu', mtab: b === 'gaestekarte' ? 'guest' : b === 'saison' ? 'plan' : b === 'service' ? 'service' : 'calc'};
+    case 'rezepte': case 'cards': { const [cid, mode] = b.split('/'); const cv = Object.keys(RZ_HASH).find(k => RZ_HASH[k] === mode) || null; return {tab:'cards', card: cid && C(cid) ? cid : null, cv: cid && C(cid) ? cv : undefined}; }
     case 'labor': return {tab:'cards'};
     case 'ware': { const w = WARE_TABS.find(x => x[0] === b); if(b === 'preis-check') return {tab:'pcheck'}; return w ? {tab:w[2], stab:w[3] || null} : {tab:'stock', stab:'bestand'}; }
     case 'stock': return {tab:'stock', stab:'bestand'};
@@ -125,8 +125,8 @@ function fromHash(){
   let h = ''; try { h = decodeURIComponent(location.hash.slice(1)); } catch(e){ h = location.hash.slice(1); }
   if(!h) return;
   const r = hashParse(h); if(!r){ hashSync(); return; }
-  const same = r.tab === view.tab && (r.tab !== 'cards' || (r.card || null) === (view.card || null)) && (!r.stab || r.stab === view.stab) && (!r.mtab || r.mtab === view.mtab) && (r.tab !== 'daten' || (r.imp || '') === (view.daten ? view.daten.imp : ''));
-  if(!same){ view = {...view, tab:r.tab, card:r.card || null, q:'', sim:null, daten:null}; if(r.tab === 'daten' && r.imp){ datenOpen(r.imp); hashSync(); return; } if(r.stab) view.stab = r.stab; if(r.mtab) view.mtab = r.mtab; view.order = null; view.recv = null; render(); }
+  const same = r.tab === view.tab && (r.tab !== 'cards' || ((r.card || null) === (view.card || null) && (r.cv === undefined || !r.card || (r.cv || rzDefault()) === rzMode(C(r.card))))) && (!r.stab || r.stab === view.stab) && (!r.mtab || r.mtab === view.mtab) && (r.tab !== 'daten' || (r.imp || '') === (view.daten ? view.daten.imp : ''));
+  if(!same){ view = {...view, tab:r.tab, card:r.card || null, q:'', sim:null, daten:null}; if(r.tab === 'daten' && r.imp){ datenOpen(r.imp); hashSync(); return; } if(r.stab) view.stab = r.stab; if(r.mtab) view.mtab = r.mtab; if(r.tab === 'cards' && r.cv !== undefined) view.cv = r.cv; view.order = null; view.recv = null; render(); }
   hashSync();
 }
 
