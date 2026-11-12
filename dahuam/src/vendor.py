@@ -22,7 +22,8 @@ FONTS = [
 ]
 # variable Schriften: Bereich so begrenzen, wie die Schnitte bisher geladen wurden (gleiches Schriftbild wie vorher)
 WEIGHTS = {'Figtree':'400 700', 'Fraunces':'300 600', 'Caveat':'400 600', 'Schibsted Grotesk':'500 600', 'Source Serif 4':'400 600', 'Cormorant Garamond':'400 600'}
-LIBS = [('html2canvas', 'dist/html2canvas.min.js', 'html2canvas.min.js'), ('jspdf', 'dist/jspdf.umd.min.js', 'jspdf.umd.min.js'), ('xlsx', 'dist/xlsx.full.min.js', 'xlsx.full.min.js')]
+LIBS = [('html2canvas', 'dist/html2canvas.min.js', 'html2canvas.min.js'), ('jspdf', 'dist/jspdf.umd.min.js', 'jspdf.umd.min.js'), ('xlsx', 'dist/xlsx.full.min.js', 'xlsx.full.min.js'),
+        ('zxing-library', 'umd/index.min.js', 'zxing-library.min.js')]   # Strichcode-Leser (scan.js), lädt erst beim Öffnen des Scanners
 css = []; rows = []; files = []
 for prefix, fam, sheets in FONTS:
     p, meta = pkg(prefix); n = 0
@@ -55,7 +56,7 @@ Die vollständigen Lizenztexte liegen im Ordner `licenses/`.
 
 - **OFL-1.1** (SIL Open Font License): Schriften dürfen verwendet, eingebettet und weitergegeben werden; die Lizenz muss beiliegen, die Schriften dürfen nicht einzeln verkauft werden.
 - **MIT** (html2canvas © Niklas von Hertzen, jsPDF © James Hall, yWorks GmbH und Mitwirkende): Verwendung frei, Copyright-Hinweis muss erhalten bleiben.
-- **Apache-2.0** (SheetJS Community Edition © SheetJS LLC): Verwendung frei, Lizenz- und Copyright-Hinweis müssen erhalten bleiben.
+- **Apache-2.0** (SheetJS Community Edition © SheetJS LLC; ZXing © ZXing-Autoren, TypeScript-Fassung © zxing-js-Mitwirkende): Verwendung frei, Lizenz- und Copyright-Hinweis müssen erhalten bleiben.
 
 Von den Schriften sind nur die Teile „latin“ und „latin-ext“ und nur die Schnitte enthalten, die die App zeichnet.
 ''')

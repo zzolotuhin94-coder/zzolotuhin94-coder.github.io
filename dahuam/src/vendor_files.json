@@ -31,5 +31,6 @@
 "vendor/fonts/cormorant-garamond-latin-wght-italic.woff2",
 "vendor/html2canvas.min.js",
 "vendor/jspdf.umd.min.js",
-"vendor/xlsx.full.min.js"
+"vendor/xlsx.full.min.js",
+"vendor/zxing-library.min.js"
 ]

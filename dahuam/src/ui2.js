@@ -534,7 +534,7 @@ function menuDialog(m, prefill){
 }
 
 function prodDialog(p, pre){
-  const isNew = !p; p = p || {id:uid('p'), name:'', unit:'kg', price:'', lossCold:0, lossHot:0, alg:'', algNone:false, pieceG:'', stock:0, minStock:0, loc:'L', supplier:''};
+  const isNew = !p; p = p || {id:uid('p'), name:'', unit:'kg', price:'', lossCold:0, lossHot:0, alg:'', algNone:false, pieceG:'', stock:0, minStock:0, loc:'L', supplier:'', ean:[]};
   const dr = isDrink(p) || !!(isNew && pre && pre.drink); const L0 = dr && +p.gebL > 0 ? +p.gebL : 0;
   const r2 = v => Math.round(v*100)/100;
   openDialog(isNew ? 'Neuer Artikel' : 'Artikel bearbeiten', `
@@ -560,6 +560,7 @@ function prodDialog(p, pre){
       <label class="f">Lagerort<select name="loc">${Object.entries(LOCS).map(([k,l])=>`<option value="${k}" ${(isNew && dr ? 'W' : p.loc)===k?'selected':''}>${l}</option>`).join('')}</select></label>
       <label class="f">Lieferant<select name="supplier"><option value="">— keiner —</option>${(S.suppliers||[]).map(s=>`<option value="${s.id}" ${p.supplier===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select></label>
       <label class="f">Artikelnummer beim Lieferanten<input name="artNo" value="${esc(p.artNo||'')}"></label>
+      ${scanEanField(isNew && pre && pre.ean ? {ean:[pre.ean]} : p)}
       <label class="f" data-k="food">Gebinde<input name="pack" value="${esc(dr ? '' : p.pack||'')}" placeholder="z. B. Sack 10 kg"></label>
       <label class="f" data-k="food">Inhalt Gebinde in ${esc(p.unit)}<input name="packQty" class="num-in" type="text" inputmode="decimal" value="${dr ? '' : numIn(p.packQty||'')}"></label>
       <label class="f"><span data-gl="M">Mindestbestand</span><input name="minStock" class="num-in" type="text" inputmode="decimal" value="${numIn(L0 ? r2((+p.minStock||0)/L0) : p.minStock)}"></label>
@@ -567,8 +568,8 @@ function prodDialog(p, pre){
     </div>
     ${algControlHtml(algClean(p.alg), prodAlgState(p), {note:'„Keine Allergene“ ist eine bestätigte Angabe. „Noch nicht geprüft“ bleibt auf der Karte sichtbar offen.'})}
     <div class="togs" data-k="food"><label class="tog"><input type="checkbox" name="basic" ${p.basic===true?'checked':''}><span></span>Grundzutat wie Salz, Gewürze, Öl: steht nicht auf der Prep-Liste</label></div>`,
-    fd => { const ar = algControlRead(fd); if(!ar) return false;
-      const common = {name:fd.get('name').trim(), alg:ar.alg, algNone:ar.algNone, loc:fd.get('loc'), supplier:fd.get('supplier'), artNo:fd.get('artNo').trim()};
+    fd => { const ar = algControlRead(fd); if(!ar) return false; const ean = scanEanRead(fd, p); if(ean === false) return false;   // Strichcodes: scan.js
+      const common = {name:fd.get('name').trim(), alg:ar.alg, algNone:ar.algNone, loc:fd.get('loc'), supplier:fd.get('supplier'), artNo:fd.get('artNo').trim(), ean};
       if(fd.get('kind') === 'g'){
         const geb = GEB[fd.get('geb')] ? fd.get('geb') : 'fl', L = +fd.get('gebL'), N = geb === 'kiste' ? Math.round(+fd.get('gebN')) : 1, gp = +fd.get('gprice') || 0;
         if(!(L > 0)) return dlgErr('gebL', 'Bitte den Inhalt in Litern eintragen, zum Beispiel 0,75.');
@@ -585,7 +586,7 @@ function prodDialog(p, pre){
       ['geb','gebL','gebN','pfand','pourLoss'].forEach(k => { delete p[k]; });
       if(isNew){ p.stock = 0; S.products.push(p); const s = +fd.get('stock')||0; if(s) addMove('in', p.id, s, 'Anfangsbestand'); } },
     {del: isNew ? null : () => { const u = usage('p:'+p.id); if(u.length) return info('Artikel wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(c=>c.name).join(', ')}. Entfernen Sie es dort zuerst.`); ask(`Artikel „${p.name}“ löschen?`, () => { S.products = S.products.filter(x=>x!==p); }); },
-     after: f => { algControlBind(f);
+     after: f => { algControlBind(f); scanEanBind(f);
       const sync = () => { const g = f.elements.kind.value === 'g'; f.dataset.kind = g ? 'drink' : 'food';
         f.querySelectorAll('[data-k]').forEach(b => { const on = (b.dataset.k === 'drink') === g; b.hidden = !on; b.querySelectorAll('input,select').forEach(i => { i.disabled = !on; }); });
         const geb = f.elements.geb.value, one = GEB[geb] || 'Flasche', kiste = geb === 'kiste';

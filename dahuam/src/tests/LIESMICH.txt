@@ -8,3 +8,4 @@ wtests = Willkommensseite (erster Start, Widmung, Geschenk-Link, Hinweis je Ger�
 gtests = Speisekarte-Gestalter (Vorlagen, Verbindung zur Speisekarte, Verschieben mit Zeiger und Tasten, Spalten, Effekte, Rückgängig, echtes PDF je Vorlage, Allergene, Umstellung alter Stände, Handy/Tablet/Desktop, hell/dunkel). Feste Uhr: Do 12.11.2026.
 atests = Apartments (Buchungen, Kalender-Import .ics, Übersicht, Reinigung, Wechseltag, Heute-Zeile, PDF, Sicherung, Umstellung, Geräte).
 Anleitung (dahuam/Anleitung-DAHUAM202.pdf): ../anleitung/shots.js macht die Bilder, ../anleitung/make.js das PDF; danach build.py.
+scantests = Strichcode-Scanner (Codes und Prüfziffern, Dekoder ZXing mit selbst gezeichneten Strichcodes, künstliche Kamera aus .y4m-Videos, Inventur zählen, Codes lernen, Artikel-Dialog und Import mit Spalte EAN, ohne Kamera, ohne Code zählen, Wareneingang, offline, Geräte). run_all.sh setzt PORT=8774. Bilder nach s-out/ und /home/user/review-out/scan/.
