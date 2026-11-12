@@ -48,8 +48,8 @@ function einkaufSeed(d){
       lines: lines.map(([pid,n,dn,ip,ls]) => { const p = d.products.find(x=>x.id===pid); const f = p.packQty||1; return {pid, n, f, ou:p.packQty?p.pack:p.unit, price:Math.round(p.price*f*100)/100, artNo:p.artNo, delivered: dn ?? null, invPrice: ip ?? null, ls: ls || ''}; }), ...extra}; d.orders.push(o); return o; };
   mk('sup_gross', 6, 'delivered', [['flour',2,2],['sugar',1,1],['oil',1,1],['fries',3,3]], {receipt:{date:daysAgoIso(6), noteNo:'LS 88412', checkedBy:'u_chef', temp:'', photo:''}});
   mk('sup_fleisch', 5, 'delivered', [['pork',10,10],['veal',5,5,34.5],['beef_mince',6,6]], {receipt:{date:daysAgoIso(5), noteNo:'LS 2231', checkedBy:'u_chef', temp:'2,8 °C', photo:''}});
-  mk('sup_wein', 9, 'delivered', [['gv',3,3],['zweigelt',2,2],['kirsch',2,2]], {receipt:{date:daysAgoIso(9), noteNo:'R 2026-1190', checkedBy:'u_bar', temp:'', photo:''}});
-  mk('sup_getraenke', 4, 'delivered', [['bier',2,2],['mineral',3,3],['almdudler',2,2]], {receipt:{date:daysAgoIso(4), noteNo:'LS 55021', checkedBy:'u_bar', temp:'', photo:''}});
+  mk('sup_wein', 9, 'delivered', [['gv',3,3],['zweigelt',2,2],['kirsch',2,2]], {receipt:{date:daysAgoIso(9), noteNo:'R 2026-1190', checkedBy:'u_staff', temp:'', photo:''}});
+  mk('sup_getraenke', 4, 'delivered', [['bier',2,2],['mineral',3,3],['almdudler',2,2]], {receipt:{date:daysAgoIso(4), noteNo:'LS 55021', checkedBy:'u_staff', temp:'', photo:''}});
   mk('sup_baeck', 1, 'delivered', [['brioche',2,2],['bread',6,6]], {receipt:{date:daysAgoIso(1), noteNo:'', checkedBy:'u_staff', temp:'', photo:''}});
   mk('sup_gem', 3, 'complaint', [['potato',1,1],['romaine',4,2,null,'short'],['parsley',1,0,null,'missing'],['lemon',2,2]], {receipt:{date:daysAgoIso(3), noteNo:'ohne Nr.', checkedBy:'u_chef', temp:'', photo:''}, complaint:{status:'open', text:'Römersalat: 2 von 4 kg geliefert. Petersilie fehlt (1 kg). Bitte Gutschrift oder Nachlieferung.'}});
   const mo = mk('sup_molk', 0, 'confirmed', [['milk',2],['cream',1],['butter',2],['bergkase',4]]); mo.confirmedNote = 'Telefonisch bestätigt';
@@ -74,7 +74,7 @@ function einkaufMigrate(d){
   if(idMap[s.currentUser]) s.currentUser = idMap[s.currentUser];
   if(!s.users.some(u => u.id === s.currentUser)) s.currentUser = s.users[0].id;
   if(old4 && d.team && Array.isArray(d.team.people)) d.team.people.forEach(p => { if(!p) return; if(p.user === 'u_owner') p.user = d.team.people.some(x => x && x.user === 'u_chef') ? '' : 'u_chef'; else if(p.user === 'u_bar') p.user = ''; });
-  if(old4) d.orders.forEach(o => { if(!o) return; ['createdBy','sentBy'].forEach(k => { if(idMap[o[k]]) o[k] = idMap[o[k]]; }); if(o.receipt && idMap[o.receipt.by]) o.receipt.by = idMap[o.receipt.by]; });
+  if(old4) d.orders.forEach(o => { if(!o) return; ['createdBy','sentBy'].forEach(k => { if(idMap[o[k]]) o[k] = idMap[o[k]]; }); if(o.receipt && idMap[o.receipt.checkedBy]) o.receipt.checkedBy = idMap[o.receipt.checkedBy]; });
   // Limit und Status 'approval' gibt es nicht mehr: wartende Bestellungen sind wieder Entwürfe
   delete s.orderLimit; d.orders.forEach(o => { if(o && o.status === 'approval') o.status = 'draft'; if(o){ delete o.approvalBy; delete o.approvedBy; delete o.approved; } });
   if(!s.orderNo) s.orderNo = d.orders.length+1;
@@ -84,10 +84,13 @@ function einkaufMigrate(d){
 
 /* ---------- Hilfsfunktionen ---------- */
 const SUP = id => (S.suppliers||[]).find(x=>x.id===id);
-const ORD = id => (S.orders||[]).find(x=>x.id===id);
+/* Neue Bestellung: erst eine Vorschau (ORD_TMP), ein Entwurf entsteht mit der ersten Änderung bzw. beim Senden */
+let ORD_TMP = null;
+const ORD = id => (S.orders||[]).find(x=>x.id===id) || (ORD_TMP && ORD_TMP.id === id ? ORD_TMP : null);
 function supName(p){ const s = SUP(p.supplier); return s ? s.name : (p.supplier || 'kein Lieferant'); }
 function me(){ if(typeof cloudReady==='function' && cloudReady() && CL.member) return {id:CL.session?.user?.id||'cloud', name:CL.member.name, role:roleNorm(CL.member.role)}; return S.settings.users.find(u=>u.id===S.settings.currentUser) || {id:'?', name:'?', role:'chef'}; }
-function userName(id){ const u = (S.settings.users||[]).find(x=>x.id===id); return u ? u.name : (id && id.length > 20 ? 'Team' : id || '—'); }
+const USER_OLD = {u_owner:'u_chef', u_bar:'u_staff'};   // frühere Kennungen (vier Rollen) → heutige
+function userName(id){ const us = S.settings.users||[]; const u = us.find(x=>x.id===id) || us.find(x=>x.id===USER_OLD[id]); return u ? u.name : !id ? '—' : id.length > 20 ? 'Team' : 'unbekannt'; }
 function orderTotal(o){ return o.lines.reduce((t,l)=>t + (+l.n||0)*(+l.price||0), 0); }
 function deliveredTotal(o){ return o.lines.reduce((t,l)=>t + (+(l.delivered ?? l.n)||0)*(+(l.invPrice ?? l.price)||0), 0); }
 function supProducts(sid){ return stockProducts().filter(p=>p.supplier===sid).sort(byName); }
@@ -111,9 +114,38 @@ function priceHistory(pid){ return movesByDate().filter(m=>m.pid===pid && m.type
 function newOrder(sid, fill=true){
   const sp = SUP(sid); const ex = draftFor(sid); if(ex) return ex;
   const o = {id:uid('o'), no:orderNoNext(), supplier:sid, createdAt:new Date().toISOString(), createdBy:me().id, status:'draft', deliveryDate:nextDelivery(sp), note:'', lines:[]};
-  if(fill) lowStock().filter(p=>p.supplier===sid).forEach(p => { const n = packSuggest(p); if(n>0) o.lines.push(lineFor(p,n)); });
+  if(fill) supNeed(sid, o.deliveryDate).forEach(x => o.lines.push(lineFor(x.p, x.n)));
   S.orders.push(o); return o;
 }
+/* Was bei einem Lieferanten nötig ist: unter Mindestbestand (wie bisher) und, wo die Rezepturen es zeigen,
+   was laut Prognose bis zur übernächsten Lieferung fehlt (Lager + bestellte Lieferungen abgezogen). */
+function supNeed(sid, dl){
+  const sp = SUP(sid); if(!sp) return []; const t = todayStr();
+  dl = dl || nextDelivery(sp); const dl2 = nextDelivery(sp, dl);
+  let need = new Map(); try { if(typeof vbNeedUntil === 'function') need = vbNeedUntil(dl2 > dl ? dl2 : dAdd(dl, 1)); } catch(e){ console.warn('Bedarf:', e); }
+  const inc = new Map(); (S.orders||[]).forEach(o => { if(!['sent','confirmed'].includes(o.status) || o.deliveryDate >= dl2 || o.deliveryDate < t) return; (o.lines||[]).forEach(l => inc.set(l.pid, (inc.get(l.pid)||0) + (+l.n||0)*(+l.f||1))); });
+  return supProducts(sid).map(p => { const st = Math.max(0, +p.stock||0);
+    const minQ = (+p.minStock||0) > 0 && st < +p.minStock ? orderSuggest(p) : 0;
+    const fq = Math.max(0, (need.get(p.id)||0) - st - (inc.get(p.id)||0)); const q = Math.max(minQ, fq); if(!(q > 0.0005)) return null;
+    const n = p.packQty ? Math.ceil(q/p.packQty - 1e-9) : p.unit === 'Stk' ? Math.ceil(q - 1e-9) : Math.ceil(q*2 - 1e-9)/2;
+    return n > 0 ? {p, n, prog: fq > minQ} : null; }).filter(Boolean);
+}
+/* Bestellung öffnen: vorhandener Entwurf oder eine Vorschau mit Vorschlag (noch kein Entwurf, keine Nummer verbraucht) */
+function ordStart(sid, fill=true){
+  const ex = draftFor(sid); if(ex) return ex; const sp = SUP(sid);
+  const o = {id:uid('o'), no:`B-${todayStr().slice(0,4)}-${String(S.settings.orderNo||1).padStart(4,'0')}`, supplier:sid, createdAt:new Date().toISOString(), createdBy:me().id, status:'draft', deliveryDate:nextDelivery(sp), note:'', lines:[], tmp:true};
+  if(fill) supNeed(sid, o.deliveryDate).forEach(x => o.lines.push(lineFor(x.p, x.n)));
+  ORD_TMP = o; return o;
+}
+/* aus der Vorschau wird ein Entwurf: beim ersten Speichern, solange die Vorschau offen ist und Positionen hat */
+function ordTmpCommit(force){
+  const o = ORD_TMP; if(!o || (S.orders||[]).includes(o)) { ORD_TMP = null; return; }
+  if(view.order !== o.id && !force) { ORD_TMP = null; return; }
+  if(!force && !o.lines.length && !o.note) return;
+  if(draftFor(o.supplier)){ ORD_TMP = null; return; }
+  o.no = orderNoNext(); o.createdAt = new Date().toISOString(); delete o.tmp; S.orders.push(o); ORD_TMP = null;
+}
+const _saveEk = save; save = function(){ ordTmpCommit(); return _saveEk.apply(this, arguments); };
 function orderText(o){
   if(typeof o === 'string') o = ORD(o);
   const sp = SUP(o.supplier), s = S.settings;
@@ -175,7 +207,7 @@ function orderEditor(o){
   const hasCold = o.lines.some(l => P(l.pid)?.loc === 'K' || P(l.pid)?.loc === 'T');
   const head = `<button type="button" class="back" data-act="ordBack">${ico('arrow')}Alle Bestellungen</button>
   <section class="panel ord-head">
-    <div><h1 class="h-ord">${esc(sp.name)}</h1><div class="muted sm">${esc(o.no)} · ${esc(SUP_CATS[sp.cat]||'')}</div>
+    <div><h1 class="h-ord">${esc(sp.name)}</h1><div class="muted sm">${o.tmp ? 'Neue Bestellung, noch nicht gespeichert' : esc(o.no)} · ${esc(SUP_CATS[sp.cat]||'')}</div>
       <div class="muted sm">${CHANNELS[sp.channel]}${sp.email?' · '+esc(sp.email):''}${sp.phone?' · '+esc(sp.phone):''}${sp.customerNo?' · Kundennr. '+esc(sp.customerNo):''}</div></div>
     <div class="ord-st">${statusPill(o.status)}<span class="muted sm">erstellt ${fmtDate(o.createdAt)} von ${esc(userName(o.createdBy))}${o.sentAt?` · gesendet ${fmtDate(o.sentAt)} via ${esc(o.sentVia||'')}`:''}</span></div>
   </section>`;
@@ -188,6 +220,7 @@ function orderEditor(o){
     ${o.receipt ? `<td class="r mono ${l.ls&&l.ls!=='ok'?'bad-t':''}" data-l="Geliefert">${l.delivered!=null?num(l.delivered,2):'—'}${l.ls&&l.ls!=='ok'?' · '+LSTAT[l.ls]:''}</td>
     <td class="r mono" data-l="Rechnungspreis">${ip != null ? eur(ip) : '—'}${dev != null ? `<small class="dev ${dev>3?'bad-t':dev<0?'good-t':''}">${eur(l.price)} → ${eur(ip)} · ${dev>0?'+':'−'}${num(Math.abs(dev),1)} %</small>` : ''}</td>` : ''}
     <td class="ol-x">${editable?`<button type="button" class="icon-btn" data-act="olDel" data-id="${i}" aria-label="Position entfernen">${ico('x')}</button>`:''}</td></tr>`; }).join('');
+  const emptyTxt = o.tmp ? `Nichts nötig: kein Artikel von ${esc(sp.name)} unter Mindestbestand, und laut Prognose fehlt nichts bis zur nächsten Lieferung. Wenn Sie trotzdem bestellen, fügen Sie unten Artikel hinzu.` : 'Noch keine Positionen.';
   const addable = supProducts(sp.id).filter(p => !o.lines.some(l=>l.pid===p.id));
   const sendBtns = () => { if(!editable) return ''; if(!o.lines.some(l=>+l.n>0)) return '<p class="hint">Fügen Sie mindestens eine Position hinzu.</p>';
     if(block) return `<p class="hint">${esc(block)}</p>`;
@@ -202,11 +235,11 @@ function orderEditor(o){
     b.push(`<button type="button" class="btn" data-act="ordMarkSent" data-id="${o.id}">${sp.channel==='phone'?'Telefonisch bestellt':'Als gesendet markieren'}</button>`);
     return `<div class="send-row">${b.join('')}</div>${view.opened===o.id?`<div class="ok-box">Bestellung im ${esc(view.openedVia||'')} geöffnet? Nach dem Senden hier bestätigen: <button type="button" class="btn sm" data-act="ordMarkSent" data-id="${o.id}">Ja, gesendet</button></div>`:''}`; };
   const below = sp.minOrder && tot < sp.minOrder;
-  return head + `<div class="grid2">
+  return head + `<div class="grid2 ord-grid ${o.receipt ? 'has-rc' : ''}">
     <div class="col">
       <section class="panel flush"><div class="panel-h pad"><h2>Positionen</h2><span class="muted sm">${o.lines.length}</span></div>
         <div class="tbl-wrap"><table class="otab"><thead><tr><th>Artikel</th><th class="r">Menge</th><th class="r">= Einheit</th><th class="r">Preis</th><th class="r">Summe</th>${o.receipt?'<th class="r">Geliefert</th><th class="r">Rechnungspreis</th>':''}<th></th></tr></thead>
-        <tbody>${rows || '<tr><td colspan="6" class="muted">Noch keine Positionen.</td></tr>'}</tbody>
+        <tbody>${rows || `<tr><td colspan="6" class="muted ol-empty">${emptyTxt}</td></tr>`}</tbody>
         <tfoot><tr><td colspan="4">${o.receipt ? 'Summe bestellt, exkl. MwSt.' : 'Summe exkl. MwSt.'}</td><td class="r mono" data-l="${o.receipt ? 'Summe bestellt' : 'Summe'}">${eur(tot)}</td>${o.receipt?`<td class="r muted tf-l">geliefert</td><td class="r mono" data-l="Summe geliefert">${eur(deliveredTotal(o))}</td>`:''}<td class="ol-x"></td></tr>${pf > 0 || pfD > 0 ? `<tr class="pf-row"><td colspan="4">Pfand, kommt mit dem Leergut zurück</td><td class="r mono" data-l="Pfand">${eur(pf)}</td>${o.receipt?`<td class="r muted tf-l">geliefert</td><td class="r mono" data-l="Pfand geliefert">${eur(pfD)}</td>`:''}<td class="ol-x"></td></tr>` : ''}</tfoot></table></div>
         ${editable ? `<div class="panel-f"><select id="olAdd" class="sm-sel" aria-label="Artikel hinzufügen"><option value="">+ Artikel von ${esc(sp.name)} …</option>${addable.map(p=>`<option value="${p.id}">${esc(p.name)}${p.pack?' ('+esc(p.pack)+')':''}</option>`).join('')}</select><button type="button" class="btn sm" data-act="olSuggest" data-id="${o.id}">Vorschlag laden</button></div>` : ''}
       </section>
@@ -259,12 +292,13 @@ function receiveForm(o, hasCold){
 }
 
 /* ---------- Lieferanten ---------- */
+const MONTH_NAMES_EK = ['Jänner','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 function supplierView(){
   const sups = S.suppliers || [];
   return `<div class="lo-grid">${sups.map(sp => { const n = S.products.filter(p=>p.supplier===sp.id).length; const spend = S.orders.filter(o=>o.supplier===sp.id && o.receipt && o.receipt.date.slice(0,7)===todayStr().slice(0,7)).reduce((a,o)=>a+deliveredTotal(o),0); return `<article class="lo ${sp.active?'':'off'}">
     <div class="lo-h"><b>${esc(sp.name)}</b><span class="tag">${CHANNELS[sp.channel]}</span></div>
     <div class="muted sm">${esc(SUP_CATS[sp.cat]||'')} · ${n} Artikel${sp.customerNo?' · Kd.-Nr. '+esc(sp.customerNo):''}</div>
-    <div class="kv"><span>Bestellen</span><span>${DAYS.filter(([i])=>sp.orderDays.includes(i)).map(([,l])=>l).join(' ')} bis ${esc(sp.cutoff)}</span><span>Lieferung</span><span>${DAYS.filter(([i])=>sp.deliveryDays.includes(i)).map(([,l])=>l).join(' ')}</span><span>Mindestwert</span><span>${eur(sp.minOrder)}</span><span>Einkauf diesen Monat</span><span>${eur(spend)}</span></div>
+    <div class="kv"><span>Bestellen</span><span>${DAYS.filter(([i])=>sp.orderDays.includes(i)).map(([,l])=>l).join(' ')} bis ${esc(sp.cutoff)}</span><span>Lieferung</span><span>${DAYS.filter(([i])=>sp.deliveryDays.includes(i)).map(([,l])=>l).join(' ')}</span><span>Mindestwert</span><span>${eur(sp.minOrder)}</span><span>Einkauf ${MONTH_NAMES_EK[new Date().getMonth()]}</span><span>${eur(spend)}</span></div>
     <div class="row-btns"><button type="button" class="btn sm" data-act="supEdit" data-id="${sp.id}">${ico('edit')}Bearbeiten</button><button type="button" class="btn sm" data-act="ordNew" data-id="${sp.id}">${ico('cart')}Bestellen</button></div>
   </article>`; }).join('')}</div>
   ${lgSection()}
@@ -319,26 +353,47 @@ function ordBook(o, ek){
       else o.status = 'delivered';
       view.recv = null; save(); render(); toast((o.status==='complaint' ? `Eingebucht · ${diffs.length + priceUp.length} Abweichungen, Reklamation vorbereitet` : `Eingebucht · ${o.lines.length} Positionen, alles in Ordnung`) + (pfSum > 0 ? ` · Pfand ${eur(pfSum)} beim Leergut vermerkt` : ''));
 }
+/* ---------- Senden: unter Mindestwert oder außerhalb der Bestelltage erst nachfragen ---------- */
+function ordSendWarn(o){
+  const sp = SUP(o.supplier); if(!sp || o.status !== 'draft') return []; const out = []; const tot = orderTotal(o); const t = todayStr();
+  if(+sp.minOrder > 0 && tot < +sp.minOrder - 0.004) out.push(`Die Bestellung hat ${eur(tot)}, der Mindestbestellwert von ${esc(sp.name)} ist ${eur(sp.minOrder)}. Es fehlen ${eur(sp.minOrder - tot)}.`);
+  const days = DAYS.filter(([i]) => sp.orderDays.includes(i)).map(([,l]) => l).join(' ');
+  if(sp.orderDays.length && !sp.orderDays.includes(wd(t))) out.push(`Heute ist kein Bestelltag. ${esc(sp.name)} nimmt Bestellungen ${esc(days)} an.`);
+  else if(sp.orderDays.length && nowMin() > hm(sp.cutoff)) out.push(`Der Annahmeschluss heute war um ${esc(sp.cutoff)} Uhr.`);
+  return out;
+}
+const ORD_SEND_OK = new Set();
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act="ordMarkSent"],[data-act="ordOpened"],[data-act="ordCloudSend"]'); if(!el || el.closest('.ok-box')) return;
+  const oid = el.dataset.act === 'ordOpened' ? String(el.dataset.id).split(':')[0] : el.dataset.id; const o = ORD(oid); if(!o || ORD_SEND_OK.has(o.id)) return;
+  const warn = ordSendWarn(o); if(!warn.length) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  const sel = `#app [data-act="${el.dataset.act}"][data-id="${CSS.escape(el.dataset.id)}"]`;
+  openDialog('Trotzdem senden?', warn.map(w => `<p class="dlg-p">${w}</p>`).join('') + '<p class="dlg-p">Der Lieferant nimmt die Bestellung vielleicht nicht an.</p>',
+    () => { ORD_SEND_OK.add(o.id); setTimeout(() => { const b = document.querySelector(sel); if(b) b.click(); }, 30); }, {ok:'Trotzdem senden', toast:false});
+}, true);
+
 /* ---------- Ereignisse ---------- */
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if(!el) return;
   const id = el.dataset.id;
   switch(el.dataset.act){
-    case 'ordNew': { const o = newOrder(id); view.stab = 'bestellung'; view.order = o.id; view.recv = null; save(); go('stock'); break; }
+    case 'ordNew': { const o = ordStart(id); view.stab = 'bestellung'; view.order = o.id; view.recv = null; go('stock'); break; }
     case 'ordOpen': view.stab = 'bestellung'; view.order = id; view.recv = null; go('stock'); break;
-    case 'ordBack': view.order = null; view.recv = null; view.opened = null; render(); break;
+    case 'ordBack': view.order = null; view.recv = null; view.opened = null; ORD_TMP = null; render(); break;
     case 'ordRe': { const src = ORD(id); const ex = draftFor(src.supplier); const o = ex || newOrder(src.supplier, false); if(!ex){ o.lines = src.lines.map(l => { const p = P(l.pid); return p ? lineFor(p, l.n) : null; }).filter(Boolean); } save(); view.stab = 'bestellung'; view.order = o.id; view.recv = null; go('stock'); toast(ex ? 'Offener Entwurf geöffnet' : `Positionen aus ${src.no} übernommen`); break; }
     case 'ofilter': view.ofilter = id; render(); break;
     case 'olDel': { const o = ORD(view.order); o.lines.splice(+id,1); save(); render(); break; }
-    case 'olSuggest': { const o = ORD(id); let n = 0; lowStock().filter(p=>p.supplier===o.supplier).forEach(p => { if(!o.lines.some(l=>l.pid===p.id)){ const q = packSuggest(p); if(q>0){ o.lines.push(lineFor(p,q)); n++; } } }); save(); render(); toast(n ? `${n} Artikel unter Mindestbestand ergänzt` : 'Alle Artikel unter Mindestbestand sind schon drin'); break; }
-    case 'ordOpened': { const [oid, via] = id.split(':'); view.opened = oid; view.openedVia = via; setTimeout(render, 300); break; }
-    case 'ordMarkSent': { const o = ORD(id); const sp = SUP(o.supplier); o.status = 'sent'; o.sentAt = new Date().toISOString(); o.sentVia = view.opened===o.id ? view.openedVia : CHANNELS[sp.channel]; o.sentBy = me().id; view.opened = null; save(); render(); toast(`${o.no} gesendet · Lieferung ${dayLabel(o.deliveryDate)}`); break; }
-    case 'ordCopy': { const txt = orderText(ORD(id)); const pr = navigator.clipboard?.writeText(txt); const fb = () => openDialog('Bestelltext', `<textarea class="code" readonly id="ordTxt">${esc(txt)}</textarea>`, null, {cancel:'Schließen', after:()=>$('#ordTxt').select()}); if(pr) pr.then(()=>toast('Bestelltext kopiert'), fb); else fb(); break; }
+    case 'olSuggest': { const o = ORD(id); const sp = SUP(o.supplier); let n = 0; const all = supNeed(o.supplier, o.deliveryDate); all.forEach(x => { if(!o.lines.some(l=>l.pid===x.p.id)){ o.lines.push(lineFor(x.p, x.n)); n++; } }); if(n) save(); render();
+      toast(n ? `${n} ${n === 1 ? 'Artikel' : 'Artikel'} ergänzt` : all.length ? 'Der Vorschlag ist schon in der Bestellung' : `Bei ${sp ? sp.name : 'diesem Lieferanten'} ist nichts nötig: nichts unter Mindestbestand, nichts fehlt laut Prognose`); break; }
+    case 'ordOpened': { const [oid, via] = id.split(':'); if(ORD_TMP && ORD_TMP.id === oid){ ordTmpCommit(true); save(); } view.opened = oid; view.openedVia = via; setTimeout(render, 300); break; }
+    case 'ordMarkSent': { const o = ORD(id); const sp = SUP(o.supplier); ORD_SEND_OK.delete(o.id); if(o === ORD_TMP) ordTmpCommit(true); o.status = 'sent'; o.sentAt = new Date().toISOString(); o.sentVia = view.opened===o.id ? view.openedVia : CHANNELS[sp.channel]; o.sentBy = me().id; view.opened = null; save(); render(); toast(`${o.no} gesendet · Lieferung ${dayLabel(o.deliveryDate)}`); break; }
+    case 'ordCopy': { if(ORD_TMP && ORD_TMP.id === id){ ordTmpCommit(true); save(); } const txt = orderText(ORD(id)); const pr = navigator.clipboard?.writeText(txt); const fb = () => openDialog('Bestelltext', `<textarea class="code" readonly id="ordTxt">${esc(txt)}</textarea>`, null, {cancel:'Schließen', after:()=>$('#ordTxt').select()}); if(pr) pr.then(()=>toast('Bestelltext kopiert'), fb); else fb(); break; }
     case 'ordPrint': printOrder(ORD(id)); break;
     case 'ordConfirm': { const o = ORD(id); o.status = 'confirmed'; o.confirmedNote = 'Bestätigung erhalten '+fmtDate(new Date().toISOString()); save(); render(); break; }
     case 'ordDelay': delayDialog(ORD(id)); break;
     case 'ordCancel': ask('Bestellung stornieren? Bitte den Lieferanten auch selbst informieren.', () => { ORD(id).status = 'cancelled'; }, 'Stornieren'); break;
-    case 'ordDel': ask('Entwurf löschen?', () => { S.orders = S.orders.filter(o=>o.id!==id); view.order = null; }); break;
+    case 'ordDel': if(ORD_TMP && ORD_TMP.id === id){ ORD_TMP = null; view.order = null; render(); break; } ask('Entwurf löschen?', () => { S.orders = S.orders.filter(o=>o.id!==id); view.order = null; }); break;
     case 'ordRecv': view.stab = 'bestellung'; view.order = id; view.recv = id; go('stock'); break;
     case 'rCancel': view.recv = null; render(); break;
     case 'rAll': { const o = ORD(id); o.lines.forEach(l => { l.delivered = l.n; l.ls = 'ok'; }); save(); render(); break; }

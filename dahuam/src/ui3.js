@@ -148,8 +148,8 @@ function renderCards(){
 function buyNewDialog(){
   const sups = (S.suppliers||[]).filter(s=>s.active);
   openDialog('Neue Bestellung', `<label class="f">Lieferant<select name="sid">${sups.map(s=>`<option value="${s.id}">${esc(s.name)} · ${esc(SUP_CATS[s.cat]||'')}</option>`).join('')}</select></label>
-    <div class="togs"><label class="tog"><input type="checkbox" name="fill" checked><span></span>Artikel unter Mindestbestand vorschlagen</label></div>`,
-    fd => { const o = newOrder(fd.get('sid'), !!fd.get('fill')); view.stab = 'bestellung'; view.order = o.id; }, {ok:'Anlegen', done:'Entwurf angelegt'});
+    <div class="togs"><label class="tog"><input type="checkbox" name="fill" checked><span></span>Vorschlag laden: unter Mindestbestand und laut Prognose</label></div>`,
+    fd => { const o = ordStart(fd.get('sid'), !!fd.get('fill')); view.stab = 'bestellung'; view.order = o.id; }, {ok:'Öffnen', done:() => ORD_TMP ? 'Nichts nötig. Artikel fügen Sie in der Bestellung hinzu.' : 'Entwurf angelegt'});
 }
 
 /* ---------- Ereignisse ---------- */
