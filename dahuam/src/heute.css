@@ -53,3 +53,5 @@ details.dh-more .rows .rw:first-child{border-top:1px solid var(--line)}
   li.rw.dh-r:has(.dh-x){flex-wrap:wrap;gap:0}
   #app[data-view] .dh .btn.dh-x{margin:-4px 0 12px calc(64px*var(--fz,1) + 12px);min-height:44px}
 }
+/* Tablet und schmale Fenster (bis 900 px, wo die Leiste unten steht): „Öl gewechselt“ ebenfalls mindestens 44 px hoch */
+@media (max-width:900px),(pointer:coarse){#app .dh .btn.dh-x{min-height:44px}}

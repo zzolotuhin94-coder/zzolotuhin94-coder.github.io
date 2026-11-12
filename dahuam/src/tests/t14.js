@@ -25,7 +25,7 @@ await p.focus('[data-grip="1"]');await p.keyboard.press('ArrowLeft');await p.wai
 await p.screenshot({path:'dd-after.png'});
 // mobile touch
 const ctx=await b.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});const m=await ctx.newPage();m.on('pageerror',e=>errs.push('m '+e.message));
-await m.goto(F);await m.waitForTimeout(900);await m.evaluate(id=>{go('cards');view.card=id;render();document.querySelector('.shelf').scrollIntoView({block:'center'})},cid);await m.waitForTimeout(300);
+await m.goto(F);await m.waitForTimeout(900);/* am Handy öffnet eine Rezeptur in der Küchen-Ansicht (phone.js); das Ziehen gehört zur Kalkulation */await m.evaluate(id=>{go('cards');view.card=id;view.cv='kalk';render();document.querySelector('.shelf').scrollIntoView({block:'center'})},cid);await m.waitForTimeout(300);
 console.log('m width',await m.evaluate(()=>document.documentElement.scrollWidth));await m.screenshot({path:'dd-m.png'});
 // simulate touch drag of chip via CDP
 const cdp=await ctx.newCDPSession(m);const c2=await (await m.$('.sh-chip')).boundingBox();const tl=await (await m.$('.ti-add')).boundingBox();

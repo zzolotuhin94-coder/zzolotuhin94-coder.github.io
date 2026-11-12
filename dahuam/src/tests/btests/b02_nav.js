@@ -41,16 +41,17 @@ const L = require('./lib');
     L.ok(/In einem anderen Fenster geöffnet/.test(ro.bar) && ro.ind === 'Nur ansehen' && ro.nav === 9 && ro.appTop >= ro.top, 'zweites Fenster: Zeile „In einem anderen Fenster geöffnet“, Anzeige „Nur ansehen“, Navigation vollständig', ro);
     await B.evaluate(() => { location.hash = '#ware/bestellen'; }); await B.waitForTimeout(250); L.ok(await B.evaluate(() => view.tab === 'buy' && !!document.querySelector('#relBars .rel-bar.info')), 'im zweiten Fenster lässt sich durch die neuen Bereiche blättern, die Zeile bleibt');
     await B.close(); p.errs.length = 0; await p.context().close(); }
-  { const {p} = await L.open(b, L.PHONE);
+  const errs02 = [];
+  { const {p} = await L.open(b, {vp:{width:760, height:1000}, ctx:L.PHONE.ctx});   // 701 bis 900 px: die bisherige schmale Ansicht. Bis 700 px gilt die Handy-Bedienung (phone.js, siehe phonetests)
     const bar = await p.evaluate(() => [...document.querySelectorAll('.bottom .nav-i')].filter(n => n.getClientRects().length).map(n => n.textContent.replace(/\u00ad/g, '').trim() + ':' + (n.dataset.tab || n.dataset.act)));
     // fix-3: Ware (täglich bestellen) statt Checklisten in der Leiste; ein Wort „Vorbereitung“ statt „Prep“; Checklisten unter „Mehr“ und auf „Heute“
-    L.ok(bar.join('|') === 'Heute:dash|Vorbereitung:vorb|Rezepte:cards|Ware:ware|Mehr:mehr', 'Handy: Heute · Vorbereitung · Rezepte · Ware · Mehr', bar);
-    const fit = await p.evaluate(() => [...document.querySelectorAll('.bottom .nav-i')].map(n => { const r = n.getBoundingClientRect(); const s = n.querySelector('span'); return r.left >= 0 && r.right <= 390.5 && r.height >= 44 && s.scrollWidth <= s.clientWidth + 1; }));
-    L.ok(fit.every(Boolean) && await p.evaluate(() => document.documentElement.scrollWidth === 390), 'Handy: alle fünf Punkte passen, kein Wort abgeschnitten, mindestens 44 px hoch', fit);
+    L.ok(bar.join('|') === 'Heute:dash|Vorbereitung:vorb|Rezepte:cards|Ware:ware|Mehr:mehr', 'schmal (760 px): Heute · Vorbereitung · Rezepte · Ware · Mehr', bar);
+    const fit = await p.evaluate(() => [...document.querySelectorAll('.bottom .nav-i')].map(n => { const r = n.getBoundingClientRect(); const s = n.querySelector('span'); return r.left >= 0 && r.right <= 760.5 && r.height >= 44 && s.scrollWidth <= s.clientWidth + 1; }));
+    L.ok(fit.every(Boolean) && await p.evaluate(() => document.documentElement.scrollWidth === 760), 'schmal: alle fünf Punkte passen, kein Wort abgeschnitten, mindestens 44 px hoch', fit);
     await p.click('.bottom .nav-i[data-act="mehr"]'); await p.waitForTimeout(300);
     const sh = await p.evaluate(() => { const m = document.getElementById('mehr'); const box = m.querySelector('.sheet-box').getBoundingClientRect(); return {open:!m.hidden, items:[...m.querySelectorAll('.sheet-i b')].map(x => x.textContent), tab:view.tab, box:[Math.round(box.left), Math.round(box.right), Math.round(box.bottom)], h:[...m.querySelectorAll('.sheet-i')].every(x => x.getBoundingClientRect().height >= 44), exp:document.querySelector('.bottom [data-act="mehr"]').getAttribute('aria-expanded'), role:m.querySelector('.sheet-box').getAttribute('role')}; });
     L.ok(sh.open && sh.items.join('|') === 'Checklisten|Speisekarte|Team & Zahlen|Apartments|Einstellungen|Suche' && sh.tab === 'dash', '„Mehr“ ist ein Blatt mit Checklisten, Speisekarte, Team & Zahlen, Apartments, Einstellungen, Suche; die Seite bleibt, wo sie war', sh);
-    L.ok(sh.box[0] === 0 && sh.box[1] === 390 && sh.box[2] === 844 && sh.h && sh.exp === 'true' && sh.role === 'dialog', 'Blatt füllt die Breite, Zeilen ≥ 44 px, für Vorleser als Dialog');
+    L.ok(sh.box[0] === 0 && sh.box[1] === 760 && sh.box[2] === 1000 && sh.h && sh.exp === 'true' && sh.role === 'dialog', 'Blatt füllt die Breite, Zeilen ≥ 44 px, für Vorleser als Dialog');
     await p.click('#mehr .sheet-i[data-tab="checkl"]'); await p.waitForTimeout(300);
     L.ok(await p.evaluate(() => document.getElementById('mehr').hidden && view.tab === 'checkl' && location.hash === '#checklisten' && document.querySelector('.bottom [data-act="mehr"]').classList.contains('on') && !document.querySelector('.bottom .nav-i[data-tab].on')), 'Tipp auf „Checklisten“: Blatt zu, Checklisten offen, „Mehr“ ist markiert');
     await p.click('.bottom .nav-i[data-act="mehr"]'); await p.waitForTimeout(250); await p.keyboard.press('Escape'); await p.waitForTimeout(200); L.ok(await p.evaluate(() => document.getElementById('mehr').hidden), 'Esc schließt das Blatt');
@@ -59,6 +60,19 @@ const L = require('./lib');
     await p.click('.bottom .nav-i[data-tab="cards"]'); await p.waitForTimeout(250); L.ok(await p.evaluate(() => view.tab === 'cards' && document.querySelector('.bottom .nav-i.on').dataset.tab === 'cards' && !document.querySelector('.bottom [data-act="mehr"]').classList.contains('on')), 'Rezepte direkt in der Leiste');
     // Speicher-Punkt oben
     await p.evaluate(() => { S.settings.name = 'Test B'; save(); }); await L.idle(p); await p.waitForTimeout(900);
-    L.ok(await p.evaluate(() => { const n = document.querySelector('.topbar .save-dot'); return !!n && !n.hidden && /ok/.test(n.className); }), 'Handy: Speicher-Punkt oben zeigt „gespeichert“');
-    await L.done(b, p.errs); }
+    L.ok(await p.evaluate(() => { const n = document.querySelector('.topbar .save-dot'); return !!n && !n.hidden && /ok/.test(n.className); }), 'schmal: Speicher-Punkt oben zeigt „gespeichert“');
+    await p.context().close(); errs02.push(...p.errs); }
+  // Handy (bis 700 px): vier Ziele, „Mehr“ ist eine Seite; der Speicher-Punkt steht auf „Heute“ neben dem Namen
+  { const {p} = await L.open(b, L.PHONE);
+    const bar = await p.evaluate(() => [...document.querySelectorAll('.bottom .nav-i')].filter(n => n.getClientRects().length).map(n => n.textContent.trim()));
+    L.ok(bar.join('|') === 'Heute|Suchen|Bestellen|Mehr', 'Handy: Heute · Suchen · Bestellen · Mehr', bar);
+    const fit = await p.evaluate(() => [...document.querySelectorAll('.bottom .nav-i')].map(n => { const r = n.getBoundingClientRect(); const s = n.querySelector('span'); return r.left >= 0 && r.right <= 390.5 && r.height >= 44 && s.scrollWidth <= s.clientWidth + 1; }));
+    L.ok(fit.every(Boolean) && await p.evaluate(() => document.documentElement.scrollWidth === 390), 'Handy: alle vier Punkte passen, kein Wort abgeschnitten, mindestens 44 px hoch', fit);
+    await p.click('.bottom .nav-i[data-ph="mehr"]'); await p.waitForTimeout(300);
+    L.ok(await p.evaluate(() => location.hash === '#mehr' && view.tab === 'dash' && !!document.querySelector('#app .hy-grp') && !document.querySelector('#mehr:not([hidden])')), 'Handy: „Mehr“ ist eine eigene Seite, kein Blatt');
+    await p.click('.bottom .nav-i[data-ph="heute"]'); await p.waitForTimeout(250);
+    await p.evaluate(() => { S.settings.name = 'Test B2'; save(); }); await L.idle(p); await p.waitForTimeout(900);
+    L.ok(await p.evaluate(() => { const n = document.querySelector('#app .hy-who .save-dot'); return !!n && !n.hidden && /ok/.test(n.className); }), 'Handy: Speicher-Punkt neben dem Namen zeigt „gespeichert“');
+    errs02.push(...p.errs);
+    await L.done(b, errs02); }
 })();

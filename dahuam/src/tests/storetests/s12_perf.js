@@ -36,7 +36,11 @@ const OLD = fs.readFileSync(__dirname + '/../index.before-a.html', 'utf8');
   const n3 = out['nachher 3J'], v3 = out['vorher 3J'], n0 = out['nachher 0J'], v0 = out['vorher 0J'];
   L.ok(n3.save.tBlock < 50 && n3.save.maxSlice < 50, `3 Jahre, 4-fach gedrosselt: save() blockiert ${n3.save.tBlock} ms, längster Block ${n3.save.maxSlice} ms (Ziel < 50; vorher ${v3.save.tBlock} ms)`);
   L.ok(n0.save.tBlock < 50, `Demostand, 4-fach gedrosselt: save() blockiert ${n0.save.tBlock} ms (vorher ${v0.save.tBlock} ms)`);
-  L.ok(n0.start.sichtbar < v0.start.sichtbar + 150 && n3.start.sichtbar < v3.start.sichtbar + 250, `Start, 4-fach gedrosselt, App sichtbar: Demostand ${v0.start.sichtbar} → ${n0.start.sichtbar} ms, 3 Jahre ${v3.start.sichtbar} → ${n3.start.sichtbar} ms`);
+  /* Zusammenführung fix-5: bei 390 px ist die erste Seite jetzt „Heute“ der Handy-Bedienung (phone.js/phone.css). Gemessen (4-fach gedrosselt, Median aus 7):
+     derselbe Stand ohne phone.js/phone.css Demostand +75 … +103 ms, mit +142 … +183 ms. Das Mehr ist kein JavaScript (Heute am Handy rechnet kalt 19 ms, das Tagesblatt aus fix-3 25 ms),
+     sondern Lesen von rund 94 KB mehr Quelltext und Stil/Layout der größeren Handy-Seite; die erzwungene zusätzliche Stilberechnung beim Zeichnen ist entfernt (phone.js phThemeColor, phMarks).
+     Grenze für den Demostand daher +200 statt +150 ms; die Grenze für 3 Jahre (+250) bleibt. */
+  L.ok(n0.start.sichtbar < v0.start.sichtbar + 200 && n3.start.sichtbar < v3.start.sichtbar + 250, `Start, 4-fach gedrosselt, App sichtbar: Demostand ${v0.start.sichtbar} → ${n0.start.sichtbar} ms, 3 Jahre ${v3.start.sichtbar} → ${n3.start.sichtbar} ms`);
   console.log(`  info  erstes Bild überhaupt (FCP): Demostand ${v0.start.fcp} → ${n0.start.fcp} ms, 3 Jahre ${v3.start.fcp} → ${n3.start.fcp} ms. Vorher erschien zuerst die leere Hülle (Seitenleiste), jetzt bleibt der Hintergrund stehen, bis die Daten da sind.`);
   console.log('  info  In der Vorher-Messung waren die Google-Schriften gesperrt (kein Netz im Test); nachher werden die eigenen Schriftdateien wirklich geladen (rund 30 ms bei 4-facher Drossel).');
   fs.writeFileSync(__dirname + '/perf.json', JSON.stringify(out, null, 1));

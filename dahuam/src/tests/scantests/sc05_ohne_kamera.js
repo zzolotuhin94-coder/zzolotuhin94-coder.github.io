@@ -54,7 +54,7 @@ const INSECURE = () => { Object.defineProperty(window, 'isSecureContext', {get:(
   // ---------- ohne Strichcode zählen ----------
   { const b = await L.launch(); const {p} = await L.open(b, {...L.PHONE}); const ev = (f, a) => p.evaluate(f, a);
     await ev(() => { S.invDraft = {date:new Date().toISOString(), counts:{}}; save(); }); await L.go(p, 'ware/inventur');
-    await p.click('#app [data-scan="invList"]'); await p.waitForTimeout(250);
+    await ev(() => scanOpen('inv', {list:true})); await p.waitForTimeout(250);   // „Ohne Code zählen“ des Scanners (am Handy zählt die Inventur-Seite ohne Code Ort für Ort, phone.js)
     const l = await ev(() => ({layer:__scan.layer, cam:__scan.stream, grp:[...document.querySelectorAll('#scLs .sc-grp span')].map(x => x.textContent), first:document.querySelector('#scLs .sc-row').dataset.id, sub:document.querySelector('#scLsub').textContent, h:document.querySelector('#scSheet').getBoundingClientRect().height, rowH:document.querySelector('#scLs .sc-row').getBoundingClientRect().height}));
     L.ok(l.layer === 'list' && !l.cam && l.grp.join('|') === 'Kühlhaus|Tiefkühler|Trockenlager|Gemüselager|Bar & Weinkeller' && l.sub === '0 von 65 gezählt', 'Liste ohne Kamera: nach Lagerort wie die Zählliste, Fortschritt oben', l);
     L.ok(l.h > 760 && l.rowH >= 56, 'ganze Höhe, Zeilen mindestens 56 px hoch (mit dem Daumen gut zu treffen)', l);
@@ -73,7 +73,7 @@ const INSECURE = () => { Object.defineProperty(window, 'isSecureContext', {get:(
     await p.click('#scSheet [data-sc="toCam"]'); await L.wait(p, () => __scan.cam && __scan.cam !== '');
     L.ok(await ev(() => __scan.camWanted && __scan.layer === null), '„Mit Kamera scannen“ schaltet auf die Kamera um');
     await p.click('#scan [data-sc="close"]'); await p.waitForTimeout(250);
-    L.ok(await ev(f => document.querySelector('#inv-' + f).value === '1,5' && document.querySelector('#invProg').textContent === '2 / 65', first), 'Zählliste der Seite zeigt die Werte');
+    L.ok(await ev(f => S.invDraft.counts[f] === 1.5 && document.querySelector('#app [data-act="phInvLoc"][data-id="K"] .hy-n').textContent === '2/21' && /^2 von 65 Artikeln gezählt/.test(document.querySelector('#app .hy-text').textContent), first), 'die Handy-Inventur zeigt den Stand (Kühlhaus 2/21, 2 von 65)');
     // Wareneingang
     const oid = await ev(() => { const o = S.orders.find(x => ['sent', 'confirmed'].includes(x.status) && x.lines.length >= 2); o.lines.forEach((l, i) => { P(l.pid).ean = ['2' + String(i).padStart(11, '0')].map(x => x + gtinCheck(x)); }); save(); view.stab = 'bestellung'; view.order = o.id; view.recv = o.id; go('buy'); return o.id; }); await p.waitForTimeout(250);
     L.ok(await ev(() => !!document.querySelector('#app [data-scan="recv"]')), 'Wareneingang prüfen: Knopf „Scannen“');

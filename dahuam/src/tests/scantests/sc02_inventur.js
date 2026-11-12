@@ -12,7 +12,8 @@ const key = async (p, s) => { for(const k of s) await p.click(`#scSheet .sc-pad 
   { const b = await L.launchCam(fB); const {p} = await L.open(b, {...L.PHONE}); const ev = (f, a) => p.evaluate(f, a);
     await ev(c => { P('butter').ean = [c]; save(); }, cB);
     await L.go(p, 'ware/inventur'); await p.click('#app [data-act="invStart"]'); await p.waitForTimeout(300);
-    L.ok(await ev(() => !!S.invDraft && !!document.querySelector('#app [data-scan="inv"]') && !!document.querySelector('#app [data-scan="invList"]')), 'laufende Inventur: Knöpfe „Scannen“ und „Ohne Code zählen“');
+    // Handy (phone.js): ohne Code zählt man Lagerort für Lagerort; dazu „Mit dem Scanner zählen“. „Ohne Code zählen“ bietet der Scanner selbst (unten in der Kamera)
+    L.ok(await ev(() => !!S.invDraft && !!document.querySelector('#app [data-scan="inv"]') && document.querySelectorAll('#app [data-act="phInvLoc"]').length === 5), 'laufende Inventur am Handy: „Mit dem Scanner zählen“ neben den fünf Lagerorten');
     const big = await ev(() => { const r = document.querySelector('#app [data-scan="inv"]').getBoundingClientRect(); return r.height >= 48 && r.width >= 150; }); L.ok(big, 'große Tippfläche für „Scannen“');
     await p.click('#app [data-scan="inv"]');
     await L.wait(p, () => __scan.layer === 'count');
@@ -40,8 +41,8 @@ const key = async (p, s) => { for(const k of s) await p.click(`#scSheet .sc-pad 
     L.ok(await ev(() => S.invDraft.counts.butter) === 6.5 && /zurückgenommen/.test(await L.txt(p, '#scLast')), 'Rückgängig: wieder 6,5 kg');
     // schließen: die Zählliste zeigt den Wert
     await p.click('#scan [data-sc="close"]'); await p.waitForTimeout(250);
-    const s4 = await ev(() => ({open:__scan.open, hidden:document.querySelector('#scan').hidden, cam:!!document.querySelector('#scVideo').srcObject, v:document.querySelector('#inv-butter').value, prog:document.querySelector('#invProg').textContent, inert:document.querySelectorAll('[inert]').length, lock:document.documentElement.classList.contains('sc-open')}));
-    L.ok(!s4.open && s4.hidden && !s4.cam && s4.v === '6,5' && s4.prog === '1 / 65' && !s4.inert && !s4.lock, 'Schließen: Kamera aus, Zählliste zeigt 6,5 bei Butter, Fortschritt 1 / 65', s4);
+    const s4 = await ev(() => ({open:__scan.open, hidden:document.querySelector('#scan').hidden, cam:!!document.querySelector('#scVideo').srcObject, v:document.querySelector('#app [data-act="phInvLoc"][data-id="K"] .hy-n').textContent, prog:document.querySelector('#app .hy-text').textContent, inert:document.querySelectorAll('[inert]').length, lock:document.documentElement.classList.contains('sc-open')}));
+    L.ok(!s4.open && s4.hidden && !s4.cam && s4.v === '1/21' && /^1 von 65 Artikeln gezählt/.test(s4.prog) && !s4.inert && !s4.lock, 'Schließen: Kamera aus, die Handy-Inventur zeigt Kühlhaus 1/21 und 1 von 65 gezählt', s4);
     // Team zählt mit; Escape schließt
     await L.team(p); await L.go(p, 'ware/inventur');
     L.ok(await ev(() => !document.querySelector('#app [data-scan="inv"]').disabled), 'Team: „Scannen“ ist frei');

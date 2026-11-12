@@ -46,13 +46,13 @@ const L = require('./lib');
     L.ok(p.errs.length === 0, 'Desktop: keine Fehler', p.errs); await p.context().close(); }
   // ---------- Handy ----------
   { const {p} = await L.open(b, {...L.PHONE}); const ev = (f, a) => p.evaluate(f, a);
-    const bar = await ev(() => [...document.querySelectorAll('.bottom .nav-i')].filter(n => n.getClientRects().length).map(n => n.textContent.replace(/\u00ad/g, '').trim()));
-    L.ok(bar.join('|') === 'Heute|Vorbereitung|Rezepte|Ware|Mehr', 'Handy: untere Leiste unverändert (Apartments unter „Mehr“)', bar);
-    await p.click('.bottom .nav-i[data-act="mehr"]'); await p.waitForTimeout(250);
-    const sh = await ev(() => [...document.querySelectorAll('#mehr .sheet-i b')].map(x => x.textContent));
-    L.ok(sh.join('|') === 'Checklisten|Speisekarte|Team & Zahlen|Apartments|Einstellungen|Suche' /* fix-3: Ware in der Leiste, Checklisten unter „Mehr“ */, '„Mehr“ enthält „Apartments“', sh);
-    await p.click('#mehr .sheet-i[data-tab="apart"]'); await p.waitForTimeout(300);
-    L.ok(await ev(() => view.tab === 'apart' && document.getElementById('mehr').hidden && document.querySelector('.bottom [data-act="mehr"]').classList.contains('on')), 'Tipp: Apartments offen, „Mehr“ markiert');
+    const bar = await ev(() => [...document.querySelectorAll('.bottom .nav-i')].filter(n => n.getClientRects().length).map(n => n.textContent.trim()));
+    L.ok(bar.join('|') === 'Heute|Suchen|Bestellen|Mehr', 'Handy: untere Leiste der Handy-Bedienung (phone.js)', bar);
+    await p.click('.bottom .nav-i[data-ph="mehr"]'); await p.waitForTimeout(250);
+    const sh = await ev(() => [...document.querySelectorAll('#app > .hy-grp .hy-mr > span:first-of-type')].map(x => x.textContent));
+    L.ok(sh.includes('Apartments'), '„Mehr“ enthält „Apartments“', sh);
+    await p.click('#app [data-act="apGo"]'); await p.waitForTimeout(300);
+    L.ok(await ev(() => view.tab === 'apart' && document.querySelector('.bottom .nav-i.on').dataset.ph === 'mehr'), 'Tipp: Apartments offen, „Mehr“ markiert');
     const ph = await ev(() => ({grid:getComputedStyle(document.querySelector('#app .ap-grid')).display, days:[...document.querySelectorAll('#app .ap-days > li')].map(li => li.querySelector('.ap-dh').innerText.replace(/\s+/g, ' ').trim()),
       today:[...document.querySelectorAll('#app .ap-days > li.today .ap-dl')].map(x => x.innerText.replace(/\s+/g, ' ').trim()), wide:document.documentElement.scrollWidth - innerWidth}));
     L.ok(ph.grid === 'none' && ph.days.length === 7 && ph.days[3] === 'Heute 12.11. 2 von 3 belegt' && ph.wide <= 0, 'Handy: Woche als Liste der Tage, heute markiert, nichts breiter als der Bildschirm', ph);

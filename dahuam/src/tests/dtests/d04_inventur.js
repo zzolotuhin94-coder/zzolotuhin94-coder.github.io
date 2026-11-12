@@ -1,6 +1,6 @@
-// Bar-Inventur am Handy: volle Flaschen als ganze Zahl, die angebrochene in Zehnteln, Fass genauso. Ergebnis in Litern für die vorhandene Bestands- und Differenzrechnung.
+// Bar-Inventur in der Zählliste, schmale Ansicht 760 px (bis 700 px zählt das Handy im Blatt mit denselben Zehnteln, siehe phonetests/p02 und p05): volle Flaschen als ganze Zahl, die angebrochene in Zehnteln, Fass genauso. Ergebnis in Litern für die vorhandene Bestands- und Differenzrechnung.
 const L = require('./lib'); const near = (a, b, e = 1e-6) => Math.abs(a - b) < e; const sp = s => String(s).replace(/ /g, ' ').replace(/\s+/g, ' ').trim();
-(async () => { const b = await L.launch(); const {p} = await L.open(b, {vp:L.PHONE.vp, ctx:L.PHONE.ctx});
+(async () => { const b = await L.launch(); const {p} = await L.open(b, {vp:{width:760, height:1000}, ctx:L.PHONE.ctx});
   await L.go(p, 'ware/inventur');
   L.ok(/Getränke zählen Sie in vollen Flaschen oder Fässern, die angebrochene dazu in Zehnteln/.test(await p.evaluate(() => document.querySelector('#app .fact').textContent)), 'vor dem Start: ein Satz erklärt das Zählen der Getränke');
   await p.click('#app [data-act=invStart]'); await p.waitForTimeout(300);
@@ -9,9 +9,9 @@ const L = require('./lib'); const near = (a, b, e = 1e-6) => Math.abs(a - b) < e
   L.ok(sec.n === 12 && sec.bars === 9 && sec.plain === 'Kaffeebohnen|Kirschwasser|Kochwein weiß, trocken', 'Abschnitt „Bar & Weinkeller“: 9 Getränke mit Flaschen-Zählung, Kaffee und Kochzutaten wie bisher', sec);
   // Maße am Handy
   const m = await p.evaluate(() => { const bad = []; document.querySelectorAll('#app .inv-l li.bar').forEach(li => { const r = li.getBoundingClientRect(); const inp = li.querySelector('input[data-invf]').getBoundingClientRect(); const bs = [...li.querySelectorAll('.inv-t button')]; const br = bs.map(x => x.getBoundingClientRect());
-      if(r.right > 390.5 || inp.height < 44 || bs.length !== 9 || br.some(x => x.right > 390.5 || x.height < 40 || x.width < 28) || br.some((x, i) => i && x.left < br[i - 1].right)) bad.push(li.id); });
+      if(r.right > 760.5 || inp.height < 40 || bs.length !== 9 || br.some(x => x.right > 760.5 || x.height < 28 || x.width < 28) || br.some((x, i) => i && x.left < br[i - 1].right)) bad.push(li.id); });
     return {bad, w:document.documentElement.scrollWidth, txt:[...document.querySelectorAll('#ir-gv .inv-t button')].map(x => x.textContent).join(' '), em:document.querySelector('#ir-gv .inv-q em').textContent + '|' + document.querySelector('#ir-bier .inv-q em').textContent, soll:document.querySelector('#ir-gv .inv-n small').textContent + '|' + document.querySelector('#ir-bier .inv-n small').textContent}; });
-  L.ok(m.bad.length === 0 && m.w === 390, 'Handy 390 px: Feld mindestens 44 px hoch, neun Zehntel-Knöpfe je 40 px hoch, nichts ragt hinaus, kein Querrollen', m);
+  L.ok(m.bad.length === 0 && m.w === 760, 'schmal 760 px: Feld mindestens 40 px hoch, neun Zehntel-Knöpfe, nichts ragt hinaus, kein Querrollen (die Fingermaße 44/40 px prüft am Handy phonetests/p05 und p08)', m);
   L.ok(m.txt === '0,1 0,2 0,3 0,4 0,5 0,6 0,7 0,8 0,9' && m.em === 'Fl.|Fass' && m.soll === 'Soll 8 Fl.|Soll 1,5 Fass', 'Knöpfe 0,1 bis 0,9; Einheit „Fl.“ bzw. „Fass“; Soll in Flaschen und Fässern', [m.txt, m.em, m.soll]);
   await p.evaluate(() => document.querySelector('#ir-apfelsaft').scrollIntoView({block:'start'})); await p.evaluate(() => window.scrollBy(0, -120)); await L.shot(p, 'd04-inventur-handy', {full:false});
   // ---------- Veltliner: 5 volle + 0,3 ----------
@@ -68,5 +68,5 @@ const L = require('./lib'); const near = (a, b, e = 1e-6) => Math.abs(a - b) < e
   L.ok(after.gv === 3.75 && after.bier === 48 && after.zw === 13.65 && after.min === 4.125 && after.pork === before.pork && after.draft === null && after.inv.counted === 5 && near(after.inv.diff, -41.66, 0.006), 'abgeschlossen: Bestände in Litern gesetzt (3,75 · 48 · 13,65 · 4,125), nicht Gezähltes unverändert, Inventur mit −€ 41,66 abgelegt', after);
   L.ok(after.m0 === 'bier:3|gv:-2.25|kaffee:-0.5|mineral:-5.775|zweigelt:-1.35', 'Buchungen „Inventur“ in der Basiseinheit Liter', after.m0);
   await L.go(p, 'ware/buchungen');
-  L.ok(await p.evaluate(() => document.documentElement.scrollWidth === 390 && /−?-?3 Fl\./.test([...document.querySelectorAll('#app .moves li')].find(li => /Grüner Veltliner/.test(li.textContent)).textContent)), 'Buchungen: Differenz Veltliner als −3 Fl. lesbar, Breite 390');
+  L.ok(await p.evaluate(() => document.documentElement.scrollWidth === 760 && /−?-?3 Fl\./.test([...document.querySelectorAll('#app .moves li')].find(li => /Grüner Veltliner/.test(li.textContent)).textContent)), 'Buchungen: Differenz Veltliner als −3 Fl. lesbar, Breite 390');
   await L.done(b, p.errs); })();

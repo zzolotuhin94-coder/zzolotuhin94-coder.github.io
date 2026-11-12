@@ -11,9 +11,10 @@ const tiny = p => p.evaluate(() => [...document.querySelectorAll('#app *, .botto
     await L.go(p, 'einstellungen');
     const pan = await ev(() => { const s = document.querySelector('#setupAnzeige'); return s ? {h:s.querySelector('h2').textContent, opts:[...s.querySelectorAll('[data-act="ansFz"]')].map(x => x.textContent.trim()), on:s.querySelector('[data-act="ansFz"].on').textContent.trim()} : null; });
     L.ok(pan && pan.h === 'Anzeige' && pan.opts.join('|') === 'Normal|Groß|Sehr groß' && pan.on === 'Normal', 'Einstellungen › Anzeige: Schriftgröße Normal / Groß / Sehr groß', pan);
-    await L.go(p, 'heute'); const m0 = await ev(() => ({body:parseFloat(getComputedStyle(document.body).fontSize), h1:parseFloat(getComputedStyle(document.querySelector('#app h1')).fontSize), row:parseFloat(getComputedStyle(document.querySelector('#app .dh-b .rw-main b')).fontSize), sub:parseFloat(getComputedStyle(document.querySelector('#app .dh-b .rw-main small')).fontSize)}));
+    // Handy (phone.js): dieselbe Messung an den Zeilen der Handy-Bedienung (phone.css geht durch dieselbe Umrechnung in build.py)
+    await L.go(p, 'heute'); const m0 = await ev(() => ({body:parseFloat(getComputedStyle(document.body).fontSize), h1:parseFloat(getComputedStyle(document.querySelector('#app h1')).fontSize), row:parseFloat(getComputedStyle(document.querySelector('#app .dh-b .rw-main b, #phBoard .hy-row .hy-tm b')).fontSize), sub:parseFloat(getComputedStyle(document.querySelector('#app .dh-b .rw-main small, #phBoard .hy-row .hy-tm small')).fontSize)}));
     await L.go(p, 'einstellungen'); await p.click('#setupAnzeige [data-act="ansFz"][data-id="3"]'); await p.waitForTimeout(200);
-    await L.go(p, 'heute'); const m3 = await ev(() => ({fz:document.documentElement.dataset.fz, body:parseFloat(getComputedStyle(document.body).fontSize), h1:parseFloat(getComputedStyle(document.querySelector('#app h1')).fontSize), row:parseFloat(getComputedStyle(document.querySelector('#app .dh-b .rw-main b')).fontSize), sub:parseFloat(getComputedStyle(document.querySelector('#app .dh-b .rw-main small')).fontSize)}));
+    await L.go(p, 'heute'); const m3 = await ev(() => ({fz:document.documentElement.dataset.fz, body:parseFloat(getComputedStyle(document.body).fontSize), h1:parseFloat(getComputedStyle(document.querySelector('#app h1')).fontSize), row:parseFloat(getComputedStyle(document.querySelector('#app .dh-b .rw-main b, #phBoard .hy-row .hy-tm b')).fontSize), sub:parseFloat(getComputedStyle(document.querySelector('#app .dh-b .rw-main small, #phBoard .hy-row .hy-tm small')).fontSize)}));
     const r = k => Math.round(m3[k] / m0[k] * 100) / 100;
     L.ok(m3.fz === '3' && r('body') === 1.25 && r('h1') === 1.25 && r('row') >= 1.2 && r('sub') >= 1.2, '„Sehr groß“: die ganze Oberfläche wird 25 % größer (Grundschrift, Überschrift, Zeilen, Nebentext)', {m0, m3});
     await p.reload(); await L.ready(p); L.ok(await ev(() => document.documentElement.dataset.fz === '3'), 'die Wahl bleibt auf diesem Gerät gespeichert');
@@ -23,16 +24,20 @@ const tiny = p => p.evaluate(() => [...document.querySelectorAll('#app *, .botto
     await L.go(p, 'heute'); await L.shot(p, 'nachher-heute-sehr-gross');
     await ev(() => { fzSet('1'); }); errs.push(...p.errs); await p.context().close(); }
   // ---------- untere Leiste: schmal (Zoom) und große Schrift ----------
-  for(const fz of ['1', '3']) for(const w of [390, 339, 320, 260]){
+  // bis 700 px die vier Ziele der Handy-Bedienung (phone.js), darüber bis 900 px die Leiste aus fix-3
+  for(const fz of ['1', '3']) for(const w of [760, 390, 339, 320, 260]){
     const {p} = await L.open(b, {vp:{width:w, height:700}, ctx:{isMobile:true, hasTouch:true}, init:`try{localStorage.setItem('dahuam202_fz','${fz}')}catch(e){}`});
     const r = await p.evaluate(() => { const bar = document.querySelector('.bottom'); const items = [...bar.querySelectorAll('.nav-i')]; return {vw:innerWidth, sw:document.documentElement.scrollWidth, bw:Math.round(bar.getBoundingClientRect().width), bottom:Math.round(bar.getBoundingClientRect().bottom), vh:innerHeight, labels:items.map(i => i.textContent.replace(/­/g, '')), clip:items.filter(i => { const s = i.querySelector('span'); return s.scrollWidth > s.clientWidth + 1 || i.scrollWidth > i.clientWidth + 1 || i.getBoundingClientRect().right > innerWidth + 0.5; }).map(i => i.textContent), fs:Math.min(...items.map(i => parseFloat(getComputedStyle(i).fontSize))), op:getComputedStyle(bar).backgroundColor}; });
-    L.ok(r.sw === r.vw && r.bw === r.vw && r.bottom === r.vh && r.clip.length === 0 && r.fs >= 11.9 && r.labels.join('|') === 'Heute|Vorbereitung|Rezepte|Ware|Mehr' && !/rgba\(.*, 0\.\d+\)$/.test(r.op), `untere Leiste ${w} px, Schrift ${fz}: ganz sichtbar, nichts abgeschnitten, mindestens 12 px, deckend`, r);
+    L.ok(r.sw === r.vw && r.bw === r.vw && r.bottom === r.vh && r.clip.length === 0 && r.fs >= 11.9 && r.labels.join('|') === (w > 700 ? 'Heute|Vorbereitung|Rezepte|Ware|Mehr' : 'Heute|Suchen|Bestellen|Mehr') && !/rgba\(.*, 0\.\d+\)$/.test(r.op), `untere Leiste ${w} px, Schrift ${fz}: ganz sichtbar, nichts abgeschnitten, mindestens 12 px, deckend`, r);
     if(w === 320) await L.shot(p, `nachher-leiste-${w}-schrift${fz}`); errs.push(...p.errs); await p.context().close(); }
   // ---------- kein Text unter 12 px; Kontrast ----------
-  for(const dark of [false, true]){
-    const {p} = await L.open(b, {...L.PHONE, dark}); await p.evaluate(CONTRAST); const small = [];
+  // Handy (phone.js) und schmal (701–900 px). Die Kontrast-Messung gilt den Elementen von fix-3 (Tagesblatt, Bestandskarten) und läuft schmal;
+  // die Handy-Bedienung misst ihren Kontrast selbst (phonetests: jede Seite hell und dunkel ≥ 4,5:1).
+  for(const [dev, dv] of [['Handy', L.PHONE], ['schmal', L.NARROW]]) for(const dark of [false, true]){
+    const {p} = await L.open(b, {...dv, dark}); await p.evaluate(CONTRAST); const small = [];
     for(const h of L.SCREENS.filter(x => x !== 'speisekarte/gaestekarte')){ await L.go(p, h); const t = await tiny(p); if(t.length) small.push(h + ': ' + t.join(', ')); }
-    L.ok(small.length === 0, `${dark ? 'dunkel' : 'hell'}: kein Text unter 12 px (Handy, alle Seiten)`, small);
+    L.ok(small.length === 0, `${dark ? 'dunkel' : 'hell'}: kein Text unter 12 px (${dev}, alle Seiten)`, small);
+    if(dev === 'Handy'){ errs.push(...p.errs); await p.context().close(); continue; }
     await L.go(p, 'heute');
     const cr = await p.evaluate(() => ({sub:__cr(document.querySelector('#app .dh-b .rw-main small')), lab:__cr(document.querySelector('#app .dh-l')), lead:__cr(document.querySelector('#app .dh-b .rw-lead')), nav:__cr(document.querySelector('.bottom .nav-i:not(.on)')), navOn:__cr(document.querySelector('.bottom .nav-i.on')), ms:__cr(document.querySelector('#app .dh-ms'))}));
     await L.go(p, 'ware/bestand'); Object.assign(cr, await p.evaluate(() => ({sup:__cr(document.querySelector('#app table.stock td small.muted')), grp:__cr(document.querySelector('#app table.stock tr.grp td small') || document.querySelector('#app table.stock tr.grp td')), fact:__cr(document.querySelector('#app .fact'))})));
