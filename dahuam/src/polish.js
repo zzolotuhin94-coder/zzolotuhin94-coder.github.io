@@ -27,7 +27,9 @@ function renderDash(){
   // Stand je Lieferant kommt aus supToday(), genau wie im Einkauf
   const dueSt = due.map(sp => ({sp, st: supToday(sp)}));
   const openDue = dueSt.filter(x => x.st.state === 'open'), sentDue = dueSt.filter(x => x.st.state === 'sent'), pastDue = dueSt.filter(x => x.st.state === 'past');
-  const orderInfo = !due.length ? 'kein Bestelltag' : openDue.length ? `${openDue.length} ${openDue.length===1?'Bestellung':'Bestellungen'} offen, bis ${esc(openDue[openDue.length-1].sp.cutoff)} Uhr` : pastDue.length ? `Annahmeschluss vorbei${sentDue.length ? `, ${sentDue.length} bestellt` : ''}` : 'alles bestellt';
+  // offen zählt nur, wo etwas nötig ist oder ein Entwurf liegt; Lieferanten ohne Bedarf stehen ruhig darunter
+  const needDue = openDue.filter(x => x.st.draft || supNeed(x.sp.id, x.st.delivery).length);
+  const orderInfo = !due.length ? 'kein Bestelltag' : openDue.length && !needDue.length ? 'heute nichts nötig' : openDue.length ? `${needDue.length} ${needDue.length===1?'Bestellung':'Bestellungen'} offen, bis ${esc(needDue[needDue.length-1].sp.cutoff)} Uhr` : pastDue.length ? `Annahmeschluss vorbei${sentDue.length ? `, ${sentDue.length} bestellt` : ''}` : 'alles bestellt';
   const subParts = [closed ? `${DAYNAME[w]} ist Ruhetag` : 'Servicetag', esc(sTitle), orderInfo];
   const orderRow = ({sp, st}) => {
     const need = st.state === 'sent' || st.draft ? [] : supNeed(sp.id, st.delivery); const val = need.reduce((a,x)=>a+x.n*(x.p.packQty||1)*x.p.price,0);
@@ -58,7 +60,7 @@ function renderDash(){
     <div class="row-btns"><button type="button" class="btn" data-act="sales">Verkäufe buchen</button></div></div>
   ${einrLine()}
   <div class="day">
-    ${openDue.length ? daySec('Bestellen', `${openDue.length} offen, Annahmeschluss`, orderRows + pastLine) : ''}
+    ${openDue.length ? daySec('Bestellen', needDue.length ? `${needDue.length} offen, Annahmeschluss` : 'heute nichts nötig', orderRows + pastLine) : ''}
     ${recvRows ? daySec('Lieferungen prüfen', '', recvRows) : ''}
     ${!openDue.length && (orderRows || pastLine) ? daySec('Bestellen', sentDue.length ? `${sentDue.length} heute bestellt` : 'heute nichts mehr offen', orderRows + pastLine) : ''}
     ${cardRows ? daySec(live.length || dayDishes.length ? 'Heute auf der Karte' : 'Demnächst', '', cardRows) : ''}

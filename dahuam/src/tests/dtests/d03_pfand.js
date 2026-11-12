@@ -15,7 +15,10 @@ const L = require('./lib'); const near = (a, b, e = 1e-6) => Math.abs(a - b) < e
   // Bestellung nur mit Lebensmitteln: keine Pfand-Zeile
   L.ok(await p.evaluate(() => { const o = S.orders.find(x => x.supplier === 'sup_molk'); view.order = o.id; render(); const r = !document.querySelector('#app .pf-row') && !/Pfand/.test(document.querySelector('#app').textContent); view.order = window.__oid; render(); return r; }), 'Bestellung ohne Getränke: das Wort Pfand kommt nicht vor');
   // ---------- senden, Wareneingang: 1 Fass fehlt ----------
-  await p.click('#app [data-act=ordMarkSent]'); await p.waitForTimeout(300); await p.click('#app [data-act=ordRecv]'); await p.waitForTimeout(300);
+  await p.click('#app [data-act=ordMarkSent]'); await p.waitForTimeout(300);
+  // unter dem Mindestbestellwert (199,08 < 300): die App fragt jetzt vor dem Senden
+  L.ok(await p.evaluate(() => document.querySelector('#dlg').open && /Mindestbestellwert/.test(document.querySelector('#dlgForm').textContent)), 'Senden unter dem Mindestbestellwert: Rückfrage'); await L.dlgOk(p); await p.waitForTimeout(300);
+  await p.click('#app [data-act=ordRecv]'); await p.waitForTimeout(300);
   L.ok(/Das Pfand der gelieferten Gebinde wird beim Leergut des Lieferanten vermerkt/.test(await p.evaluate(() => document.querySelector('#app .recv').closest('section').textContent)), 'Wareneingang: ein Satz sagt, dass das Pfand vermerkt wird');
   await p.fill('#rd-0', '1'); await p.keyboard.press('Tab'); await p.waitForTimeout(150);
   const st0 = await p.evaluate(() => ({bier:P('bier').stock, weizen:P('weizen').stock, price:P('bier').price}));

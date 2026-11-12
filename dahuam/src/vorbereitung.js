@@ -161,7 +161,7 @@ function vbShelf(c){
   const v = +m[1].replace(',', '.'); const h = /^(h|std|stunden)/i.test(m[2]) ? v : v * 24; if(!(h > 0)) return null; return {h, d:Math.max(1, Math.ceil(h / 24 - 1e-9))};
 }
 /* letzter Tag, an dem eine Charge vom Tag D noch verwendet wird (72 h: gekocht Do, verwenden bis Sa). Ohne Angabe: null */
-function vbExp(c, D){ const sh = vbShelf(c); return sh ? dAdd(D, sh.d - 1) : null; }
+function vbExp(c, D){ const sh = D ? vbShelf(c) : null; return sh ? dAdd(D, sh.d - 1) : null; }
 /* ---------- „noch da“: Bestand je Basisrezept über die Tage fortgeschrieben ---------- */
 function vbFirst(){ const st = planState(); const cap = dAdd(todayStr(), -7); const ds = Object.values(st.rest).map(r => r.s).concat(Object.keys(st.cook)).filter(Boolean).map(d => d < cap ? cap : d).sort(); return ds[0] || null; }
 function vbLots(D){

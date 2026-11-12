@@ -19,7 +19,8 @@ function gebGuess(pr, old, pq, unitGiven){
   const ratio = old > 0 ? pr / old : null;
   if(ratio != null && Math.abs(ratio / pq - 1) <= 0.35 && Math.abs(ratio - 1) > 0.5) return {guess:'pack', sure:true};
   if(ratio != null && ratio >= 0.6 && ratio <= 1.6) return {guess:'unit', sure:true};
-  return {guess: unitGiven ? 'unit' : 'pack', sure:false};
+  // ohne bisherigen Preis: steht die Einheit (kg, l, Stk) in der Liste, gilt der Preis je Einheit (so steht es in der Vorlage); sonst fragen
+  return unitGiven ? {guess:'unit', sure:true} : {guess:'pack', sure:false};
 }
 /* Preisliste importieren */
 function plMatch(name, art){
