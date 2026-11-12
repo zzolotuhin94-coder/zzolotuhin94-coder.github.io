@@ -1,7 +1,7 @@
 // Anleitung als PDF: node anleitung/make.js  →  dahuam/Anleitung-DAHUAM202.pdf und w-out/anleitung-seite-N.png
 // Vorher (wenn sich die App geändert hat): node anleitung/shots.js (Server auf :8765). Danach python3 build.py (Precache).
 const {chromium} = require('playwright'); const fs = require('fs'); const path = require('path');
-const SITE_DIR = process.env.DAHUAM_SITE || '/home/user/wt-2/dahuam';   // Ordner dahuam/ im Repository
+const SITE_DIR = process.env.DAHUAM_SITE || '/home/user/zzolotuhin94-coder.github.io/dahuam';   // Ordner dahuam/ im Repository
 const OUT_PDF = path.join(SITE_DIR, 'Anleitung-DAHUAM202.pdf');
 const PNG_DIR = path.join(__dirname, '..', 'w-out'); fs.mkdirSync(PNG_DIR, {recursive:true});
 const version = (/APP_VERSION = '([^']+)'/.exec(fs.readFileSync(path.join(__dirname, '..', 'build.py'), 'utf8')) || [])[1] || '';

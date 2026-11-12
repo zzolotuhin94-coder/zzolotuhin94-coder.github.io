@@ -1,6 +1,6 @@
 // Neue Version: wird im Hintergrund geholt, gemeldet, und erst nach „Neu laden“ (oder beim nächsten Start) verwendet. Nie gemischt.
 const L = require('./lib'); const fs = require('fs'); const http = require('http'); const path = require('path');
-const SRC = process.env.SITE || '/home/user/wt-2/dahuam/'; const PORT = 8771;
+const SRC = process.env.SITE || '/home/user/zzolotuhin94-coder.github.io/dahuam/'; const PORT = 8771;
 const MIME = {html:'text/html; charset=utf-8', js:'text/javascript', json:'application/json', webmanifest:'application/manifest+json', png:'image/png', svg:'image/svg+xml', webp:'image/webp', woff2:'font/woff2', md:'text/plain'};
 (async () => {
   const html1 = fs.readFileSync(SRC + 'index.html', 'utf8'), sw1 = fs.readFileSync(SRC + 'sw.js', 'utf8'); const B1 = /APP_BUILD = '([0-9a-f]+)'/.exec(html1)[1]; const B2 = 'ffff' + B1.slice(4);
