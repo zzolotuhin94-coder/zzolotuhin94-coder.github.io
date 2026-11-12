@@ -1,6 +1,6 @@
 const L=require('../fixtests/lib');
 exports.L=L; exports.ok=L.ok; exports.done=L.done;
-exports.URL0='http://127.0.0.1:8765/dahuam/index.html';
+exports.URL0='http://127.0.0.1:8773/dahuam/index.html';
 exports.open=L.open;
 exports.PHONE={vp:{width:390,height:844},mobile:true,touch:true};
 // Zustand des laufenden Rundgangs
