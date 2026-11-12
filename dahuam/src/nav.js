@@ -217,8 +217,10 @@ function renderSetup(){
     </section>
     <section class="panel gd-panel"><div class="panel-h"><h2>Hilfe</h2></div>
       <ul class="gd-rows">
+        <li><span class="gd-r-t"><b>Willkommen</b><small>Die erste Seite: Widmung und drei Schritte zum Start.</small></span><button type="button" class="btn sm" data-act="wlOpen">Öffnen</button></li>
         <li><span class="gd-r-t"><b>Rundgang</b><small>Die täglichen Seiten in fünf Schritten.</small></span><button type="button" class="btn sm" data-act="tourMain">Starten</button></li>
         <li><span class="gd-r-t"><b>Was ist das?</b><small>Einschalten und auf etwas tippen. Die App erklärt es und ändert dabei nichts.</small></span><button type="button" class="btn sm" data-act="helpMode" aria-pressed="${HELP_ON}">${HELP_ON ? 'Ausschalten' : 'Einschalten'}</button></li>
+        ${wlPdfRow()}
         <li><span class="gd-r-t"><b>Einrichtung</b><small>${o.pct >= 100 ? 'Alles eingerichtet.' : `${o.pct} % · ${o.doneN} von ${o.st.length} Schritten fertig.`}</small></span><button type="button" class="btn sm" data-act="goTab" data-id="einr">Öffnen</button></li>
       </ul></section>
     <section class="panel" id="setupDaten"><div class="panel-h"><h2>Sicherung</h2></div>
@@ -238,6 +240,7 @@ function renderSetup(){
   </div>
   <details class="more setup-more" data-more="setup" ${(view.more||{}).setup?'open':''}><summary>Mehr Optionen</summary><div class="setup-grid">
     <section class="panel"><div class="panel-h"><h2>Cloud</h2>${cloud?`<span class="cloud-chip ${cloudState}">${{ok:'synchron',busy:'speichert …',offline:'offline',err:'Fehler',off:''}[cloudState]}</span>`:''}</div>${cloudBox}<p class="hint">${n} Fotos gespeichert.</p></section>
+    ${wlGiftPanel()}
   </div></details>`;
 }
 

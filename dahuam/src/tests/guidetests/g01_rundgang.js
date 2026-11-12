@@ -34,13 +34,13 @@ const {L,ok,done,T,settle,PHONE,URL0}=require('./h');
  t=await T(p);ok(t.title==='Ware'&&/unter „Mehr“/.test(t.text)&&t.found&&t.sw===390,'Handy: „Ware“ zeigt auf „Mehr“ und sagt es dazu',t.text.slice(-40));
  await p.click('#gd [data-gd="skip"]');await settle(p,400);ok(await p.evaluate(()=>!GD.t),'„Überspringen“ beendet');
  await done(b,errs);}
-// ---------- Erster Start: einmal angeboten, als Zeile, nicht als Fenster
-{const {b,p,errs}=await L.open({url:URL0,init:()=>{try{ if(!sessionStorage.getItem('t_once')){ sessionStorage.setItem('t_once','1'); localStorage.removeItem('dahuam202_kueche_de_v1_guide'); } }catch(e){}}});
+// ---------- Erster Start: die Willkommensseite bietet den Rundgang an (seit welcome.js kein eigenes Angebot mehr)
+{const {b,p,errs}=await L.open({url:URL0,init:()=>{try{ if(!sessionStorage.getItem('t_once')){ sessionStorage.setItem('t_once','1'); localStorage.removeItem('dahuam202_kueche_de_v1_guide'); localStorage.removeItem('dahuam202_kueche_de_v1_welcome'); } }catch(e){}}});
  await settle(p,1600);
- const s=await p.evaluate(()=>({toast:document.querySelector('#toast').classList.contains('show')?document.querySelector('#toast').textContent:'',dlg:!!document.querySelector('dialog[open]'),gd:!!document.querySelector('#gd'),intro:!!document.getElementById('intro'),cover:(()=>{const e=document.elementFromPoint(720,300);return e&&!!e.closest('#toast,.reward,dialog')})()}));
- ok(/Rundgang/.test(s.toast)&&!s.dlg&&!s.gd&&!s.intro&&!s.cover,'erster Start: Angebot als Zeile unten, kein Fenster, keine Startanimation, nichts verdeckt den Inhalt',s);
- await p.click('#toast .toast-act');await settle(p);ok(await p.evaluate(()=>!!GD.t&&GD.t.i===0),'der Knopf in der Zeile startet den Rundgang');await p.keyboard.press('Escape');
+ const s=await p.evaluate(()=>({toast:document.querySelector('#toast').classList.contains('show')?document.querySelector('#toast').textContent:'',dlg:!!document.querySelector('dialog[open]'),gd:!!document.querySelector('#gd'),intro:!!document.getElementById('intro'),wl:!!document.getElementById('wl'),tour:!!document.querySelector('#wl [data-wl="tour"]')}));
+ ok(!/Rundgang/.test(s.toast)&&!s.dlg&&!s.gd&&!s.intro&&s.wl&&s.tour,'erster Start: nur die Willkommensseite, darin der Rundgang als Knopf; keine zweite Zeile, kein Fenster, keine Startanimation',s);
+ await p.click('#wl [data-wl="tour"]');await settle(p);ok(await p.evaluate(()=>!!GD.t&&GD.t.i===0&&!document.getElementById('wl')),'der Knopf startet den Rundgang, die Willkommensseite ist zu');await p.keyboard.press('Escape');
  await p.reload();await p.waitForTimeout(1800);
- ok(await p.evaluate(()=>!/Rundgang/.test(document.querySelector('#toast').classList.contains('show')?document.querySelector('#toast').textContent:'')),'beim zweiten Start kein Angebot mehr');
+ ok(await p.evaluate(()=>!/Rundgang/.test(document.querySelector('#toast').classList.contains('show')?document.querySelector('#toast').textContent:'')&&!document.getElementById('wl')),'beim zweiten Start kein Angebot und keine Willkommensseite mehr');
  await done(b,errs);}
 })();

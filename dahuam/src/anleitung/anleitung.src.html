@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="de-AT">
+<head>
+<meta charset="utf-8">
+<title>DAHUAM.202 Küchen-App – Erste Schritte</title>
+<!-- Quelle der Anleitung. make.js setzt __SITE__ ein (Ordner dahuam/) und macht daraus Anleitung-DAHUAM202.pdf. -->
+<style>
+@font-face{font-family:"Figtree";font-weight:400 700;src:url(__SITE__/vendor/fonts/figtree-latin-wght-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+2013-2014,U+2018-201E,U+2022,U+2026,U+20AC,U+203A}
+@font-face{font-family:"Figtree";font-weight:400 700;src:url(__SITE__/vendor/fonts/figtree-latin-ext-wght-normal.woff2) format("woff2");unicode-range:U+0100-02FF}
+@font-face{font-family:"Barlow Condensed";font-weight:500;src:url(__SITE__/vendor/fonts/barlow-condensed-latin-500-normal.woff2) format("woff2")}
+@font-face{font-family:"Barlow Condensed";font-weight:600;src:url(__SITE__/vendor/fonts/barlow-condensed-latin-600-normal.woff2) format("woff2")}
+@page{size:A4;margin:17mm 17mm 18mm}
+:root{--fg:#1c1f21;--muted:#5d6164;--line:#e2ddd2;--gold:#8a6a36}
+*{box-sizing:border-box}
+html,body{margin:0;background:#fff;color:var(--fg)}
+body{font:400 9.5pt/1.48 "Figtree",system-ui,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+h1,h2,h3{font-family:"Barlow Condensed","Figtree",sans-serif;font-weight:600;margin:0;letter-spacing:.005em}
+.head{display:flex;align-items:center;gap:14px;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.head .mark{flex:none;width:46px;height:46px;overflow:hidden}
+.head .mark img{display:block;width:87px;margin:-6px 0 0 -20px}
+.head .k{font:500 8pt/1.2 "Figtree";letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+h1{font-size:24pt;line-height:1.05;margin-top:2px}
+.lead{font-size:10.5pt;margin:0 0 4px;text-wrap:pretty}
+h2{font-size:14.5pt;margin:16px 0 6px;display:flex;align-items:baseline;gap:8px}
+h2 .n{font:600 9pt/1 "Figtree";color:var(--gold);border:1px solid #d9c9aa;border-radius:50%;width:19px;height:19px;display:inline-grid;place-items:center;transform:translateY(-2px)}
+h3{font-size:11.5pt;margin:10px 0 2px}
+p{margin:0 0 6px;text-wrap:pretty}
+ul{margin:0 0 6px;padding-left:15px}
+li{margin:0 0 2px}
+b{font-weight:600}
+.path{font-weight:600;white-space:nowrap}
+.muted{color:var(--muted)}
+.areas{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:4px 0 6px;padding:0}
+.areas dt{font-weight:600;white-space:nowrap}
+.areas dd{margin:0;color:var(--muted)}
+.row{display:flex;gap:16px;align-items:flex-start}
+.row > .txt{flex:1 1 auto;min-width:0}
+figure{margin:6px 0 8px;break-inside:avoid}
+figure img{display:block;width:100%;border:1px solid var(--line);border-radius:6px}
+figure.phone{flex:none;width:52mm}
+figure.phone img{border-radius:12px;border:1px solid #d6d0c4}
+figcaption{font-size:8pt;color:var(--muted);margin-top:4px}
+.task{break-inside:avoid;padding:6px 0 4px;border-top:1px solid var(--line)}
+.task:first-of-type{border-top:0}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;border-top:1px solid var(--line)}
+.pair .task{border-top:0;display:flex;flex-direction:column}
+.pair .task p{flex:1 1 auto}
+.pair figure img{height:58mm;object-fit:cover;object-position:left top}
+.pb{break-before:page}
+.pb{break-before:page}
+.note{border-left:2px solid var(--gold);padding:2px 0 2px 10px;margin:8px 0;color:var(--fg)}
+.foot{margin-top:14px;padding-top:8px;border-top:1px solid var(--line);font-size:8pt;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<header class="head">
+  <span class="mark"><img src="__SITE__/brand/logo.svg" alt=""></span>
+  <div><div class="k">DAHUAM.202 Küchen-App</div><h1>Erste Schritte</h1></div>
+</header>
+
+<p class="lead">Die Küchen-App hält an einem Ort zusammen, was in Küche und Einkauf jeden Tag anfällt: Speisekarte und Gästekarte, Rezepturen mit Wareneinsatz, Lager und Bestellungen, die Prep-Liste, Checklisten mit Eigenkontrolle, Dienstplan und Auswertung. Sie läuft im Browser auf Handy, Tablet und Computer und funktioniert nach dem ersten Öffnen auch ohne Internet.</p>
+
+<div class="row">
+  <div class="txt">
+    <h2><span class="n">1</span>Das erste Öffnen</h2>
+    <p>Beim ersten Öffnen auf einem Gerät erscheint die Willkommensseite: oben eine Widmung, darunter drei Schritte.</p>
+    <ul>
+      <li><b>Beispiele ansehen.</b> Die App ist mit Beispieldaten gefüllt. Alles lässt sich ausprobieren; die Beispiele kann man jederzeit wiederherstellen.</li>
+      <li><b>Eigene Daten.</b> Speisekarte, Artikel und Rezepturen aus Dateien laden oder leer starten (Abschnitt 3).</li>
+      <li><b>Aufs Handy.</b> iPhone und iPad: in Safari auf das Teilen-Symbol, dann <b>„Zum Home-Bildschirm“</b>. Android: in Chrome auf das Menü <b>⋮</b>, dann <b>„App installieren“</b> oder „Zum Startbildschirm hinzufügen“. Bietet Chrome die Installation direkt an, steht auf der Willkommensseite der Knopf „App installieren“.</li>
+    </ul>
+    <p><b>„Los geht’s“</b> führt zu „Heute“. <b>„Kurzer Rundgang“</b> zeigt die täglichen Seiten in fünf Schritten. Die Willkommensseite lässt sich später wieder öffnen: <span class="path">Einstellungen › Hilfe › Willkommen</span>.</p>
+  </div>
+  <figure class="phone"><img src="img/1-willkommen.jpg" alt="Willkommensseite am Handy"><figcaption>Die Willkommensseite am Handy</figcaption></figure>
+</div>
+
+<h2><span class="n">2</span>Die Bereiche</h2>
+<dl class="areas">
+  <dt>Heute</dt><dd>Das Tagesblatt: was heute zu bestellen ist, welche Lieferung kommt, welche Checkliste offen ist.</dd>
+  <dt>Vorbereitung</dt><dd>Die Prep-Liste für heute und die nächsten Tage, aus der Prognose gerechnet. Ein Tipp hakt ab.</dd>
+  <dt>Checklisten</dt><dd>Aufsperren, Zusperren und Putzen zum Abhaken, dazu die Eigenkontrolle.</dd>
+  <dt>Speisekarte</dt><dd>Alle Gerichte mit Preis und Wareneinsatz, die Gästekarte, Saison und Aktionen.</dd>
+  <dt>Rezepte</dt><dd>Rezepturen für Gerichte und Basisrezepte: was hineinkommt und was eine Portion kostet.</dd>
+  <dt>Ware</dt><dd>Bestand, Bestellen, Lieferanten, Preise, Inventur und Buchungen.</dd>
+  <dt>Team &amp; Zahlen</dt><dd>Dienstplan und Auswertung der Verkäufe aus der Kasse.</dd>
+  <dt>Einstellungen</dt><dd>Betrieb und Steuer, Sicherung, Eigene Daten und Hilfe.</dd>
+</dl>
+<p class="muted">Am Handy stehen unten Heute, Prep, Checklisten und Rezepte; Speisekarte, Ware, Team &amp; Zahlen und Einstellungen liegen unter „Mehr“.</p>
+
+
+<div class="row pb">
+  <div class="txt">
+    <h2 style="margin-top:0"><span class="n">3</span>Eigene Daten</h2>
+    <p><span class="path">Einstellungen › Eigene Daten</span> führt in sechs Schritten von den Beispielen zu Ihrem Betrieb: zuerst <b>leer starten</b> oder die Beispiele behalten, dann Speisekarte, Artikel &amp; Preise, Rezepturen, Team und Kasse importieren.</p>
+    <ul>
+      <li><b>Vorlagen:</b> Zu jedem Import gibt es eine Vorlage zum Ausfüllen, als CSV und als Excel.</li>
+      <li><b>Vorschau:</b> Jeder Import zeigt zuerst, was neu, geändert oder fehlerhaft ist. Geändert wird erst, wenn Sie übernehmen.</li>
+      <li><b>Rückgängig:</b> Nach jedem Import gibt es „Rückgängig“. Dann ist alles wie vorher.</li>
+    </ul>
+    <p class="muted">Bis dahin steht unten in der Seitenleiste „Beispieldaten · eigene Daten“; der Link führt ebenfalls hierher.</p>
+  </div>
+  <figure class="phone"><img src="img/3-eigene-daten.jpg" alt="Eigene Daten am Handy"><figcaption>Eigene Daten: sechs Schritte</figcaption></figure>
+</div>
+
+<h2><span class="n">4</span>Im Alltag</h2>
+<div class="pair">
+<div class="task">
+  <h3>Gästekarte als PDF</h3>
+  <p><span class="path">Speisekarte › Gästekarte</span>. Den Tag wählen (Heute, Morgen oder eine Aktion): die Karte zeigt, was an diesem Tag gilt. <b>„Als PDF speichern“</b> erstellt die Datei zum Drucken oder Verschicken. Darunter gibt es das Allergen-Blatt als PDF.</p>
+  <figure><img src="img/4-gaestekarte.jpg" alt="Gästekarte"><figcaption>„Als PDF speichern“ oben rechts</figcaption></figure>
+</div>
+
+<div class="task">
+  <h3>Rezept für die Küche</h3>
+  <p><span class="path">Rezepte</span>, ein Gericht öffnen, oben <b>„Küche“</b> wählen. Die Mengen stehen groß und ohne Preise, für ×1, ×2, ×5, ×10 oder eine eigene Portionszahl. Ein Basisrezept öffnet sich mit genau der Menge, die gebraucht wird. <b>„Als PDF“</b> speichert das Rezept zum Ausdrucken.</p>
+  <figure><img src="img/5-rezept-kueche.jpg" alt="Rezept in der Ansicht Küche"><figcaption>Rezept in der Ansicht „Küche“</figcaption></figure>
+</div>
+</div>
+<div class="task">
+  <h3>Bestellung</h3>
+  <p><span class="path">Ware › Bestellen</span>. Bei jedem Lieferanten, der heute annimmt, steht die Uhrzeit des Annahmeschlusses. <b>„Bestellung vorbereiten“</b> legt einen Entwurf an; die App schlägt vor, was unter dem Mindestbestand liegt. Je nach Lieferant öffnet <b>„E-Mail öffnen“</b>, „WhatsApp öffnen“ oder „Webshop öffnen“ den fertigen Text. Abschicken müssen Sie selbst, danach <b>„Als gesendet markieren“</b>. Kommt die Ware: Bestellung öffnen, „Wareneingang“, prüfen, <b>„Einbuchen“</b>.</p>
+</div>
+<div class="task" style="border-top:0">
+  <h3>Eigenkontrolle: die Monatsmappe</h3>
+  <p><span class="path">Checklisten › Verlauf</span>, unten den Monat wählen, <b>„Monatsmappe als PDF“</b>. Die Mappe enthält Temperaturen, Wareneingang, Frittieröl, Reinigungsplan und Checklisten eines Monats, dazu alle Abweichungen auf einem eigenen Blatt.</p>
+</div>
+
+<div class="row">
+  <div class="txt">
+    <h2><span class="n">5</span>Daten und Sicherheit</h2>
+    <ul>
+      <li><b>Die Daten bleiben auf dem Gerät.</b> Sie liegen nur in diesem Browser. Die App schickt nichts weg, solange unter Einstellungen keine Cloud verbunden ist.</li>
+      <li><b>Jedes Gerät hat eigene Daten.</b> Was am Handy eingetragen wird, steht nicht von selbst am Tablet.</li>
+      <li><b>Sicherung:</b> „Sicherung erstellen“ unter <span class="path">Einstellungen</span> speichert alles als Datei. Am besten einmal pro Woche. Sobald eigene Daten drin sind, erinnert „Heute“ daran, wenn es noch keine Sicherung gibt oder die letzte sieben Tage alt ist.</li>
+      <li><b>Wiederherstellen:</b> „Sicherung laden“ ersetzt alle Daten durch die Datei; vorher legt die App eine Sicherheitskopie an. So kommen die Daten auch auf ein anderes Gerät.</li>
+      <li><b>Frühere Stände:</b> Die App hebt selbst die letzten sieben Arbeitstage und je einen Stand der vier Wochen davor auf (<span class="path">Einstellungen › Speicher &amp; frühere Stände</span>).</li>
+    </ul>
+    <p class="note">Website-Daten im Browser nicht löschen: damit wären auch die Daten der App weg. Am sichersten liegt die App auf dem Home-Bildschirm.</p>
+  </div>
+</div>
+<figure><img src="img/6-sicherung.jpg" alt="Sicherung in den Einstellungen" style="width:58%"><figcaption>Einstellungen › Sicherung</figcaption></figure>
+
+<h2><span class="n">6</span>Hilfe in der App</h2>
+<ul>
+  <li><b>„Was ist das?“</b> einschalten (am Computer unten in der Seitenleiste, am Handy das ?-Symbol oben) und auf etwas tippen. Die App erklärt es und ändert dabei nichts.</li>
+  <li><b>Das ? neben dem Seitentitel</b> zeigt „So geht’s hier“: drei, vier Sätze zur Seite.</li>
+  <li><b>Suche</b> (Lupe, am Computer Strg K): ein Gericht, einen Artikel oder eine Seite finden.</li>
+  <li><b>Rundgang, Willkommen und diese Anleitung</b> stehen unter <span class="path">Einstellungen › Hilfe</span>.</li>
+</ul>
+
+<p class="foot">Die Bilder zeigen die Beispieldaten der App. Stand: App-Version __VERSION__.</p>
+</body>
+</html>
