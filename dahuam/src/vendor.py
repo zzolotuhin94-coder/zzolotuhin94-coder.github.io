@@ -4,7 +4,7 @@ Erzeugt fonts.css (wird von build.py in die Seite eingebettet) und vendor/LICENS
 Einmal ausführen, wenn sich die Auswahl ändert:  python3 vendor.py"""
 import os, re, shutil, json, glob
 SP = os.path.dirname(os.path.abspath(__file__)); DL = os.path.join(SP, 'dl')
-OUT = '/home/user/wt-4/dahuam/vendor'
+OUT = '/home/user/zzolotuhin94-coder.github.io/dahuam/vendor'
 os.makedirs(OUT + '/fonts', exist_ok=True); os.makedirs(OUT + '/licenses', exist_ok=True)
 def pkg(prefix):
     d = [x for x in glob.glob(DL + '/x_' + prefix + '-[0-9]*') if os.path.isdir(x)]
@@ -60,4 +60,4 @@ Die vollständigen Lizenztexte liegen im Ordner `licenses/`.
 
 Von den Schriften sind nur die Teile „latin“ und „latin-ext“ und nur die Schnitte enthalten, die die App zeichnet.
 ''')
-print(len(css), 'font faces,', len(files), 'files,', sum(os.path.getsize('/home/user/wt-4/dahuam/' + f) for f in files)//1024, 'KB')
+print(len(css), 'font faces,', len(files), 'files,', sum(os.path.getsize('/home/user/zzolotuhin94-coder.github.io/dahuam/' + f) for f in files)//1024, 'KB')
