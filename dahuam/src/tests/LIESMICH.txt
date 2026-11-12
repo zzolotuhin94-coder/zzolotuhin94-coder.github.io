@@ -8,3 +8,4 @@ wtests = Willkommensseite (erster Start, Widmung, Geschenk-Link, Hinweis je Ger�
 gtests = Speisekarte-Gestalter (Vorlagen, Verbindung zur Speisekarte, Verschieben mit Zeiger und Tasten, Spalten, Effekte, Rückgängig, echtes PDF je Vorlage, Allergene, Umstellung alter Stände, Handy/Tablet/Desktop, hell/dunkel). Feste Uhr: Do 12.11.2026.
 atests = Apartments (Buchungen, Kalender-Import .ics, Übersicht, Reinigung, Wechseltag, Heute-Zeile, PDF, Sicherung, Umstellung, Geräte).
 Anleitung (dahuam/Anleitung-DAHUAM202.pdf): ../anleitung/shots.js macht die Bilder, ../anleitung/make.js das PDF; danach build.py.
+phonetests = Handy-Bedienung bis 700 px (phone.js): Heute auf einem Bildschirm, Suchen und Scannen, Bestellen mit Blatt, Vorbereitung, Inventur je Lagerort, Rezept in der Küche, Mehr, Geräte (iPhone 13 und SE, hell/dunkel, Kontrast, Zielgrößen, Breiten 700/820/1280). Feste Uhr: Do 12.11.2026, 10:30. Bilder: PH_OUT=/pfad node phonetests/shots.js.
