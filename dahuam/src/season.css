@@ -81,21 +81,14 @@
 .g-tk .g-sp-list{gap:18px;margin-top:10px}
 .g-tk .g-n{font-size:21px}
 .g-tk{max-width:620px}
-.tk-label{max-width:860px;margin:28px auto 10px;font:600 12px var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
 .g-closed{display:flex;gap:10px;align-items:center;max-width:860px;margin:0 auto 12px;padding:10px 14px;border-radius:12px;background:var(--warn-bg);color:var(--warn);font-weight:600;font-size:14px}
 
 /* ===== Werkzeuge Gästekarte ===== */
-@media (min-width:1001px){.guest-wrap{grid-template-columns:330px minmax(0,1fr)}}
-.guest-tools{gap:14px;max-height:calc(100vh - 32px);overflow:auto;padding-bottom:4px}
-.guest-tools .panel{display:flex;flex-direction:column;gap:12px}
-.guest-tools .panel-h{margin-bottom:0}
 .sm-link{font-size:13px;font-family:var(--f-body)}
 .chips-row.tight{padding-bottom:2px;margin-bottom:0}
 .chip.sm,.chips-row.tight .chip{padding:4px 10px;font-size:12.5px}
 .fields.two{grid-template-columns:1fr 1fr}
 
-.clr{display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}
-.clr input{width:34px;height:34px;padding:2px;border-radius:10px;cursor:pointer}
 
 .warn-box,.ok-box{display:flex;gap:10px;align-items:flex-start;border-radius:12px;padding:10px 12px;font-size:13px}
 .warn-box{background:var(--bad-bg);color:var(--bad)}

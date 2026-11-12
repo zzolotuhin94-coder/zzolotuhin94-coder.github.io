@@ -53,7 +53,7 @@ function seed(){
   plusMigrate(d);
   teamMigrate(d);
   barDemo(d); barMigrate(d);
-  rzMigrate(d); ekMigrate(d);
+  rzMigrate(d); ekMigrate(d); gsMigrate(d);
   return d;
 }
 
@@ -84,7 +84,7 @@ function migrate(d){
   plusMigrate(d);
   teamMigrate(d);
   barMigrate(d);
-  rzMigrate(d); ekMigrate(d);
+  rzMigrate(d); ekMigrate(d); gsMigrate(d);
   return d;
 }
 
@@ -195,7 +195,7 @@ function fmtDate(iso){ return new Date(iso).toLocaleDateString('de-AT',{day:'2-d
 /* ---------- Rahmen ---------- */
 function render(){
   const app = $('#app');
-  const fn = {dash:renderDash, menu:renderMenu, stock:renderStock, products:renderProducts, setup:renderSetup, buy:renderBuy, report:renderReport, einr:renderEinrichtung, pcheck:renderPriceCheck, vorb:renderVorb, dienst:renderDienst, checkl:renderCheckl, daten:renderDaten}[view.tab];
+  const fn = {dash:renderDash, menu:renderMenu, stock:renderStock, products:renderProducts, setup:renderSetup, buy:renderBuy, report:renderReport, einr:renderEinrichtung, pcheck:renderPriceCheck, vorb:renderVorb, dienst:renderDienst, checkl:renderCheckl, daten:renderDaten, apart:renderApart}[view.tab];
   app.innerHTML = fn ? fn() : (view.card && C(view.card) ? renderCard(C(view.card)) : renderCards());
   app.dataset.view = view.tab;
   app.classList.remove('enter'); void app.offsetWidth; app.classList.add('enter');

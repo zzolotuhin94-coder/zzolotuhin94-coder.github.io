@@ -17,12 +17,13 @@ const L = require('./lib'); const fs = require('fs'); const path = require('path
   L.ok(await p.evaluate(() => S.settings.name === 'Offline-Test' && S.menu.length > 50 && !!document.querySelector('#app h1')), 'ohne Netz neu laden: App startet mit den Daten (früher: ERR_INTERNET_DISCONNECTED)');
   for(const t of await p.evaluate(() => TABS.map(t => t[0]))){ await p.evaluate(t => go(t), t); await p.waitForTimeout(60); }
   await p.evaluate(() => { view.mtab = 'guest'; go('menu'); }); await p.waitForTimeout(800);
-  for(const st of ['schlicht', 'haus']){ await p.click(`[data-act="gStyle"][data-id="${st}"]`); await p.waitForTimeout(700); }
+  for(const st of ['schlicht', 'alpin', 'elegant', 'kreide', 'getraenke', 'haus']){ await p.click(`#gsRail [data-gs="look"][data-id="${st}"]`); await p.waitForFunction(() => gsReadyNow(gsFx(gsDoc(), gsState().cur)) && !GS.pend); await p.waitForTimeout(250); }   // alle Vorlagen des Gestalters: Schriften und Hintergründe müssen ohne Netz da sein
+  await p.evaluate(() => { const el = document.createElement('div'); el.innerHTML = tageskarteHtml(S.specials[0]); document.body.appendChild(el); }); await p.waitForTimeout(300);   // Tageskarten-Blatt (Schibsted Grotesk)
   await p.evaluate(() => { printOrder = printOrder; const el = document.createElement('pre'); el.style.font = "12pt 'JetBrains Mono',monospace"; el.textContent = 'Bestellung'; document.body.appendChild(el); }); await p.waitForTimeout(400);
   const fonts = await p.evaluate(async () => { await document.fonts.ready; const st = {}; for(const f of document.fonts){ const k = f.family.replace(/"/g, ''); st[k] = st[k] || new Set(); st[k].add(f.status); } return Object.fromEntries(Object.entries(st).map(([k, v]) => [k, [...v].join('/')])); });
-  const need = ['Figtree', 'Barlow Condensed', 'Fraunces', 'Caveat', 'PT Sans', 'Roboto Condensed', 'Saira Condensed', 'Schibsted Grotesk', 'Source Serif 4', 'JetBrains Mono'];
-  L.ok(need.every(f => /loaded/.test(fonts[f] || '')) && !Object.values(fonts).some(v => /error/.test(v)), 'ohne Netz: alle 10 Schriftfamilien aus dem eigenen Ordner geladen, keine fehlgeschlagen', fonts);
-  L.ok(await p.evaluate(() => [...document.images].filter(i => i.src && !i.src.startsWith('data:') && !i.src.startsWith('blob:')).every(i => i.complete && i.naturalWidth > 0)), 'ohne Netz: Bilder der Hauskarte da');
+  const need = ['Figtree', 'Barlow Condensed', 'Fraunces', 'Caveat', 'Cormorant Garamond', 'Schibsted Grotesk', 'Source Serif 4', 'JetBrains Mono'];   // PT Sans, Saira Condensed und Roboto Condensed gehörten zur früheren Ansicht „Schlicht“ und sind entfernt
+  L.ok(need.every(f => /loaded/.test(fonts[f] || '')) && !Object.values(fonts).some(v => /error/.test(v)), 'ohne Netz: alle 8 Schriftfamilien aus dem eigenen Ordner geladen, keine fehlgeschlagen', fonts);
+  L.ok(await p.evaluate(() => [...document.images].filter(i => i.src && !i.src.startsWith('data:') && !i.src.startsWith('blob:')).every(i => i.complete && i.naturalWidth > 0)), 'ohne Netz: Bilder der Gästekarte da');
   // PDF ohne Netz
   await p.evaluate(() => { const c = S.cards.find(x => x.type === 'dish'); go('cards', c.id); }); await p.waitForTimeout(300);
   const [dl] = await Promise.all([p.waitForEvent('download', {timeout:60000}), p.click('#app [data-pdf="printCard"]')]);

@@ -7,7 +7,7 @@ const dlg=()=>ev(()=>$('#dlg').open?{t:$('#dlgForm h3').textContent,ok:($('#dlgF
 const n=D=>ev(D=>tmShifts(D).length,D);
 // ---------- Navigation ----------
 const nav=await ev(()=>({side:[...document.querySelectorAll('.side .nav-i')].map(x=>x.dataset.tab),groups:document.querySelectorAll('.side .nav-group').length,ico:[...document.querySelectorAll('.side .nav-i[data-tab="team"] svg *,.side .nav-i[data-tab="checkl"] svg *')].length,desc:[NAV_DESC.team,NAV_DESC.checkl],titles:[...document.querySelectorAll('.side .nav-i')].every(b=>b.title.length>20),foot:(()=>{const r=document.querySelector('.side .side-foot').getBoundingClientRect();return r.bottom<=innerHeight+1})()}));
-ok(nav.groups===0&&nav.side.join()==='dash,vorb,checkl,menu,cards,ware,team,setup'&&nav.ico>=6&&nav.desc.every(d=>d.length>25)&&nav.titles,'nav: Checklisten and „Team & Zahlen“ among the seven areas, own icons, one-line descriptions',nav.side);
+ok(nav.groups===0&&nav.side.join()==='dash,vorb,checkl,menu,cards,ware,team,apart,setup'&&nav.ico>=6&&nav.desc.every(d=>d.length>25)&&nav.titles,'nav: Checklisten and „Team & Zahlen“ among the seven areas, own icons, one-line descriptions',nav.side);
 ok(nav.foot,'sidebar still fits at 1440×900 (footer visible)');
 await p.click('.side .nav-i[data-tab="team"]');await w(300);
 ok(await ev(()=>view.tab==='dienst'&&location.hash==='#team/dienstplan'&&/Team & Zahlen/.test(document.title)&&[...document.querySelectorAll('#app .toolbar.tabs .seg button')].map(x=>x.textContent.trim()).join()==='Dienstplan,Auswertung'),'„Team & Zahlen“ opens the Dienstplan (#team/dienstplan), with the tabs Dienstplan · Auswertung');

@@ -14,7 +14,7 @@ const L = require('./lib'); const fs = require('fs'); const near = (a, b, e = 1e
   // Heute und Einrichtung: keine neue Station, keine neuen Hinweise
   await L.go(p, 'einrichtung');
   L.ok(await p.evaluate(() => document.querySelectorAll('#app .au-row').length) === 6, 'Einrichtung: weiterhin sechs Stationen');
-  L.ok(await p.evaluate(() => NAV.length === 7 && !NAV.some(n => /bar/i.test(n[1])) && Object.keys(ROLES).join() === 'chef,team'), 'Navigation: sieben Bereiche, kein Bereich „Bar“; Rollen Chef und Team');
+  L.ok(await p.evaluate(() => NAV.length === 8 /* + Apartments */ && !NAV.some(n => /bar/i.test(n[1])) && Object.keys(ROLES).join() === 'chef,team'), 'Navigation: sieben Bereiche, kein Bereich „Bar“; Rollen Chef und Team');
   // ---------- alter Stand: Beispielbetrieb von Version 1.3.0 ----------
   const old = JSON.parse(fs.readFileSync(__dirname + '/samples/pre-d-demo.json', 'utf8'));
   const mg = await p.evaluate(o => { const before = JSON.stringify(o); const r = migrate(JSON.parse(before)); const keep = S; S = r;
@@ -22,7 +22,7 @@ const L = require('./lib'); const fs = require('fs'); const near = (a, b, e = 1e
     const out = {same:['products', 'cards', 'menu', 'orders', 'moves', 'suppliers'].filter(k => JSON.stringify(k === 'cards' ? noD2(r[k]) : r[k]) !== JSON.stringify(JSON.parse(before)[k])), keys:Object.keys(r).filter(k => !(k in o)), sKeys:Object.keys(r.settings).filter(k => !(k in o.settings) && k !== 'd2V'), min:[P('mineral').unit, P('mineral').price, P('mineral').stock, isDrink(P('mineral'))], bier:[P('bier').unit, P('bier').price, isDrink(P('bier'))], inv:r.invDraft.counts.mineral,
       old:totals(C('old_schorle')).cost, calc:r.menu.filter(m => m.card).map(m => Math.round(menuCalc(m).cost * 1e6)).join(), anyDrink:r.products.some(isDrink) || r.cards.some(c => c.drink), fmt:qtyFmt(30, P('mineral')), lg:lgBalance('sup_getraenke'), pf:orderPfand(r.orders.find(x => x.status === 'sent' && x.supplier === 'sup_getraenke')), secs:r.settings.sections.includes('Getränke')};
     S = keep; return out; }, old);
-  L.ok(mg.same.length === 0 && mg.keys.length === 0 && mg.sKeys.length === 0, 'Beispielstand von 1.3.0 lädt unverändert: Artikel, Rezepturen, Karte, Bestellungen, Buchungen gleich; kein neuer Schlüssel, keine Umrechnung', mg);
+  L.ok(mg.same.length === 0 && mg.keys.join() === 'apart' /* Apartments */ && mg.sKeys.join() === 'karte' /* Gestalter: der Stil wird zur Vorlage, gtests/g06 */, 'Beispielstand von 1.3.0 lädt unverändert: Artikel, Rezepturen, Karte, Bestellungen, Buchungen gleich; kein neuer Schlüssel, keine Umrechnung', mg);
   L.ok(mg.min.join() === 'Stk,0.42,30,false' && mg.bier.join() === 'l,2.9,false' && mg.inv === 24 && near(mg.old, 0.25 * 1.65 + 0.42) && !mg.anyDrink && mg.fmt === '30 Stk' && mg.lg === 0 && mg.pf === 0 && !mg.secs, 'alter Stand: Mineralwasser bleibt Stück zu € 0,42, die laufende Inventur (24 Stk) und die Rezeptur mit Stück-Flasche rechnen wie vorher; ohne Pfand, ohne Leergut', mg);
   // über den echten Speicher: ersetzen, neu laden, alle Seiten ohne Fehler; danach lässt sich ein Artikel zum Getränk machen
   await p.evaluate(async o => { await __store.replace(o); }, old); await p.reload(); await L.ready(p);

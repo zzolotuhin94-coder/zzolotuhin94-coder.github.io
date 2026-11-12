@@ -1,5 +1,5 @@
 import os, sys, json, hashlib
-APP_VERSION = '1.5.0'   # Paket D2: Rezept für Küche und Service, Eigenkontrolle
+APP_VERSION = '1.6.0'   # Speisekarte-Gestalter: ein Modus für die Gästekarte, Vorlagen statt Stil-Schalter
 SITE = '/home/user/zzolotuhin94-coder.github.io/dahuam/'
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 R = lambda f: open(f, encoding='utf-8').read()
@@ -7,9 +7,9 @@ R = lambda f: open(f, encoding='utf-8').read()
 # Reihenfolge zählt: spätere Dateien bauen auf früheren auf.
 JS_BEFORE = ['script_de.js', 'store.js']          # Rechenkern, Speicher
 JS_MODULES = ['season.js', 'season2.js', 'season3.js', 'einkauf.js', 'menu2.js', 'cloud.js', 'ui3.js', 'sales.js', 'report.js', 'menu3.js', 'prices.js',
-              'game.js', 'drag.js', 'polish.js', 'pdf.js', 'allergen.js', 'hauskarte.js', 'fixes.js', 'guide_txt.js', 'guide.js', 'vorbereitung.js', 'team.js', 'nav.js', 'reliab.js', 'daten.js', 'bar.js', 'rezept.js', 'eigen.js', 'welcome.js']
-CSS_MODULES = ['season.css', 'einkauf.css', 'menu2.css', 'ui3.css', 'report.css', 'menu3.css', 'prices.css', 'game.css', 'drag.css', 'polish.css',
-               'hauskarte.css', 'fixes.css', 'guide.css', 'plus.css', 'team.css', 'reliab.css', 'nav.css', 'daten.css', 'bar.css', 'rezept.css', 'eigen.css', 'welcome.css']
+              'game.js', 'drag.js', 'polish.js', 'pdf.js', 'allergen.js', 'hauskarte.js', 'fixes.js', 'guide_txt.js', 'guide.js', 'vorbereitung.js', 'team.js', 'nav.js', 'reliab.js', 'daten.js', 'bar.js', 'rezept.js', 'eigen.js', 'apart.js', 'welcome.js', 'gestalter.js', 'gestalter_ed.js']
+CSS_MODULES = ['season.css', 'einkauf.css', 'menu2.css', 'ui3.css', 'report.css', 'prices.css', 'game.css', 'drag.css', 'polish.css',
+               'fixes.css', 'guide.css', 'plus.css', 'team.css', 'reliab.css', 'nav.css', 'daten.css', 'bar.css', 'rezept.css', 'eigen.css', 'apart.css', 'welcome.css', 'gestalter.css']
 start = '/* ---------- Start ---------- */'
 a, b = R('ui2.js').split(start)                   # ui2.js: Oberfläche; der Start-Block läuft erst nach allen Modulen
 js = '\n'.join([R(f) for f in JS_BEFORE] + [a] + [R(f) for f in JS_MODULES] + [start + b])
@@ -40,7 +40,7 @@ assert 'fonts.googleapis.com/css2?family=Cormorant' not in out and out.count('<l
 
 # ---------- Paket A: Offline-Paket (Service Worker, Manifest) mit gemeinsamer Build-Kennung ----------
 ICONS = ['icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-192.png', 'icons/maskable-512.png', 'icons/apple-touch-icon.png']
-PRECACHE = ['manifest.webmanifest', 'icons/icon-192.png', 'icons/apple-touch-icon.png'] + ['brand/' + f for f in sorted(os.listdir(SITE + 'brand'))] \
+PRECACHE = ['manifest.webmanifest', 'icons/icon-192.png', 'icons/apple-touch-icon.png'] + ['brand/logo.svg', 'brand/slate.webp', 'brand/table.webp'] \
     + ['photos/unmatched/gaststube.webp', 'photos/unmatched/aussen-winter.webp', 'photos/unmatched/silvesterabend-fondue.webp'] + json.load(open('vendor_files.json')) \
     + (['Anleitung-DAHUAM202.pdf'] if os.path.exists(SITE + 'Anleitung-DAHUAM202.pdf') else [])   # Anleitung (anleitung/make.js), offline verfügbar
 manifest = json.dumps({

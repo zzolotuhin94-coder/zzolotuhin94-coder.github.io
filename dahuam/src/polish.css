@@ -215,7 +215,6 @@ dialog h3{font:500 22px var(--f-display);letter-spacing:.01em}
 .kbd-btn kbd{font-family:var(--f-body)}
 
 /* Gästekarte-Werkzeuge: Reiter als Segment behalten, nichts in Versalien */
-.guest-tools .f{font-weight:500}
 
 /* Dunkel: Kontraste nachziehen */
 :root[data-theme="dark"] .au-row.done .au-n{color:#16130d}
