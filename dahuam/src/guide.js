@@ -305,11 +305,12 @@ palData = function(){
   return a;
 };
 
-/* Erster Start: der Rundgang wird einmal angeboten, als Zeile unten, nicht als Fenster */
+/* Erster Start: statt eines eigenen Angebots öffnet sich die Willkommensseite (welcome.js); der Rundgang ist dort ein Knopf */
 function gdFirstRun(){
-  if(G_NOINTRO || !S || GP.asked || GP.tour) return;
+  if(!S) return;
+  if(typeof wlFirstRun === 'function'){ wlFirstRun(); return; }
+  if(G_NOINTRO || GP.asked || GP.tour) return;
   GP.asked = 1; gpSave();
-  setTimeout(() => { if(GD.t || document.querySelector('dialog[open]')) return; toast('Neu hier? Ein kurzer Rundgang zeigt die täglichen Seiten.', {label:'Rundgang', action:() => tourStart(), ms:12000}); }, 600);
 }
 
 /* =====================================================================

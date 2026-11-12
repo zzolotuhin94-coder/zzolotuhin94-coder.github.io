@@ -1,0 +1,51 @@
+/* ===================== Willkommen: eine ruhige Seite über der App ===================== */
+html.wl-on, html.wl-on body{overflow:hidden}
+.wl{--wl-gold:linear-gradient(135deg,#7d5f30,#a8854f 46%,#c29d63 52%,#94733f 60%,#7a5c2f);position:fixed;inset:0;z-index:300;background:var(--bg);color:var(--fg);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;opacity:0;transition:opacity .28s ease}
+.wl.in{opacity:1}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .wl{--wl-gold:linear-gradient(135deg,#9c7a45,#d2ae72 45%,#f0dcae 52%,#b8925a 60%,#8a6a3b)}}
+:root[data-theme="dark"] .wl{--wl-gold:linear-gradient(135deg,#9c7a45,#d2ae72 45%,#f0dcae 52%,#b8925a 60%,#8a6a3b)}
+@media (prefers-reduced-motion:reduce){.wl{transition:none}}
+.wl-in{max-width:560px;margin:0 auto;padding:max(40px,calc(env(safe-area-inset-top,0px) + 28px)) 20px max(40px,calc(env(safe-area-inset-bottom,0px) + 28px))}
+.wl-top{text-align:center;padding-bottom:30px;border-bottom:1px solid var(--line)}
+.wl-logo{--w:64px;display:block;margin:0 auto 24px;width:var(--w);height:var(--w);background:var(--wl-gold);
+  -webkit-mask:url(brand/logo.svg) no-repeat;mask:url(brand/logo.svg) no-repeat;-webkit-mask-size:calc(var(--w)*119.3/63) auto;mask-size:calc(var(--w)*119.3/63) auto;
+  -webkit-mask-position:calc(var(--w)*-27.6/63) calc(var(--w)*-8.3/63);mask-position:calc(var(--w)*-27.6/63) calc(var(--w)*-8.3/63)}
+.wl-for{margin:0;font:500 12px/1.3 var(--f-body);letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.wl-text{margin:12px auto 0;max-width:30em;font:italic 400 21px/1.45 "Fraunces",Georgia,serif;color:var(--fg);text-wrap:balance;overflow-wrap:anywhere}
+.wl-from{margin:12px 0 0;font-size:14px;color:var(--muted);overflow-wrap:anywhere}
+.wl-from::before{content:"– "}
+.wl-ask{margin:18px auto 0;max-width:30em;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px;align-items:center}
+.wl-ask-b{display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
+.wl-h{margin:30px 0 4px;font:500 26px/1.15 var(--f-display);letter-spacing:.005em;outline:none}
+.wl-steps{list-style:none;margin:0;padding:0}
+.wl-steps li{display:grid;grid-template-columns:30px 1fr;gap:14px;padding:18px 0;border-top:1px solid var(--line)}
+.wl-steps li:first-child{border-top:0}
+.wl-n{width:28px;height:28px;border-radius:50%;border:1px solid var(--line-strong);display:grid;place-items:center;font:600 13px/1 var(--f-body);color:var(--muted);margin-top:1px}
+.wl-steps h2{margin:0;font:600 16px/1.3 var(--f-body)}
+.wl-steps p{margin:5px 0 0;font-size:14.5px;line-height:1.55;color:var(--muted);text-wrap:pretty}
+.wl-steps p b{color:var(--fg);font-weight:600;white-space:nowrap}
+.wl-ico{width:17px;height:17px;vertical-align:-3px;fill:none;stroke:var(--fg);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.wl-inline{margin-top:10px}
+.wl .link{font-family:var(--f-body);font-size:inherit}
+.wl-inline .link{font-size:14.5px}
+.wl-note{margin:6px 0 0;padding:18px 0 0;border-top:1px solid var(--line);font-size:13.5px;line-height:1.55;color:var(--muted);text-wrap:pretty}
+.wl-acts{display:flex;gap:10px;margin-top:28px}
+.wl-acts .btn{min-height:46px;justify-content:center;font-size:15px;padding:10px 22px}
+.wl-acts .btn.primary{flex:1 1 auto}
+.wl-pdf{margin:18px 0 0;text-align:center;font-size:13.5px}
+.wl-pdf .link{color:var(--muted);font-weight:500}
+@media (max-width:520px){
+  .wl-in{padding-left:16px;padding-right:16px}
+  .wl-logo{--w:56px;margin-bottom:20px}
+  .wl-text{font-size:19px}
+  .wl-acts{flex-direction:column}
+  .wl-acts .btn{width:100%}
+}
+@media (min-width:900px) and (min-height:760px){.wl-in{padding-top:64px}}
+/* Einstellungen: Widmung und Geschenk-Link */
+.wl-gift textarea{resize:vertical;min-height:72px;font-family:inherit}
+.gift-row{display:flex;gap:8px;margin-top:8px;min-width:0}
+.gift-row input{flex:1 1 auto;min-width:0;font-size:13px;padding:7px 10px;border:1px solid var(--line);border-radius:var(--r-s);background:var(--surface-2);color:var(--fg)}
+.wl-note .link,.wl-text .link{display:inline;min-height:0;padding:6px 0;margin:-6px 0}
+.wl-inline{margin-top:6px}
+.wl-inline .link{min-height:40px}
