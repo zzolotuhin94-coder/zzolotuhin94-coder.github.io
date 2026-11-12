@@ -3,7 +3,7 @@ const {chromium}=require('playwright');
 (async()=>{const b=await chromium.launch();const errs=[];let fails=0;const ok=(c,m,x)=>{console.log((c?'  ok   ':'  FAIL ')+m+(x!==undefined?'  → '+JSON.stringify(x):''));if(!c)fails++};
 const c=await b.newContext({viewport:{width:1440,height:900}});const p=await c.newPage();p.on('pageerror',e=>errs.push(String(e)));
 const ev=(f,a)=>p.evaluate(f,a);const w=ms=>p.waitForTimeout(ms);
-await p.goto('http://127.0.0.1:8765/dahuam/index.html?fresh=1&nointro#team/dienstplan');await p.waitForSelector('.tm-dept');
+await p.goto('http://127.0.0.1:8772/dahuam/index.html?fresh=1&nointro#team/dienstplan');await p.waitForSelector('.tm-dept');
 const names=()=>ev(()=>[...document.querySelectorAll('#app .tm-t tbody tr:not(.tm-grp) .tm-name')].map(x=>x.textContent).join());
 const W=await ev(()=>tmView().w);
 ok(await ev(()=>[...document.querySelectorAll('#app .tm-dept button')].map(x=>x.textContent+(x.classList.contains('on')?'*':'')).join())==='Alle*,Küche,Service','switch Alle · Küche · Service, Alle first');
@@ -24,7 +24,7 @@ await p.click('[data-act="tmDept"][data-id="all"]');await w(150);ok(await ev(()=
 await c.close();
 /* Handy */
 const c2=await b.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true,colorScheme:'dark'});const q=await c2.newPage();q.on('pageerror',e=>errs.push(String(e)));
-await q.goto('http://127.0.0.1:8765/dahuam/index.html?fresh=1&nointro#team/dienstplan');await q.waitForSelector('.tm-dept');
+await q.goto('http://127.0.0.1:8772/dahuam/index.html?fresh=1&nointro#team/dienstplan');await q.waitForSelector('.tm-dept');
 ok(await q.evaluate(()=>document.documentElement.scrollWidth<=390),'phone: no horizontal scroll');
 ok(await q.evaluate(()=>[...document.querySelectorAll('#app .tm-dl .tm-dgrp')].map(x=>x.textContent).join())==='Küche,Service','phone day view: two headed blocks');
 await q.tap('[data-act="tmDept"][data-id="service"]');await q.waitForTimeout(150);

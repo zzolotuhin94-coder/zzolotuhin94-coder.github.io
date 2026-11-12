@@ -1,6 +1,6 @@
 const {chromium}=require('playwright');
 (async()=>{const b=await chromium.launch();const errs=[];
-const F='http://127.0.0.1:8765/dahuam/index.html?nointro';
+const F='http://127.0.0.1:8772/dahuam/index.html?nointro';
 const p=await b.newPage({viewport:{width:1440,height:960},deviceScaleFactor:1});p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&errs.push(m.text()));
 await p.goto(F);await p.evaluate(()=>__store.wipe(true));await p.reload();await p.waitForTimeout(1200);const ev=(f,a)=>p.evaluate(f,a);
 console.log('demo prices',await ev(()=>S.products.filter(p=>p.priceDemo).length),'/',await ev(()=>S.products.length));
