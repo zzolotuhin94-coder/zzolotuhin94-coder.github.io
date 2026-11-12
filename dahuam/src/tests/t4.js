@@ -1,6 +1,6 @@
 const {chromium}=require('playwright');const fs=require('fs');
 (async()=>{const b=await chromium.launch();const errs=[];
-const F='http://127.0.0.1:8765/dahuam/index.html?nointro';
+const F='http://127.0.0.1:8775/dahuam/index.html?nointro';
 const p=await b.newPage({viewport:{width:1440,height:960},timezoneId:'Europe/Vienna'});p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&errs.push(m.text()));
 await p.goto(F);await p.waitForTimeout(900);const ev=(f,a)=>p.evaluate(f,a);
 console.log('specials',await ev(()=>S.specials.map(s=>s.name+' '+s.from+'..'+s.to).join(' | ')));
