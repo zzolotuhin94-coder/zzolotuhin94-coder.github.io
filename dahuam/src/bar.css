@@ -76,3 +76,4 @@ tr.pf-row td{color:var(--muted);font-weight:400;border-top:0;padding-top:0}
   .inv-l li.bar .inv-t button{flex:none;width:42px}
   .inv-l li.bar .inv-d{grid-column:4;grid-row:1}
 }
+.lg-sum.bad-t{color:var(--bad)}

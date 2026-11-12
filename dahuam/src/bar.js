@@ -147,8 +147,8 @@ function lgSection(){
   const rows = (S.suppliers || []).map(sp => ({sp, bal:lgBalance(sp.id), kinds:lgKinds(sp.id), last:lgList().find(e => e.sup === sp.id)})).filter(x => x.kinds.length || Math.abs(x.bal) > 0.004);
   if(!rows.length) return '';
   const sum = rows.reduce((a, x) => a + x.bal, 0);
-  return `<h2 class="sec-h">Leergut<small class="muted sm">Pfand, das bei den Lieferanten steht: ${eur(sum)}</small></h2>
-  <ul class="lg-l">${rows.map(x => `<li><span class="lg-n"><b>${esc(x.sp.name)}</b><small>${x.last ? `${fmtDate(x.last.date)} · ${x.last.amt < 0 ? 'zurückgegeben' : 'geliefert'} ${eur(Math.abs(x.last.amt))}` : 'noch nichts gebucht'}</small></span><span class="mono lg-v">${eur(x.bal)}</span><button type="button" class="btn sm" data-act="lgReturn" data-id="${x.sp.id}">Leergut zurückgeben</button></li>`).join('')}</ul>`;
+  return `<h2 class="sec-h">Leergut<small class="muted sm">${sum < -0.004 ? `Guthaben bei den Lieferanten: ${eur(-sum)}` : `Pfand, das bei den Lieferanten steht: ${eur(sum)}`}</small></h2>
+  <ul class="lg-l">${rows.map(x => `<li><span class="lg-n"><b>${esc(x.sp.name)}</b><small>${x.last ? `${fmtDate(x.last.date)} · ${x.last.amt < 0 ? 'zurückgegeben' : 'geliefert'} ${eur(Math.abs(x.last.amt))}` : 'noch nichts gebucht'}</small></span><span class="mono lg-v">${x.bal < -0.004 ? `Guthaben ${eur(-x.bal)}` : eur(x.bal)}</span><button type="button" class="btn sm" data-act="lgReturn" data-id="${x.sp.id}">Leergut zurückgeben</button></li>`).join('')}</ul>`;
 }
 function lgDialog(sid){
   const sp = SUP(sid); if(!sp) return; const kinds = lgKinds(sid); const bal = lgBalance(sid); const hist = lgList().filter(e => e.sup === sid).slice(0, 8);
@@ -157,15 +157,20 @@ function lgDialog(sid){
     ${kinds.length ? `<div class="lg-k">${kinds.map((k, i) => `<label class="lg-kr"><span><b>${esc(k.label)}</b><small>${eur(k.pfand)} Pfand je ${esc(k.word)}${k.sizes ? ' · ' + esc(k.sizes) : ''}</small></span><input name="k${i}" class="num-in" type="text" inputmode="numeric" placeholder="0" autocomplete="off" aria-label="Anzahl ${esc(k.label)}"></label>`).join('')}</div>` : ''}
     <label class="f">${kinds.length ? 'Oder Betrag laut Gutschrift, €' : 'Betrag laut Gutschrift, €'}<input name="amt" class="num-in" type="text" inputmode="decimal" autocomplete="off"></label>
     <p class="lg-sum" id="lgSum" aria-live="polite"></p>
+    <div id="lgWarn"></div>
     ${hist.length ? `<details class="alg-det lg-h"><summary>Letzte Buchungen</summary><ul>${hist.map(e => `<li><span class="mono">${fmtDate(e.date)}</span><span>${esc(e.note || (e.amt < 0 ? 'Rückgabe' : 'Lieferung'))}</span><span class="mono">${signedEur(e.amt)}</span>${e.ret ? `<button type="button" class="link" data-lgundo="${e.id}">stornieren</button>` : '<span></span>'}</li>`).join('')}</ul></details>` : ''}`,
     (fd, f0) => { let sum = 0; const parts = [];
       kinds.forEach((k, i) => { const n = Math.round(+fd.get('k' + i) || 0); if(n > 0){ sum += n * k.pfand; parts.push(`${n} × ${k.label}`); } });
       const amt = +fd.get('amt') || 0; if(amt > 0){ sum += amt; parts.push('Gutschrift'); }
       sum = Math.round(sum * 100) / 100;
       if(!(sum > 0)){ dlgErr(null, 'Bitte eintragen, was zurückgeht.'); (f0.elements.k0 || f0.elements.amt).focus(); return false; }
+      // mehr zurück, als offen ist: nur nach ausdrücklicher Bestätigung (sonst steht danach ein Minus beim Lieferanten)
+      if(sum > bal + 0.004 && f0.dataset.force !== String(sum)){ const w = f0.querySelector('#lgWarn');
+        w.innerHTML = `<div class="warn-box dlg-warn" role="alert"><span><b>Das ist mehr, als offen ist.</b> Offen sind ${eur(Math.max(0, bal))}, zurück ${eur(sum)}. Stimmt die Anzahl? Wenn der Lieferant wirklich mehr gutschreibt, bleibt ein Guthaben von ${eur(sum - Math.max(0, bal))}.</span><button type="button" class="btn sm" id="lgForce">Trotzdem buchen</button></div>`;
+        w.querySelector('#lgForce').onclick = () => { f0.dataset.force = String(sum); f0.requestSubmit(); }; return false; }
       const e = lgAdd(sid, -sum, 'Rückgabe: ' + parts.join(', ')); e.ret = true; lgDialog.last = `Leergut zurück an ${sp.name}: ${eur(sum)} · offen ${eur(lgBalance(sid))}`; },
     {ok:'Buchen', done:() => lgDialog.last, after: f => {
-      const upd = () => { f.querySelectorAll('.f-err').forEach(n => n.remove()); let s = 0; kinds.forEach((k, i) => { const v = numParse(f.elements['k' + i].value); if(v > 0) s += Math.round(v) * k.pfand; }); const a = numParse(f.elements.amt.value); if(a > 0) s += a; f.querySelector('#lgSum').textContent = s > 0 ? `Zurück: ${eur(s)} · danach offen ${eur(bal - s)}` : ''; };
+      const upd = () => { f.querySelectorAll('.f-err').forEach(n => n.remove()); let s = 0; kinds.forEach((k, i) => { const v = numParse(f.elements['k' + i].value); if(v > 0) s += Math.round(v) * k.pfand; }); const a = numParse(f.elements.amt.value); if(a > 0) s += a; const el = f.querySelector('#lgSum'); const over = s > bal + 0.004; el.textContent = s > 0 ? `Zurück: ${eur(s)} · ${over ? `mehr als offen (${eur(Math.max(0, bal))})` : `danach offen ${eur(bal - s)}`}` : ''; el.classList.toggle('bad-t', over); f.querySelector('#lgWarn').innerHTML = ''; delete f.dataset.force; };
       f.oninput = upd;
       f.onclick = e => { const b = e.target.closest('[data-lgundo]'); if(!b) return; lgRemove(b.dataset.lgundo); save(); $('#dlg').close(); render(); toast('Rückgabe storniert'); }; }});
 }
