@@ -51,7 +51,7 @@ const L = require('./lib'); const fs = require('fs');
     L.ok(old.apart === undefined, 'Beispielstand von 1.4.0: noch ohne Apartments');
     const mg = await ev(o => { const before = JSON.parse(JSON.stringify(o)); const r = migrate(JSON.parse(JSON.stringify(o))); const again = migrate(JSON.parse(JSON.stringify(r)));
       const own = JSON.parse(JSON.stringify(o)); own.demo = false; const r2 = migrate(own);
-      return {same:['products', 'menu', 'orders', 'moves', 'suppliers', 'team', 'settings'].filter(k => k !== 'settings' && JSON.stringify(r[k]) !== JSON.stringify(before[k])), apts:r.apart.apts.length, demo:r.apart.apts.every(x => x.demo) && r.apart.bookings.every(x => x.demo), once:JSON.stringify(again.apart) === JSON.stringify(r.apart),
+      return {same:['products', 'menu', 'orders', 'moves', 'suppliers', 'team', 'settings'].filter(k => k !== 'settings' && JSON.stringify((k === 'products' ? r[k].map(x => { const y = {...x}; delete y.ean; return y; }) : r[k])) !== JSON.stringify(before[k])) /* Artikel: nur ean: [] dazu (Scanner) */, apts:r.apart.apts.length, demo:r.apart.apts.every(x => x.demo) && r.apart.bookings.every(x => x.demo), once:JSON.stringify(again.apart) === JSON.stringify(r.apart),
         own:r2.apart.apts.length === 0 && r2.apart.bookings.length === 0 && r2.apart.settings.list.length === 6 && r2.apart.settings.checkin === '15:00'}; }, old);
     L.ok(mg.same.length === 0 && mg.apts === 3 && mg.demo, 'alter Beispielstand lädt unverändert und bekommt einmal die Beispiel-Apartments (als Beispiel markiert)', mg);
     L.ok(mg.once, 'erneutes Laden ändert nichts mehr');
