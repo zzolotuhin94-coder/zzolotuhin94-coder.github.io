@@ -1,6 +1,6 @@
 // Entferntes ist wirklich weg: nicht versteckt, sondern nicht mehr in der gebauten Datei. Dazu die Größe vorher und nachher.
 const fs = require('fs'); const path = require('path'); const L = require('./lib');
-const SITE = process.env.SITE || '/home/user/zzolotuhin94-coder.github.io/dahuam/';
+const SITE = process.env.SITE || '/home/user/wt-4/dahuam/';
 const html = fs.readFileSync(SITE + 'index.html', 'utf8'); const before = fs.existsSync(path.join(__dirname, '..', 'index.before-b.html')) ? fs.statSync(path.join(__dirname, '..', 'index.before-b.html')).size : null;
 const GONE = [
   // Rezept-Labor

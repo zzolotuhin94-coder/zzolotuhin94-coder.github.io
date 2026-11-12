@@ -30,7 +30,7 @@ const L = require('./lib'); const fs = require('fs'); const path = require('path
   const pdf = fs.readFileSync(await dl.path()); L.ok(pdf.slice(0, 5).toString() === '%PDF-' && pdf.length > 20000 && /\.pdf$/.test(dl.suggestedFilename()), `ohne Netz: Rezeptur als PDF gespeichert (${Math.round(pdf.length/1024)} KB)`, dl.suggestedFilename());
   L.ok(await p.evaluate(() => [...document.scripts].filter(s => s.src).map(s => s.src.replace(location.origin, '')).join()) === '/dahuam/vendor/html2canvas.min.js,/dahuam/vendor/jspdf.umd.min.js', 'PDF-Bibliotheken kamen aus dem eigenen Ordner');
   // Excel ohne Netz (Kassendatei und Preisliste)
-  const XLSX = require(path.join('/home/user/zzolotuhin94-coder.github.io/dahuam/vendor/xlsx.full.min.js'));
+  const XLSX = require(path.join('/home/user/wt-4/dahuam/vendor/xlsx.full.min.js'));
   const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['Artikel', 'Einheit', 'Preis'], ['Mehl glatt', 'kg', 1.11], ['Butter', 'kg', 9.99]]), 'Preise'); const xf = __dirname + '/tmp_preise.xlsx'; fs.writeFileSync(xf, Buffer.from(XLSX.write(wb, {type:'array', bookType:'xlsx'})));
   await p.evaluate(() => { go('products'); plDialog(); }); await p.waitForTimeout(300); await p.setInputFiles('#plFile', xf); await p.waitForTimeout(1500);
   const pl = await p.evaluate(() => ({txt:document.querySelector('#plText').value, out:document.querySelector('#plOut').innerText.replace(/\s+/g, ' ').slice(0, 260) /* D1: zwei Beispiel-Artikel mehr stehen vor „Butter“ */, lib:[...document.scripts].some(s => /vendor\/xlsx\.full\.min\.js$/.test(s.src))}));
