@@ -63,7 +63,7 @@ const CK_DEFAULTS = [
     'Herd, Ofen und Pass einschalten',
     'Arbeitsflächen reinigen und desinfizieren',
     'Schneidbretter, Messer und saubere Tücher bereitlegen',
-    'Mise en place nach der Prep-Liste auffüllen',
+    'Mise en place nach der Vorbereitungsliste auffüllen',
     'Seife und Papier am Handwaschbecken auffüllen',
     'Müllsäcke einsetzen',
   ]],
