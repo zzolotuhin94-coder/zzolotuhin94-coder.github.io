@@ -1,6 +1,6 @@
 // Entferntes ist wirklich weg: nicht versteckt, sondern nicht mehr in der gebauten Datei. Dazu die Größe vorher und nachher.
 const fs = require('fs'); const path = require('path'); const L = require('./lib');
-const SITE = '/home/user/zzolotuhin94-coder.github.io/dahuam/';
+const SITE = process.env.SITE || '/home/user/zzolotuhin94-coder.github.io/dahuam/';
 const html = fs.readFileSync(SITE + 'index.html', 'utf8'); const before = fs.existsSync(path.join(__dirname, '..', 'index.before-b.html')) ? fs.statSync(path.join(__dirname, '..', 'index.before-b.html')).size : null;
 const GONE = [
   // Rezept-Labor
@@ -27,12 +27,12 @@ const GONE = [
   L.ok(found.length === 0, `${GONE.length} Zeichenfolgen entfernter Funktionen kommen in der gebauten Datei nicht mehr vor`, found);
   const size = fs.statSync(SITE + 'index.html').size;
   console.log(`  Größe index.html: vorher ${before} Bytes, nachher ${size} Bytes (${before ? Math.round((1 - size / before) * 100) : '?'} % weniger)`);
-  L.ok(before && size < before * 1.12, 'die gebaute Datei bleibt höchstens 12 % über dem Stand vor Paket B (nach Paket B waren es über 10 % weniger; Paket C brachte Import, Allergen-Blatt und zweiten Steuersatz, Paket D1 Bar & Getränke mit rund 35 KB, Paket D2 Küchen- und Service-Ansicht, Eigenkontrolle und Monatsmappe mit rund 70 KB, die Willkommensseite mit Widmung und Geschenk-Link rund 17 KB, der Speisekarte-Gestalter rund 10 KB – er ersetzt Hauskarten-Satz und Website-Ansicht)', {vorher:before, nachher:size});
+  L.ok(before && size < before * 1.2, 'die gebaute Datei bleibt höchstens 20 % über dem Stand vor Paket B (nach Paket B waren es über 10 % weniger; Paket C brachte Import, Allergen-Blatt und zweiten Steuersatz, Paket D1 Bar & Getränke mit rund 35 KB, Paket D2 Küchen- und Service-Ansicht, Eigenkontrolle und Monatsmappe mit rund 70 KB, die Willkommensseite mit Widmung und Geschenk-Link rund 17 KB, der Speisekarte-Gestalter rund 10 KB – er ersetzt Hauskarten-Satz und Website-Ansicht)', {vorher:before, nachher:size});
   // im laufenden Programm: keine der alten Seiten, keine alten Einstellungen
   const b = await L.launch(); const {p} = await L.open(b, {vp:{width:1440, height:900}});
   const rt = await p.evaluate(() => ({tabs:TABS.map(t => t[0]).join(), fn:['renderLabor','renderStempel','renderBegriffe','renderAufbau','gdRewards','missionGo','isSimple','vsw','matrixSvg','guideHere','checkRewards'].filter(n => { try { return typeof eval(n) !== 'undefined'; } catch(e){ return false; } }), cls:document.body.className, intro:!!document.getElementById('intro'), skDefs:!!document.getElementById('skDefs')}));
   L.ok(rt.fn.length === 0 && !/simple/.test(rt.cls) && !rt.intro && !rt.skDefs, 'im laufenden Programm gibt es keine der entfernten Funktionen', rt);
-  L.ok(rt.tabs === 'dash,vorb,checkl,menu,cards,stock,buy,products,pcheck,dienst,report,setup,einr,daten', 'Seiten der App', rt.tabs);
+  L.ok(rt.tabs === 'dash,vorb,checkl,menu,cards,stock,buy,products,pcheck,dienst,report,setup,einr,daten,apart', 'Seiten der App', rt.tabs);
   // auf keiner Seite: Kachelreihen, Karten-/Kompakt-Schalter, Lagerort-Marken in den Zeilen, Strich-Spalten
   const bad = []; for(const h of L.SCREENS){ await L.go(p, h); const r = await p.evaluate(() => ({tiles:document.querySelectorAll('#app .tiles, #app .tile').length, vsw:document.querySelectorAll('#app .vsw').length, note:document.querySelectorAll('#app .note, #app .wozu, #app .pl-demo').length, eyebrow:document.querySelectorAll('#app .page-h .eyebrow').length, reward:document.querySelectorAll('.reward,.gd-rw').length, txt:/Stempel|Rezept-Labor|Demodaten|Beispielpreis|Küchenchef|Inhaber/.test(document.querySelector('#app').innerText)}));
     if(r.tiles || r.vsw || r.note || r.eyebrow || r.reward || r.txt) bad.push(h + ' ' + JSON.stringify(r)); }

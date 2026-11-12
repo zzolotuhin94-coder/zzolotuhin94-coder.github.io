@@ -1,0 +1,176 @@
+/* =====================================================================
+   Apartments: Übersicht, Woche, Reinigung, Verwalten, Wochenplan (A4)
+   Farben je Apartment wie im Dienstplan (--tm0 … --tm7), Listen statt Kästen.
+   ===================================================================== */
+.ap{--ap-name:180px}
+.ap .warn-t,.ap-dash .warn-t,#dlg .ap-il .warn-t{color:var(--warn)}
+.ap-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--pc,var(--muted));flex:none}
+.ap-h{margin:22px 0 8px;font:600 13px/1.3 var(--f-body);color:var(--muted);letter-spacing:.01em}
+.ap .toolbar.tabs + .ap-h{margin-top:4px}
+.ap-quiet{margin:0;color:var(--faint);font-size:13px}
+.ap-none{padding-top:12px} .ap-none .btn{margin-top:16px}
+
+/* ---------- Heute ---------- */
+.ap-rows{list-style:none;margin:0;padding:0;max-width:860px;border-top:1px solid var(--line-strong)}
+.ap-r{display:grid;grid-template-columns:minmax(150px,240px) minmax(0,1fr);gap:4px 20px;padding:12px 0;border-bottom:1px solid var(--line)}
+.ap-rn{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ap-rn b{display:flex;align-items:center;gap:8px;font:500 19px/1.2 var(--f-display);letter-spacing:.005em}
+.ap-st{font-size:12.5px;color:var(--muted)}
+.ap-st.ap-free{color:var(--faint)}
+.ap-evs{display:flex;flex-direction:column;min-width:0}
+.ap-ev{display:grid;grid-template-columns:92px minmax(0,1fr);gap:10px;align-items:baseline;width:100%;min-height:36px;padding:6px 0;border:0;background:none;color:var(--fg);font:inherit;text-align:left;cursor:pointer;border-radius:0}
+.ap-ev + .ap-ev{border-top:1px dashed var(--line)}
+.ap-ev:hover .ap-et{text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px}
+.ap-k{font-size:12.5px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ap-et{min-width:0;overflow-wrap:anywhere}
+.ap-et small{display:block;color:var(--muted);font-size:12.5px}
+.ap-k.in{color:var(--good)}
+
+/* ---------- Woche ---------- */
+.ap-wh{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;max-width:1100px;margin-top:26px}
+.ap-wh .ap-h{margin:0 0 8px}
+.ap-wk{display:flex;align-items:center;gap:2px;margin:0 0 6px}
+.ap-wk .icon-btn{width:40px;height:40px;color:var(--muted)} .ap-wk .icon-btn:hover{color:var(--fg)}
+.ap-wkl{min-width:120px;display:flex;flex-direction:column;align-items:center;line-height:1.15}
+.ap-wkl b{font:500 21px/1.1 var(--f-display);letter-spacing:.01em}
+.ap-wkl small{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ap-wk .btn{margin-left:8px}
+.ap-grid{max-width:1100px;border-top:1px solid var(--line-strong)}
+.ap-g{display:grid;grid-template-columns:var(--ap-name) repeat(14,minmax(0,1fr));align-items:center;position:relative}
+.ap-gh{height:40px;border-bottom:1px solid var(--line)}
+.ap-gd{font-size:12.5px;color:var(--muted);padding:0 6px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ap-gd b{font:500 15px/1 var(--f-display);color:var(--fg);margin-right:2px}
+.ap-gd.today b{color:var(--accent);box-shadow:inset 0 -2px 0 var(--accent);padding-bottom:2px}
+.ap-gr{min-height:58px;border-bottom:1px solid var(--line);grid-template-rows:58px}
+.ap-gn{grid-column:1;grid-row:1;display:flex;align-items:center;gap:8px;min-width:0;padding-right:10px}
+.ap-gn b{font-weight:600;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.ap-gc{grid-row:1;align-self:stretch;border-left:1px solid var(--line)}
+.ap-gt{grid-row:1;align-self:stretch;background:var(--accent-soft)}
+.ap-bar{grid-row:1;z-index:1;display:flex;align-items:center;gap:6px;min-width:0;height:36px;margin:0 2px;padding:0 8px 0 9px;border:0;border-left:3px solid var(--pc);border-radius:4px;background:color-mix(in srgb,var(--pc) var(--tm-tint,12%),var(--surface));color:var(--fg);font:inherit;font-size:13px;text-align:left;cursor:pointer;overflow:hidden}
+.ap-bar b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ap-bar small{flex:none;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.ap-bar.cut-l{border-left-style:dashed;border-radius:0 4px 4px 0;margin-left:0}
+.ap-bar.cut-r{border-radius:4px 0 0 4px;margin-right:0}
+.ap-bar.clash{box-shadow:inset 0 0 0 1px var(--warn)}
+.ap-bar:hover{background:color-mix(in srgb,var(--pc) calc(var(--tm-tint,12%) + 8%),var(--surface))}
+.ap-free-b{grid-row:1;align-self:center;height:30px;margin:0 3px;display:flex;align-items:center;justify-content:center;border:1px dashed var(--line-strong);border-radius:4px;color:var(--faint);font-size:12px;white-space:nowrap;overflow:hidden}
+.ap-days{display:none;list-style:none;margin:0;padding:0;border-top:1px solid var(--line-strong)}
+.ap-days > li{padding:10px 0 8px;border-bottom:1px solid var(--line)}
+.ap-dh{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ap-dh b{font:500 18px/1.1 var(--f-display);color:var(--fg)}
+.ap-dh span{margin-left:auto;font-size:12.5px;color:var(--faint)}
+.ap-days li.today .ap-dh b{color:var(--accent)}
+.ap-dl{display:grid;grid-template-columns:70px minmax(0,1fr);gap:10px;align-items:baseline;width:100%;min-height:44px;padding:6px 0 6px 10px;border:0;border-left:3px solid var(--pc);margin:2px 0;background:none;color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+.ap-dl b{font-weight:600}
+.ap-dl small{display:block;color:var(--muted);font-size:12.5px;overflow-wrap:anywhere}
+
+/* ---------- Reinigung ---------- */
+.ap-wash{margin:4px 0 6px;max-width:860px}
+.ap-wash small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.ap-ch{margin:20px 0 6px;font:600 13px/1.3 var(--f-body);color:var(--muted);display:flex;gap:8px;align-items:baseline}
+.ap-ch.today{color:var(--fg)}
+.ap-ch span{font-weight:400}
+.ap-cls{list-style:none;margin:0;padding:0;max-width:860px;border-top:1px solid var(--line-strong)}
+.ap-cl{display:grid;grid-template-columns:52px minmax(0,1fr) auto;align-items:center;gap:6px 10px;min-height:68px;border-bottom:1px solid var(--line)}
+.ap-ck{display:grid;place-items:center;width:52px;height:60px;padding:0;border:0;background:none;cursor:pointer}
+.ap-ck .ck-box{width:30px;height:30px}
+.ap-cl.on .ap-ck .ck-box{background:var(--good);border-color:var(--good);color:var(--surface)}
+.ap-cl.on .ap-ck .ck-box .ico{opacity:1}
+.ap-ck:hover .ck-box{border-color:var(--muted)}
+.ap-cl.urgent .ck-box{border-color:var(--warn)}
+.ap-cl.late .ck-box,.ap-cl.over .ck-box{border-color:var(--bad)}
+.ap-cm{display:flex;flex-direction:column;gap:2px;min-width:0;padding:10px 0;border:0;background:none;color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+.ap-cm b{display:flex;align-items:center;gap:8px;font:500 18px/1.2 var(--f-display);letter-spacing:.005em}
+.ap-cm small{font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.ap-cm .ap-note{color:var(--fg)}
+.ap-cm .ap-note::before{content:'Notiz: ';color:var(--muted)}
+.ap-cl.on .ap-cm b{color:var(--muted)}
+.ap-who{min-height:40px;max-width:180px;padding:0 12px;border:1px solid var(--line-strong);border-radius:20px;background:var(--surface);color:var(--fg);font:inherit;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.ap-who.none{color:var(--muted);border-style:dashed}
+.ap-empty{padding:18px 0}
+
+/* ---------- Verwalten ---------- */
+.ap-apts{list-style:none;margin:0;padding:0;max-width:860px;border-top:1px solid var(--line-strong)}
+.ap-apts > li{display:flex;align-items:center;gap:10px 18px;padding:12px 0;border-bottom:1px solid var(--line)}
+.ap-an{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ap-an b{display:flex;align-items:center;gap:8px;font:500 19px/1.2 var(--f-display)}
+.ap-an small{font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.ap-an small:empty{display:none}
+.ap .toolbar.tabs + .ap-apts,.ap .toolbar.tabs + .ap-wk{border-top:0}
+.ap-aa{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.ap-sec .ap-mask{letter-spacing:.15em;color:var(--faint)}
+.ap-sec .ap-code{color:var(--fg);font-weight:600}
+.ap-sec .link{margin-left:4px}
+.ap-priv{max-width:860px;margin-top:18px}
+
+/* ---------- Dialoge ---------- */
+.ap-dinfo{line-height:1.5}
+.ap-list{border:0;margin:10px 0 4px;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:2px 16px}
+.ap-list legend,.ap-ch-f legend,.ap-cols legend{padding:0;margin-bottom:6px;font-size:12.5px;color:var(--muted)}
+.ap-list .tog{min-height:40px}
+.ap-done{margin-top:10px;font-weight:600}
+.ap-hist{margin-top:12px;font-size:13px}
+.ap-hist summary{cursor:pointer;color:var(--muted)}
+.ap-hist ul{list-style:none;margin:6px 0 0;padding:0}
+.ap-hist li{display:grid;grid-template-columns:120px minmax(0,1fr);gap:10px;padding:4px 0;border-top:1px dashed var(--line)}
+.ap-hist li span:first-child{color:var(--muted);font-variant-numeric:tabular-nums}
+.ap-ch-f{border:0;margin:8px 0 0;padding:0}
+.ap-ch-f .togs{display:flex;flex-wrap:wrap;gap:4px 16px}
+.ap-nights{margin:-2px 0 4px;min-height:1.2em}
+.ap-src{color:var(--muted)}
+.ap-pick{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
+.ap-pick .btn{min-height:44px}
+.ap-cols{border:0;margin:8px 0 0;padding:0;display:flex;gap:10px;flex-wrap:wrap}
+.ap-col{position:relative;cursor:pointer}
+.ap-col input{position:absolute;opacity:0;width:1px;height:1px}
+.ap-col span{display:block;width:32px;height:32px;border-radius:50%;background:var(--pc);border:3px solid var(--surface);box-shadow:0 0 0 1px var(--line-strong)}
+.ap-col input:checked + span{box-shadow:0 0 0 2px var(--fg)}
+.ap-col input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+.ap-led{list-style:none;margin:0 0 10px;padding:0}
+.ap-le{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.ap-le input{flex:1}
+.ap-how,.ap-alt{margin:8px 0;font-size:13.5px}
+.ap-how summary,.ap-alt summary{cursor:pointer;color:var(--muted);padding:8px 0}
+.ap-how ol{margin:4px 0 0;padding-left:20px;line-height:1.5}
+.ap-src-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0}
+.ap-url{display:flex;gap:8px;align-items:flex-end}
+.ap-url .f{flex:1;margin:0}
+.ap-sum{margin:14px 0 4px}
+.ap-honest{margin:0 0 6px}
+.ap-ilist{max-height:46vh;overflow:auto}
+.ap-il .imp-ln s{color:var(--faint);font-weight:400}
+.ap-ist{flex:none;font-size:12.5px;color:var(--muted);white-space:nowrap}
+.ap-il.st-neu .ap-ist{color:var(--good)} .ap-il.st-akt .ap-ist{color:var(--warn)} .ap-il.st-weg .ap-ist{color:var(--bad)}
+.ap-il.st-skip .imp-ln b{color:var(--muted);font-weight:400}
+.ap-err{display:block;margin-top:10px}
+.ap-kv{grid-template-columns:110px 1fr}
+
+/* ---------- Handy und Tablet ---------- */
+@media (max-width:1100px){ .ap{--ap-name:140px} }
+@media (max-width:700px){
+  .ap-r{grid-template-columns:1fr;gap:2px}
+  .ap-rn{flex-direction:row;align-items:baseline;justify-content:space-between;gap:10px}
+  .ap-st{text-align:right}
+  .ap-ev{grid-template-columns:84px minmax(0,1fr);min-height:44px}
+  .ap-grid{display:none}
+  .ap-days{display:block}
+  .ap-wh{margin-top:22px}
+  .ap-wk{margin-left:-8px}
+  .ap-cl{grid-template-columns:48px minmax(0,1fr) auto;gap:0 8px}
+  .ap-ck{width:48px} .ap-who{max-width:112px;padding:0 10px}
+  .ap-apts > li{flex-direction:column;align-items:stretch}
+  .ap-aa{justify-content:flex-start}
+  .ap-aa .btn{flex:1;min-height:44px}
+  .ap-list{grid-template-columns:1fr}
+  .ap-url{flex-direction:column;align-items:stretch}
+  .ap-hist li{grid-template-columns:1fr;gap:0}
+}
+@media (pointer:coarse),(max-width:1100px){ .ap-ev{min-height:44px} .ap-who{min-height:44px} .ap-bar{height:44px} .ap .seg button{min-height:44px} .ap-wk .icon-btn{width:44px;height:44px}
+   .ap .page-h .btn,.ap-aa .btn,#dlg .ap-pick .btn,#dlg .ap-src-row .btn{min-height:44px} .ap-list .tog{min-height:44px} }
+
+/* ---------- Wochenplan A4 (gemessen wie die Monatsmappe) ---------- */
+.ap-page .mp-t td:nth-child(2){width:150px}
+.ap-page .mp-t td:nth-child(3){width:120px}
+.ap-page .mp-t td:nth-child(4){width:160px}
+.ap-page .mp-t tr.cp-d td{border-top:1px solid #9a9a9a}
+.ap-pwash{margin-top:12px;font-size:11.5px;color:#111}

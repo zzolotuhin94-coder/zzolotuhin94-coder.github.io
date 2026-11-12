@@ -42,7 +42,7 @@ const L = require('./lib');
   // ---------- Service-Liste ----------
   await L.go(p, 'speisekarte/service');
   const sl = await ev(() => { const {rows} = svRows(); return {n:rows.length, dom:document.querySelectorAll('#app .sv-rb').length, tabs:[...document.querySelectorAll('#app .toolbar.tabs [role=tab]')].map(x => x.textContent.replace(/\d+$/, '')).join('|'), nav:NAV.length, on:document.querySelector('.side .nav-i.on, .nav-i.on').textContent.trim(), fact:document.querySelector('#app .sv-fact').textContent, hidden:S.menu.filter(m => m.hidden).length, guest:guestItems(seasonFor(todayStr()) || 'winter', todayStr()).length}; });
-  L.ok(sl.tabs === 'Gerichte|Gästekarte|Saison & Aktionen|Service' && sl.nav === 7 && sl.on === 'Speisekarte', 'Service-Liste ist ein Reiter der Speisekarte; weiterhin sieben Bereiche', sl.tabs);
+  L.ok(sl.tabs === 'Gerichte|Gästekarte|Saison & Aktionen|Service' && sl.nav === 8 && sl.on === 'Speisekarte', 'Service-Liste ist ein Reiter der Speisekarte; acht Bereiche (mit Apartments)', sl.tabs);
   L.ok(sl.n === sl.dom && sl.n === sl.guest && /Karte von heute, Donnerstag, 12\. November · \d+ Einträge/.test(sl.fact), 'alles, was heute auf der Karte steht (wie die Gästekarte von heute)', [sl.n, sl.guest, sl.fact]);
   // Zeile: Buchstaben, „keine“ oder „nachfragen“; aufklappen zeigt den Block
   const row = n => ev(n => { const r = [...document.querySelectorAll('#app .sv-r')].find(x => x.querySelector('.sv-n b').textContent === n); return r ? r.innerText.replace(/\s+/g, ' ').trim() : null; }, n);

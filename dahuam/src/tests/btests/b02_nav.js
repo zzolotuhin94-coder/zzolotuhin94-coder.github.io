@@ -1,9 +1,9 @@
-// Navigation: sieben Bereiche und die Einstellungen; am Handy fünf Punkte und „Mehr“; alte Adressen leiten um; Speicher-Anzeige und „Nur ansehen“ gehen weiter.
+// Navigation: acht Bereiche und die Einstellungen; am Handy fünf Punkte und „Mehr“; alte Adressen leiten um; Speicher-Anzeige und „Nur ansehen“ gehen weiter.
 const L = require('./lib');
 (async () => { const b = await L.launch();
   { const {p} = await L.open(b, {vp:{width:1440, height:900}});
     const nav = await p.evaluate(() => [...document.querySelectorAll('.side .nav-i')].map(n => n.textContent.trim() + ':' + (n.dataset.tab || n.dataset.act)));
-    L.ok(nav.join('|') === 'Heute:dash|Vorbereitung:vorb|Checklisten:checkl|Speisekarte:menu|Rezepte:cards|Ware:ware|Team & Zahlen:team|Einstellungen:setup', 'Desktop: sieben Bereiche und die Einstellungen', nav);
+    L.ok(nav.join('|') === 'Heute:dash|Vorbereitung:vorb|Checklisten:checkl|Speisekarte:menu|Rezepte:cards|Ware:ware|Team & Zahlen:team|Apartments:apart|Einstellungen:setup', 'Desktop: acht Bereiche und die Einstellungen', nav);
     L.ok(await p.evaluate(() => view.tab === 'dash' && location.hash === '#heute' && document.querySelector('.side .nav-i.on').dataset.tab === 'dash'), 'Start auf „Heute“');
     // Unter-Reiter
     const tabs = async h => { await L.go(p, h); return p.evaluate(() => [...document.querySelectorAll('#app .toolbar.tabs .seg button')].map(x => x.childNodes[0].textContent.trim()).join('|')); };
@@ -38,7 +38,7 @@ const L = require('./lib');
     // zweites Fenster: nur ansehen
     const B = await p.context().newPage(); await B.goto(L.URL); await B.waitForFunction(() => !document.documentElement.classList.contains('booting')); await B.waitForTimeout(500);
     const ro = await B.evaluate(() => ({bar:(document.querySelector('#relBars .rel-bar.info') || {innerText:''}).innerText.replace(/\s+/g, ' '), ind:document.querySelector('.side .save-ind').textContent, nav:document.querySelectorAll('.side .nav-i').length, top:document.querySelector('#relBars').getBoundingClientRect().top, appTop:document.querySelector('#app').getBoundingClientRect().top}));
-    L.ok(/In einem anderen Fenster geöffnet/.test(ro.bar) && ro.ind === 'Nur ansehen' && ro.nav === 8 && ro.appTop >= ro.top, 'zweites Fenster: Zeile „In einem anderen Fenster geöffnet“, Anzeige „Nur ansehen“, Navigation vollständig', ro);
+    L.ok(/In einem anderen Fenster geöffnet/.test(ro.bar) && ro.ind === 'Nur ansehen' && ro.nav === 9 && ro.appTop >= ro.top, 'zweites Fenster: Zeile „In einem anderen Fenster geöffnet“, Anzeige „Nur ansehen“, Navigation vollständig', ro);
     await B.evaluate(() => { location.hash = '#ware/bestellen'; }); await B.waitForTimeout(250); L.ok(await B.evaluate(() => view.tab === 'buy' && !!document.querySelector('#relBars .rel-bar.info')), 'im zweiten Fenster lässt sich durch die neuen Bereiche blättern, die Zeile bleibt');
     await B.close(); p.errs.length = 0; await p.context().close(); }
   { const {p} = await L.open(b, L.PHONE);
@@ -48,7 +48,7 @@ const L = require('./lib');
     L.ok(fit.every(Boolean) && await p.evaluate(() => document.documentElement.scrollWidth === 390), 'Handy: alle fünf Punkte passen, kein Wort abgeschnitten, mindestens 44 px hoch', fit);
     await p.click('.bottom .nav-i[data-act="mehr"]'); await p.waitForTimeout(300);
     const sh = await p.evaluate(() => { const m = document.getElementById('mehr'); const box = m.querySelector('.sheet-box').getBoundingClientRect(); return {open:!m.hidden, items:[...m.querySelectorAll('.sheet-i b')].map(x => x.textContent), tab:view.tab, box:[Math.round(box.left), Math.round(box.right), Math.round(box.bottom)], h:[...m.querySelectorAll('.sheet-i')].every(x => x.getBoundingClientRect().height >= 44), exp:document.querySelector('.bottom [data-act="mehr"]').getAttribute('aria-expanded'), role:m.querySelector('.sheet-box').getAttribute('role')}; });
-    L.ok(sh.open && sh.items.join('|') === 'Speisekarte|Ware|Team & Zahlen|Einstellungen|Suche' && sh.tab === 'dash', '„Mehr“ ist ein Blatt mit Speisekarte, Ware, Team & Zahlen, Einstellungen, Suche; die Seite bleibt, wo sie war', sh);
+    L.ok(sh.open && sh.items.join('|') === 'Speisekarte|Ware|Team & Zahlen|Apartments|Einstellungen|Suche' && sh.tab === 'dash', '„Mehr“ ist ein Blatt mit Speisekarte, Ware, Team & Zahlen, Apartments, Einstellungen, Suche; die Seite bleibt, wo sie war', sh);
     L.ok(sh.box[0] === 0 && sh.box[1] === 390 && sh.box[2] === 844 && sh.h && sh.exp === 'true' && sh.role === 'dialog', 'Blatt füllt die Breite, Zeilen ≥ 44 px, für Vorleser als Dialog');
     await p.click('#mehr .sheet-i[data-tab="ware"]'); await p.waitForTimeout(300);
     L.ok(await p.evaluate(() => document.getElementById('mehr').hidden && view.tab === 'stock' && location.hash === '#ware/bestand' && document.querySelector('.bottom [data-act="mehr"]').classList.contains('on') && !document.querySelector('.bottom .nav-i[data-tab].on')), 'Tipp auf „Ware“: Blatt zu, Ware offen, „Mehr“ ist markiert');

@@ -18,7 +18,7 @@ const OLD = fs.readFileSync(__dirname + '/../index.before-a.html', 'utf8');
   { // 1 Demostand, von der alten App gespeichert
     const c = await L.ctx(b); const o = await oldApp(c); const raw = await o.evaluate(() => { S.settings.name = 'Alt gespeichert'; save(); return localStorage.getItem(KEY); }); await o.close();
     const p = await L.page(c); const r = await cmp(p, raw);
-    L.ok(r.diff.length === 0, 'Demostand: jeder alte Schlüssel ist unverändert angekommen (bis auf die Umstellungen aus Paket B)', r.diff); L.ok(r.extra.sort().join() === 'imports,schema', 'neu sind nur das Datenformat und die Liste der Importe (Paket C)', r.extra);
+    L.ok(r.diff.length === 0, 'Demostand: jeder alte Schlüssel ist unverändert angekommen (bis auf die Umstellungen aus Paket B)', r.diff); L.ok(r.extra.sort().join() === 'apart,imports,schema', 'neu sind nur das Datenformat, die Liste der Importe (Paket C) und die Apartments', r.extra);
     L.ok(r.same && r.st.mode === 'idb' && r.st.rev === 1 && !r.st.dirty, 'liegt in IndexedDB, Speicher und Bildschirm sind gleich', r.st);
     L.ok(/"_store":"idb"/.test(r.marker) && r.marker.length < 200, 'alter Schlüssel ist nur noch ein kleiner Marker', r.marker);
     L.ok(r.snaps.length === 1 && r.snaps[0] === 'umzug:' + raw.length, 'alter Stand liegt zusätzlich als „vor der Umstellung“ bei den früheren Ständen', r.snaps);

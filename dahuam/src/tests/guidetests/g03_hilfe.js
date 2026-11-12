@@ -54,7 +54,7 @@ const {L,ok,done,settle,PHONE,bub}=require('./h');
  ok(await p.evaluate(()=>document.querySelector('#dlg').open&&/Garverlust/.test(document.querySelector('#dlg').textContent)),'Schnellsuche findet ein Fachwort und zeigt die Erklärung');await p.keyboard.press('Escape');
  // ein Satz je Navigationspunkt
  const nav=await p.evaluate(()=>({titles:[...document.querySelectorAll('.side .nav-i')].map(b=>b.title),groups:document.querySelectorAll('.side .nav-group').length}));
- ok(nav.titles.length===8&&nav.titles.every(t=>t.length>20)&&nav.groups===0,'acht Navigationspunkte, jeder mit einem Satz, keine Gruppen-Überschriften',nav);
+ ok(nav.titles.length===9/* + Apartments */&&nav.titles.every(t=>t.length>20)&&nav.groups===0,'neun Navigationspunkte (mit Apartments), jeder mit einem Satz, keine Gruppen-Überschriften',nav);
  // Brotkrume
  await p.evaluate(()=>go('cards','dish_kaiser'));await settle(p,250);
  ok(await p.evaluate(()=>{const c=document.querySelector('#app .crumb');return !!c&&c.querySelector('.back').textContent.trim()==='Alle Rezepturen'&&c.querySelector('.crumb-here').textContent===C('dish_kaiser').name&&/Kaiserschmarrn.*Rezepte/.test(document.title)}),'Rezeptur: Zurück-Knopf, aktueller Ort, Titel des Fensters');
