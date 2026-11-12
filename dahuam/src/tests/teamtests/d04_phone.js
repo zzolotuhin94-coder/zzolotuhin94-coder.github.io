@@ -11,10 +11,9 @@ const check=async(name,root='#app')=>{const s=await sw();const sm=await small(ro
 const checkDlg=async name=>{const s=await sw();const fit=await dlgFit();const sm=await small('#dlgForm');ok(s===390&&fit,`${name}: dialog fits 390, nothing sticks out`,[s,fit]);ok(sm.length===0,`${name}: touch targets ≥ 40 px`,sm.slice(0,6));};
 const swipe=(dx)=>ev(dx=>{const el=document.querySelector('#app .tm-dl');const T=(x)=>new Touch({identifier:1,target:el,clientX:x,clientY:420});el.dispatchEvent(new TouchEvent('touchstart',{touches:[T(200)],changedTouches:[T(200)],bubbles:true}));el.dispatchEvent(new TouchEvent('touchend',{touches:[],changedTouches:[T(200+dx)],bubbles:true}))},dx);
 // ---------- unter „Mehr“ › Team & Zahlen ----------
-await p.tap('.bottom .nav-i[data-act="mehr"]');await w(300);
-// fix-3: Ware (täglich bestellen) in der Leiste; Checklisten unter „Mehr“ und als Zeile auf „Heute“
-ok(await ev(()=>!!$('#mehr .sheet-i[data-tab="team"]')&&!document.querySelector('.bottom .nav-i[data-tab="team"]')&&!!$('#mehr .sheet-i[data-tab="checkl"]')&&!!document.querySelector('.bottom .nav-i[data-tab="ware"]')),'phone: Ware in the bottom bar; Checklisten and „Team & Zahlen“ (Dienstplan) under „Mehr“');
-await p.tap('#mehr .sheet-i[data-tab="team"]');await w(300);ok(await ev(()=>view.tab==='dienst'&&document.querySelector('.bottom .nav-i.on').dataset.act==='mehr'),'tap opens the plan; the bottom bar marks „Mehr“');
+await p.tap('.bottom .nav-i[data-ph="mehr"]');await w(300);   // Handy-Bedienung (phone.js): „Mehr“ ist eine Seite
+ok(await ev(()=>!!$('#app [data-act="tmGo"]')&&!!$('#app [data-act="ckGo"]')&&!document.querySelector('.bottom .nav-i[data-tab="team"]')),'phone: Dienstplan and Checklisten are rows under „Mehr“');
+await p.tap('#app [data-act="tmGo"]');await w(300);ok(await ev(()=>view.tab==='dienst'&&document.querySelector('.bottom .nav-i.on').dataset.ph==='mehr'),'tap opens the plan; the bottom bar marks „Mehr“');
 // ---------- Tagesansicht ----------
 const dv=await ev(()=>({day:tmView().day,strip:[...document.querySelectorAll('#app .tm-days button')].map(x=>x.innerText.replace(/\s+/g,' ')),on:$('#app .tm-days button.on').innerText.replace(/\s+/g,' '),h:$('#app .tm-dh').firstChild.textContent,rows:[...document.querySelectorAll('#app .tm-dr')].map(r=>r.querySelector('.tm-pn b').textContent+': '+r.querySelector('.tm-dc').innerText.replace(/\s+/g,' ')),plus:document.querySelectorAll('#app .tm-dr .tm-plus').length,table:!!$('#app .tm-t'),staff:$('#app .tm-dstaff').innerText.replace(/\s+/g,' '),acts:[...document.querySelectorAll('#app .tm-acts .btn')].map(x=>x.textContent.trim()),top:$('#app .tm-dl').getBoundingClientRect().top}));
 ok(dv.day==='2026-11-12'&&dv.strip.length===7&&dv.on==='Do 12.'&&dv.h==='Donnerstag, 12. November'&&!dv.table,'phone: one day per screen, opens on today, seven day buttons, no wide table',dv.strip);
@@ -78,8 +77,8 @@ await p.tap('#app .ck-hb[data-id="2026-11-08"]');await w(250);ok(await ev(()=>!!
 await ev(()=>{view.ck.tab='vorlagen';render()});await w(200);await check('checklist templates');
 await p.tap('#app [data-act="ckTplEdit"][data-id="ck_open_k"]');await w(300);await checkDlg('edit list dialog');await ev(()=>$('#dlg').close());
 // ---------- Heute ----------
-await ev(()=>go('dash'));await w(300);ok(await ev(()=>!!$('#app .tm-dash')&&document.querySelectorAll('#app .tm-dash .rw').length===2&&document.querySelectorAll('#app .dh-now .rw.ek-dash').length===2),'Heute on the phone has the team rows (fix-3: Dienst und eine Zeile für die Checklisten; Eigenkontrolle oben unter „Heute zu tun“)');
-ok(await sw()===390,'Heute: page scrollWidth === 390',await sw());const sm=await small('#app .tm-dash');ok(sm.length===0,'Heute team rows: touch targets ≥ 40 px',sm);
+await ev(()=>go('dash'));await w(300);ok(await ev(()=>{const t=[...document.querySelectorAll('#phBoard .hy-row .hy-tm b')].map(x=>x.textContent);return t.includes('Im Dienst')&&t.includes('Eigenkontrolle')&&!!$('#phBoard [data-act="ckGo"]')}),'Heute on the phone (phone.js) has the rows Im Dienst, a checklist and Eigenkontrolle');
+ok(await sw()===390,'Heute: page scrollWidth === 390',await sw());const sm=await small('#phBoard');ok(sm.length===0,'Heute rows: touch targets ≥ 40 px',sm);
 // ---------- eine Darstellung am Handy ----------
 await ev(()=>go('dienst'));await w(300);ok(await ev(()=>[...document.querySelectorAll('#app .tm-modes button')].map(x=>x.textContent).join()==='Tag,Woche'&&typeof setMode==='undefined'&&!!$('#app .tm-dl')),'phone: Tag and Woche as the two views; the month is under „Mehr Optionen“');await check('Dienstplan');
 await ev(()=>{view.ck.tab='heute';go('checkl')});await w(200);await p.tap('#app .ck-l');await w(250);await check('running checklist');

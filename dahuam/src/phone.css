@@ -1,0 +1,254 @@
+/* ===================== Handy (bis 700 px), siehe phone.js =====================
+   Alles hängt an html.ph: die Klasse gibt es nur am Handy. Darüber greift hier nichts.
+   Zahl links (Barlow Condensed), Sache rechts (Figtree), Haarlinien statt Karten, ein Blatt von unten. */
+html.ph{--hy-line2:var(--line-strong);--hy-btn:#1c1f21;--hy-btn-fg:#fff;--hy-scrim:rgba(28,31,33,.44);--hy-pad:20px;
+  --hy-gold:linear-gradient(135deg,#7d5f30,#a8854f 46%,#c29d63 52%,#94733f 60%,#7a5c2f)}
+@media (prefers-color-scheme:dark){html.ph:not([data-theme="light"]){--hy-btn:#ece9e2;--hy-btn-fg:#121416;--hy-scrim:rgba(0,0,0,.62);--hy-gold:linear-gradient(135deg,#9c7a45,#d2ae72 45%,#f0dcae 52%,#b8925a 60%,#8a6a3b)}}
+html.ph[data-theme="dark"]{--hy-btn:#ece9e2;--hy-btn-fg:#121416;--hy-scrim:rgba(0,0,0,.62);--hy-gold:linear-gradient(135deg,#9c7a45,#d2ae72 45%,#f0dcae 52%,#b8925a 60%,#8a6a3b)}
+
+/* Rahmen: kein dunkler Kopf, unten vier Ziele */
+html.ph .topbar{display:none}
+html.ph main#app{padding:calc(env(safe-area-inset-top,0px) + 10px) max(var(--hy-pad),env(safe-area-inset-right,0px)) calc(104px + env(safe-area-inset-bottom,0px)) max(var(--hy-pad),env(safe-area-inset-left,0px));overflow-x:clip}
+html.ph .bottom{background:var(--surface);backdrop-filter:none;-webkit-backdrop-filter:none;padding:6px max(10px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px))}
+html.ph .bottom .nav-slot{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+html.ph .bottom .nav-i.hy-nav{min-height:48px;gap:3px;padding:2px 2px;font:500 13px/1 var(--f-body);color:var(--muted);border-radius:12px;justify-content:center}
+html.ph .bottom .nav-i.hy-nav .ico{width:25px;height:25px;stroke-width:1.7;color:inherit}
+html.ph .bottom .nav-i.hy-nav.on{color:var(--fg);font-weight:600}
+html.ph .bottom .nav-i.hy-nav.on .ico{color:var(--accent)}
+html.ph body.hy-lock{overflow:hidden}
+html.ph #toast{bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:120}
+
+/* Kopf */
+html.ph .hy-brand{display:flex;align-items:center;gap:10px;min-height:40px}
+html.ph .hy-logo{--w:30px;width:var(--w);height:var(--w);flex:none;background:var(--hy-gold);-webkit-mask:url(brand/logo.svg) no-repeat;mask:url(brand/logo.svg) no-repeat;-webkit-mask-size:calc(var(--w)*119.3/63) auto;mask-size:calc(var(--w)*119.3/63) auto;-webkit-mask-position:calc(var(--w)*-27.6/63) calc(var(--w)*-8.3/63);mask-position:calc(var(--w)*-27.6/63) calc(var(--w)*-8.3/63)}
+html.ph .hy-brand b{font:500 17px/1 var(--f-display);letter-spacing:.09em;color:var(--accent)}
+html.ph .hy-who{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:15px;color:var(--muted)}
+html.ph .hy-who .save-dot{position:static;margin:0}
+html.ph .hy-h1{font:600 34px/1.06 var(--f-display);letter-spacing:.002em;margin:10px 0 0;outline:none;overflow-wrap:anywhere;text-wrap:balance}
+html.ph .hy-back + .hy-h1{margin-top:0}
+html.ph .hy-voice{font:italic 400 18px/1.4 "Fraunces",Georgia,serif;margin:6px 0 0;color:var(--fg)}
+html.ph .hy-back{display:inline-flex;align-items:center;gap:2px;min-height:44px;margin:0 0 0 -8px;padding:0 10px 0 0;border:0;background:none;font:500 17px/1 var(--f-body);color:var(--accent);cursor:pointer}
+html.ph .hy-back .ico{width:24px;height:24px;stroke-width:1.8}
+html.ph .hy-sec{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font:600 22px/1.1 var(--f-display);letter-spacing:0;margin:24px 0 8px}
+html.ph .hy-sec span{font:400 15px/1.2 var(--f-body);color:var(--muted)}
+html.ph .hy-text{font-size:16px;line-height:1.45;color:var(--muted);margin:14px 0}
+html.ph .hy-text b{color:var(--fg);font-weight:600}
+html.ph .hy-hint{font-size:16px;line-height:1.45;color:var(--muted);margin:18px 0 0}
+html.ph .hy-bad{color:var(--bad)}
+html.ph .hy-lnk{display:inline-flex;align-items:center;min-height:44px;border:0;background:none;padding:0;font:600 17px/1.2 var(--f-body);color:var(--accent);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;cursor:pointer;text-align:left}
+html.ph .hy-links{display:flex;flex-direction:column;align-items:flex-start;gap:2px;margin-top:14px}
+html.ph .hy-note{display:flex;flex-direction:column;align-items:flex-start;margin:12px 0 0;font-size:15px;color:var(--muted)}
+
+/* Suchen und Scannen */
+html.ph .hy-entry{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;margin-top:16px}
+html.ph .hy-find,html.ph .hy-field{height:56px;border-radius:14px;background:var(--surface);border:1px solid var(--hy-line2);display:flex;align-items:center;gap:10px;padding:0 16px;color:var(--muted);font:400 17px/1 var(--f-body);cursor:pointer;min-width:0}
+html.ph .hy-find .ico,html.ph .hy-field .ico{width:24px;height:24px;flex:none}
+html.ph .hy-field{cursor:text;padding-right:6px}
+html.ph .hy-field:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+html.ph .hy-field input{flex:1;min-width:0;height:52px;border:0;background:none;box-shadow:none;outline:none;padding:0;font:400 18px/1 var(--f-body);color:var(--fg)}
+html.ph .hy-field.hy-solo{margin-top:12px}
+html.ph .hy-scan{height:56px;padding:0 18px;border-radius:14px;border:0;background:var(--hy-btn);color:var(--hy-btn-fg);display:flex;align-items:center;justify-content:center;gap:9px;font:600 17px/1 var(--f-body);cursor:pointer}
+html.ph .hy-scan .ico{width:24px;height:24px}
+
+/* Die Tafel: Zahl links, Sache rechts */
+html.ph .hy-board{list-style:none;margin:14px calc(var(--hy-pad)*-1) 0;padding:0;border-top:1px solid var(--line)}
+html.ph .hy-sec + .hy-board{margin-top:0}
+html.ph .hy-board.hy-in{margin-left:0;margin-right:0}
+html.ph .hy-row{display:grid;grid-template-columns:78px minmax(0,1fr) auto auto;align-items:center;column-gap:0;width:100%;min-height:68px;padding:9px 14px 9px var(--hy-pad);border:0;border-bottom:1px solid var(--line);background:none;color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+html.ph .hy-in .hy-row{padding-left:0;padding-right:0}
+html.ph .hy-row.hy-static{cursor:default}
+html.ph .hy-row:active{background:var(--surface-2)}
+html.ph .hy-n{font:500 31px/1 var(--f-display);font-variant-numeric:tabular-nums;white-space:nowrap}
+html.ph .hy-n small{display:block;font:500 15px/1 var(--f-body);color:var(--muted);margin-bottom:3px}
+html.ph .hy-n .ico{width:28px;height:28px;stroke-width:1.8;display:block}
+html.ph .hy-tm{min-width:0}
+html.ph .hy-tm b{display:block;font:600 18px/1.2 var(--f-body);overflow-wrap:anywhere}
+html.ph .hy-tm small{display:block;font:400 15px/1.3 var(--f-body);color:var(--muted);margin-top:2px;overflow-wrap:anywhere}
+html.ph .hy-e{padding-left:10px;font-size:16px;color:var(--muted);white-space:nowrap}
+html.ph .hy-e b{color:var(--fg);font-weight:600;font-variant-numeric:tabular-nums}
+html.ph .hy-chev{width:22px;height:22px;color:var(--hy-line2);margin-left:4px;flex:none}
+html.ph .hy-row.now .hy-n{color:var(--accent)}
+html.ph .hy-row.done .hy-n{color:var(--good)}
+html.ph .hy-row.off .hy-n,html.ph .hy-row.off .hy-tm b{color:var(--muted)}
+html.ph .hy-row.off .hy-tm b{font-weight:500}
+html.ph .hy-row.hy-q{grid-template-columns:92px minmax(0,1fr) auto auto}
+html.ph .hy-row.hy-q .hy-n{font-size:25px}
+html.ph .hy-row.hy-q .hy-n small,html.ph .hy-cq small{display:inline;font:400 15px/1 var(--f-body);margin:0 0 0 4px}
+html.ph .hy-row.hy-w .hy-n{font-size:27px}
+html.ph .hy-row.hy-res{grid-template-columns:44px minmax(0,1fr) auto auto;min-height:62px}
+html.ph .hy-row.hy-res .hy-n{color:var(--muted)}
+html.ph .hy-row.hy-one{grid-template-columns:minmax(0,1fr) auto;min-height:56px}
+
+/* Abhak-Zeilen (Inventur) */
+html.ph .hy-ck{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;width:100%;min-height:62px;padding:8px var(--hy-pad);border:0;border-bottom:1px solid var(--line);background:none;color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+html.ph .hy-o{width:28px;height:28px;border-radius:50%;border:1.7px solid var(--hy-line2);display:grid;place-items:center}
+html.ph .hy-ck.on .hy-o{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+html.ph .hy-o .ico{width:17px;height:17px;stroke-width:2.4}
+html.ph .hy-cq{font:500 24px/1 var(--f-display);font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:10px}
+html.ph .hy-bar{height:4px;border-radius:2px;background:var(--line);margin-top:12px;overflow:hidden}
+html.ph .hy-bar i{display:block;height:100%;background:var(--accent)}
+html.ph .hy-prog{font-size:15px;color:var(--muted);margin:6px 0 0}
+
+/* Auswahl-Streifen (Tage, Filter): wischt in sich, die Seite nicht */
+html.ph .hy-chips{display:flex;gap:8px;margin:14px calc(var(--hy-pad)*-1) 0;padding:0 var(--hy-pad) 2px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+html.ph .hy-chips::-webkit-scrollbar{display:none}
+html.ph .hy-chips button{flex:none;min-height:44px;padding:0 15px;border-radius:22px;border:1px solid var(--hy-line2);background:none;color:var(--fg);font:500 16px/1 var(--f-body);white-space:nowrap;cursor:pointer;display:flex;align-items:center;gap:6px}
+html.ph .hy-chips button small{font-size:14px;color:var(--muted)}
+html.ph .hy-chips button.on{background:var(--hy-btn);color:var(--hy-btn-fg);border-color:var(--hy-btn);font-weight:600}
+html.ph .hy-chips button.on small{color:inherit;opacity:.8}
+html.ph .hy-chips button.closed:not(.on){color:var(--muted)}
+
+/* Knöpfe */
+html.ph .hy-btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:56px;padding:8px 16px;border-radius:14px;border:1px solid var(--hy-btn);background:var(--hy-btn);color:var(--hy-btn-fg);font:600 18px/1.2 var(--f-body);text-align:center;text-decoration:none;cursor:pointer;margin-top:10px}
+html.ph .hy-btn.q{background:transparent;color:var(--fg);border-color:var(--hy-line2)}
+html.ph .hy-btn.t{background:transparent;border-color:transparent;color:var(--accent);min-height:48px;font-size:17px;margin-top:4px}
+html.ph .hy-two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+html.ph .hy-foot{margin-top:18px}
+
+/* Mehr */
+html.ph .hy-grp{list-style:none;margin:0 calc(var(--hy-pad)*-1);padding:0;border-top:1px solid var(--line)}
+html.ph .hy-h1 + .hy-grp{margin-top:16px}
+html.ph .hy-grp + .hy-grp{margin-top:18px}
+html.ph .hy-mr{display:grid;grid-template-columns:38px minmax(0,1fr) auto auto;align-items:center;width:100%;min-height:52px;padding:0 14px 0 var(--hy-pad);border:0;border-bottom:1px solid var(--line);background:none;color:var(--fg);font:500 18px/1.2 var(--f-body);text-align:left;cursor:pointer}
+html.ph .hy-mr > .ico:first-child{width:23px;height:23px;color:var(--muted)}
+html.ph .hy-mr .hy-e{font-size:15px}
+html.ph .hy-lap{margin:18px 0 0;padding:14px 16px 8px;border-radius:14px;background:var(--surface-2)}
+html.ph .hy-lap h2{display:flex;align-items:center;gap:10px;font:600 22px/1.1 var(--f-display);margin:0}
+html.ph .hy-lap h2 .ico{color:var(--muted)}
+html.ph .hy-lap p{font-size:15px;line-height:1.4;color:var(--muted);margin:4px 0 0}
+html.ph .hy-lap .hy-grp{margin:6px -16px 0;border-top:1px solid var(--line)}
+html.ph .hy-lap .hy-mr{padding-left:16px;font-size:17px}
+html.ph .hy-lap .hy-mr:last-child{border-bottom:0}
+html.ph .hy-lap li:last-child .hy-mr{border-bottom:0}
+html.ph .hy-demo{margin:16px 0 0;font-size:15px;color:var(--muted)}
+html.ph .hy-demo .link{min-height:44px;font-family:var(--f-body);font-size:15px}
+
+/* Blatt von unten */
+#phSheet{position:fixed;inset:0;z-index:90}
+#phSheet[hidden]{display:none}
+#phSheet .hy-scrim{position:absolute;inset:0;background:var(--hy-scrim)}
+#phSheet .hy-box{position:absolute;inset:auto 0 0 0;max-height:calc(100dvh - 56px);display:flex;flex-direction:column;background:var(--surface);color:var(--fg);border-radius:24px 24px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.2);outline:none;animation:phUp .22s ease-out}
+@keyframes phUp{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){#phSheet .hy-box{animation:none}}
+#phSheet .hy-grab{display:block;width:40px;height:5px;border-radius:3px;background:var(--hy-line2);margin:10px auto 0;flex:none}
+#phSheet .hy-x{position:absolute;top:14px;right:12px;width:44px;height:44px;border-radius:50%;border:0;background:var(--surface-2);color:var(--fg);display:grid;place-items:center;cursor:pointer;z-index:1}
+#phSheet .hy-x .ico{width:20px;height:20px}
+#phSheet .hy-body{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:14px 20px calc(22px + env(safe-area-inset-bottom,0px))}
+#phSheet h2{font:600 30px/1.06 var(--f-display);margin:0;padding-right:48px;overflow-wrap:anywhere}
+#phSheet .hy-sub{font-size:16px;line-height:1.35;color:var(--muted);margin:5px 0 0;padding-right:48px}
+#phSheet .hy-hit{display:flex;align-items:center;gap:7px;font-size:15px;font-weight:600;color:var(--good);margin:0 0 6px}
+#phSheet .hy-hit .ico{width:18px;height:18px;stroke-width:2.4}
+#phSheet .hy-lis{list-style:none;margin:12px 0 0;padding:0;border-top:1px solid var(--line)}
+#phSheet .hy-li{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;min-height:66px;padding:6px 0;border-bottom:1px solid var(--line)}
+#phSheet .hy-step{display:flex;align-items:center;gap:2px}
+#phSheet .hy-step b{min-width:38px;text-align:center;font:500 26px/1 var(--f-display);font-variant-numeric:tabular-nums}
+#phSheet .hy-step button{width:44px;height:44px;border-radius:50%;border:1px solid var(--hy-line2);background:none;color:var(--fg);display:grid;place-items:center;cursor:pointer}
+#phSheet .hy-step .ico{width:20px;height:20px}
+#phSheet .hy-add{position:relative;display:inline-flex;margin-top:6px}
+#phSheet .hy-add select{position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:16px;cursor:pointer}
+#phSheet .hy-add:focus-within .hy-lnk{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+#phSheet .hy-sum{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:12px 0 2px;font-size:17px}
+#phSheet .hy-sum b{font:600 30px/1 var(--f-display);font-variant-numeric:tabular-nums}
+#phSheet .hy-min{display:flex;align-items:center;gap:6px;font-size:15px;margin:2px 0 8px}
+html.ph .hy-min{font-size:15px;margin:8px 0 0}
+html.ph .hy-min.ok{color:var(--good)}
+html.ph .hy-min.no{color:var(--bad)}
+html.ph .hy-min .ico{width:18px;height:18px;stroke-width:2.2}
+#phSheet .hy-ask{font:italic 400 18px/1.4 "Fraunces",Georgia,serif;margin:10px 0 2px}
+#phSheet .hy-del{color:var(--muted);font-weight:500;font-size:15px;min-height:44px}
+#phSheet .hy-alg{display:flex;flex-wrap:wrap;gap:8px}
+#phSheet .hy-alg span{min-height:34px;padding:0 12px;border-radius:17px;border:1px solid var(--hy-line2);display:flex;align-items:center;gap:5px;font-size:15px}
+/* Zählen */
+#phSheet .hy-count{display:grid;grid-template-columns:64px minmax(0,1fr) 64px;align-items:center;margin:16px 0 4px}
+#phSheet .hy-count > button{width:64px;height:64px;border-radius:50%;border:1.5px solid var(--hy-line2);background:none;color:var(--fg);display:grid;place-items:center;cursor:pointer}
+#phSheet .hy-count > button .ico{width:28px;height:28px}
+#phSheet .hy-count label{display:flex;align-items:baseline;justify-content:center;gap:8px;min-width:0}
+#phSheet .hy-count input{width:3.2ch;min-width:0;flex:0 1 auto;field-sizing:content;max-width:100%;border:0;border-bottom:2px solid transparent;border-radius:0;background:none;box-shadow:none;padding:0;text-align:right;font:500 64px/1.05 var(--f-display);font-variant-numeric:tabular-nums;color:var(--fg)}
+#phSheet .hy-count input:focus{outline:none;border-bottom-color:var(--accent)}
+#phSheet .hy-count input.bad-in{border-bottom-color:var(--bad)}
+#phSheet .hy-count input::placeholder{color:var(--faint)}
+#phSheet .hy-count label span{font:500 20px/1 var(--f-body);color:var(--muted)}
+#phSheet .hy-was{text-align:center;font-size:16px;color:var(--muted);margin:4px 0 12px}
+#phSheet .hy-was b{color:var(--fg);font-weight:600}
+#phSheet .hy-tenths{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;margin:8px 0 6px}
+#phSheet .hy-tenths small{font-size:15px;color:var(--muted);width:100%;text-align:center}
+#phSheet .hy-tenths button{min-width:44px;height:44px;border-radius:22px;border:1px solid var(--hy-line2);background:none;color:var(--fg);font:500 15px/1 var(--f-body);cursor:pointer}
+#phSheet .hy-tenths button.on{background:var(--hy-btn);color:var(--hy-btn-fg);border-color:var(--hy-btn)}
+
+/* Vorbereitung: die vorhandene Prep-Liste, groß und ruhig */
+html.ph .hy-fcline{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:17px;margin:10px 0 0}
+html.ph .hy-fcline b{font-weight:600}
+html.ph #app[data-ph="vorb"] .pl-prep{margin:0;padding:0;border:0;background:none}
+html.ph #app[data-ph="vorb"] .pl-prep > .day-h{display:flex;align-items:baseline;gap:10px;font:400 15px/1.2 var(--f-body);color:var(--muted);margin:6px 0 0;border:0;padding:0}
+html.ph #app[data-ph="vorb"] .pl-prep > .day-h{font-size:0}
+html.ph #app[data-ph="vorb"] .pl-prep > .day-h span{font:400 15px/1.2 var(--f-body);color:var(--muted);margin:0}
+html.ph #app[data-ph="vorb"] .pl-prep > .day-h .pl-clear{font:500 15px/1.2 var(--f-body);min-height:44px;margin-left:auto;color:var(--muted)}
+html.ph #app[data-ph="vorb"] .pl-groups{display:block;columns:auto}
+html.ph #app[data-ph="vorb"] .pl-h3{font:600 22px/1.1 var(--f-display);color:var(--fg);margin:22px 0 8px}
+html.ph #app[data-ph="vorb"] .pl-chk{margin:0 calc(var(--hy-pad)*-1);border-top:1px solid var(--line)}
+html.ph #app[data-ph="vorb"] .pl-chk li{position:relative;border-bottom:1px solid var(--line)}
+html.ph #app[data-ph="vorb"] .pl-chk li + li .pl-c{border-top:0}
+html.ph #app[data-ph="vorb"] .pl-c{grid-template-columns:44px minmax(0,1fr) auto;gap:0;min-height:60px;padding:8px var(--hy-pad);font-size:18px;font-weight:600}
+html.ph #app[data-ph="vorb"] .pl-c i{width:28px;height:28px;border-radius:50%;border:1.7px solid var(--hy-line2);background:none}
+html.ph #app[data-ph="vorb"] .pl-c.on i{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+html.ph #app[data-ph="vorb"] .pl-c-n small{font:400 15px/1.3 var(--f-body);color:var(--muted);margin-top:2px}
+html.ph #app[data-ph="vorb"] .pl-c b{font:500 24px/1 var(--f-display);padding-left:10px}
+html.ph #app[data-ph="vorb"] .pl-c.on .pl-c-n,html.ph #app[data-ph="vorb"] .pl-c.on b{color:var(--muted)}
+html.ph #app[data-ph="vorb"] .pl-rz{display:none}
+html.ph #app[data-ph="vorb"] .pl-alling{min-height:44px;margin-top:10px;font-family:var(--f-body);font-size:16px;text-align:left}
+html.ph #app[data-ph="vorb"] .hy-fc{margin-top:8px}
+html.ph #app[data-ph="vorb"] .hy-fc .pl-sec{margin-top:14px}
+html.ph #app[data-ph="vorb"] .pl-facrow .seg{display:flex;width:100%}
+html.ph #app[data-ph="vorb"] .pl-facrow .seg button{flex:1;min-height:44px;justify-content:center;padding:6px 4px;font-size:14px}
+
+/* Rezept in der Küche */
+html.ph #app.hy-kueche .rz-bar{display:none}
+html.ph #app[data-ph="rezk"] .back{min-height:44px;font-family:var(--f-body);font-size:17px;color:var(--accent)}
+html.ph #app.hy-kueche .rz-h h1{font:600 32px/1.06 var(--f-display);letter-spacing:.002em}
+html.ph #app.hy-kueche .rz-h .eyebrow{text-transform:none;letter-spacing:0;font:400 15px/1.3 var(--f-body);color:var(--muted)}
+html.ph #app.hy-kueche .rz-chips button{min-width:56px;min-height:44px}
+html.ph #app.hy-kueche .rz-sec h2{font:600 22px/1.1 var(--f-display)}
+html.ph #app.hy-kueche .rz-sec h2 span{font:400 15px/1.2 var(--f-body);color:var(--muted)}
+html.ph .hy-rzmore{display:flex;flex-direction:column;align-items:flex-start;margin:18px 0 0;border-top:1px solid var(--line);padding-top:8px}
+html.ph .hy-rzmore .hy-lnk{font-weight:500;font-size:16px;color:var(--muted)}
+
+/* Bestehende Seiten am Handy: die Reiter von „Ware“ und „Team & Zahlen“ sind hier Ziele unter „Mehr“ */
+html.ph #app[data-view="stock"] > .toolbar.tabs,html.ph #app[data-view="buy"] > .toolbar.tabs,html.ph #app[data-view="products"] > .toolbar.tabs,html.ph #app[data-view="pcheck"] > .toolbar.tabs,
+html.ph #app[data-view="dienst"] > .toolbar.tabs,html.ph #app[data-view="report"] > .toolbar.tabs{display:none}
+html.ph #app > .hy-back + .page-h{margin-top:0}
+html.ph #app .page-h h1{font-size:32px}
+
+/* Feinschliff nach dem Vergleich mit dem Entwurf */
+html.ph #app[data-ph="vorb"] .pl-grp.vk .pl-c{grid-template-columns:44px minmax(0,1fr) auto}
+html.ph #app[data-ph="vorb"] .pl-grp.vk .pl-c b{grid-column:auto;font:500 20px/1 var(--f-display)}
+html.ph #app[data-ph="vorb"] .pl-c b{font-size:22px}
+html.ph #app[data-ph="vorb"] .pl-c-n{font-size:18px;line-height:1.2}
+/* Rezept: Menge groß und links, wie auf der Tafel */
+html.ph #app[data-ph="rezk"] .crumb-here,html.ph #app[data-ph="rezk"] .crumb-sep{display:none}
+html.ph #app.hy-kueche .crumb-q{display:none}
+html.ph #app.hy-kueche .rz-i{grid-template-columns:100px minmax(0,1fr);gap:8px;min-height:52px;padding:8px 0;font-size:18px}
+html.ph #app.hy-kueche .rz-q{text-align:left;font:500 25px/1.05 var(--f-display)}
+html.ph #app.hy-kueche .rz-q small,html.ph #app.hy-kueche .rz-t small{font-size:15px}
+html.ph #app.hy-kueche .rz-step{grid-template-columns:40px minmax(0,1fr);gap:4px;font-size:18px;line-height:1.45}
+html.ph #app.hy-kueche .rz-sn{font-size:28px;line-height:1}
+html.ph #app.hy-kueche .rz-n{margin-top:12px}
+html.ph #app.hy-kueche .rz-alg .rz-al{font:600 22px/1.1 var(--f-display);color:var(--fg);margin-bottom:6px}
+html.ph #app.hy-kueche .rz-open{font-size:15px}
+/* kleine Handys (iPhone SE): etwas dichter, damit mehr von „Heute“ auf einen Blick passt */
+@media (max-height:700px){
+  html.ph #app[data-ph="heute"] .hy-row{min-height:60px;padding-top:7px;padding-bottom:7px}
+  html.ph #app[data-ph="heute"] .hy-n{font-size:28px}
+  html.ph #app[data-ph="heute"] .hy-h1{font-size:31px;margin-top:6px}
+  html.ph #app[data-ph="heute"] .hy-entry{margin-top:12px}
+  html.ph #app[data-ph="heute"] .hy-find,html.ph #app[data-ph="heute"] .hy-scan{height:50px}
+  html.ph #app[data-ph="heute"] .hy-board{margin-top:12px}
+}
+html.ph .hy-lap > .hy-lnk{color:var(--fg)}
+html.ph #app[data-ph="vorb"] .pl-prep > .day-h span{margin-left:0;padding-left:0}
+html.ph #app[data-ph="vorb"] .pl-grp.vk .pl-c b{font-size:18px}
+html.ph #app.hy-kueche .rz-sec h2{color:var(--fg)}
+html.ph #app[data-ph="rezk"] .back{font-weight:500}
+/* bestehende Seiten behalten ihren Rand von 16 px (ihre Leisten und Raster rechnen damit) */
+html.ph main#app[data-ph="x"]{--hy-pad:16px}
+#phSheet .hy-tenths button{background:var(--surface)}
+html.ph body::before{background:var(--bg)}
