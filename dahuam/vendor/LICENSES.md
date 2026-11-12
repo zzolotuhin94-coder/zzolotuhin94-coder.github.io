@@ -10,12 +10,10 @@ Die vollständigen Lizenztexte liegen im Ordner `licenses/`.
 | Barlow Condensed | Schrift | @fontsource/barlow-condensed 5.3.0 | OFL-1.1 | 175 KB |
 | Fraunces | Schrift | @fontsource-variable/fraunces 5.3.0 | OFL-1.1 | 273 KB |
 | Caveat | Schrift | @fontsource-variable/caveat 5.3.0 | OFL-1.1 | 102 KB |
-| PT Sans | Schrift | @fontsource/pt-sans 5.3.0 | OFL-1.1 | 146 KB |
-| Roboto Condensed | Schrift | @fontsource-variable/roboto-condensed 5.3.0 | OFL-1.1 | 83 KB |
-| Saira Condensed | Schrift | @fontsource/saira-condensed 5.3.0 | OFL-1.1 | 64 KB |
 | Schibsted Grotesk | Schrift | @fontsource-variable/schibsted-grotesk 5.3.0 | OFL-1.1 | 66 KB |
 | Source Serif 4 | Schrift | @fontsource-variable/source-serif-4 5.3.1 | OFL-1.1 | 453 KB |
 | JetBrains Mono | Schrift | @fontsource/jetbrains-mono 5.3.0 | OFL-1.1 | 29 KB |
+| Cormorant Garamond | Schrift | @fontsource-variable/cormorant-garamond 5.3.0 | OFL-1.1 | 142 KB |
 | html2canvas.min.js | Bibliothek | html2canvas 1.4.1 | MIT | 194 KB |
 | jspdf.umd.min.js | Bibliothek | jspdf 2.5.1 | MIT | 356 KB |
 | xlsx.full.min.js | Bibliothek | xlsx 0.18.5 | Apache-2.0 | 861 KB |

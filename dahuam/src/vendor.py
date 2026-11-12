@@ -15,15 +15,13 @@ FONTS = [
  ('fontsource-barlow-condensed', 'Barlow Condensed', ['300.css', '400.css', '500.css', '600.css', '700.css']),
  ('fontsource-variable-fraunces', 'Fraunces', ['opsz.css', 'opsz-italic.css']),
  ('fontsource-variable-caveat', 'Caveat', ['wght.css']),
- ('fontsource-pt-sans', 'PT Sans', ['400.css', '700.css']),
- ('fontsource-variable-roboto-condensed', 'Roboto Condensed', ['wght.css']),
- ('fontsource-saira-condensed', 'Saira Condensed', ['300.css', '400.css']),
  ('fontsource-variable-schibsted-grotesk', 'Schibsted Grotesk', ['wght.css']),
  ('fontsource-variable-source-serif-4', 'Source Serif 4', ['opsz.css', 'opsz-italic.css']),
  ('fontsource-jetbrains-mono', 'JetBrains Mono', ['500.css']),
+ ('fontsource-variable-cormorant-garamond', 'Cormorant Garamond', ['wght.css', 'wght-italic.css']),   # Speisekarte-Gestalter: Vorlage „Elegant“
 ]
 # variable Schriften: Bereich so begrenzen, wie die Schnitte bisher geladen wurden (gleiches Schriftbild wie vorher)
-WEIGHTS = {'Figtree':'400 700', 'Fraunces':'300 600', 'Caveat':'400 600', 'Roboto Condensed':'400 700', 'Schibsted Grotesk':'500 600', 'Source Serif 4':'400 600'}
+WEIGHTS = {'Figtree':'400 700', 'Fraunces':'300 600', 'Caveat':'400 600', 'Schibsted Grotesk':'500 600', 'Source Serif 4':'400 600', 'Cormorant Garamond':'400 600'}
 LIBS = [('html2canvas', 'dist/html2canvas.min.js', 'html2canvas.min.js'), ('jspdf', 'dist/jspdf.umd.min.js', 'jspdf.umd.min.js'), ('xlsx', 'dist/xlsx.full.min.js', 'xlsx.full.min.js')]
 css = []; rows = []; files = []
 for prefix, fam, sheets in FONTS:

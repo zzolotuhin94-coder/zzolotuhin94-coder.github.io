@@ -12,8 +12,8 @@ const ev=f=>p.evaluate(f).catch(e=>console.log('ERR',String(e).slice(0,120)));
 const tabs=await ev(()=>TABS.map(t=>t[0]));
 for(const t of tabs){await ev(`go('${t}')`);await p.waitForTimeout(120);await grab(t)}
 for(const mt of ['calc','guest','layout','plan']){await ev(`view.mtab='${mt}';go('menu')`);await p.waitForTimeout(150);await grab('menu:'+mt)}
-for(const st of ['haus','web','book']){await ev(`view.mtab='guest';go('menu')`);await p.click('[data-act="gStyle"][data-id="'+st+'"]').catch(e=>console.log('noclick',st));await p.waitForTimeout(300);await grab('guest:'+st);
-  await ev(`printMenu()`);await p.waitForTimeout(200);await ev(`document.getElementById('print').style.display='block'`);await grab('print:'+st);await ev(`document.getElementById('print').style.display=''`);
+for(const st of ['haus','alpin','elegant','kreide','getraenke','schlicht']){await ev(`view.mtab='guest';go('menu')`);await p.click('#gsRail [data-gs="look"][data-id="'+st+'"]').catch(e=>console.log('noclick',st));await p.waitForTimeout(600);await grab('guest:'+st); /* Vorlagen des Gestalters (früher die Stile haus/web/book) */
+  await ev(`gsPrintFill()`);await p.waitForTimeout(200);await ev(`document.getElementById('print').style.display='block'`);await grab('print:'+st);await ev(`document.getElementById('print').style.display=''`);
   for(const sea of ['winter','fruehling','sommer','herbst']){await ev(`view.season='${sea}';render()`);await p.waitForTimeout(120);await grab('guest:'+st+':'+sea)}}
 const sps=await ev(()=>S.specials.map(s=>s.id));
 for(const id of sps||[]){await ev(`document.querySelector('[data-act]');view.mtab='plan';go('menu')`);await ev(`(()=>{const sp=S.specials.find(x=>x.id==='${id}');document.getElementById('print').innerHTML=tageskarteHtml(sp);document.getElementById('print').style.display='block'})()`);await grab('tageskarte');await ev(`document.getElementById('print').style.display=''`)}

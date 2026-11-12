@@ -88,5 +88,5 @@ const near = (a, b, e = 1e-9) => Math.abs(a - b) < e;
   L.ok(JSON.stringify(sp2) === JSON.stringify([[10, 'Speisen', 9, 45.09], [20, 'Getränke', 10, 45]]), 'Mineralwasser am Gericht auf Speisen gestellt: zählt in der Aufteilung zu 10 % (18/1,1 + 28,73 = 45,09)', sp2);
   // Gästekarte: Fußzeile bleibt
   await L.go(p, 'speisekarte/gaestekarte'); await p.waitForTimeout(600);
-  L.ok(await p.evaluate(() => /inkl\. MwSt\./.test(hsPages(curSeasonKey(), view.gdate).pop()) && !/20 %|10 %/.test(hsPages(curSeasonKey(), view.gdate).pop())), 'Gästekarte: Fußzeile bleibt „inkl. MwSt.“, ohne Sätze');
+  L.ok(await p.evaluate(() => /inkl\. MwSt\./.test(gsPages({print:true}).pop()) && !/20 %|10 %/.test(gsPages({print:true}).pop())), 'Gästekarte: Fußzeile bleibt „inkl. MwSt.“, ohne Sätze');
   await L.done(b, p.errs); })();

@@ -383,11 +383,6 @@ textarea.code{min-height:200px;font:12px/1.4 var(--f-mono)}
 .sm-ta{min-height:70px}
 
 /* Gästekarte: Werkzeuge + Vorschau */
-.guest-wrap{display:grid;grid-template-columns:300px minmax(0,1fr);gap:18px;align-items:start}
-.guest-tools{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);display:flex;flex-direction:column;gap:14px}
-.guest-tools .seg{align-self:flex-start}
-.guest-prev{min-width:0}
-@media (max-width:1000px){.guest-wrap{grid-template-columns:minmax(0,1fr)}.guest-tools{position:static}}
 
 /* Die Karte selbst: eigenes Druckobjekt mit festen Farben je Stil */
 .g-paper{--gp:#f6efe2;--gi:#20352c;--ga:#c8742f;--gm:#6b6457;max-width:860px;margin:0 auto;background:var(--gp);color:var(--gi);border-radius:6px;box-shadow:0 30px 60px -30px rgba(0,0,0,.45);padding:clamp(28px,6vw,64px) clamp(20px,6vw,68px);font-family:"Cormorant Garamond",Georgia,serif}

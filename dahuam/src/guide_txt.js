@@ -127,7 +127,9 @@ H('gericht_foto','Foto','Ein Foto für dieses Gericht aufnehmen oder aussuchen.'
 H('pdf','Als PDF speichern','Macht aus der Gästekarte eine Datei. Die können Sie drucken oder verschicken.');
 H('drucken','Drucken','Schickt die Seite an den Drucker.');
 H('gdate','Datum der Karte','Die Karte zeigt, was an diesem Tag gilt: Saison, Wochentag und Aktionen.');
-H('gstil','Gestaltung','Zwei Stile für die Gästekarte: die Hauskarte und eine schlichte Karte, die wenig Farbe braucht. Der Inhalt bleibt gleich.');
+H('gstil','Vorlage','Sechs fertige Gestaltungen für die Gästekarte. Ein Tipp genügt, danach lässt sich alles verschieben. Jede Vorlage merkt sich Ihre Anordnung.');
+H('geffekt','Effekte','Hintergrund, Akzentfarbe, Ornament und Schrift. Ein Tipp ändert die ganze Karte.');
+H('gbaustein','Baustein','Die Karte besteht aus Bausteinen. Antippen wählt einen aus. Am Griff ziehen verschiebt ihn, mit Alt und den Pfeiltasten geht es auch.');
 H('ausblenden','Ausblenden','Das Gericht bleibt in der App, steht aber nicht auf der Gästekarte.');
 H('reihenfolge','Reihenfolge','Am Griff ziehen: Das Gericht wandert in seiner Kategorie nach oben oder unten. So steht es dann auch auf der Gästekarte.');
 
@@ -227,7 +229,7 @@ const HELP_SEL = [
   ['[data-act="sec"][data-id="over"],[data-act="goMenu"][data-id="over"]','f_ueber'],['[data-act="sec"][data-id="none"],[data-act="goMenu"][data-id="none"]','f_ohne_rez'],['[data-act="sec"][data-id="noalg"],[data-act="goMenu"][data-id="noalg"]','f_ohne_alg'],['[data-act="sec"][data-id="nophoto"]','f_ohne_foto'],['#app .sel-cat','f_kategorie'],
   ['#app input[data-mp]','preisfeld'],['#app .lt-st','status'],['#app [data-act="mtab"]','reiter_menu'],
   ['#app [data-act="newMenu"]','neu_gericht'],['#app button[data-act="editMenu"]','gericht_bearbeiten'],['#app [data-act="photoMenu"]','gericht_foto'],['#app [data-pdf]','pdf'],['#app [data-act="printMenu"],#app [data-act="printCard"],#app [data-act="ordPrint"]','drucken'],
-  ['#gdate,#app [data-act="gdate"]','gdate'],['#app [data-act="gStyle"]','gstil'],['#app [data-act="itemHide"]','ausblenden'],['#app .lt-grip','reihenfolge'],['#app [data-act="gseason"],#app [data-act="editSeason"]','saison'],['#app [data-act="newSpecial"],#app [data-act="editSpecial"]','aktion'],
+  ['#gdate,#app [data-act="gdate"]','gdate'],['#app [data-gs="look"]','gstil'],['#app [data-gs="fx"],#app label.tog:has([data-gst])','geffekt'],['#gsCanvas .gs-b,#app [data-gs="add"]','gbaustein'],['#app [data-act="itemHide"]','ausblenden'],['#app .lt-grip','reihenfolge'],['#app [data-act="gseason"],#app [data-act="editSeason"]','saison'],['#app [data-act="newSpecial"],#app [data-act="editSpecial"]','aktion'],
   ['#app [data-act="newCard"][data-id="dish"]','neu_rezept'],['#app [data-act="newCard"][data-id="semi"]','neu_basis'],['#app [data-act="ctype"]','r_typ'],['#app [data-act="tellerPick"]','zutat_plus'],['#app [data-act="delLine"]','zutat_weg'],
   ['#app input[data-lf="qty"]','menge'],['#app [data-act="stepAdd"],#app textarea[data-step]','schritt'],['#cf-yieldG','portionsgewicht'],['#app [data-act="photoCard"]','rez_foto'],['#app [data-act="dupCard"]','duplizieren'],['#app [data-act="delCard"]','rez_loeschen'],['#app [data-act="toMenu"]','auf_karte'],
   ['#app .plate','teller'],['#sim','preissim'],['#portions','produktionsmenge'],['#app [data-act="pcFor"]','preischeck'],
@@ -270,7 +272,7 @@ const HOWTO = {
   vorb:['Oben wählen Sie den Tag: heute, morgen oder später in der Woche.', 'Die Prep-Liste zeigt, was vorzukochen und herzurichten ist. Ein Tipp hakt ab.', 'Die Prognose darunter können Sie überschreiben, zum Beispiel bei einer Reservierung.', 'Fehlt Ware, legen Sie sie mit einem Tipp in die Bestellung.'],
   checkl:['Jeden Tag gibt es frische Listen. Tippen Sie auf eine Liste und dann auf jeden erledigten Punkt.', 'Manche Punkte brauchen eine Zahl, zum Beispiel die Temperatur im Kühlhaus.', 'Darunter steht die Eigenkontrolle: Reinigungsplan, Frittieröl, Temperatur der Lieferungen.', 'Im Verlauf sehen Sie die letzten 14 Tage und speichern die Monatsmappe als PDF.'],
   menu:['Eine Zeile je Gericht: Preis, Wareneinsatz und was übrig bleibt.', 'Den Preis ändern Sie direkt in der Zeile.', 'Am Griff links ziehen Sie ein Gericht an eine andere Stelle seiner Kategorie.', '„Ohne Rezeptur“ und „Allergene offen“ zeigen, wo noch etwas fehlt.'],
-  guest:['So sehen die Gäste die Karte. Es zählt der gewählte Tag: Saison, Wochentag, Aktionen.', 'Links wählen Sie den Stil und die Texte.', '„Als PDF speichern“ macht eine Datei zum Drucken oder Verschicken.'],
+  guest:['So sehen die Gäste die Karte. Es zählt der gewählte Tag: Saison, Wochentag, Aktionen.', 'Vorlage und Effekte wählen Sie mit einem Tipp. Bausteine am Blatt antippen und am Griff verschieben.', '„Als PDF speichern“ macht eine Datei zum Drucken oder Verschicken.'],
   plan:['Die vier Balken sind Ihre Saisonen. Ein Tipp ändert, von wann bis wann eine gilt.', 'Eine Aktion ist eine eigene kleine Karte für ein paar Tage, zum Beispiel Wildwochen.', 'Welches Gericht in welcher Saison gilt, stellen Sie beim Gericht ein.'],
   cards:['Gerichte gehen an den Gast. Basisrezepte kochen Sie vor: Fond, Teig, Dressing.', 'Ein Tipp auf eine Zeile öffnet die Rezeptur.', '„+ Rezeptur“ legt eine neue an.'],
   card:['In der Mitte des Tellers steht, was eine Portion kostet. Jedes Stück im Ring ist eine Zutat.', 'Die Menge je Zutat ändern Sie direkt im Feld. „+ Zutat“ legt eine neue auf den Teller.', 'Unter „Zubereitung“ schreiben Sie Schritt für Schritt auf, wie es gemacht wird.', 'Der Preis-Simulator zeigt, was bei einem anderen Preis übrig bleibt. Erst „Übernehmen“ ändert den Preis.'],

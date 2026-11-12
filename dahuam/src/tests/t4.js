@@ -8,7 +8,7 @@ console.log('today season',await ev(()=>seasonFor(todayStr())));
 for(const [d,n] of [['2027-01-20','winter'],['2027-05-01','fruehling'],['2027-07-20','sommer'],['2026-10-05','herbst']]){
   await ev(d=>{view.mtab='guest';view.gdate=d;view.gseason=null;go('menu')},d);await p.waitForTimeout(400);
   await p.screenshot({path:'s-'+n+'.png'});
-  console.log(n, await ev(()=>({items:document.querySelectorAll('.guest-prev .g-item').length, sea:curSeasonKey()})));
+  console.log(n, await ev(()=>({items:document.querySelectorAll('#gsCanvas .gs-d').length, sea:curSeasonKey()})));
 }
 const wild=await ev(()=>S.specials[0].from);
 await ev(d=>{view.gdate=d;render()},wild);await p.waitForTimeout(300);await p.screenshot({path:'s-wild.png'});
@@ -17,8 +17,8 @@ await p.evaluate(()=>document.querySelector('.tk-label')?.scrollIntoView());awai
 // Wednesday closed
 await ev(()=>{view.gdate='2026-11-11';render()});console.log('closed', await ev(()=>!!document.querySelector('.g-closed')));
 // Tafelspitz only Sunday
-await ev(()=>{view.gdate='2026-11-15';render()});const sun=await ev(()=>document.querySelector('.guest-prev').textContent.includes('Tafelspitz'));
-await ev(()=>{view.gdate='2026-11-16';render()});const mon=await ev(()=>document.querySelector('.guest-prev').textContent.includes('Tafelspitz'));console.log('tafelspitz sun/mon',sun,mon);
+await ev(()=>{view.gdate='2026-11-15';render()});const sun=await ev(()=>document.querySelector('#gsCanvas').textContent.includes('Tafelspitz'));
+await ev(()=>{view.gdate='2026-11-16';render()});const mon=await ev(()=>document.querySelector('#gsCanvas').textContent.includes('Tafelspitz'));console.log('tafelspitz sun/mon',sun,mon);
 // plan
 await ev(()=>{view.mtab='plan';render()});await p.waitForTimeout(300);await p.screenshot({path:'s-plan.png'});
 // new special via dialog
@@ -32,7 +32,7 @@ await p.click(`[data-ms="${mid}:winter"] + span`);console.log('caesar seasons',a
 // season edit: color + date
 await ev(()=>{view.mtab='guest';view.gseason='winter';render()});
 await p.fill('[data-smd=from]','15.11.');await p.press('[data-smd=from]','Tab');await p.waitForTimeout(150);console.log('winter from',await ev(()=>S.settings.seasons.winter.from),'today now',await ev(()=>seasonFor(todayStr())));
-await p.click('[data-act=hkAccent][data-id="#2d5c86"]');console.log('accent',await ev(()=>S.settings.seasons.winter.accent));await p.waitForTimeout(200);await p.screenshot({path:'s-custom.png'});
+/* die Akzentfarbe je Saison gibt es im Gestalter nicht mehr (dort: drei Akzentfarben je Vorlage) */ await p.click('#gsRail [data-gs="fx"][data-k="acc"][data-id="1"]').catch(()=>{});console.log('akzent der vorlage',await ev(()=>gsDoc().fx.acc));await p.waitForTimeout(200);await p.screenshot({path:'s-custom.png'});
 // menu dialog seasons
 await ev(()=>menuDialog(S.menu.find(m=>m.name==='Caesar Salat')));await p.screenshot({path:'s-mdlg.png'});await p.click('#dlgCancel');
 // QA: click after edit

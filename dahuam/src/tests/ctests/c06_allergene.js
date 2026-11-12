@@ -84,38 +84,43 @@ const pdfPages = f => (fs.readFileSync(f, 'latin1').match(/\/Type\s*\/Page[^s]/g
   // ---------- Gästekarten ----------
   await p.evaluate(() => { P('fries').algNone = true; P('cranberry').alg = 'O'; save(); });   // Schnitzel vollständig, Kaiserschmarrn (Apfelmus) bleibt offen
   await L.go(p, 'speisekarte/gaestekarte'); await p.waitForTimeout(900);
-  const gk = await p.evaluate(() => { const k = curSeasonKey(), d = view.gdate || todayStr(); const items = guestItems(k, d); const open = items.filter(m => !hasAlg(m)); const pages = hsPages(k, d).join(''); const doc = new DOMParser().parseFromString('<div>' + pages + '</div>', 'text/html');
-    const find = n => [...doc.querySelectorAll('.hs-d,.hs-feat,.hs-tr,.hs-kd,.hs-plate')].find(x => x.textContent.includes(n));
-    const kai = find('Kaiserschmarrn'), sch = find('Wiener Schnitzel'), gul = find('Gulaschsuppe'), an = find(open.find(m => !m.card).name);
-    return {nOpen:open.length, miss:(document.querySelector('#algMiss') || {textContent:''}).textContent.replace(/\s+/g, ' '), kai:kai && (kai.querySelector('.hs-al') || {textContent:''}).textContent, sch:sch && (sch.querySelector('.hs-al') || {textContent:''}).textContent, gul:gul && (gul.querySelector('.hs-al') || {textContent:''}).textContent, an:an && (an.querySelector('.hs-al') || {textContent:''}).textContent,
-      leg:(doc.querySelector('.hs-back .alg-open') || {textContent:''}).textContent, legKeys:[...doc.querySelectorAll('.hs-back .lg b')].map(x => x.textContent).join(''), foot:[...doc.querySelectorAll('.hs-back .fnote')].pop().textContent, everyDish:[...doc.querySelectorAll('.hs-d,.hs-tr,.hs-kd')].filter(x => !x.querySelector('.hs-al')).map(x => (x.querySelector('.hs-n,.n,.kn') || x).textContent).filter(t => !items.some(m => algInfo(m).state === 'none' && t.includes(m.name))).length, noneN:items.filter(m => algInfo(m).state === 'none').length}; });
-  L.ok(gk.kai === 'A C G O °' && gk.sch === 'A C G O' && gk.gul === 'A' && gk.an === '°', 'Hauskarte: unvollständig = bekannte Buchstaben und °; ohne jede Angabe nur °; vollständig ohne Zeichen', [gk.kai, gk.sch, gk.gul, gk.an]);
+  // Gestalter: die fertigen Blätter einer Vorlage (früher hsPages / Ansicht „Schlicht“)
+  const card = look => p.evaluate(look => { gsState().cur = look; save(); render(); const k = curSeasonKey(), d = view.gdate || todayStr(); const items = guestItems(k, d); const open = items.filter(m => !hasAlg(m)); const doc = new DOMParser().parseFromString('<div>' + gsPages({print:true}).join('') + '</div>', 'text/html');
+    const nm = x => [...x.querySelector('.gs-n').childNodes].filter(c => c.nodeType === 3).map(c => c.textContent).join('').trim();
+    const find = n => [...doc.querySelectorAll('.gs-d')].find(x => nm(x) === n); const al = n => { const x = find(n); return x ? (x.querySelector('.gs-al') || {textContent:''}).textContent : null; };
+    return {nOpen:open.length, miss:(document.querySelector('#algMiss') || {textContent:''}).textContent.replace(/\s+/g, ' '), kai:al('Kaiserschmarrn'), sch:al('Wiener Schnitzel'), gul:al('Gulaschsuppe'), an:al(open.find(m => !m.card && !m.group).name),
+      leg:(doc.querySelector('.gs-lg .alg-open') || {textContent:''}).textContent, legKeys:[...doc.querySelectorAll('.gs-lgl b')].map(x => x.textContent).join(''), foot:[...doc.querySelectorAll('.gs-lg .gs-fn')].pop().textContent,
+      everyDish:[...doc.querySelectorAll('.gs-d')].filter(x => !x.querySelector('.gs-al')).map(nm).filter(t => !items.some(m => algInfo(m).state === 'none' && t === m.name)).length, noneN:items.filter(m => algInfo(m).state === 'none').length}; }, look);
+  const gk = await card('haus');
+  L.ok(gk.kai === 'A C G O °' && gk.sch === 'A C G O' && gk.gul === 'A' && gk.an === '°', 'Vorlage Hauskarte: unvollständig = bekannte Buchstaben und °; ohne jede Angabe nur °; vollständig ohne Zeichen', [gk.kai, gk.sch, gk.gul, gk.an]);
   L.ok(gk.everyDish === 0 && gk.noneN === 5 /* D1: dazu vier Beispiel-Getränke ohne Allergene */, 'ohne Buchstaben und ohne ° stehen nur Gerichte und Getränke mit bestätigtem „keine Allergene“: nichts sieht aus wie „allergenfrei“, solange es nicht gepflegt ist', [gk.everyDish, gk.noneN]);
-  L.ok(gk.leg === 'Bei Gerichten mit ° fragen Sie bitte unser Team – Angaben werden ergänzt.' && !gk.legKeys.includes('°') && /inkl\. MwSt\./.test(gk.foot), 'Legende auf der letzten Seite: der Satz zu °; die Fußzeile bleibt „inkl. MwSt.“', [gk.leg, gk.legKeys]);
+  L.ok(gk.leg === 'Bei Gerichten mit ° fragen Sie bitte unser Team – Angaben werden ergänzt.' && !gk.legKeys.includes('°') && /inkl\. MwSt\./.test(gk.foot), 'Legende (Baustein „Allergene & Hinweise“): der Satz zu °; die Fußzeile bleibt „inkl. MwSt.“', [gk.leg, gk.legKeys]);
   L.ok(new RegExp('^' + cntTxt(await p.evaluate(() => noAlgCount())) + ' ohne vollständige Allergenangabe, ' + gk.nOpen + ' davon auf dieser Karte').test(gk.miss) && /In Karte und PDF stehen sie mit °/.test(gk.miss) && /Liste zeigen/.test(gk.miss), 'vor dem PDF: eine Zeile nennt die Zahl und führt zur Liste (nichts wird gesperrt)', gk.miss);
   function cntTxt(n){ return n + ' Gerichte'; }
   // Wortlaut ändern (Texte)
-  L.ok(await p.evaluate(() => { const i = document.querySelector('#app .hs-copy input[data-hsc="algOpen"]'); return !!i && i.value === ALG_OPEN_TXT && document.querySelectorAll('#app input[data-hsc="algOpen"]').length === 1; }), 'Texte-Feld der Hauskarte: der Satz ist dort änderbar (einmal, nicht doppelt)');
-  await p.fill('#app .hs-copy input[data-hsc="algOpen"]', 'Mit ° markiert: Bitte fragen Sie im Service nach.'); await p.waitForTimeout(600);
-  L.ok(await p.evaluate(() => S.settings.menuCopy.algOpen === 'Mit ° markiert: Bitte fragen Sie im Service nach.' && /Mit ° markiert: Bitte fragen Sie im Service nach\./.test(hsPages(curSeasonKey(), view.gdate).join(''))), 'geänderter Wortlaut steht in der Karte');
-  await p.fill('#app .hs-copy input[data-hsc="algOpen"]', ''); await p.waitForTimeout(600);
-  L.ok(await p.evaluate(() => hsPages(curSeasonKey(), view.gdate).join('').includes(ALG_OPEN_TXT)), 'leeres Feld: der Standardsatz gilt (das Zeichen bleibt nie ohne Erklärung)');
+  await p.evaluate(() => gsSelect(gsDoc().blocks.find(b => b.t === 'legend').id)); await p.waitForTimeout(150);
+  L.ok(await p.evaluate(() => { const i = document.querySelector('#gsRail input[data-hsc="algOpen"]'); return !!i && i.value === ALG_OPEN_TXT && document.querySelectorAll('#app input[data-hsc="algOpen"]').length === 1; }), 'Baustein „Allergene & Hinweise“ antippen: der Satz ist dort änderbar (einmal, nicht doppelt)');
+  await p.fill('#gsRail input[data-hsc="algOpen"]', 'Mit ° markiert: Bitte fragen Sie im Service nach.'); await p.waitForTimeout(600);
+  L.ok(await p.evaluate(() => S.settings.menuCopy.algOpen === 'Mit ° markiert: Bitte fragen Sie im Service nach.' && /Mit ° markiert: Bitte fragen Sie im Service nach\./.test(gsPages({print:true}).join(''))), 'geänderter Wortlaut steht in der Karte');
+  await p.fill('#gsRail input[data-hsc="algOpen"]', ''); await p.waitForTimeout(600);
+  L.ok(await p.evaluate(() => gsPages({print:true}).join('').includes(ALG_OPEN_TXT)), 'leeres Feld: der Standardsatz gilt (das Zeichen bleibt nie ohne Erklärung)');
+  await p.evaluate(() => gsSelect(null)); await p.waitForTimeout(150);
   await p.click('#app [data-act="algMiss"], #algMiss [data-act="goMenu"]'); await p.waitForTimeout(300);
   L.ok(await p.evaluate(() => view.tab === 'menu' && view.sec === 'noalg' && document.querySelectorAll('#app table.lt-menu tbody tr.row').length === noAlgCount()), '„Liste zeigen“ öffnet die Speisekarte mit dem Filter „Allergene offen“');
-  // Stil „Schlicht“
-  await p.evaluate(() => { S.settings.guestStyle = 'schlicht'; save(); view.mtab = 'guest'; go('menu'); }); await p.waitForTimeout(500);
-  const wk = await p.evaluate(() => { const find = n => [...document.querySelectorAll('#app .wk-dish')].find(x => x.querySelector('.wk-n').textContent.includes(n)); const a = n => { const x = find(n); return x ? (x.querySelector('.wk-a') || {textContent:'(nichts)'}).textContent : null; };
-    const open = guestItems(curSeasonKey(), view.gdate).find(m => !m.card && !hasAlg(m) && !m.group); return {kai:a('Kaiserschmarrn'), gul:a('Gulaschsuppe'), an:a(open.name), leg:(document.querySelector('#app .wk-open') || {textContent:''}).textContent, legKeys:[...document.querySelectorAll('#app .wk-leg b')].map(x => x.textContent).join(''), none:[...document.querySelectorAll('#app .wk-dish')].filter(x => !x.querySelector('.wk-a')).filter(x => !guestItems(curSeasonKey(), view.gdate).some(m => algInfo(m).state === 'none' && x.querySelector('.wk-n').textContent.includes(m.name))).length, field:!!document.querySelector('#app [data-algopen] input[data-hsc="algOpen"]'), foot:document.querySelector('#app .wk-foot p:last-child').textContent}; });
-  L.ok(wk.kai === 'Allergene A C G O °' && wk.gul === 'Allergene A' && wk.an === 'Allergene °' && wk.none === 0, 'Schlicht: „Allergene A C G O °“ / „Allergene °“; ohne Zeile nur das bestätigte „keine“', wk);
-  L.ok(wk.leg === ALG_OPEN_TXT_() && !wk.legKeys.includes('°') && wk.field && /inkl\. MwSt\./.test(wk.foot), 'Schlicht: Satz in der Legende, Feld für den Wortlaut bei der Fußzeile, „inkl. MwSt.“ bleibt');
+  // Vorlage „Schlicht“ (und jede andere): dieselben Zeichen, derselbe Satz
+  await L.go(p, 'speisekarte/gaestekarte'); await p.waitForTimeout(500);
+  for(const look of ['schlicht', 'alpin', 'elegant']){ const wk = await card(look);
+    L.ok(wk.kai === 'A C G O °' && wk.gul === 'A' && wk.an === '°' && wk.everyDish === 0, `Vorlage ${look}: „A C G O °“ / „°“; ohne Zeichen nur das bestätigte „keine“`, [wk.kai, wk.gul, wk.an, wk.everyDish]);
+    L.ok(wk.leg === ALG_OPEN_TXT_() && !wk.legKeys.includes('°') && /inkl\. MwSt\./.test(wk.foot), `Vorlage ${look}: Satz in der Legende, „inkl. MwSt.“ bleibt`); }
+  await p.evaluate(() => { gsState().cur = 'haus'; save(); render(); });
   function ALG_OPEN_TXT_(){ return 'Bei Gerichten mit ° fragen Sie bitte unser Team – Angaben werden ergänzt.'; }
   // Tageskarte (Aktion): Zeile ohne Rezeptur und ohne Angabe; „keine“ gilt als Angabe
   const tk = await p.evaluate(() => { const sp = {id:'sp_t', name:'Testkarte', from:todayStr(), to:todayStr(), mode:'tageskarte', style:'', note:'', items:[{name:'Suppe des Tages', desc:'', price:6, veg:'', card:'', alg:''}, {name:'Obstsalat', desc:'', price:5, veg:'vg', card:'', alg:'keine'}, {name:'Gulasch', desc:'', price:9, veg:'', card:'dish_goulash', alg:''}]}; const h = tageskarteHtml(sp); const doc = new DOMParser().parseFromString(h, 'text/html'); const a = n => { const x = [...doc.querySelectorAll('.hk-dish')].find(y => y.textContent.includes(n)); return (x.querySelector('.hk-alg') || {textContent:'(nichts)'}).textContent; }; return {s:a('Suppe des Tages'), o:a('Obstsalat'), g:a('Gulasch'), leg:(doc.querySelector('.hk-open') || {textContent:''}).textContent}; });
   L.ok(tk.s === '°' && tk.o === '(nichts)' && tk.g === 'A' && tk.leg === ALG_OPEN_TXT_(), 'Tageskarte: offene Zeile mit °, „keine“ ist eine Angabe, Legende mit dem Satz', tk);
 
   // ---------- Allergen-Blatt ----------
-  await p.evaluate(() => { S.settings.guestStyle = 'haus'; save(); view.mtab = 'guest'; go('menu'); }); await p.waitForTimeout(700);
-  L.ok(await p.evaluate(() => !!document.querySelector('#app .guest-tools [data-act="algSheet"]') && /Allergen-Blatt als PDF/.test(document.querySelector('#app [data-act="algSheet"]').textContent)), 'Gästekarte: „Allergen-Blatt als PDF“');
+  await p.evaluate(() => { gsState().cur = 'haus'; save(); view.mtab = 'guest'; go('menu'); }); await p.waitForTimeout(700);
+  L.ok(await p.evaluate(() => !!document.querySelector('#gsRail [data-act="algSheet"]') && /Allergen-Blatt als PDF/.test(document.querySelector('#app [data-act="algSheet"]').textContent)), 'Gästekarte: „Allergen-Blatt als PDF“');
   await p.click('#app [data-act="algSheet"]'); await p.waitForTimeout(500);
   const ab = await p.evaluate(() => { const r = abPages(); const doc = new DOMParser().parseFromString('<div>' + r.pages.join('') + '</div>', 'text/html'); const pages = [...doc.querySelectorAll('.ab-page')];
     const items = guestItems(curSeasonKey(), view.gdate || todayStr()); const spItems = specialsFor(view.gdate || todayStr()).flatMap(sp => sp.items); const rows = [...doc.querySelectorAll('.ab-t tbody tr:not(.ab-sec)')]; const row = n => rows.find(x => x.querySelector('.ab-n').textContent.replace(' °', '').trim() === n);
@@ -136,12 +141,12 @@ const pdfPages = f => (fs.readFileSync(f, 'latin1').match(/\/Type\s*\/Page[^s]/g
   const size = fs.statSync(dl.file).size; const np = pdfPages(dl.file);
   L.ok(/^Allergen-Blatt-DAHUAM\.202-\d{4}-\d\d-\d\d\.pdf$/.test(dl.name) && size > 40000 && np === ab.n && fs.readFileSync(dl.file).slice(0, 5).toString() === '%PDF-', `echtes PDF: ${dl.name}, ${np} Seiten wie in der Vorschau, ${Math.round(size / 1024)} KB`, {size, np});
   L.ok(/PDF erstellt: Allergen-Blatt.*\(\d Seiten\)/.test(await L.toast(p)) && await p.evaluate(() => !document.querySelector('#print').innerHTML && !document.querySelector('#print').classList.contains('pdf')), 'Meldung mit Seitenzahl; der Druckbereich ist danach wieder leer', await L.toast(p));
-  // Speisekarte „Schlicht“ als PDF: mit ° und Legende, Seitenzahl plausibel
-  await p.evaluate(() => { S.settings.guestStyle = 'schlicht'; save(); render(); }); await p.waitForTimeout(400);
+  // Speisekarte, Vorlage „Schlicht“, als PDF: mit ° und Legende, Seitenzahl plausibel
+  await p.evaluate(() => { gsState().cur = 'schlicht'; save(); render(); }); await p.waitForTimeout(600);
   let printHtml = ''; await p.exposeFunction('__keepPrint', h => { printHtml = h; });
   await p.evaluate(() => { const _e = exportPdf; exportPdf = function(n){ __keepPrint(document.querySelector('#print').innerHTML); return _e(n); }; });
   const dl2 = await L.dl(p, () => p.click('#app [data-pdf="printMenu"]')); await p.waitForTimeout(500);
   const np2 = pdfPages(dl2.file);
   L.ok(/^Speisekarte-/.test(dl2.name) && np2 >= 2 && np2 <= 8 && fs.statSync(dl2.file).size > 100000, `Speisekarte als PDF: ${np2} Seiten`, [dl2.name, np2]);
-  L.ok(/Allergene A C G O °/.test(printHtml) && printHtml.includes('Bei Gerichten mit ° fragen Sie bitte unser Team') && /inkl\. MwSt\./.test(printHtml), 'im PDF-Inhalt: ° am Gericht und der Satz in der Legende; „inkl. MwSt.“ bleibt');
+  L.ok(/<span class="gs-al">A C G O °<\/span>/.test(printHtml) && printHtml.includes('Bei Gerichten mit ° fragen Sie bitte unser Team') && /inkl\. MwSt\./.test(printHtml), 'im PDF-Inhalt: ° am Gericht und der Satz in der Legende; „inkl. MwSt.“ bleibt');
   await L.done(b, p.errs); })();

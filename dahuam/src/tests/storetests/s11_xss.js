@@ -31,10 +31,9 @@ const {open} = require('../review-technik/lib'); const fs = require('fs'); const
     for(const m of ['week','day','month']) await T('dienst '+m, () => { tmView().mode = m; go('dienst'); });
     const sink = document.createElement('div'); sink.style.cssText = 'position:absolute;left:-9999px'; document.body.appendChild(sink);
     const H = async (name, f) => T(name, () => { sink.innerHTML = f(); });
-    await H('guestHtml', () => guestHtml()); await H('guestPrevHtml', () => guestPrevHtml()); await H('guestHtmlWeb', () => guestHtmlWeb(curSeasonKey(), todayStr(), {print:true}));
-    await H('guestHtmlHaus', () => guestHtmlHaus(curSeasonKey(), todayStr(), {print:true}));
+    await H('guestHtml', () => guestHtml()); await H('guestPrevHtml', () => guestPrevHtml()); for(const k of Object.keys(GS_LOOKS)) await H('Vorlage ' + k, () => { gsState().cur = k; return gsPages({print:true}).join(''); });   // Gestalter: jede Vorlage (früher guestHtmlWeb / guestHtmlHaus)
+    gsState().cur = 'haus';
     for(const sp of S.specials) await H('tageskarte', () => tageskarteHtml(sp));
-    await H('kids', () => kidsHtml(curSeasonKey(), todayStr()));
     await H('vbPrint', () => vbPrintHtml(todayStr())); await H('tmPrint', () => tmPrintHtml(tmMonday(todayStr()))); await H('ckPrint', () => ckPrintHtml(todayStr().slice(0,7)));
     await H('tmMonth', () => tmMonthHtml(todayStr().slice(0,7)));
     for(const o of S.orders) await H('orderText', () => `<pre>${esc(orderText(o))}</pre>`);

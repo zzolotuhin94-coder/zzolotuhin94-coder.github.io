@@ -53,7 +53,7 @@ function seed(){
   plusMigrate(d);
   teamMigrate(d);
   barDemo(d); barMigrate(d);
-  rzMigrate(d); ekMigrate(d);
+  rzMigrate(d); ekMigrate(d); gsMigrate(d);
   return d;
 }
 
@@ -84,7 +84,7 @@ function migrate(d){
   plusMigrate(d);
   teamMigrate(d);
   barMigrate(d);
-  rzMigrate(d); ekMigrate(d);
+  rzMigrate(d); ekMigrate(d); gsMigrate(d);
   return d;
 }
 

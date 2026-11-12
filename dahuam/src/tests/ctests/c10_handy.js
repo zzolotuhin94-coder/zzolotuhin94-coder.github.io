@@ -1,7 +1,7 @@
 // Handy 390 px: keine neue Seite und kein neuer Dialog ist breiter als der Bildschirm.
 const L = require('./lib');
 (async () => { const b = await L.launch(); const {p} = await L.open(b, L.PHONE);
-  const chk = async (name, extra) => { const w = await p.evaluate(() => { const d = document.querySelector('#dlg'); const dw = d.open ? Math.round(d.getBoundingClientRect().right) : 0; const over = [...document.querySelectorAll('#app *, #dlgForm *')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.right > 391 && !e.closest('.tbl-wrap,.lt-wrap,.seg,.chips-row,.hs-prev,.ab-sheet,.guest-prev,.ab-prev,.rp-out,.shelf') ; }).slice(0, 3).map(e => e.tagName + '.' + e.className); return {sw:document.documentElement.scrollWidth, dw, over}; }); L.ok(w.sw === 390 && w.dw <= 390 && w.over.length === 0, `390 px: ${name}`, w.sw === 390 && w.dw <= 390 && !w.over.length ? undefined : w); if(extra) await extra(); };
+  const chk = async (name, extra) => { const w = await p.evaluate(() => { const d = document.querySelector('#dlg'); const dw = d.open ? Math.round(d.getBoundingClientRect().right) : 0; const over = [...document.querySelectorAll('#app *, #dlgForm *')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.right > 391 && !e.closest('.tbl-wrap,.lt-wrap,.seg,.chips-row,.gs-sheet,.ab-sheet,.ab-prev,.rp-out,.shelf') ; }).slice(0, 3).map(e => e.tagName + '.' + e.className); return {sw:document.documentElement.scrollWidth, dw, over}; }); L.ok(w.sw === 390 && w.dw <= 390 && w.over.length === 0, `390 px: ${name}`, w.sw === 390 && w.dw <= 390 && !w.over.length ? undefined : w); if(extra) await extra(); };
   await L.go(p, 'einstellungen/eigene-daten'); await chk('Eigene Daten (Übersicht)');
   L.ok(await p.evaluate(() => [...document.querySelectorAll('#app .ed-row .btn')].every(x => x.getBoundingClientRect().height >= 40)), 'Knöpfe der Schritte sind mit dem Finger gut zu treffen (≥ 40 px)');
   await p.click('#app [data-act="leerAsk"]'); await p.waitForTimeout(250); await chk('Dialog „Leer starten?“'); await p.click('#dlgCancel'); await p.waitForTimeout(200);
@@ -33,7 +33,7 @@ const L = require('./lib');
   await L.go(p, 'speisekarte/gaestekarte'); await p.waitForTimeout(700); await chk('Gästekarte mit Hinweis und „Allergen-Blatt“');
   await p.evaluate(() => abDialog()); await p.waitForTimeout(400); await chk('Dialog Allergen-Blatt');
   L.ok(await p.evaluate(() => { const sh = document.querySelector('#dlgForm .ab-sheet'); const pg = sh.querySelector('.ab-page').getBoundingClientRect(); const r = sh.getBoundingClientRect(); return pg.width <= r.width + 1 && pg.width > 200; }), 'Vorschau des Blatts ist auf die Breite verkleinert'); await p.click('#dlgCancel'); await p.waitForTimeout(200);
-  await p.evaluate(() => { S.settings.guestStyle = 'schlicht'; save(); render(); }); await p.waitForTimeout(400); await chk('Gästekarte „Schlicht“ mit ° und Legende');
+  await p.evaluate(() => { gsState().cur = 'schlicht'; save(); render(); }); await p.waitForTimeout(600); await chk('Gästekarte, Vorlage „Schlicht“ mit ° und Legende');
   await L.go(p, 'einstellungen'); await chk('Einstellungen (zwei Steuersätze, Eigene Daten)');
   await L.go(p, 'einrichtung'); await chk('Einrichtung mit den Verweisen „aus Datei importieren“');
   await L.go(p, 'team/auswertung'); await chk('Auswertung (Monatsübersicht je Steuersatz)');
