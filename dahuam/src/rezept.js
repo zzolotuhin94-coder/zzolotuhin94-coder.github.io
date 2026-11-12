@@ -94,7 +94,7 @@ function rzOpenSub(i){
   view.rz = {id:l.sub.id, n, stack:st.stack.concat([{id:c.id, n:st.n}])}; RZ_N.set(l.sub.id, n); view.card = l.sub.id; render(); hashSync(); window.scrollTo({top:0});
 }
 function rzUp(){ const st = view.rz; const p = st && st.stack && st.stack[st.stack.length - 1]; if(!p || !C(p.id)){ go('cards'); return; } view.rz = {id:p.id, n:p.n, stack:st.stack.slice(0, -1)}; RZ_N.set(p.id, p.n); view.card = p.id; render(); hashSync(); window.scrollTo({top:0}); }
-function rzSetN(n){ const c = C(view.card); if(!c) return; if(!(n > 0) || n > 9999){ toast('Bitte eine Zahl größer als 0 eingeben, zum Beispiel 4 oder 2,5.'); render(); return; } rzState(c).n = n; RZ_N.set(c.id, n); render(); }
+function rzSetN(n){ const c = C(view.card); if(!c) return; if(!(n > 0) || n > 9999){ toast('Bitte eine Zahl größer als 0 eingeben, zum Beispiel 4 oder 2,5.'); render(); return; } const st = rzState(c); const same = Math.abs(st.n - n) < 1e-9; st.n = n; RZ_N.set(c.id, n); if(!same || !document.querySelector('#app .rz-k')) render(); }   // schon beim Tippen gerechnet: nicht neu zeichnen (sonst ginge ein Tipp auf eine Zutat ins Leere)
 /* beim Tippen sofort mitrechnen, ohne das Feld neu zu zeichnen */
 function rzLive(t){
   const c = C(view.card); if(!c) return; const v = numParse(t.value); let n = v;

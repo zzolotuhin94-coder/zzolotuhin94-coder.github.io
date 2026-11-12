@@ -85,7 +85,7 @@ function algControlRead(fd){
 }
 /* Plausibilität für „keine Allergene“: typische Wörter in Name, Beschreibung, Kategorie. Nur ein Hinweis, die App entscheidet nichts. */
 const ALG_HINT_WORDS = [['A', /(mehl|brot|weizen|dinkel|roggen|gerste|hafer|teig|nudel|pasta|semmel|brösel|knödel|strudel|kuchen|torte|schnitzel|pizza|spätzle|nockerl|schmarrn|palatschink|toast|croûton|crouton|bier)/],
-  ['B', /(garnele|shrimp|krabbe|hummer|languste|scampi|krebs)/], ['C', /(^|[^a-zäöüß])(ei|eier|eigelb|eiweiß|eiklar|dotter)([^a-zäöüß]|$)|mayonnaise|mayo/],
+  ['B', /(garnele|shrimp|krabbe|hummer|languste|scampi|krebs)/], ['C', /(^|[^a-zäöüß])(ei|eier|eigelb|eiweiß|eiklar|dotter)([^a-zäöüß]|$)|mayonnaise|mayo|spiegelei|rührei|eierspeis|eiernockerl|omelett/],
   ['D', /(fisch|forelle|lachs|saibling|zander|thunfisch|sardelle|kabeljau|karpfen|hering|dorsch)/], ['E', /erdnuss/], ['F', /(soja|tofu)/],
   ['G', /(milch|käse|butter|sahne|obers|rahm|joghurt|jogurt|topfen|quark|mozzarella|parmesan|molke|mascarpone|ricotta|feta|gorgonzola|emmentaler|crème fraîche|creme fraiche)/],
   ['H', /(nuss|nüsse|mandel|pistazie|cashew|pekan|macadamia|pesto)/], ['L', /sellerie/], ['M', /senf/], ['N', /(sesam|tahin)/], ['O', /(wein|sekt|prosecco)/], ['P', /lupine/], ['R', /(muschel|tintenfisch|kalmar|calamari|oktopus|schnecke)/]];
