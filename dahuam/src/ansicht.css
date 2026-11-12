@@ -30,7 +30,7 @@ html.ov-on body{padding-right:var(--sbw,0px)}
 html.ov-on .bottom{right:var(--sbw,0px)}
 
 /* ---------- Dialoge: Speichern bleibt unten sichtbar ---------- */
-dialog form > .dlg-actions{position:sticky;bottom:-22px;z-index:3;margin:6px -22px -22px;padding:12px 22px calc(12px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line);border-radius:0 0 10px 10px}
+dialog form > .dlg-actions{position:sticky;bottom:0;z-index:3;margin:6px -22px -22px;padding:12px 22px calc(12px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line);border-radius:0 0 10px 10px}
 
 /* ---------- Schnellsuche: Art des Treffers, Schließen statt Esc am Handy ---------- */
 #palList .pg{display:block}
@@ -175,3 +175,15 @@ dialog form > .dlg-actions{position:sticky;bottom:-22px;z-index:3;margin:6px -22
 @media (max-width:900px){table.lt.lt-menu td.lt-gripc + td{max-width:48vw}table.lt.lt-menu .lt-miss .link{white-space:normal}}
 @media (max-width:600px){table.lt .lt-n small{white-space:normal;max-width:none}}
 @media (max-width:600px){table.matrix{min-width:0!important;width:100%}table.matrix th,table.matrix td{padding-left:3px!important;padding-right:3px!important}table.matrix th{text-transform:none;letter-spacing:0}table.matrix td:first-child{white-space:normal;padding-left:10px!important}table.matrix td:first-child .pn{white-space:normal;overflow-wrap:anywhere}}
+/* Tablet quer (901–1180 px): Listen passen ohne abgeschnittene Spalten; die Zeile selbst öffnet zum Bearbeiten */
+@media (min-width:901px) and (max-width:1180px){
+  table.lt .lt-n small{max-width:24ch}
+  table.lt td,table.lt th{padding-left:10px;padding-right:10px}
+  table.lt th{letter-spacing:.03em}
+  table.lt .lt-acts .icon-btn{display:none}
+}
+/* Bestellen, Tablet hoch: Knöpfe der Lieferanten-Zeile in eine eigene Zeile darunter */
+@media (min-width:601px) and (max-width:900px){
+  #app.v-list .oc{grid-template-columns:minmax(120px,1fr) minmax(0,1.4fr) 120px 96px 130px!important}
+  #app.v-list .oc .row-btns{grid-column:1 / -1!important;grid-row:3!important;justify-content:flex-start;flex-wrap:wrap!important;margin-top:6px}
+}
