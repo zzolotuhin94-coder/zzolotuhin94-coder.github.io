@@ -169,9 +169,10 @@ await p.click('#dlgForm [data-tmwho="tp_theresa"]');await w(300);ok(await ev(()=
 await ev(()=>{S.settings.currentUser='u_chef';tmView().mine=false;save();render()});
 // ---------- Heute ----------
 await ev(()=>go('dash'));await w(300);
-const dash=await ev(()=>({who:$('#app .tm-dash .tm-dash-who').innerText.replace(/\s+/g,' '),h:$('#app .tm-dash .day-h').textContent,boxes:document.querySelectorAll('#app .tm-dash .panel,#app .tm-dash .note').length,after:!!$('#app .pl-dash')&&!!($('#app .pl-dash').compareDocumentPosition($('#app .tm-dash'))&4)}));
-ok(/^4 Heute im Dienst Anna \(Küche 08–16\), Lukas \(Küche 15–23\), Theresa \(Service 15–23\), Hannes \(Bar 16–00\) Dienstplan$/.test(dash.who)&&dash.boxes===0&&dash.after,'Heute: „Heute im Dienst: Anna (Küche 08–16), …“ as one row in the day sheet, no boxes',dash.who);
-await p.click('#app .tm-dash [data-act="tmGo"]');await w(250);ok(await ev(()=>view.tab==='dienst'&&tmView().w==='2026-11-09'),'button leads to the plan');
+const dash=await ev(()=>({who:$('#app .tm-dash .tm-dash-who').innerText.replace(/\s+/g,' '),h:$('#app .tm-dash .dh-l').textContent,boxes:document.querySelectorAll('#app .tm-dash .panel,#app .tm-dash .note').length,after:!!$('#app .pl-dash')&&!!($('#app .pl-dash').compareDocumentPosition($('#app .tm-dash'))&4)}));
+// fix-3: die Zeile selbst führt zum Plan und trennt „jetzt“ und „später“
+ok(dash.who==='4 Heute im Dienst jetzt: Anna (Küche 08–16) · später: Lukas (Küche 15–23), Theresa (Service 15–23), Hannes (Bar 16–00)'&&dash.boxes===0&&dash.after,'Heute: „Heute im Dienst: Anna (Küche 08–16), …“ as one row in the day sheet, no boxes',dash.who);
+await p.click('#app .tm-dash [data-act="tmGo"]');await w(250);ok(await ev(()=>view.tab==='dienst'&&tmView().w==='2026-11-09'),'the row leads to the plan');
 // ---------- Schnellsuche, Hilfe, „So geht’s hier“ ----------
 const pal=await ev(()=>{const a=palData();return ['Dienstplan','Checklisten','Dienstplan diese Woche','Checkliste Öffnen Küche','Team verwalten','Mein Dienst'].map(n=>{const x=a.find(y=>y.n===n);return !!x&&!!x.s})});ok(pal.every(Boolean),'command palette: both areas (with description), „Dienstplan diese Woche“, „Checkliste Öffnen Küche“, „Team verwalten“',pal);
 await ev(()=>{go('menu');palData().find(x=>x.n==='Checkliste Öffnen Küche').run()});await w(300);ok(await ev(()=>view.tab==='checkl'&&$('#app h1').firstChild.textContent==='Öffnen Küche'),'palette entry opens the list directly');

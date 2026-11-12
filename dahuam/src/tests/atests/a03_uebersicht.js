@@ -30,9 +30,10 @@ const L = require('./lib');
     L.ok(await ev(() => document.querySelector('#dlgForm [name="guest"]').value === 'Herr Lechner'), 'Tipp auf „Anreise Herr Lechner“ öffnet die Buchung'); await L.dlgClose(p);
     // ---------- Heute ----------
     await L.go(p, 'heute');
-    const dash = await ev(() => { const r = [...document.querySelectorAll('#app .ap-dash')]; const sec = r[0] && r[0].closest('.day-sec'); return {n:r.length, txt:r[0] ? r[0].innerText.replace(/\s+/g, ' ').trim() : '', sec:sec ? sec.querySelector('.day-h').textContent : '', cards:document.querySelectorAll('#app .day-sec').length}; });
-    L.ok(dash.n === 1 && dash.txt === 'Apartments 1 Anreise, 1 Abreise, 1 Reinigung offen, Wechseltag bis 15:00 Uhr Öffnen' && dash.sec === 'Offen', 'Heute: genau eine ruhige Zeile unter „Offen“, kein eigener Abschnitt', dash);
-    await p.click('#app .ap-dash [data-act="apGo"]'); await p.waitForTimeout(250);
+    const dash = await ev(() => { const r = [...document.querySelectorAll('#app .ap-dash')]; const sec = r[0] && r[0].closest('.day-sec'); return {n:r.length, txt:r[0] ? r[0].innerText.replace(/\s+/g, ' ').trim() : '', sec:sec ? sec.querySelector('.dh-l').textContent : '', cards:document.querySelectorAll('#app .day-sec').length}; });
+    // fix-3: die Zeile steht unter „Heute zu tun“ und ist selbst der Knopf
+    L.ok(dash.n === 1 && dash.txt === 'Apartments 1 Anreise, 1 Abreise, 1 Reinigung offen, Wechseltag bis 15:00 Uhr' && dash.sec === 'Heute zu tun', 'Heute: genau eine ruhige Zeile unter „Heute zu tun“, kein eigener Abschnitt', dash);
+    await p.click('#app .ap-dash .dh-b'); await p.waitForTimeout(250);
     L.ok(await ev(() => view.tab === 'apart' && view.ap.tab === 'reinigung' && location.hash === '#apartments/reinigung'), '„Öffnen“ führt zur Reinigung');
     await ev(() => { const a = apS(); a.bookings = a.bookings.filter(x => x.from !== todayStr() && x.to !== todayStr()); Object.keys(a.cleans).forEach(k => { if(k.endsWith(todayStr())) delete a.cleans[k]; }); save(); go('dash'); });
     L.ok(await ev(() => !document.querySelector('#app .ap-dash')), 'nichts an- oder abzureisen, keine Reinigung offen: keine Zeile');
@@ -45,11 +46,11 @@ const L = require('./lib');
     L.ok(p.errs.length === 0, 'Desktop: keine Fehler', p.errs); await p.context().close(); }
   // ---------- Handy ----------
   { const {p} = await L.open(b, {...L.PHONE}); const ev = (f, a) => p.evaluate(f, a);
-    const bar = await ev(() => [...document.querySelectorAll('.bottom .nav-i')].filter(n => n.getClientRects().length).map(n => n.textContent.trim()));
-    L.ok(bar.join('|') === 'Heute|Prep|Checklisten|Rezepte|Mehr', 'Handy: untere Leiste unverändert', bar);
+    const bar = await ev(() => [...document.querySelectorAll('.bottom .nav-i')].filter(n => n.getClientRects().length).map(n => n.textContent.replace(/\u00ad/g, '').trim()));
+    L.ok(bar.join('|') === 'Heute|Vorbereitung|Rezepte|Ware|Mehr', 'Handy: untere Leiste unverändert (Apartments unter „Mehr“)', bar);
     await p.click('.bottom .nav-i[data-act="mehr"]'); await p.waitForTimeout(250);
     const sh = await ev(() => [...document.querySelectorAll('#mehr .sheet-i b')].map(x => x.textContent));
-    L.ok(sh.join('|') === 'Speisekarte|Ware|Team & Zahlen|Apartments|Einstellungen|Suche', '„Mehr“ enthält „Apartments“', sh);
+    L.ok(sh.join('|') === 'Checklisten|Speisekarte|Team & Zahlen|Apartments|Einstellungen|Suche' /* fix-3: Ware in der Leiste, Checklisten unter „Mehr“ */, '„Mehr“ enthält „Apartments“', sh);
     await p.click('#mehr .sheet-i[data-tab="apart"]'); await p.waitForTimeout(300);
     L.ok(await ev(() => view.tab === 'apart' && document.getElementById('mehr').hidden && document.querySelector('.bottom [data-act="mehr"]').classList.contains('on')), 'Tipp: Apartments offen, „Mehr“ markiert');
     const ph = await ev(() => ({grid:getComputedStyle(document.querySelector('#app .ap-grid')).display, days:[...document.querySelectorAll('#app .ap-days > li')].map(li => li.querySelector('.ap-dh').innerText.replace(/\s+/g, ' ').trim()),

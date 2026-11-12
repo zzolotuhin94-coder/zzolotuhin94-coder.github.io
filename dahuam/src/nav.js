@@ -8,9 +8,11 @@ ICO.ware = ICO.stock; ICO.team = ICO.dienst;
 ICO.more = '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>';
 ICO.minus = ICO.minus || '<path d="M5 12h14"/>';
 
-const NAV = [['dash','Heute','Heute'],['vorb','Vorbereitung','Prep'],['checkl','Checklisten','Checklisten'],['menu','Speisekarte','Karte'],['cards','Rezepte','Rezepte'],['ware','Ware','Ware'],['team','Team & Zahlen','Team'],['apart','Apartments','Apartments']];
-const NAV_BOTTOM = ['dash','vorb','checkl','cards'];                 // Handy: vier Bereiche und „Mehr“
-const NAV_MORE = ['menu','ware','team','apart','setup'];                     // stehen am Handy unter „Mehr“
+const NAV = [['dash','Heute','Heute'],['vorb','Vorbereitung','Vorberei&shy;tung'],['checkl','Checklisten','Checklisten'],['menu','Speisekarte','Karte'],['cards','Rezepte','Rezepte'],['ware','Ware','Ware'],['team','Team & Zahlen','Team'],['apart','Apartments','Apartments']];
+/* Handy: vier Bereiche und „Mehr“. Ware (Bestand, Bestellen, Lieferungen) brauchen die Inhaber jeden Tag;
+   Checklisten und Eigenkontrolle stehen auf „Heute“ als eigene Zeile und unter „Mehr“. Ein Wort je Bereich, kein „Prep“. */
+const NAV_BOTTOM = ['dash','vorb','ware','cards'];
+const NAV_MORE = ['checkl','menu','team','apart','setup'];                   // stehen am Handy unter „Mehr“
 const NAV_OF = {dash:'dash', vorb:'vorb', checkl:'checkl', menu:'menu', cards:'cards', stock:'ware', buy:'ware', products:'ware', pcheck:'ware', dienst:'team', report:'team', setup:'setup', einr:'setup', daten:'setup'};
 function navKey(tab){ return NAV_OF[tab] || tab; }
 function navHtml(short){

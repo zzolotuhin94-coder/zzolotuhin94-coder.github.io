@@ -5,7 +5,7 @@ const L = require('./lib'); const fs = require('fs');
   let l = await line(); L.ok(!l.d && !l.s, 'Demodaten: keine Erinnerung', l);
   await p.evaluate(() => { S.settings.name = 'Nur der Name'; save(); }); l = await line(); L.ok(!l.d, 'nur den Namen geändert, sonst Demostand: noch keine Erinnerung');
   await p.evaluate(() => { const pr = S.products.find(x => x.priceDemo); markPrice(pr, 'manuell'); pr.price = 12.34; save(); }); l = await line();
-  L.ok(l.d === 'Es gibt noch keine Sicherung als Datei. Sicherung speichern' && /noch keine Sicherung/.test(l.s), 'erster eigener Preis → eine Zeile auf Heute und in den Einstellungen', l);
+  L.ok(l.d === 'Sicherung speichern Es gibt noch keine Sicherung als Datei.' /* fix-3: auf Heute eine Zeile wie alle anderen, der Name der Aktion zuerst */ && /noch keine Sicherung/.test(l.s), 'erster eigener Preis → eine Zeile auf Heute und in den Einstellungen', l);
   L.ok(await p.evaluate(() => !document.querySelector('#dlg').open && !document.querySelector('#toast.show')), 'kein Fenster, kein Hinweis, der sich aufdrängt');
   await p.evaluate(() => go('dash')); await p.waitForTimeout(150);
   const [dl] = await Promise.all([p.waitForEvent('download'), p.click('#app .rel-remind [data-rel=backup]')]); const bk = JSON.parse(fs.readFileSync(await dl.path(), 'utf8')); await p.waitForTimeout(300);
@@ -14,7 +14,7 @@ const L = require('./lib'); const fs = require('fs');
   L.ok(await p.evaluate(() => Date.now() - new Date(localStorage.getItem(KEY + '_lastBackup')).getTime() < 60000) && /^\d\d\.\d\d\.\d{4}$/.test(await p.textContent('#relLastBk')), 'Zeitpunkt der letzten Sicherung ist vermerkt und steht in den Einstellungen');
   await p.evaluate(() => localStorage.setItem(KEY + '_lastBackup', new Date(Date.now() - 6.5*864e5).toISOString())); l = await line(); L.ok(!l.d, '6 Tage alt: noch nichts');
   await p.evaluate(() => localStorage.setItem(KEY + '_lastBackup', new Date(Date.now() - 8.2*864e5).toISOString())); l = await line();
-  L.ok(/^Die letzte Sicherung als Datei ist 8 Tage alt\. Sicherung speichern$/.test(l.d) && /8 Tage alt/.test(l.s), '8 Tage alt: Zeile mit dem Alter', l);
+  L.ok(/^Sicherung speichern Die letzte Sicherung als Datei ist 8 Tage alt\.$/.test(l.d) && /8 Tage alt/.test(l.s), '8 Tage alt: Zeile mit dem Alter', l);
   // der bisherige Weg „Sicherung erstellen“ zählt genauso
   await p.evaluate(() => go('setup')); await p.click('[data-act=export]'); await p.waitForTimeout(200); const [dl2] = await Promise.all([p.waitForEvent('download'), p.click('#dlBtn')]); await p.waitForTimeout(300); await p.evaluate(() => document.querySelector('#dlg').close());
   const bk2 = JSON.parse(fs.readFileSync(await dl2.path(), 'utf8')); l = await line();

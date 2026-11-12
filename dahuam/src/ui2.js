@@ -592,7 +592,7 @@ function prodDialog(p, pre){
       ${isNew?`<label class="f"><span data-gl="A">Anfangsbestand</span><input name="stock" class="num-in" type="text" inputmode="decimal" value="0"></label>`:''}
     </div>
     ${algControlHtml(algClean(p.alg), prodAlgState(p), {note:'„Keine Allergene“ ist eine bestätigte Angabe. „Noch nicht geprüft“ bleibt auf der Karte sichtbar offen.'})}
-    <div class="togs" data-k="food"><label class="tog"><input type="checkbox" name="basic" ${p.basic===true?'checked':''}><span></span>Grundzutat wie Salz, Gewürze, Öl: steht nicht auf der Prep-Liste</label></div>`,
+    <div class="togs" data-k="food"><label class="tog"><input type="checkbox" name="basic" ${p.basic===true?'checked':''}><span></span>Grundzutat wie Salz, Gewürze, Öl: steht nicht auf der Vorbereitungsliste</label></div>`,
     fd => { const ar = algControlRead(fd); if(!ar) return false;
       const common = {name:fd.get('name').trim(), alg:ar.alg, algNone:ar.algNone, loc:fd.get('loc'), supplier:fd.get('supplier'), artNo:fd.get('artNo').trim()};
       if(fd.get('kind') === 'g'){

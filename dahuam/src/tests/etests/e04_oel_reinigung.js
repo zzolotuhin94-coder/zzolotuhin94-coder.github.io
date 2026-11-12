@@ -74,9 +74,10 @@ const L = require('./lib');
   await L.go(p, 'heute');
   L.ok(await ev(() => document.querySelectorAll('#app .ek-dash').length) === 0, 'alles erledigt: auf „Heute“ steht keine Zeile zur Eigenkontrolle');
   await L.chef(p); await ev(() => { delete S.checks.runs['2026-11-12'].ek_clean; S.checks.ek.log = S.checks.ek.log.filter(r => !(r.d === '2026-11-12' && r.k === 'oil' && r.t === 'wechsel')); save(); go('dash'); }); await w(200);
-  const dash = await ev(() => ({n:document.querySelectorAll('#app .ek-dash').length, t:document.querySelector('#app .ek-dash').innerText.replace(/\s+/g, ' ').trim(), sec:document.querySelector('#app .ek-dash').closest('section').className, cards:document.querySelectorAll('#app .day-sec').length}));
-  L.ok(dash.n === 1 && dash.t === '3 Eigenkontrolle Reinigungsplan: 2 offen, 1 davon überfällig · Frittieröl: geprüft: wechseln Öffnen' && /tm-dash/.test(dash.sec), 'etwas steht an: EINE ruhige Zeile im Team-Block (keine neue Karte)', dash.t);
-  await p.click('#app .ek-dash [data-act="ekOpen"]'); await w(200);
+  // fix-3: „Heute zu tun“ hat je Sache eine Zeile, die selbst an den richtigen Ort führt (Frittieröl mit „Öl gewechselt“, Reinigungsplan)
+  const dash = await ev(() => ({t:[...document.querySelectorAll('#app .ek-dash')].map(x => x.innerText.replace(/\s+/g, ' ').trim()), sec:[...document.querySelectorAll('#app .ek-dash')].map(x => x.closest('section').className)}));
+  L.ok(dash.t.join('|') === 'heute Frittieröl · Fritteuse geprüft: wechseln Öl gewechselt|2 Reinigungsplan 2 offen, 1 davon überfällig' && dash.sec.every(c => /dh-now/.test(c)), 'etwas steht an: je eine ruhige Zeile unter „Heute zu tun“ (keine neue Karte)', dash.t);
+  await p.click('#app .ek-dash.dh-clean .dh-b'); await w(200);
   L.ok(await ev(() => location.hash === '#checklisten' && document.querySelector('#app h1').textContent === 'Reinigungsplan'), 'die Zeile führt zum Reinigungsplan');
   // Chef nimmt ein Häkchen zurück
   await p.click('#app [data-act="ekTick"][data-id="ec_hand"]'); await w(150); await ev(() => document.querySelector('#toast').classList.remove('show')); await p.click('#app [data-act="ekTick"][data-id="ec_hand"]'); await w(200);

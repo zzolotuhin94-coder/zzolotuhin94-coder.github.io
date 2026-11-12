@@ -7,8 +7,8 @@
 
 /* ---------- Bereiche: ein Satz, wozu ---------- */
 const NAV_DESC = {
-  dash:'Was heute zu tun ist: bestellen, Lieferungen prüfen, Checklisten.',
-  vorb:'Die Prep-Liste für heute und morgen, aus der Prognose gerechnet.',
+  dash:'Was heute zu tun ist: Vorbereitung, bestellen, Eigenkontrolle, Lieferungen, Dienst.',
+  vorb:'Die Vorbereitungsliste für heute und morgen, aus der Prognose gerechnet.',
   checkl:'Listen zum Abhaken beim Aufsperren, Zusperren und Putzen.',
   menu:'Alle Gerichte mit Preis. Hier machen Sie auch die Karte für die Gäste.',
   cards:'Was in ein Gericht kommt und was es kostet.',
@@ -217,7 +217,7 @@ H('s_reset','Beispieldaten wiederherstellen','Ersetzt alles durch die Beispielda
 H('s_rolle','Rolle wechseln','Stellt um, wer gerade arbeitet. Das Team sieht alles, hakt ab, bereitet Bestellungen vor, nimmt Ware an, bucht Schwund und zählt bei der Inventur mit. Alles andere ändert der Chef.');
 H('station','Einrichtung','Sechs Schritte zeigen, wie viel von Ihrem Betrieb schon in der App steht. Die App rechnet das aus Ihren Daten.');
 H('schwund_wert','Schwund','Was im Zeitraum als Schwund gebucht wurde, je Artikel in Euro zum Einkaufspreis.');
-H('grundzutat','Kleinmengen','Salz, Gewürze, Öl und alles, wovon der Tag nur ein paar Gramm braucht. Auf der Prep-Liste stehen sie erst, wenn Sie „alle Zutaten zeigen“ tippen.');
+H('grundzutat','Kleinmengen','Salz, Gewürze, Öl und alles, wovon der Tag nur ein paar Gramm braucht. Auf der Vorbereitungsliste stehen sie erst, wenn Sie „alle Zutaten zeigen“ tippen.');
 H('mehr_opt','Mehr Optionen','Selten Gebrauchtes steht hier: sortieren, weitere Spalten, CSV, Vergleich.');
 
 /* Wo welche Erklärung hängt: [Selektor, Schlüssel]. Der erste Treffer zählt. */
@@ -260,7 +260,7 @@ const gPhoneMore = k => !gq(`.side .nav-i[data-tab="${k}"]`) && !gq(`.bottom .na
 /* ---------- Der kurze Rundgang: die Seiten für jeden Tag ---------- */
 const RUNDGANG = [
   {t:'Heute', go:() => go('dash'), sel:gNav('dash'), x:'Ihr Tagesblatt. Hier steht, was heute zu bestellen ist, welche Lieferung kommt und welche Checkliste offen ist. Schauen Sie jeden Morgen kurz hinein.'},
-  {t:'Vorbereitung', go:() => go('vorb'), sel:gNav('vorb'), x:'Die Prep-Liste: was heute vorzukochen und herzurichten ist. Die App rechnet sie aus den Verkäufen der letzten Wochen. Ein Tipp hakt ab.'},
+  {t:'Vorbereitung', go:() => go('vorb'), sel:gNav('vorb'), x:'Die Vorbereitungsliste: was heute vorzukochen und herzurichten ist. Die App rechnet sie aus den Verkäufen der letzten Wochen. Ein Tipp hakt ab.'},
   {t:'Checklisten', go:() => go('checkl'), sel:gNav('checkl'), x:'Aufsperren, Zusperren, Putzen: Listen zum Abhaken. Die App merkt sich, wer was wann erledigt hat.'},
   {t:'Ware', go:() => { view.stab = 'bestellung'; view.order = null; view.recv = null; go('buy'); }, sel:gNav('ware'), x:() => 'Bestand, Bestellen, Lieferanten, Preise und Inventur. Unter „Bestellen“ schlägt die App vor, was fehlt, und dort buchen Sie auch die Lieferung ein.' + gPhoneMore('ware')},
   {t:'Suche', sel:['.side [data-act="palette"]', '.topbar [data-act="palette"]'], x:'Sie finden etwas nicht? Tippen Sie hier ein Gericht, einen Artikel oder eine Seite ein. Alles Weitere erklärt „Was ist das?“: einschalten und auf etwas tippen.'},
@@ -268,8 +268,8 @@ const RUNDGANG = [
 
 /* ---------- „So geht’s hier“: drei, vier Sätze je Seite ---------- */
 const HOWTO = {
-  dash:['Oben steht, was heute zu bestellen ist und welche Lieferung kommt.', 'Der Knopf rechts in jeder Zeile führt direkt hin.', 'Unter „Offen“ steht, was an der Karte noch fehlt.'],
-  vorb:['Oben wählen Sie den Tag: heute, morgen oder später in der Woche.', 'Die Prep-Liste zeigt, was vorzukochen und herzurichten ist. Ein Tipp hakt ab.', 'Die Prognose darunter können Sie überschreiben, zum Beispiel bei einer Reservierung.', 'Fehlt Ware, legen Sie sie mit einem Tipp in die Bestellung.'],
+  dash:['Oben steht, was heute zu tun ist: Vorbereitung, Bestellen bis wann, Eigenkontrolle, Lieferungen.', 'Ein Tipp auf eine Zeile führt direkt hin. „Öl gewechselt“ trägt den Ölwechsel gleich ein.', 'Ganz unten, eingeklappt: was bei der Einrichtung noch fehlt.'],
+  vorb:['Oben wählen Sie den Tag: heute, morgen oder später in der Woche.', 'Die Vorbereitungsliste zeigt, was vorzukochen und herzurichten ist. Ein Tipp hakt ab.', 'Die Prognose darunter können Sie überschreiben, zum Beispiel bei einer Reservierung.', 'Fehlt Ware, legen Sie sie mit einem Tipp in die Bestellung.'],
   checkl:['Jeden Tag gibt es frische Listen. Tippen Sie auf eine Liste und dann auf jeden erledigten Punkt.', 'Manche Punkte brauchen eine Zahl, zum Beispiel die Temperatur im Kühlhaus.', 'Darunter steht die Eigenkontrolle: Reinigungsplan, Frittieröl, Temperatur der Lieferungen.', 'Im Verlauf sehen Sie die letzten 14 Tage und speichern die Monatsmappe als PDF.'],
   menu:['Eine Zeile je Gericht: Preis, Wareneinsatz und was übrig bleibt.', 'Den Preis ändern Sie direkt in der Zeile.', 'Am Griff links ziehen Sie ein Gericht an eine andere Stelle seiner Kategorie.', '„Ohne Rezeptur“ und „Allergene offen“ zeigen, wo noch etwas fehlt.'],
   guest:['So sehen die Gäste die Karte. Es zählt der gewählte Tag: Saison, Wochentag, Aktionen.', 'Vorlage und Effekte wählen Sie mit einem Tipp. Bausteine am Blatt antippen und am Griff verschieben.', '„Als PDF speichern“ macht eine Datei zum Drucken oder Verschicken.'],
