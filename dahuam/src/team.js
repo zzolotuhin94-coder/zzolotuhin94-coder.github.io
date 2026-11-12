@@ -670,7 +670,7 @@ function ckRunHtml(tp, D){
   const run = ckRun(D, tp.id) || {items:{}}; const pr = ckProg(tp, D);
   const row = it => { const r = run.items[it.id]; const on = !!r;
     if(it.val){ const bad = on && r.out;
-      return `<li class="ck-i val ${on ? 'on' : ''} ${bad ? 'out' : ''}" data-item="${it.id}"><label class="ck-vl" for="ckv-${it.id}"><span class="ck-box" aria-hidden="true">${ico('check')}</span><span class="ck-t"><span>${esc(it.t)}</span><small>${on ? `${esc(r.b)}, ${r.a} Uhr · ` : ''}erlaubt ${esc(ckRangeTxt(it.val))}${bad && r.note ? ` · <span class="ck-note">${esc(r.note)}</span>` : ''}${on && r.prev && r.prev.length ? ` · korrigiert, vorher <s>${r.prev.map(x => ckVal(x.v)).join(', ')} ${esc(it.val.unit || '')}</s>` : ''}</small></span></label>
+      return `<li class="ck-i val ${on ? 'on' : ''} ${bad ? 'out' : ''}" data-item="${it.id}"><label class="ck-vl" for="ckv-${it.id}"><span class="ck-box" aria-hidden="true">${ico('check')}</span><span class="ck-t"><span>${esc(it.t)}</span><small>${on ? `${esc(r.b)}, ${r.a} Uhr · ` : ''}erlaubt ${esc(ckRangeTxt(it.val))}${bad && r.note ? ` · <span class="ck-note">${esc(r.note)}</span>` : ''}${on && r.prev && r.prev.length ? ` · korrigiert, vorher <s>${r.prev.map(x => ckVal(x.v)).join(', ')} ${esc(it.val.unit || '')}</s>${r.prev.filter(x => x.note).map(x => ` (<span class="ck-note">${esc(x.note)}</span>)`).join('')}${r.ck === 'nach' ? ' · nachgemessen' : r.ck === 'tipp' ? ' · Tippfehler' : ''}${!r.out && r.note ? ` · ${esc(r.note)}` : ''}` : ''}</small></span></label>
         <span class="ck-vin"><input id="ckv-${it.id}" class="num-in ck-v" type="text" inputmode="${+it.val.min < 0 ? 'text' : 'decimal'}" data-num="self" data-ckv="${it.id}" value="${on ? ckVal(r.v) : ''}" placeholder="–" autocomplete="off" aria-label="${esc(it.t)}, Wert in ${esc(it.val.unit || '')}"><span>${esc(it.val.unit || '')}</span></span>
 </li>`; }
     return `<li class="ck-i ${on ? 'on' : ''}" data-item="${it.id}"><button type="button" role="checkbox" aria-checked="${on}" class="ck-c" data-act="ckChk" data-id="${it.id}"><span class="ck-box" aria-hidden="true">${ico('check')}</span><span class="ck-t"><span>${esc(it.t)}</span>${on ? `<small>${esc(r.b)}, ${r.a} Uhr</small>` : ''}</span></button></li>`; };
@@ -688,7 +688,7 @@ function ckHistDetail(D){
     // erledigte Punkte in der Reihenfolge der Liste, dazu Punkte, die es in der Liste nicht mehr gibt
     const ids = tp.items.map(i => i.id).concat(Object.keys(run.items).filter(id => !tp.items.some(i => i.id === id)));
     return `<div class="ck-hd"><h3>${esc(tp.name)}<span>${pr.done} von ${pr.total} · ${ckStateTxt(pr)}</span></h3><ul>${ids.map(id => { const r = run.items[id]; const it = tp.items.find(i => i.id === id) || (tp.old || []).find(i => i.id === id);
-      return `<li class="${r ? 'on' : 'miss'} ${r && r.out ? 'out' : ''}"><span class="ck-hs" aria-hidden="true">${r ? ico('check') : ''}</span><span class="ck-ht">${esc(ckItemLabel(tp, id))}${r && r.note ? `<small>${esc(r.note)}</small>` : ''}${r && r.prev && r.prev.length ? `<small>korrigiert, vorher ${r.prev.map(x => `${ckVal(x.v)} (${esc(x.b)}, ${x.a})`).join(', ')}</small>` : ''}</span>${it && it.val ? `<span class="ck-hv">${it.val ? ckSpark(tp, it, D) : ''}<b>${r && r.v != null ? `${ckVal(r.v)} ${esc(it.val.unit || '')}` : '–'}</b></span>` : ''}<span class="ck-hw">${r ? `${esc(r.b)} · ${r.a}` : pr.over ? 'offen geblieben' : 'offen'}</span></li>`; }).join('')}</ul></div>`; }).join('') + ek;
+      return `<li class="${r ? 'on' : 'miss'} ${r && r.out ? 'out' : ''}"><span class="ck-hs" aria-hidden="true">${r ? ico('check') : ''}</span><span class="ck-ht">${esc(ckItemLabel(tp, id))}${r && r.note ? `<small>${esc(r.note)}</small>` : ''}${r && r.prev && r.prev.length ? `<small>korrigiert, vorher ${r.prev.map(x => `${ckVal(x.v)} (${esc(x.b)}, ${x.a}${x.note ? ': ' + esc(x.note) : ''})`).join(', ')}</small>` : ''}</span>${it && it.val ? `<span class="ck-hv">${it.val ? ckSpark(tp, it, D) : ''}<b>${r && r.v != null ? `${ckVal(r.v)} ${esc(it.val.unit || '')}` : '–'}</b></span>` : ''}<span class="ck-hw">${r ? `${esc(r.b)} · ${r.a}` : pr.over ? 'offen geblieben' : 'offen'}</span></li>`; }).join('')}</ul></div>`; }).join('') + ek;
 }
 function ckHistHtml(){
   const days = ckHistDays(14); const c = ckS(); const today = ckToday();
@@ -727,13 +727,29 @@ function renderCheckl(){
 function ckValueInput(inp){
   const v0 = view.ck; const D = ckToday(); const tp = ckTpl(v0.run); if(!tp) return; const it = tp.items.find(i => i.id === inp.dataset.ckv); if(!it || !it.val) return;
   const run = ckRun(D, tp.id); const old = run && run.items[it.id]; const raw = inp.value.trim().replace(/[−–]/g, '-').replace(/\s|°|C$/gi, '');
-  if(raw === ''){ if(old && !canEditAll()){ inp.value = ckVal(old.v); toast('Einen eingetragenen Wert löscht nur der Chef. Ein falscher Wert lässt sich überschreiben.'); return; } if(old){ ckSet(D, tp, it, null); render(); toast('Wert gelöscht', {action:() => { ckSet(D, tp, it, old); render(); }}); } else inp.value = ''; return; }
+  if(raw === ''){ if(old && !canEditAll()){ inp.value = ckVal(old.v); toast('Einen eingetragenen Wert löscht nur der Chef. Ein falscher Wert lässt sich überschreiben.'); return; }
+    if(!old){ inp.value = ''; return; }
+    // gerade eben vertippt (höchstens 10 Minuten, nie korrigiert): löschen mit Rückweg; sonst stornieren mit Grund, der Wert bleibt in der Monatsmappe
+    const [hh, mm] = String(old.a || '').split(':').map(Number); const n = new Date(); const age = n.getHours() * 60 + n.getMinutes() - (hh * 60 + mm);
+    if(age >= 0 && age <= 10 && !(old.prev || []).length && !old.out){ ckSet(D, tp, it, null); render(); toast('Wert gelöscht', {action:() => { ckSet(D, tp, it, old); render(); }}); return; }
+    inp.value = ckVal(old.v);
+    ekVoidDlg(`${tp.name}: ${it.t}, ${ckVal(old.v)} ${it.val.unit || ''} (${old.b}, ${old.a} Uhr)`, v => { ekS().log.unshift({id:uid('ek'), k:'ckv', d:D, tp:tp.id, it:it.id, t:`${tp.name}: ${it.t}`, v:old.v, unit:it.val.unit || '', b:old.b, a:old.a, at:new Date().toISOString(), out:old.out || 0, note:old.note || '', prev:old.prev || [], void:v}); ckSet(D, tp, it, null); });
+    return; }
   const v = /^-?\d+([.,]\d+)?$/.test(raw) ? numParse(raw) : NaN;
   if(!isFinite(v) || Math.abs(v) > 999){ inp.value = old ? ckVal(old.v) : ''; inp.classList.add('bad-in'); setTimeout(() => inp.classList.remove('bad-in'), 1600); toast('Bitte eine Zahl eingeben, zum Beispiel 3,5 oder -18.'); return; }
   if(old && Math.abs(old.v - v) < 1e-9) { inp.value = ckVal(old.v); return; }
   // Korrektur: der alte Wert bleibt am Eintrag stehen
-  const prev = old ? {prev:(old.prev || []).concat([{v:old.v, b:old.b, a:old.a}]).slice(-6)} : {};
+  const prev = old ? {prev:(old.prev || []).concat([{v:old.v, b:old.b, a:old.a, ...(old.out ? {out:1} : {}), ...(old.note ? {note:old.note} : {}), ...(old.ck ? {ck:old.ck} : {})}]).slice(-6)} : {};
   const fin = rec => { const full = ckSet(D, tp, it, rec); render(); if(full) toast(`${tp.name}: alles erledigt`); else if(old) toast('Korrektur gespeichert. Der alte Wert bleibt sichtbar.'); };
+  if(ckInRange(it.val, v) && old && old.out){
+    // Korrektur eines Werts mit Maßnahme: Nachmessung oder Tippfehler? Die alte Notiz bleibt beim alten Wert.
+    tmDialog('Wert korrigieren', `<p class="dlg-p"><b>${esc(it.t)}: ${ckVal(old.v)} → ${ckVal(v)} ${esc(it.val.unit || '')}</b><br>Der alte Wert bleibt mit seiner Notiz sichtbar.</p>
+      <fieldset class="ek-pick"><legend>Was war es?</legend><label><input type="radio" name="ck" value="nach" checked><span>Nachmessung nach der Maßnahme</span></label><label><input type="radio" name="ck" value="tipp"><span>Tippfehler</span></label></fieldset>
+      <label class="f">Notiz zur Korrektur<input name="note" maxlength="120" placeholder="freiwillig, z. B. nach 20 Minuten nachgemessen" autocomplete="off"></label>`,
+      fd => { const ck = fd.get('ck') === 'tipp' ? 'tipp' : 'nach'; const note = String(fd.get('note') || '').trim(); setTimeout(() => fin(ckRec({v, ck, ...(note ? {note} : {}), ...prev})), 0); },
+      {ok:'Korrektur speichern', toast:false});
+    $('#dlg').addEventListener('close', () => setTimeout(() => { if(view.tab === 'checkl') render(); }, 60), {once:true});
+    return; }
   if(ckInRange(it.val, v)){ fin(ckRec({v, ...prev})); return; }
   tmDialog('Wert außerhalb des Bereichs', `<p class="dlg-p"><b>${esc(it.t)}: ${ckVal(v)} ${esc(it.val.unit || '')}</b><br>Erlaubt sind ${esc(ckRangeTxt(it.val))}. Was haben Sie getan?</p><label class="f">Kurze Notiz<input name="note" maxlength="120" placeholder="z. B. Tür war offen, Chef informiert" autocomplete="off"></label>`,
     (fd, f) => { const note = String(fd.get('note') || '').trim(); if(note.length < 3) return dlgErr(f.elements.note, 'Bitte kurz notieren, was getan wurde.'); setTimeout(() => { const full = ckSet(D, tp, it, ckRec({v, out:1, note, ...prev})); render(); toast(full ? `${tp.name}: alles erledigt` : 'Wert mit Notiz gespeichert'); }, 0); },

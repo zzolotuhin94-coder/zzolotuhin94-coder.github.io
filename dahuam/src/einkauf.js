@@ -325,7 +325,7 @@ function supplierDialog(sp){
     fd => { Object.assign(sp, {name:fd.get('name').trim(), cat:fd.get('cat'), channel:fd.get('channel'), email:fd.get('email').trim(), whatsapp:fd.get('whatsapp').trim(), phone:fd.get('phone').trim(), shopUrl:fd.get('shopUrl').trim(), customerNo:fd.get('customerNo').trim(), contact:fd.get('contact').trim(),
       orderDays:fd.getAll('od').map(Number), deliveryDays:fd.getAll('dd').map(Number), cutoff:fd.get('cutoff')||'12:00', minOrder:+fd.get('minOrder')||0, note:fd.get('note').trim(), active:!!fd.get('active')});
       if(isNew) S.suppliers.push(sp); },
-    {del: isNew ? null : () => { const n = S.products.filter(p=>p.supplier===sp.id).length; if(n) return info('Lieferant hat Artikel', `${n} Artikel sind diesem Lieferanten zugeordnet. Ordnen Sie sie zuerst einem anderen Lieferanten zu oder setzen Sie ihn auf inaktiv.`); ask(`Lieferant „${sp.name}“ löschen?`, () => { S.suppliers = S.suppliers.filter(x=>x!==sp); }); }});
+    {del: isNew ? null : () => { const n = S.products.filter(p=>p.supplier===sp.id).length; if(n) return info('Lieferant hat Artikel', `${n} Artikel sind diesem Lieferanten zugeordnet. Ordnen Sie sie zuerst einem anderen Lieferanten zu oder setzen Sie ihn auf inaktiv.`); askDel(`Lieferant „${sp.name}“ löschen?`, `Lieferant „${sp.name}“`, () => { S.suppliers = S.suppliers.filter(x=>x!==sp); }); }});
 }
 function delayDialog(o){
   const sp = SUP(o.supplier);

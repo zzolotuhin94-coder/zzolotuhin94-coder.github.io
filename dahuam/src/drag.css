@@ -21,3 +21,10 @@ body.dragging,body.dragging *{cursor:grabbing!important;user-select:none;-webkit
 .sh-chip:hover{border-color:var(--accent)} .sh-chip.semi{border-left:3px solid var(--accent)} .sh-chip.used{opacity:.55}
 .sh-chip.drag-ghost{opacity:1}
 .shelf-none{font-size:12.5px;color:var(--muted);padding:6px 2px}
+/* Teller: wird die Spalte schmal (iPad quer, rechts Kostenstruktur), stehen die Zutaten-Kacheln unter dem Teller statt über den Rand */
+.teller-sec{container-type:inline-size}
+.tl-tiles{grid-template-columns:repeat(auto-fill,minmax(min(215px,100%),1fr))}
+@container (max-width:470px){
+  .teller{grid-template-columns:minmax(0,1fr)}
+  .teller > :first-child{justify-self:center}
+}
