@@ -306,12 +306,28 @@ function impProdAnalyse(d){
     const ex = dec !== 'new' ? P(dec) : null; it.ex = ex; const unit = data.unit || (ex ? ex.unit : 'kg');
     if(ex && data.unit && data.unit !== ex.unit){ fail(`Einheit ${data.unit} passt nicht zum vorhandenen Artikel „${ex.name}“ (${ex.unit}). Rezepturen rechnen in ${ex.unit}.`); continue; }
     if(data.pack && data.packQty == null){ const q = impPack(data.pack, unit); if(q){ data.packQty = q; data.packAuto = true; } }
+    impGebPrice(it, data, d, {key:'g' + r.n, old: ex && +ex.price > 0 ? +ex.price : 0, unit, unitGiven: impHas(map, 'unit') && !u.empty, drink: !!dv});
     it.data = data; it.unit = unit;
     it.sub = [dv ? `${data.pack}${data.price != null ? ' · ' + eur(data.price) + ' je Liter' : ''}${data.pfand ? ' · Pfand ' + eur(data.pfand) : ''}${data.pourLoss ? ' · Schankverlust ' + num(data.pourLoss, 1) + ' %' : ''}` : `je ${unit}${unit === 'Stk' && data.pieceG ? ' · ' + num(data.pieceG) + ' g' : ''}`, data.supName ? data.supName + (data.supNew ? ' (neuer Lieferant)' : '') : '', data.artNo ? 'Nr. ' + data.artNo : '', data.pack && !dv ? data.pack + (data.packQty ? ` = ${num(data.packQty, 3)} ${unit}` : '') : '', data.alg ? 'Allergene ' + data.alg : data.algNone ? 'keine Allergene' : ''].filter(Boolean).join(' · ');
     if(ex){ const ch = impProdDiff(ex, data); it.st = ch.length ? 'akt' : 'gleich'; if(ch.length) it.why = (mt.exact ? '' : `„${ex.name}“: `) + ch.join(' · '); if(data.stock != null) it.notes.push('Bestand vorhandener Artikel ändert nur die Inventur'); }
     else if(data.price == null) it.notes.push('ohne Preis: erscheint im Preis-Check als „Preis fehlt“');
   }
   return {items, sups:[...sups.values()]};
+}
+/* Preis je Gebinde oder je Einheit? Großhändler-Listen nennen den Preis meist je Verpackungseinheit („Sack 10 kg“ 9,50).
+   Passt das Verhältnis zum bisherigen Preis genau zur Gebindegröße, wird umgerechnet; passt es zu 1, bleibt es;
+   sonst fragt die Vorschau. Jeder große Sprung wird gezeigt. */
+function impGebPrice(it, data, d, o){
+  if(data.price == null || o.drink) return;
+  const pq = +data.packQty || 0; const pr = data.price;
+  if(pq > 0 && Math.abs(pq - 1) > 1e-6 && data.pack){
+    const {guess, sure} = gebGuess(pr, o.old, pq, o.unitGiven);
+    const dec = d.dec[o.key] === 'pack' || d.dec[o.key] === 'unit' ? d.dec[o.key] : guess;
+    if(dec === 'pack'){ data.price = Math.round(pr / pq * 10000) / 10000; it.price = data.price; it.sub2 = `${eur(pr)} je ${data.pack} = ${eur(data.price)} je ${o.unit}`; }
+    if(!sure || d.dec[o.key]) it.gctl = {key:o.key, mode:dec, pr, pq, pack:data.pack, unit:o.unit};
+    if(!sure && !d.dec[o.key]) it.notes.push(`Gilt ${eur(pr)} für ${data.pack} oder für 1 ${o.unit}? Bitte unten wählen.`);
+  }
+  if(o.old > 0){ const f = data.price / o.old; if(f >= 2 || f <= 0.5) it.notes.push(`Preis ${eur(o.old)} → ${eur(data.price)} je ${o.unit} (${f > 1 ? '+' : '−'}${num(Math.abs(f - 1) * 100, 0)} %), bitte prüfen`); }
 }
 function impProdDiff(p, x){
   const ch = [];
@@ -672,9 +688,10 @@ function impRawPrice(it){ return it.rawPrice != null && it.rawPrice !== '' ? `<s
 function impRowHtml(it, d){
   const stTxt = it.skip ? 'ausgelassen' : IMP_ST[it.st];
   const right = it.price != null && isFinite(it.price) ? `<span class="imp-x"><b class="mono">${eur(it.price)}</b>${impRawPrice(it)}</span>` : it.rawPrice ? `<span class="imp-x">${impRawPrice(it)}</span>` : '<span class="imp-x"></span>';
+  const g = it.gctl; const gctl = g ? `<label class="imp-ctl">${eur(g.pr)} gilt für<select class="sm-sel" data-impdec="${g.key}" aria-label="Preis gilt für"><option value="pack" ${g.mode === 'pack' ? 'selected' : ''}>${esc(g.pack)}, also ${eur(g.pr / g.pq)} je ${esc(g.unit)}</option><option value="unit" ${g.mode === 'unit' ? 'selected' : ''}>1 ${esc(g.unit)}</option></select></label>` : '';
   const ctl = it.ctl ? `<label class="imp-ctl">${it.ctl.sug ? `ähnlich wie „${esc(it.ctl.sug.name)}“` : 'Zuordnung'}<select class="sm-sel" data-impdec="${it.ctl.key}"><option value="new" ${it.ctl.value === 'new' ? 'selected' : ''}>als neuer Artikel</option>${it.ctl.sug ? `<option value="${it.ctl.sug.id}" ${it.ctl.value === it.ctl.sug.id ? 'selected' : ''}>„${esc(it.ctl.sug.name)}“ aktualisieren</option>` : ''}${it.ctl.value !== 'new' && it.ctl.value !== 'skip' && (!it.ctl.sug || it.ctl.sug.id !== it.ctl.value) && P(it.ctl.value) ? `<option value="${it.ctl.value}" selected>„${esc(P(it.ctl.value).name)}“ aktualisieren</option>` : ''}<option value="skip" ${it.ctl.value === 'skip' ? 'selected' : ''}>nicht übernehmen</option></select></label>` : '';
   return `<li class="imp-r st-${it.st}" data-n="${it.n}"><span class="imp-st">${stTxt}<small>Zeile ${it.n}</small></span>
-    <span class="imp-m"><b>${esc(it.title)}</b>${it.sub ? `<small>${esc(it.sub)}</small>` : ''}${it.sub2 ? `<small>${esc(it.sub2)}</small>` : ''}${it.why ? `<small class="imp-why">${esc(it.why)}</small>` : ''}${(it.notes || []).map(n => `<small class="imp-note">${esc(n)}</small>`).join('')}${ctl}</span>${right}</li>`;
+    <span class="imp-m"><b>${esc(it.title)}</b>${it.sub ? `<small>${esc(it.sub)}</small>` : ''}${it.sub2 ? `<small>${esc(it.sub2)}</small>` : ''}${it.why ? `<small class="imp-why">${esc(it.why)}</small>` : ''}${(it.notes || []).map(n => `<small class="imp-note">${esc(n)}</small>`).join('')}${gctl}${ctl}</span>${right}</li>`;
 }
 /* Rezeptur in der Vorschau: Kopf, Verknüpfung, Zeilen mit Umrechnung */
 function impRecHtml(it, d){
