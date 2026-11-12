@@ -4,9 +4,12 @@ const L = require('./lib');
   await L.tap(p, '.bottom [data-ph="best"]');
   const g = await p.evaluate(() => ({k:document.getElementById('app').dataset.ph, h:location.hash, rows:[...document.querySelectorAll('#app [data-act="phOrd"]')].map(x => x.querySelector('.hy-n').textContent.trim() + ' ' + x.querySelector('.hy-tm b').textContent), exp:[...document.querySelectorAll('#app [data-act="ordRecv"]')].map(x => x.querySelector('.hy-n').textContent.trim() + ' ' + x.querySelector('.hy-tm b').textContent), voice:document.querySelector('#app .hy-voice').textContent, tables:document.querySelectorAll('#app table').length, tabs:!!document.querySelector('#app .toolbar.tabs')}));
   L.ok(g.k === 'best' && g.h === '#ware/bestellen', 'unten „Bestellen“ öffnet die Liste', g);
-  L.ok(JSON.stringify(g.rows) === JSON.stringify(['bis12:00 Getränke Wildalm', 'bis15:00 Bäckerei Kornstube', 'bis18:00 Gastro-Großmarkt Inntal']), 'Lieferanten von heute, nach Annahmeschluss sortiert', g.rows);
+  // Zusammenführung mit fix-1: Bedarf wie in der Bestellung (supNeed: Mindestbestand und Prognose). Bei der Bäckerei ist heute nichts nötig:
+  // sie steht ruhig und grau „nichts nötig“ hinter den Lieferanten mit Bedarf (vorher nach Annahmeschluss dazwischen)
+  L.ok(JSON.stringify(g.rows) === JSON.stringify(['bis12:00 Getränke Wildalm', 'bis18:00 Gastro-Großmarkt Inntal', 'bis15:00 Bäckerei Kornstube']), 'Lieferanten von heute mit Bedarf nach Annahmeschluss, ohne Bedarf dahinter', g.rows);
+  L.ok(await p.evaluate(() => { const r = [...document.querySelectorAll('#app [data-act="phOrd"]')].find(x => /Kornstube/.test(x.textContent)); return r.classList.contains('off') && r.querySelector('.hy-tm small').textContent === 'nichts nötig' && !r.querySelector('.hy-bad'); }), 'ohne Bedarf: grau „nichts nötig“, ohne roten Countdown (wie fix-1 auf Heute)');
   L.ok(g.exp.length === 2 && /^kommtheute Talmolkerei/.test(g.exp[0]) && /^kommtmorgen Metzgerei/.test(g.exp[1]), '„Unterwegs“: was bestellt ist und wann es kommt', g.exp);
-  L.ok(g.tables === 0 && !g.tabs && /noch 3 Lieferanten/.test(g.voice), 'keine Tabelle, keine Reiter, ein Satz sagt, was heute ansteht', g.voice);
+  L.ok(g.tables === 0 && !g.tabs && /noch 2 Lieferanten/.test(g.voice), 'keine Tabelle, keine Reiter, ein Satz sagt, was heute ansteht', g.voice);
   const before = await p.evaluate(() => ({n:S.orders.length, no:S.settings.orderNo}));
   await L.tap(p, '#app [data-act="phOrd"]');
   const sh = await p.evaluate(() => ({open:!document.getElementById('phSheet').hidden, t:document.getElementById('phSheetT').textContent, lines:[...document.querySelectorAll('#phSheet .hy-li')].map(x => x.querySelector('.hy-tm b').textContent + ' ' + x.querySelector('.hy-step b').textContent), sum:document.querySelector('#phSheet .hy-sum b').textContent, min:document.querySelector('#phSheet .hy-min').textContent, main:document.querySelector('#phSheet a.hy-btn, #phSheet button.hy-btn:not(.t):not(.q)').textContent, k:document.getElementById('app').dataset.ph}));
@@ -16,6 +19,7 @@ const L = require('./lib');
   L.ok((await L.small(p, '#phSheet')).length === 0 && (await L.contrast(p, '#phSheet')).length === 0, 'Blatt: Ziele ≥ 44 px, Kontrast ≥ 4,5:1', (await L.small(p, '#phSheet')).concat(await L.contrast(p, '#phSheet')));
   const fit = await p.evaluate(() => { const bx = document.querySelector('#phSheet .hy-box').getBoundingClientRect(); return {top:Math.round(bx.top), bottom:Math.round(bx.bottom), w:Math.round(bx.width)}; });
   L.ok(fit.top >= 40 && fit.bottom === 844 && fit.w === 390, 'das Blatt sitzt unten und lässt oben die Seite sehen', fit);
+  L.ok(await p.evaluate(n => S.orders.length === n && !!ORD_TMP && ORD_TMP.tmp && !document.querySelector('#phSheet [data-act="phOrdDel"]'), before.n), 'offen ist nur eine Vorschau mit dem Vorschlag (fix-1 ORD_TMP): noch kein Entwurf, nichts zu löschen');
   // nur hineingeschaut: kein Entwurf bleibt liegen
   await L.tap(p, '#phSheet .hy-x');
   const after = await p.evaluate(() => ({n:S.orders.length, no:S.settings.orderNo}));
@@ -45,7 +49,7 @@ const L = require('./lib');
   L.ok(sent.st === 'sent' && sent.via === 'Webshop' && sent.hidden, '„Ja, gesendet“: Bestellung ist gesendet (über Webshop), das Blatt geht zu', sent);
   L.ok(sent.row === 'Heute bestellt' && sent.off && sent.last && sent.exp === 3, 'die Zeile wird grau und rückt nach unten, die Bestellung steht unter „Unterwegs“', sent);
   await L.tap(p, '.bottom [data-ph="heute"]');
-  L.ok((await L.txt(p, '#phBoard li:first-child')).includes('15:00') && (await L.txt(p, '#phBoard li:first-child')).includes('Bäckerei Kornstube'), 'Heute zeigt jetzt die nächste Frist: Bäckerei bis 15:00', await L.txt(p, '#phBoard li:first-child'));
+  L.ok((await L.txt(p, '#phBoard li:first-child')).includes('18:00') && (await L.txt(p, '#phBoard li:first-child')).includes('Gastro-Großmarkt Inntal'), 'Heute zeigt jetzt die nächste Frist mit Bedarf: Großmarkt bis 18:00 (die Bäckerei braucht nichts)', await L.txt(p, '#phBoard li:first-child'));
   // Wareneingang aus „Unterwegs“
   await L.tap(p, '.bottom [data-ph="best"]'); await L.tap(p, '#app [data-act="ordRecv"]');
   const we = await p.evaluate(() => ({k:document.getElementById('app').dataset.ph, back:document.querySelector('#app .back').textContent, sw:document.documentElement.scrollWidth, on:document.querySelector('.bottom .nav-i.on').textContent.trim()}));
@@ -56,7 +60,17 @@ const L = require('./lib');
   await L.tap(p, '#app [data-act="phOrdOther"]');
   L.ok(await p.evaluate(() => !document.getElementById('phSheet').hidden && document.querySelectorAll('#phSheet [data-act="phOrd"]').length >= 1), '„Bei anderem Lieferanten bestellen“ zeigt die übrigen Lieferanten im Blatt');
   await L.tap(p, '#phSheet [data-act="phOrd"]');
-  L.ok(await p.evaluate(() => !document.getElementById('phSheet').hidden && !!document.querySelector('#phSheet .hy-sum')), 'ein Tipp öffnet dort die Bestellung im selben Blatt'); await L.tap(p, '#phSheet .hy-x');
+  L.ok(await p.evaluate(() => !document.getElementById('phSheet').hidden && !!document.querySelector('#phSheet .hy-sum')), 'ein Tipp öffnet dort die Bestellung im selben Blatt');
+  // heute kein Bestelltag: Senden fragt erst nach (fix-1 „Trotzdem senden?“), über den Link des Lieferanten ebenso wie über „Schon gesendet“
+  if(!(await p.evaluate(() => document.querySelectorAll('#phSheet .hy-li').length))){ await p.selectOption('#phOlAdd', {index:1}); await p.waitForTimeout(200); }
+  const other = await p.evaluate(() => document.getElementById('phSheetT').textContent);
+  const link = await p.evaluate(() => { const a = document.querySelector('#phSheet a.hy-btn'); if(!a) return false; a.removeAttribute('target'); a.setAttribute('href', '#ware/bestellen'); a.click(); return true; }); await p.waitForTimeout(300);
+  if(link){ L.ok(await p.evaluate(() => document.getElementById('dlg').open && /Trotzdem senden\?/.test(document.querySelector('#dlgForm h3').textContent) && /kein Bestelltag/.test(document.getElementById('dlgForm').textContent) && !document.querySelector('#phSheet .hy-ask')), 'Link des Lieferanten an einem anderen Tag: erst „Trotzdem senden?“', other);
+    await p.click('#dlgCancel'); await p.waitForTimeout(200); }
+  await L.tap(p, '#phSheet [data-act="ordMarkSent"]');
+  L.ok(await p.evaluate(() => document.getElementById('dlg').open && /kein Bestelltag/.test(document.getElementById('dlgForm').textContent) && !document.getElementById('phSheet').hidden), '„Schon gesendet“ fragt ebenso nach, das Blatt bleibt dahinter');
+  await p.click('#dlgForm button[type=submit]'); await p.waitForTimeout(400);
+  L.ok(await p.evaluate(t => { const o = S.orders.find(x => SUP(x.supplier).name === t && x.status === 'sent' && (x.sentAt || '').slice(0, 10) === '2026-11-12'); return !!o && document.getElementById('phSheet').hidden && !document.getElementById('dlg').open; }, other), '„Trotzdem senden“: gesendet, das Blatt geht zu');
   await L.tap(p, '#app [data-act="phBuyAll"]');
   L.ok(await p.evaluate(() => !!document.querySelector('#app .olist') && /Bestellen/.test(document.querySelector('#app .hy-back').textContent)), '„Alle Bestellungen“ zeigt die volle Liste, mit Zurück zu „Bestellen“');
   await L.tap(p, '#app .hy-back'); L.ok(await L.key(p) === 'best', 'und zurück');

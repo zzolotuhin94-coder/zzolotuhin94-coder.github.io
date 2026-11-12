@@ -1,5 +1,5 @@
-// Handy-Bedienung (phone.js): gemeinsame Helfer. Feste Uhr wie etests: Donnerstag, 12.11.2026, 10:30. Server auf :8775 (PORT).
-process.env.PORT = process.env.PORT || '8775';
+// Handy-Bedienung (phone.js): gemeinsame Helfer. Feste Uhr wie etests: Donnerstag, 12.11.2026, 10:30. Server auf :8765 (PORT).
+process.env.PORT = process.env.PORT || '8765';
 const E = require('../etests/lib'); const path = require('path'); const fs = require('fs');
 Object.assign(exports, E);
 exports.IP13 = {vp:{width:390, height:844}, ctx:{hasTouch:true, isMobile:true, deviceScaleFactor:2}};

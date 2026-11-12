@@ -370,7 +370,7 @@ document.addEventListener('click', e => {
   e.preventDefault(); e.stopImmediatePropagation();
   const sel = `#app [data-act="${el.dataset.act}"][data-id="${CSS.escape(el.dataset.id)}"]`;
   openDialog('Trotzdem senden?', warn.map(w => `<p class="dlg-p">${w}</p>`).join('') + '<p class="dlg-p">Der Lieferant nimmt die Bestellung vielleicht nicht an.</p>',
-    () => { ORD_SEND_OK.add(o.id); setTimeout(() => { const b = document.querySelector(sel); if(b) b.click(); }, 30); }, {ok:'Trotzdem senden', toast:false});
+    () => { ORD_SEND_OK.add(o.id); setTimeout(() => { const b = el.isConnected ? el : document.querySelector(sel) || document.querySelector(sel.replace('#app ', '#phSheet ')); if(b) b.click(); }, 30); }, {ok:'Trotzdem senden', toast:false});   // derselbe Knopf, auch im Handy-Blatt (phone.js), auch wenn es inzwischen neu gezeichnet wurde
 }, true);
 
 /* ---------- Ereignisse ---------- */

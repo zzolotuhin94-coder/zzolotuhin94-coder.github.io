@@ -31,29 +31,47 @@ const L = require('./lib');
   L.ok(await p.evaluate(() => S.products.find(q => q.name === 'Butter').stock === 6 && !S.moves.some(m => m.note === 'Gezählt am Handy')), '„Rückgängig“ nimmt die Zählung zurück');
   await L.tap(p, '#phRes [data-act="phArt"]'); await p.fill('#phCntV', 'abc'); await L.tap(p, '#phSheet [data-act="phCntSave"]');
   L.ok(await p.evaluate(() => !document.getElementById('phSheet').hidden && document.getElementById('phCntV').classList.contains('bad-in') && S.products.find(q => q.name === 'Butter').stock === 6), 'Unsinn im Feld wird nicht gespeichert, das Blatt bleibt offen');
+  // getippt, aber nicht gespeichert: Schließen fragt erst „Änderungen verwerfen?“ (wie die Dialoge, fix-2)
   await L.tap(p, '#phSheet .hy-x');
+  L.ok(await p.evaluate(() => !document.getElementById('phSheet').hidden && /Änderungen verwerfen\?/.test(document.querySelector('#phSheet .hy-discard').textContent) && document.activeElement.dataset.act === 'phKeep'), 'getippt und nicht gespeichert: das Blatt fragt „Änderungen verwerfen?“');
+  await L.tap(p, '#phSheet [data-act="phKeep"]');
+  L.ok(await p.evaluate(() => !document.getElementById('phSheet').hidden && !document.querySelector('#phSheet .hy-discard') && document.getElementById('phCntV').value === 'abc'), '„Weiter bearbeiten“: die Eingabe bleibt stehen');
+  await p.keyboard.press('Escape'); await p.waitForTimeout(150); await L.tap(p, '#phSheet [data-act="phDrop"]');
+  L.ok(await p.evaluate(() => document.getElementById('phSheet').hidden && S.products.find(q => q.name === 'Butter').stock === 6), 'Esc fragt ebenso; „Verwerfen“ schließt ohne zu speichern');
   // Getränk: volle Flaschen und Zehntel
   await p.fill('#phQ', 'Zweigelt 0,75'); await p.waitForTimeout(120); await L.tap(p, '#phRes [data-act="phArt"]');
   L.ok(await p.evaluate(() => document.querySelectorAll('#phSheet .hy-tenths button').length === 9 && /Flaschen/.test(document.querySelector('#phSheet .hy-count label span').textContent)), 'Getränke: volle Flaschen und die angebrochene in Zehnteln');
   await p.fill('#phCntV', '10'); await L.tap(p, '#phSheet [data-act="phCntT"][data-id="5"]'); await L.tap(p, '#phSheet [data-act="phCntSave"]');
   L.ok(await p.evaluate(() => Math.abs(S.products.find(q => /^Zweigelt/.test(q.name)).stock - 10.5 * 0.75) < 1e-6), '10 Flaschen und 0,5 offen ergeben 7,875 l', await p.evaluate(() => S.products.find(q => /^Zweigelt/.test(q.name)).stock));
   // Strichcode-Nummer
-  await p.evaluate(() => { S.products.find(q => q.name === 'Butter').ean = '9012345678908'; save(); });
+  await p.evaluate(() => { S.products.find(q => q.name === 'Butter').ean = ['4000000000005', '9012345678908']; save(); });
   await p.fill('#phQ', '9012345678908'); await p.waitForTimeout(120);
   L.ok(await p.evaluate(() => document.querySelectorAll('#phRes .hy-row').length === 1 && /Butter/.test(document.querySelector('#phRes .hy-row').textContent)), 'eine Strichcode-Nummer findet genau ihren Artikel');
   await p.focus('#phQ'); await p.keyboard.press('Enter'); await p.waitForTimeout(250);
   L.ok(await p.evaluate(() => !document.getElementById('phSheet').hidden && document.getElementById('phSheetT').textContent === 'Butter'), 'Enter bei genau einem Treffer öffnet das Zähl-Blatt'); await L.tap(p, '#phSheet .hy-x');
+  L.ok(await p.evaluate(() => document.getElementById('phSheet').hidden), 'nichts getippt: × schließt sofort, ohne Rückfrage');
+  // Wörter, wie man sie im Stress tippt (fix-3 Schnellsuche): Backup, Gluten, Öl führen auch am Handy direkt ans Ziel
+  const pal = {};
+  for(const w of ['Backup', 'Gluten', 'Öl']){ await p.fill('#phQ', w); await p.waitForTimeout(150); pal[w] = await p.evaluate(() => ({secs:[...document.querySelectorAll('#phRes .hy-sec')].map(x => x.firstChild.textContent), direkt:[...document.querySelectorAll('#phRes [data-act="phPal"] .hy-tm b')].map(x => x.textContent)})); }
+  L.ok(pal.Backup.secs[0] === 'Direkt' && pal.Backup.direkt[0] === 'Sicherung speichern', '„Backup“ → Sicherung speichern', pal.Backup);
+  L.ok(pal.Gluten.direkt.includes('Ohne Gluten'), '„Gluten“ → Service-Liste „Ohne Gluten“', pal.Gluten);
+  L.ok(pal['Öl'].direkt.some(x => /Öl gewechselt|Frittieröl/.test(x)), '„Öl“ → Frittieröl / Öl gewechselt', pal['Öl']);
+  await p.fill('#phQ', 'Gluten'); await p.waitForTimeout(150);
+  await p.evaluate(() => [...document.querySelectorAll('#phRes [data-act="phPal"]')].find(x => /Ohne Gluten/.test(x.textContent)).click()); await p.waitForTimeout(300);
+  L.ok(await p.evaluate(() => view.tab === 'menu' && view.mtab === 'service' && /Suchen/.test((document.querySelector('#app .hy-back, #app .back') || {}).textContent || '')), 'ein Tipp öffnet die Service-Liste, zurück geht es zur Suche');
+  await p.goBack(); await p.waitForTimeout(300); L.ok(await L.key(p) === 'such', 'Zurück-Taste: wieder in der Suche');
   await p.fill('#phQ', '4000000000001'); await p.waitForTimeout(120);
   L.ok(/noch keinem Artikel zugeordnet/.test(await L.txt(p, '#phRes')), 'unbekannte Nummer: Hinweis, dass sie noch keinem Artikel gehört');
-  // Scannen ohne Scanner
+  // Scannen: der Strichcode-Scanner aus scan.js (scanOpen). Ohne Inventur schlägt er nach, in einer Inventur zählt er.
+  // (vorher: Ersatzweg über die Suche, solange es scan.js nicht gab; der Scanner bringt „Code eintippen“ und „Artikel suchen“ selbst mit)
   await L.tap(p, '.bottom [data-ph="heute"]'); await L.tap(p, '#app .hy-scan'); await p.waitForTimeout(150);
-  L.ok(await L.key(p) === 'such' && await p.evaluate(() => document.activeElement.id === 'phQ' && document.getElementById('phQ').getAttribute('inputmode') === 'numeric' && /Strichcode/.test(document.getElementById('toast').textContent)), 'ohne Scanner führt „Scannen“ in die Suche: Nummer eintippen oder Artikel suchen');
-  // Scannen mit Scanner (scan.js stellt openScanner bereit)
-  await p.evaluate(() => { window.__sc = 0; window.openScanner = () => { window.__sc++; }; });
-  await L.tap(p, '.bottom [data-ph="heute"]'); await L.tap(p, '#app .hy-scan');
-  L.ok(await p.evaluate(() => window.__sc === 1 && document.getElementById('app').dataset.ph === 'heute'), 'gibt es openScanner, ruft „Scannen“ genau das auf (phScan)');
-  await L.tap(p, '.bottom [data-ph="such"]'); await L.tap(p, '#app .hy-scan');
-  L.ok(await p.evaluate(() => window.__sc === 2), 'auch der Knopf in der Suche ruft den Scanner');
+  L.ok(await p.evaluate(() => __scan.open && __scan.mode === 'look' && document.getElementById('app').dataset.ph === 'heute' && !document.getElementById('scan').hidden), '„Scannen“ auf Heute öffnet den Scanner (nachschlagen)');
+  await p.keyboard.press('Escape'); await p.waitForTimeout(200);
+  L.ok(await p.evaluate(() => !__scan.open && !document.querySelector('[inert]')), 'Escape schließt den Scanner, Heute ist wieder bedienbar');
+  await p.evaluate(() => { S.invDraft = {date:new Date().toISOString(), counts:{}}; save(); });
+  await L.tap(p, '.bottom [data-ph="such"]'); await L.tap(p, '#app .hy-scan'); await p.waitForTimeout(150);
+  L.ok(await p.evaluate(() => __scan.open && __scan.mode === 'inv'), 'auch der Knopf in der Suche öffnet den Scanner; läuft eine Inventur, zählt er in die Inventur');
+  await p.keyboard.press('Escape'); await p.waitForTimeout(200); await p.evaluate(() => { S.invDraft = null; save(); });
   await p.goBack(); await p.waitForTimeout(250);
   L.ok(await L.key(p) === 'heute', 'Zurück-Taste des Handys: von der Suche zurück auf Heute');
   const ns = await L.noSide(p, 390); L.ok(ns.sw <= 390 && !ns.over.length, 'nichts ragt seitlich hinaus', ns);

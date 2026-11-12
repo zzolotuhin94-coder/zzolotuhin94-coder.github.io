@@ -18,19 +18,16 @@ ICO.phLap = '<rect x="5" y="5" width="14" height="10" rx="1.5"/><path d="M3 18.5
 ICO.phToday = '<rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/><path d="M8.5 15l2.3 2.3 4.7-4.8"/>';
 ICO.phBack = '<path d="M14.5 6l-6 6 6 6"/>';
 
-/* ---------- Scanner: genau eine Stelle zum Anschließen ----------
-   Gibt es den Scanner (scan.js: openScanner), öffnet er sich. Sonst führt „Scannen“ in die Suche:
-   Nummer vom Strichcode eintippen oder den Artikel suchen, dann die gezählte Menge eintragen. */
-function phScan(){
-  if(typeof openScanner === 'function'){ try { openScanner(); return true; } catch(e){ console.warn('Scanner:', e); } }
-  phGo('such'); setTimeout(() => { const i = document.getElementById('phQ'); if(i){ i.setAttribute('inputmode', 'numeric'); i.placeholder = 'Nummer vom Strichcode oder Artikel'; i.focus(); } }, 60);
-  toast('Nummer vom Strichcode eintippen oder den Artikel suchen.'); return false;
-}
+/* ---------- Scanner: der Strichcode-Scanner aus scan.js (scanOpen) ----------
+   Läuft eine Inventur, zählt er in die Inventur (Zählblatt des Scanners mit Ziffernblock, Flaschen und Zehntel,
+   Dazuzählen, Rückgängig; die Kamera läuft dahinter weiter). Sonst schlägt er den Artikel nach.
+   Ohne Kamera bietet der Scanner selbst „Code eintippen“ und „Artikel suchen“, unbekannte Codes lernt er. */
+function phScan(){ scanOpen(S.invDraft ? 'inv' : 'look'); }
 
 /* ---------- Bausteine ---------- */
 function phRow(o){
   const a = (o.act ? ` data-act="${o.act}"` : '') + (o.id != null ? ` data-id="${esc(o.id)}"` : '') + (o.tab ? ` data-tab="${o.tab}"` : '');
-  return `<li><button type="button" class="hy-row ${o.cls || ''}"${a}><span class="hy-n">${o.pre ? `<small>${o.pre}</small>` : ''}${o.n}</span><span class="hy-tm"><b>${o.t}</b>${o.m ? `<small>${o.m}</small>` : ''}</span>${o.e ? `<span class="hy-e">${o.e}</span>` : ''}${ico('phChev', 'hy-chev')}</button></li>`;
+  return `<li${o.x ? ' class="hy-hasx"' : ''}><button type="button" class="hy-row ${o.cls || ''}"${a}><span class="hy-n">${o.pre ? `<small>${o.pre}</small>` : ''}${o.n}</span><span class="hy-tm"><b>${o.t}</b>${o.m ? `<small>${o.m}</small>` : ''}</span>${o.e ? `<span class="hy-e">${o.e}</span>` : ''}${ico('phChev', 'hy-chev')}</button>${o.x ? `<div class="hy-xw">${o.x}</div>` : ''}</li>`;
 }
 function phQty(txt){ const s = String(txt); const i = s.lastIndexOf(' '); return i > 0 ? `${esc(s.slice(0, i))}<small>${esc(s.slice(i + 1))}</small>` : esc(s); }
 function phBackBtn(label, act, id){ return `<button type="button" class="hy-back" data-act="${act || 'phBack'}"${id != null ? ` data-id="${esc(id)}"` : ''}>${ico('phBack')}${esc(label)}</button>`; }
@@ -70,6 +67,8 @@ function phBack(){
 }
 
 /* ---------- Heute ---------- */
+/* Bedarf bei einem Lieferanten wie in der Bestellung (einkauf.js supNeed: Mindestbestand und Prognose); ein Entwurf zählt als Bedarf */
+function phSupNeed(sp, st){ if(st.draft) return st.draft.lines.length ? st.draft.lines : [1]; try { return supNeed(sp.id, st.delivery); } catch(e){ console.warn('Bedarf:', e); return []; } }
 function phHeuteRows(){
   const t = todayStr(), w = wd(t); const act = [], done = [];
   const put = (r, isDone) => { if(r) (isDone ? done : act).push(phRow(isDone ? {...r, cls:(r.cls || '') + ' off'} : r)); };
@@ -77,8 +76,10 @@ function phHeuteRows(){
   // 1 Bestellen
   safe(() => {
     const due = (S.suppliers || []).filter(sp => sp.active && sp.orderDays.includes(w)).sort((a, b) => hm(a.cutoff) - hm(b.cutoff)).map(sp => ({sp, st:supToday(sp)}));
-    const open = due.filter(x => x.st.state === 'open'), sent = due.filter(x => x.st.state === 'sent');
+    const open0 = due.filter(x => x.st.state === 'open'), sent = due.filter(x => x.st.state === 'sent');
+    const open = open0.filter(x => phSupNeed(x.sp, x.st).length), calm = open0.filter(x => !open.includes(x));
     if(open.length){ const f = open[0]; put({pre:'bis', n:esc(f.sp.cutoff), t:'Bestellen', m:esc(f.sp.name) + (open.length > 1 ? `, danach ${open.length - 1} ${open.length === 2 ? 'weiterer' : 'weitere'}` : '') + (f.st.urgent ? ` <span class="hy-bad">${esc(f.st.label)}</span>` : ''), cls:'now', tab:'buy'}); }
+    else if(calm.length) put({n:'–', t:'Bestellen', m:`Heute nichts nötig${sent.length ? `, ${sent.length} bestellt` : ''}`, tab:'buy'}, true);
     else put({n:sent.length ? ico('check') : '–', t:'Bestellen', m:!due.length ? 'Heute ist kein Bestelltag' : sent.length ? (sent.length === due.length ? 'Heute alles bestellt' : `${sent.length} bestellt, sonst Annahmeschluss vorbei`) : 'Annahmeschluss heute vorbei', tab:'buy'}, true);
   });
   // 2 Vorbereitung
@@ -97,7 +98,8 @@ function phHeuteRows(){
   });
   // 3 Checklisten
   safe(() => {
-    const D = ckToday(); const due = ckDue(D).map(tp => ({tp, pr:ckProg(tp, D)})); if(!due.length) return;
+    const D = ckToday(); const late = D !== t || nowMin() >= DH_EVENING;
+    const due = ckDue(D).map(tp => ({tp, pr:ckProg(tp, D)})).filter(x => late || !dhEvening(x.tp) || x.pr.started); if(!due.length) return;
     const open = due.filter(x => !x.pr.full);
     if(!open.length){ put({n:ico('check'), t:'Checklisten', m:due.length === 1 ? `${esc(due[0].tp.name)} erledigt` : `Alle ${due.length} Listen erledigt`, act:'ckGo', id:''}, true); return; }
     const f = open[0]; const more = open.length > 1 ? `, danach ${open.length - 1} ${open.length === 2 ? 'weitere' : 'weitere'}` : '';
@@ -110,7 +112,9 @@ function phHeuteRows(){
     const parts = [];
     if(d.oil.length) parts.push(`<span class="hy-bad">Frittieröl ${esc(ekOilDueTxt(d.oil[0].st).replace(/^Wechsel /, ''))}</span>`);
     if(d.open.length) parts.push(d.over.length ? `<span class="hy-bad">Reinigungsplan: ${d.over.length} überfällig</span>` : `Reinigungsplan: ${d.open.length} offen`);
-    put({n:String(d.open.length + d.oil.length), t:'Eigenkontrolle', m:parts[0], act:'ekOpen', id:d.oil.length && !d.over.length ? 'oil' : d.open.length ? 'clean' : 'oil'});
+    const many = k.fryers.length > 1;
+    const x = d.oil.map(({f}) => `<button type="button" class="hy-pill" data-act="dhOil" data-id="${esc(f.id)}">${ico('check')}Öl gewechselt${many ? ' · ' + esc(f.name) : ''}</button>`).join('');
+    put({n:String(d.open.length + d.oil.length), t:'Eigenkontrolle', m:parts[0], act:'ekOpen', id:d.oil.length && !d.over.length ? 'oil' : d.open.length ? 'clean' : 'oil', x});
   });
   // 5 Lieferung
   safe(() => {
@@ -167,21 +171,39 @@ renderDash = function(){
 };
 
 /* ---------- Suchen ---------- */
+/* Seiten und Aktionen aus der Schnellsuche (ansicht.js: palScore mit den Wörtern, wie man sie im Stress tippt: Gluten, Öl, Backup …).
+   Artikel, Rezepte und Gerichte listet die Handy-Suche selbst; hier nur, was direkt zu einem Ort oder einer Aktion führt. */
+const PH_PAL_G = ['Bereich', 'Aktion', 'Allergen', 'Begriff'];
+function phPalHits(q){
+  if(typeof palData !== 'function' || typeof palScore !== 'function') return [];
+  const toks = palTokens(q); if(!toks.length) return [];
+  if(!PH.pal || PH.pal.at !== S) PH.pal = {at:S, all:palData().filter(x => PH_PAL_G.includes(x.g))};
+  const hits = PH.pal.all.map(x => ({x, sc:palScore(x, toks)})).filter(h => h.sc < 3).sort((a, b) => a.sc - b.sc || (a.x.g === 'Begriff') - (b.x.g === 'Begriff'));
+  const out = (typeof palDedupe === 'function' ? palDedupe(hits.map(h => h.x)) : hits.map(h => h.x)).slice(0, 4);
+  out.exact = !!hits.length && hits[0].sc === 0;   // das Wort ist genau der Name (oder sein Stress-Wort: „Öl“ → Frittieröl)
+  return out;
+}
 function phSuchRes(){
   const q = (phS().q || '').trim().toLowerCase();
   if(!q) return `<p class="hy-hint">Artikel, Rezept oder Gericht eingeben. Mit „Scannen“ geht es über den Strichcode.</p>`;
   const hit = s => String(s || '').toLowerCase().includes(q);
   const digits = /^\d{8,14}$/.test(q);
-  const arts = S.products.filter(p => digits ? String(p.ean || '') === q || String(p.artNo || '') === q : hit(p.name) || hit(p.artNo) || hit(p.ean)).sort(byName);
+  // Strichcodes: ein Artikel hat beliebig viele (scan.js eanOf); EAN-8, UPC-A, EAN-13 und GTIN-14 werden gleich verglichen (eanKey)
+  const arts = S.products.filter(p => digits ? eanOf(p).some(c => eanKey(c) === eanKey(q)) || String(p.artNo || '') === q : hit(p.name) || hit(p.artNo) || eanOf(p).some(hit)).sort(byName);
   const recs = digits ? [] : S.cards.filter(c => hit(c.name) || c.items.some(it => { const r = refObj(it.ref); return r && hit(r.o.name); })).sort((a, b) => (hit(b.name) - hit(a.name)) || byName(a, b));
   const dishes = digits ? [] : S.menu.filter(m => !m.hidden && (hit(m.name) || hit(m.desc) || hit(m.vlabel)));
-  if(!arts.length && !recs.length && !dishes.length) return `<p class="hy-hint">Nichts gefunden für „${esc(phS().q.trim())}“.${digits ? ' Diese Nummer ist noch keinem Artikel zugeordnet.' : ''}</p>`;
+  let pal = []; try { pal = digits ? [] : phPalHits(q); } catch(err){ console.warn('Suche:', err); } PH.palHits = pal;
+  if(!arts.length && !recs.length && !dishes.length && !pal.length) return `<p class="hy-hint">Nichts gefunden für „${esc(phS().q.trim())}“.${digits ? ' Diese Nummer ist noch keinem Artikel zugeordnet.' : ''}</p>`;
   const cap = 8; const more = (n) => n > cap ? `<p class="hy-hint">${n - cap} weitere. Tippen Sie mehr Buchstaben ein.</p>` : '';
   const res = (icon, t, m, e, a) => `<li><button type="button" class="hy-row hy-res" ${a}><span class="hy-n">${ico(icon)}</span><span class="hy-tm"><b>${t}</b>${m ? `<small>${m}</small>` : ''}</span>${e ? `<span class="hy-e">${e}</span>` : ''}${ico('phChev', 'hy-chev')}</button></li>`;
   const cnt = n => `${n} gefunden`;
-  return (arts.length ? phSec('Artikel', cnt(arts.length)) + `<ul class="hy-board">${arts.slice(0, cap).map(p => res('stock', esc(p.name), esc([p.noStock ? '' : phLocName(phLocOf(p)), supName(p)].filter(Boolean).join(', ')), p.noStock ? '' : `<b>${esc(qtyFmt(+p.stock || 0, p))}</b>`, `data-act="phArt" data-id="${p.id}"`)).join('')}</ul>${more(arts.length)}` : '')
+  const palIco = x => x.g === 'Aktion' ? 'check' : x.g === 'Allergen' ? 'menu' : x.g === 'Begriff' ? 'help' : 'clip';
+  const palH = pal.length ? phSec('Direkt') + `<ul class="hy-board">${pal.map((x, i) => res(palIco(x), esc(x.n), esc(String(x.s || '').slice(0, 90)), '', `data-act="phPal" data-id="${i}"`)).join('')}</ul>` : '';
+  // ein Wort wie „Backup“, „Gluten“ oder „Öl“: der direkte Weg zuerst; sonst nach den Artikeln, Rezepten und Gerichten
+  const palFirst = pal.length && (pal.exact || (!arts.length && !recs.length));
+  return (palFirst ? palH : '') + (arts.length ? phSec('Artikel', cnt(arts.length)) + `<ul class="hy-board">${arts.slice(0, cap).map(p => res('stock', esc(p.name), esc([p.noStock ? '' : phLocName(phLocOf(p)), supName(p)].filter(Boolean).join(', ')), p.noStock ? '' : `<b>${esc(qtyFmt(+p.stock || 0, p))}</b>`, `data-act="phArt" data-id="${p.id}"`)).join('')}</ul>${more(arts.length)}` : '')
     + (recs.length ? phSec('Rezepte', cnt(recs.length)) + `<ul class="hy-board">${recs.slice(0, cap).map(c => { const via = hit(c.name) ? '' : (() => { const it = c.items.map(x => refObj(x.ref)).find(r => r && hit(r.o.name)); return it ? ', mit ' + esc(it.o.name) : ''; })(); return res('cards', esc(c.name), (c.type === 'semi' ? 'Basisrezept' : c.drink ? 'Getränk' : 'Gericht') + via, '', `data-act="openCard" data-id="${c.id}"`); }).join('')}</ul>${more(recs.length)}` : '')
-    + (dishes.length ? phSec('Speisekarte', cnt(dishes.length)) + `<ul class="hy-board">${dishes.slice(0, cap).map(m => res('menu', esc(dishLabel(m)), esc(m.section || ''), `<b>${eur(m.price)}</b>`, `data-act="phDish" data-id="${m.id}"`)).join('')}</ul>${more(dishes.length)}` : '');
+    + (dishes.length ? phSec('Speisekarte', cnt(dishes.length)) + `<ul class="hy-board">${dishes.slice(0, cap).map(m => res('menu', esc(dishLabel(m)), esc(m.section || ''), `<b>${eur(m.price)}</b>`, `data-act="phDish" data-id="${m.id}"`)).join('')}</ul>${more(dishes.length)}` : '') + (palFirst ? '' : palH);
 }
 function phSuchen(){
   const s = phS();
@@ -246,12 +268,22 @@ function phSheetDraw(){ const el = document.getElementById('phSheet'); if(!el ||
 function phSheetClose(quiet){
   const el = document.getElementById('phSheet'); if(!el || el.hidden){ PH.sheet = null; return; }
   // nur hineingeschaut: ein unberührter, eben erst angelegter Entwurf bleibt nicht liegen
-  try { const st = PH.ord; const o = st && ORD(st.id); if(o && st.fresh && !st.touched && o.status === 'draft'){ S.orders = S.orders.filter(x => x.id !== o.id); const n = +String(o.no).split('-').pop(); if(S.settings.orderNo === n + 1) S.settings.orderNo = n; save(); } } catch(e){ console.warn(e); }
+  // nur hineingeschaut: die Vorschau (einkauf.js ORD_TMP) wird nie ein Entwurf
+  if(PH.ord && ORD_TMP && ORD_TMP.id === PH.ord.id) ORD_TMP = null;
   const back = PH.sheet && PH.sheet.back; el.hidden = true; document.body.classList.remove('hy-lock'); PH.sheet = null; PH.cnt = null; PH.ord = null;
   if(!quiet && back && back.isConnected && back.focus) back.focus({preventScroll:true});
 }
 function phSheetOpen(){ const el = document.getElementById('phSheet'); return !!el && !el.hidden; }
-window.addEventListener('keydown', e => { if(e.key === 'Escape' && phSheetOpen() && !(document.getElementById('dlg') || {}).open){ e.preventDefault(); phSheetClose(); } });
+window.addEventListener('keydown', e => { if(e.key === 'Escape' && phSheetOpen() && !(document.getElementById('dlg') || {}).open){ e.preventDefault(); phSheetTryClose(); } });
+/* Eine getippte, noch nicht gespeicherte Zählung geht nicht still verloren: wie bei den Dialogen (ui2.js dlgTryClose) erst nachfragen */
+function phSheetDirty(){ const c = PH.sheet && PH.sheet.kind === 'count' && PH.cnt; if(!c) return false; const i = document.getElementById('phCntV');
+  return !!i && (i.value.trim() !== (c.v0 === '' ? '' : numIn(c.v0)) || c.t !== c.t0); }
+function phSheetTryClose(){
+  if(!phSheetDirty()){ phSheetClose(); render(); return; }
+  const b = document.getElementById('phSheetB'); let bar = b.querySelector('.hy-discard');
+  if(!bar){ b.insertAdjacentHTML('afterbegin', `<div class="hy-discard" role="alert"><span>Änderungen verwerfen?</span><div class="hy-two"><button type="button" class="hy-btn q" data-act="phKeep">Weiter bearbeiten</button><button type="button" class="hy-btn q hy-danger" data-act="phDrop">Verwerfen</button></div></div>`); bar = b.querySelector('.hy-discard'); }
+  b.scrollTop = 0; bar.querySelector('[data-act="phKeep"]').focus({preventScroll:true});
+}
 
 /* ---------- Zählen: ein Artikel, eine Zahl (Suche, Scanner, Inventur) ---------- */
 function phCntUnit(p){ return isDrink(p) ? (p.geb === 'fass' ? 'Fass' : 'Flaschen') : p.unit === 'l' ? 'Liter' : p.unit; }
@@ -259,10 +291,11 @@ function phCntStep(p){ return isDrink(p) || p.unit === 'Stk' ? 1 : 0.5; }
 function phCntStock(p){ return isDrink(p) ? Math.floor((+p.stock || 0) / p.gebL + 1e-9) : (+p.stock || 0); }
 function phCount(pid, o){
   const p = P(pid); if(!p) return; o = o || {};
-  const inv = !!S.invDraft; const c = PH.cnt = {pid, inv, loc:o.loc != null ? o.loc : null, seq:!!o.seq, v:'', t:0, hit:!!o.hit};
+  const inv = !!S.invDraft; const c = PH.cnt = {pid, inv, loc:o.loc != null ? o.loc : null, seq:!!o.seq, v:'', t:0};
   if(inv){ if(isDrink(p)){ const b = barCount(pid); c.v = b.f === '' ? '' : b.f; c.t = b.t; } else { const x = S.invDraft.counts[pid]; c.v = x === undefined || x === '' ? '' : x; } }
   else if(isDrink(p)){ const n = (+p.stock || 0) / p.gebL; c.v = Math.floor(n + 1e-9); c.t = Math.round((n - c.v) * 10); }
   else c.v = +p.stock || 0;
+  c.v0 = c.v; c.t0 = c.t;
   phSheet(phCountHtml, {kind:'count'});
 }
 function phCountHtml(){
@@ -273,9 +306,9 @@ function phCountHtml(){
   const sub = [c.seq ? '' : phLocName(phLocOf(p)), p.pack || '', pos].filter(Boolean).join(', ');
   const tenths = bar ? `<div class="hy-tenths" role="group" aria-label="${p.geb === 'fass' ? 'Angebrochenes Fass' : 'Angebrochene Flasche'}, in Zehnteln"><small>offen</small>${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(k => `<button type="button" class="${c.t === k ? 'on' : ''}" data-act="phCntT" data-id="${k}" aria-pressed="${c.t === k}">0,${k}</button>`).join('')}</div>` : '';
   const edit = canEditAll() && !c.seq ? `<button type="button" class="hy-btn t" data-act="phArtEdit" data-id="${p.id}">Artikel bearbeiten</button>` : '';
-  return `${c.hit ? `<p class="hy-hit">${ico('check')}Erkannt</p>` : ''}<h2 id="phSheetT">${esc(p.name)}</h2>${sub ? `<p class="hy-sub">${esc(sub)}</p>` : ''}
+  return `<h2 id="phSheetT">${esc(p.name)}</h2>${sub ? `<p class="hy-sub">${esc(sub)}</p>` : ''}
     <div class="hy-count"><button type="button" data-act="phCntStep" data-id="-1" aria-label="weniger">${ico('minus')}</button>
-      <label><input id="phCntV" class="num-in" type="text" inputmode="decimal" autocomplete="off" data-num="self" value="${c.v === '' ? '' : numIn(c.v)}" placeholder="${numIn(phCntStock(p))}" aria-label="Gezählt ${esc(p.name)}, ${esc(unit)}"><span>${esc(unit)}</span></label>
+      <label><input id="phCntV" class="num-in" type="text" inputmode="decimal" autocomplete="off" data-num="self" data-pid="${esc(p.id)}" value="${c.v === '' ? '' : numIn(c.v)}" placeholder="${numIn(phCntStock(p))}" aria-label="Gezählt ${esc(p.name)}, ${esc(unit)}"><span>${esc(unit)}</span></label>
       <button type="button" data-act="phCntStep" data-id="1" aria-label="mehr">${ico('plus')}</button></div>${tenths}
     <p class="hy-was">Laut App ${/^1([ ,]|$)/.test(stockTxt) && !/^1,/.test(stockTxt) ? 'ist' : 'sind'} <b>${esc(stockTxt)}</b> da.${c.inv && !c.seq ? ' Die Zählung geht in die laufende Inventur.' : ''}</p>
     <button type="button" class="hy-btn" data-act="phCntSave">${c.seq ? 'Speichern und weiter' : 'Zählung speichern'}</button>
@@ -317,7 +350,7 @@ function phBestand(){
     const isLow = low.has(p.id);
     h += phRow({n:phQty(qtyFmt(+p.stock || 0, p)), t:esc(p.name), m:isLow ? `<span class="hy-bad">Mindestens ${esc(qtyFmt(+p.minStock || 0, p))}</span>` : esc(supName(p)), cls:'hy-q', act:'phArt', id:p.id}); });
   if(cur !== null) h += '</ul>';
-  return phHead('Bestand', '', phBackBtn(phBackLabel())) + `<div class="hy-chips" role="tablist" aria-label="Filter">${chips.map(([k, l, n]) => `<button type="button" role="tab" aria-selected="${f === k}" class="${f === k ? 'on' : ''}" data-act="phBf" data-id="${k}">${esc(l)}<small>${n}</small></button>`).join('')}</div>`
+  return phHead('Bestand', '', phBackBtn(phBackLabel())) + `<button type="button" class="hy-btn q hy-scanb" data-scan="look">${ico('phScan')}Artikel scannen</button><div class="hy-chips" role="tablist" aria-label="Filter">${chips.map(([k, l, n]) => `<button type="button" role="tab" aria-selected="${f === k}" class="${f === k ? 'on' : ''}" data-act="phBf" data-id="${k}">${esc(l)}<small>${n}</small></button>`).join('')}</div>`
     + (list.length ? h : `<p class="hy-hint">${f === 'low' ? 'Nichts unter Mindestbestand.' : 'Hier liegt noch kein Artikel.'}</p>`)
     + `<div class="hy-foot"><button type="button" class="hy-btn q" data-act="moveDlg" data-id="waste">Schwund buchen</button></div>`;
 }
@@ -338,6 +371,7 @@ function phInventur(){
     const L = locs.find(x => x.k === s.loc);
     return phHead(phLocName(L.k), '', phBackBtn('Inventur', 'phInvLoc', '~'))
       + `<div class="hy-bar"><i style="width:${(L.done / L.list.length * 100).toFixed(1)}%"></i></div><p class="hy-prog" id="phInvProg">${L.done} von ${L.list.length} gezählt</p>
+      <button type="button" class="hy-btn q hy-scanb" data-scan="inv">${ico('phScan')}Mit dem Scanner zählen</button>
       <ul class="hy-board">${L.list.map(p => { const on = phInvDone(p); return `<li><button type="button" class="hy-ck ${on ? 'on' : ''}" data-act="phInvArt" data-id="${p.id}"><span class="hy-o" aria-hidden="true">${on ? ico('check') : ''}</span><span class="hy-tm"><b>${esc(p.name)}</b><small>laut App ${esc(qtyFmt(+p.stock || 0, p))}</small></span><span class="hy-cq">${on ? phQty(qtyFmt(+d.counts[p.id], p)) : ''}</span></button></li>`; }).join('')}</ul>`;
   }
   s.loc = null;
@@ -347,6 +381,7 @@ function phInventur(){
     + `<ul class="hy-board">${locs.map(x => phRow({n:`${x.done}/${x.list.length}`, t:esc(phLocName(x.k)), m:x.done === x.list.length ? 'Fertig gezählt' : x.done ? `${x.list.length - x.done} ${x.list.length - x.done === 1 ? 'Artikel fehlt' : 'Artikel fehlen'} noch` : 'Noch nicht begonnen', cls:x.done === x.list.length ? 'done' : next && x.k === next.k ? 'now' : '', act:'phInvLoc', id:x.k || '-'})).join('')}</ul>
     <p class="hy-text">${dn} von ${tot} Artikeln gezählt${dn && canEditAll() ? `, Differenz <b class="${diff < 0 ? 'hy-bad' : ''}">${signedEur(diff)}</b>` : ''}. Was Sie nicht zählen, bleibt unverändert.</p>
     <div class="hy-foot">${next ? `<button type="button" class="hy-btn" data-act="phInvNext" data-id="${next.k || '-'}">${next.done ? 'Im' : 'Mit'} ${esc(phLocName(next.k))} ${next.done ? 'weiterzählen' : 'beginnen'}</button>` : ''}
+      <button type="button" class="hy-btn q hy-scanb" data-scan="inv">${ico('phScan')}Mit dem Scanner zählen</button>
       ${dn ? `<button type="button" class="hy-btn ${next ? 'q' : ''}" data-act="invFinish">Inventur abschließen</button>` : ''}
       <button type="button" class="hy-btn t" data-act="invCancel">Inventur verwerfen</button></div>`;
 }
@@ -361,13 +396,16 @@ renderStock = function(){
 function phBestellen(){
   const t = todayStr(), w = wd(t); const sups = (S.suppliers || []).filter(s => s.active);
   const due = sups.filter(sp => sp.orderDays.includes(w)).map(sp => ({sp, st:supToday(sp)}));
-  const rank = x => x.st.state === 'open' ? 0 : x.st.state === 'sent' ? 2 : 1;
+  due.forEach(x => { x.need = x.st.state === 'sent' || x.st.draft ? [] : phSupNeed(x.sp, x.st); x.calm = x.st.state === 'open' && !x.st.draft && !x.need.length; });
+  const rank = x => x.st.state === 'open' && !x.calm ? 0 : x.calm ? 1 : x.st.state === 'sent' ? 3 : 2;
   due.sort((a, b) => rank(a) - rank(b) || hm(a.sp.cutoff) - hm(b.sp.cutoff));
-  const nOpen = due.filter(x => x.st.state === 'open').length; const first = due.find(x => x.st.state === 'open');
-  const voice = !due.length ? 'Heute ist kein Bestelltag.' : nOpen ? `Heute ${nOpen === 1 ? 'ist noch ein Lieferant' : `sind noch ${num(nOpen)} Lieferanten`} dran.` : 'Für heute ist alles erledigt.';
-  const row = ({sp, st}) => { const low = lowStock().filter(p => p.supplier === sp.id); const val = low.reduce((a, p) => a + packSuggest(p) * (p.packQty || 1) * p.price, 0); const dr = st.draft;
-    const m = st.state === 'sent' ? 'Heute bestellt' : dr ? `Entwurf, ${dr.lines.length} ${dr.lines.length === 1 ? 'Artikel' : 'Artikel'}, ${eur(orderTotal(dr))}` : low.length ? `${low.length} Artikel, ${eur(val)}${sp.minOrder && val < sp.minOrder ? `. Mindestwert ${eur(sp.minOrder)}` : ''}` : 'Nichts unter Mindestbestand';
-    return phRow({pre:st.state === 'sent' ? '' : 'bis', n:st.state === 'sent' ? ico('check') : esc(sp.cutoff), t:esc(sp.name), m:st.state === 'past' ? `Annahmeschluss vorbei. ${m}` : m + (st.urgent ? ` <span class="hy-bad">${esc(st.label)}</span>` : ''), cls:st.state === 'open' ? (first && first.sp.id === sp.id ? 'now' : '') : 'off', act:'phOrd', id:sp.id}); };
+  const nOpen = due.filter(x => rank(x) === 0).length; const first = due.find(x => rank(x) === 0);
+  const voice = !due.length ? 'Heute ist kein Bestelltag.' : nOpen ? `Heute ${nOpen === 1 ? 'ist noch ein Lieferant' : `sind noch ${num(nOpen)} Lieferanten`} dran.` : due.some(x => x.calm) ? 'Heute ist nichts nötig.' : 'Für heute ist alles erledigt.';
+  // Bedarf wie in der Bestellung (einkauf.js supNeed: Mindestbestand und Prognose); ohne Bedarf ruhig und grau „nichts nötig“
+  const row = ({sp, st, need}) => { const dr = st.draft; need = need || []; const val = need.reduce((a, x) => a + x.n * (x.p.packQty || 1) * (+x.p.price || 0), 0);
+    const calm = st.state === 'open' && !dr && !need.length;
+    const m = st.state === 'sent' ? 'Heute bestellt' : dr ? `Entwurf, ${dr.lines.length} ${dr.lines.length === 1 ? 'Artikel' : 'Artikel'}, ${eur(orderTotal(dr))}` : need.length ? `${need.length} Artikel, ${eur(val)}${sp.minOrder && val < sp.minOrder ? `. Mindestwert ${eur(sp.minOrder)}` : ''}` : 'nichts nötig';
+    return phRow({pre:st.state === 'sent' ? '' : 'bis', n:st.state === 'sent' ? ico('check') : esc(sp.cutoff), t:esc(sp.name), m:st.state === 'past' ? `Annahmeschluss vorbei. ${m}` : m + (st.urgent && !calm ? ` <span class="hy-bad">${esc(st.label)}</span>` : ''), cls:st.state === 'open' && !calm ? (first && first.sp.id === sp.id ? 'now' : '') : 'off', act:'phOrd', id:sp.id}); };
   const exp = (S.orders || []).filter(o => ['sent', 'confirmed'].includes(o.status)).sort((a, b) => a.deliveryDate.localeCompare(b.deliveryDate));
   const expRow = o => { const sp = SUP(o.supplier); const late = o.deliveryDate < t; const day = late ? tmDm(o.deliveryDate) : o.deliveryDate === t ? 'heute' : o.deliveryDate === dAdd(t, 1) ? 'morgen' : tmWdShort(o.deliveryDate);
     return phRow({pre:late ? 'sollte' : 'kommt', n:esc(day), t:esc(sp ? sp.name : '?'), m:(late ? '<span class="hy-bad">überfällig.</span> ' : '') + `${o.lines.length} ${o.lines.length === 1 ? 'Position' : 'Positionen'}, ${eur(orderTotal(o))}`, cls:'hy-w', act:'ordRecv', id:o.id}); };
@@ -386,9 +424,25 @@ renderBuy = function(){
 function phOrdOpen(sid){
   const sp = SUP(sid); if(!sp) return; const st = supToday(sp);
   if(st.state === 'sent'){ const o = lastOrder(sid); if(o){ view.stab = 'bestellung'; view.order = o.id; view.recv = null; go('stock'); return; } }
-  const had = !!draftFor(sid); const o = newOrder(sid); if(!had) save();
-  PH.ord = {id:o.id, asked:null, fresh:!had, touched:false}; phSheet(phOrdHtml, {kind:'ord'}); render();
+  // vorhandener Entwurf oder eine Vorschau mit dem Vorschlag (einkauf.js ordStart): ein Entwurf entsteht erst mit der ersten Änderung
+  const o = ordStart(sid);
+  PH.ord = {id:o.id, asked:null}; phSheet(phOrdHtml, {kind:'ord'}); render();
 }
+/* Vorschau → Entwurf (mit Nummer), sobald am Handy etwas geändert, geöffnet oder kopiert wird */
+function phOrdKeep(){ const o = PH.ord && ORD(PH.ord.id); if(o && o === ORD_TMP) ordTmpCommit(true); return o; }
+const _ordTmpCommitPh = ordTmpCommit;
+ordTmpCommit = function(force){
+  if(!force && PH.ord && ORD_TMP && ORD_TMP.id === PH.ord.id) return;   // die Vorschau im Handy-Blatt bleibt beim Speichern anderer Dinge stehen
+  return _ordTmpCommitPh(force);
+};
+/* Senden über einen Link (E-Mail, WhatsApp, Webshop, Telefon): unter dem Mindestbestellwert oder außerhalb der Bestelltage erst nachfragen, wie am Laptop (einkauf.js ordSendWarn) */
+document.addEventListener('click', e => {
+  const el = e.target.closest && e.target.closest('#phSheet [data-act="phOrdSend"]'); if(!el || !PH.ord) return;
+  const o = ORD(PH.ord.id); if(!o || ORD_SEND_OK.has(o.id)) return; const warn = ordSendWarn(o); if(!warn.length) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  openDialog('Trotzdem senden?', warn.map(w => `<p class="dlg-p">${w}</p>`).join('') + '<p class="dlg-p">Der Lieferant nimmt die Bestellung vielleicht nicht an.</p>',
+    () => { ORD_SEND_OK.add(o.id); setTimeout(() => { const a = el.isConnected ? el : document.querySelector('#phSheet [data-act="phOrdSend"]'); if(a) a.click(); }, 30); }, {ok:'Trotzdem senden', toast:false});
+}, true);
 function phOrdVia(o, sp){
   const cloud = typeof cloudReady === 'function' && cloudReady() && sp.email; const b = [];
   if(cloud) b.push({l:'Jetzt per E-Mail senden', act:'ordCloudSend'});
@@ -407,8 +461,8 @@ function phOrdHtml(){
   const add = addable.length ? `<label class="hy-add"><span class="hy-lnk">Artikel dazu</span><select id="phOlAdd" aria-label="Artikel von ${esc(sp.name)} hinzufügen"><option value="">Artikel dazu …</option>${addable.map(p => `<option value="${p.id}">${esc(p.name)}${p.pack ? ' (' + esc(p.pack) + ')' : ''}</option>`).join('')}</select></label>` : '';
   const below = sp.minOrder && tot < sp.minOrder; const has = o.lines.some(l => +l.n > 0); const block = sendBlockReason(o);
   let foot;
-  if(!has) foot = `<p class="hy-text">Noch nichts auf der Bestellung. Nichts liegt unter dem Mindestbestand.</p>`;
-  else if(block) foot = `<p class="hy-text">${esc(block)}</p><button type="button" class="hy-btn q" data-act="phClose">Als Entwurf liegen lassen</button>`;
+  if(!has) foot = `<p class="hy-text">${o.lines.length ? 'Alle Mengen stehen auf 0.' : 'Nichts nötig: nichts unter Mindestbestand, nichts fehlt laut Prognose.'} Mit „Artikel dazu“ bestellen Sie trotzdem.</p>`;
+  else if(block) foot = `<p class="hy-text">${esc(block)}</p><button type="button" class="hy-btn q" data-act="phOrdSave">${o.tmp ? 'Als Entwurf speichern' : 'Als Entwurf liegen lassen'}</button>`;
   else if(st.asked) foot = `<p class="hy-ask" role="status">Im ${esc(st.asked)} geöffnet. Ist die Bestellung draußen?</p><button type="button" class="hy-btn" data-act="ordMarkSent" data-id="${o.id}">Ja, gesendet</button><button type="button" class="hy-btn t" data-act="phOrdNot">Noch nicht</button>`;
   else { const via = phOrdVia(o, sp); const main = via[0];
     foot = (main ? (main.href ? `<a class="hy-btn" href="${esc(main.href)}"${main.blank ? ' target="_blank" rel="noopener"' : ''} data-act="phOrdSend" data-id="${esc(main.via)}">${main.l}</a>` : `<button type="button" class="hy-btn" data-act="${main.act}" data-id="${o.id}">${main.l}</button>`) : `<button type="button" class="hy-btn" data-act="phOrdCopy" data-id="${o.id}">Text kopieren</button>`)
@@ -417,7 +471,7 @@ function phOrdHtml(){
     <ul class="hy-lis">${lines}</ul>${add}
     <div class="hy-sum"><span>Summe ohne MwSt.</span><b>${eur(tot)}</b></div>
     ${sp.minOrder ? `<p class="hy-min ${below ? 'no' : 'ok'}">${below ? `Noch ${eur(sp.minOrder - tot)} bis zum Mindestwert ${eur(sp.minOrder)}` : `${ico('check')}Mindestwert ${eur(sp.minOrder)} erreicht`}</p>` : ''}
-    ${foot}<button type="button" class="hy-btn t hy-del" data-act="phOrdDel" data-id="${o.id}">Entwurf löschen</button>`;
+    ${foot}${o.tmp ? '' : `<button type="button" class="hy-btn t hy-del" data-act="phOrdDel" data-id="${o.id}">Entwurf löschen</button>`}`;
 }
 function phOrdOtherHtml(){
   const w = wd(todayStr()); const list = (S.suppliers || []).filter(s => s.active && !s.orderDays.includes(w)).sort(byName);
@@ -431,7 +485,7 @@ function phWeHtml(){
 }
 function phAbendHtml(){
   return `<h2 id="phSheetT">Tagesabschluss</h2><p class="hy-sub">Was heute verkauft wurde und was weg musste.</p>
-    <button type="button" class="hy-btn" data-act="sales">Verkäufe buchen</button><button type="button" class="hy-btn q" data-act="moveDlg" data-id="waste">Schwund buchen</button>`;
+    <button type="button" class="hy-btn" data-act="sales">Verkäufe buchen</button><button type="button" class="hy-btn q" data-act="plKasse">Kassenbericht importieren</button><button type="button" class="hy-btn q" data-act="moveDlg" data-id="waste">Schwund buchen</button>`;
 }
 function phDishHtml(id){
   const m = S.menu.find(x => x.id === id); if(!m) return ''; const ai = algInfo(m);
@@ -458,7 +512,7 @@ renderVorb = function(){
   const facSeg = `<div class="seg pl-fac" role="group" aria-label="Wie wird der Tag?">${PL_FACS.map(([f, l]) => `<button type="button" class="${Math.abs(pl.fac - f) < 0.001 ? 'on' : ''}" data-act="plFac" data-id="${f}" aria-pressed="${Math.abs(pl.fac - f) < 0.001}">${l}</button>`).join('')}</div>`;
   return phHead('Vorbereitung', '', back) + days
     + `<p class="hy-fcline"><span><b>${num(pl.total)} Portionen</b> erwartet${pl.fac !== 1 ? (pl.fac > 1 ? ', volles Haus' : ', ruhiger Tag') : ''}</span><button type="button" class="hy-lnk" data-act="phFc" aria-expanded="${!!s.fc}">${s.fc ? 'Fertig' : 'Ändern'}</button></p>`
-    + (s.fc ? `<div class="hy-fc">${vbFcHtml(pl, ro, facSeg)}${vbMiseHtml(pl)}</div>` : `<div class="hy-bar"><i id="phPlBar" style="width:${all ? (done / all * 100).toFixed(1) : 0}%"></i></div>${pl.nMiss ? `<p class="hy-min no">${pl.nMiss} ${pl.nMiss === 1 ? 'Zutat fehlt' : 'Zutaten fehlen'}. <button type="button" class="hy-lnk" data-act="phFc">Ansehen</button></p>` : ''}` + vbPrepHtml(pl));
+    + (s.fc ? `<div class="hy-fc">${vbFcHtml(pl, ro, facSeg)}${vbMiseHtml(pl)}</div>` : `<div class="hy-bar"><i id="phPlBar" style="width:${all ? (done / all * 100).toFixed(1) : 0}%"></i></div>${pl.nMiss ? `<p class="hy-min no">${pl.nMiss} ${pl.nMiss === 1 ? 'Zutat fehlt' : 'Zutaten fehlen'}. <button type="button" class="hy-lnk" data-act="phFc">Ansehen</button></p>` : ''}` + vbPrepHtml(pl).replace('class="day-h">Vorbereitungsliste<span', 'class="day-h"><span class="hy-sr">Vorbereitungsliste</span><span'));   // die Überschrift steht oben schon; für Vorleser bleibt sie
 };
 
 /* ---------- Rezepte: Liste und Küchen-Ansicht ---------- */
@@ -496,14 +550,16 @@ fromHash = function(){
   const before = [view.tab, s.page, s.loc, view.card, view.order, view.stab].join('|');
   if(page){ if(view.tab !== 'dash' || s.page !== page){ phSheetClose(true); s.page = page; s.loc = null; view = {...view, tab:'dash', card:null, order:null, recv:null}; render(); } hashSync(); return; }
   s.page = null; s.loc = loc; if(h !== 'ware/bestellen') s.buyAll = false;
-  _fromHashPh();
+  PH.replace = true; try { _fromHashPh(); } finally { PH.replace = false; }   // beim Zurückgehen nur die Adresse ordnen, nie einen neuen Schritt anlegen
   if(before !== [view.tab, s.page, s.loc, view.card, view.order, view.stab].join('|')){ phSheetClose(true); render(); }
 };
-/* Zurück-Taste des Handys: jede neue Adresse wird ein Schritt im Verlauf (sonst ersetzt die App nur die Adresse) */
+/* Zurück-Taste des Handys: jede neue Adresse wird ein Schritt im Verlauf, wie fix-2 (rezept.js) es auch über 700 px macht.
+   Wie dort ersetzt nur der Wechsel der Ansicht einer Rezeptur (Küche, Kalkulation, Service) den Eintrag, damit Zurück nicht doppelt zählt. */
 const _hashSyncPh = hashSync;
 hashSync = function(){
   if(!phOn()) return _hashSyncPh();
-  try { const w = hashWant(); const cur = decodeURIComponent(location.hash.slice(1)); if(cur === w) return; if(!cur || PH.replace) history.replaceState(null, '', '#' + w); else history.pushState(null, '', '#' + w); } catch(e){}
+  try { const w = hashWant(); const cur = decodeURIComponent(location.hash.slice(1)); if(cur === w) return; const base = x => String(x).replace(/\/(kalkulation|kueche|service)$/, '');
+    if(!cur || PH.replace || base(cur) === base(w)) history.replaceState(null, '', '#' + w); else history.pushState(null, '', '#' + w); RZ_HLAST = w; } catch(e){}
 };
 
 /* ---------- Leiste unten ---------- */
@@ -517,24 +573,37 @@ function phNavOn(){
   if(view.tab === 'buy') return 'best';
   return s.from === 'best' ? 'mehr' : s.from || 'mehr';
 }
+/* Klasse und Seiten-Kennung nur setzen, wenn sie sich ändern: jede Änderung lässt den Browser die Stile der ganzen Seite neu rechnen.
+   Vor dem Zeichnen gesetzt, rechnet render() (das für den Übergang einmal das Layout abfragt) gleich mit den Handy-Regeln. */
+function phMarks(){
+  const on = phOn(); const root = document.documentElement; if(root.classList.contains('ph') !== on) root.classList.toggle('ph', on);
+  const app = document.getElementById('app'); if(!app) return on;
+  const k = on ? phKey() : null; if(k){ if(app.dataset.ph !== k) app.dataset.ph = k; } else if('ph' in app.dataset) delete app.dataset.ph;
+  const kue = !!k && k === 'rezk' && rzMode(C(view.card)) === 'kueche'; if(app.classList.contains('hy-kueche') !== kue) app.classList.toggle('hy-kueche', kue);
+  return on;
+}
+/* Statusleiste des Handys in der Farbe der Seite (der dunkle Kopf ist am Handy weg). Erst im nächsten Bild gelesen:
+   sonst müsste der Browser mitten in render() alle Stile einmal extra rechnen (am Start rund 10 ms bei gedrosseltem Prozessor). */
+function phThemeColor(){
+  if(PH.tcT) return; PH.tcT = requestAnimationFrame(() => { PH.tcT = 0;
+    try { const m = document.querySelector('meta[name="theme-color"]'); if(!m) return; if(PH.tc == null) PH.tc = m.getAttribute('content'); const want = phOn() ? getComputedStyle(document.body).backgroundColor : PH.tc; if(m.getAttribute('content') !== want) m.setAttribute('content', want); } catch(e){} });
+}
 function phApply(){
-  const on = phOn(); const root = document.documentElement; root.classList.toggle('ph', on);
+  const on = phMarks(); phThemeColor();
   const slot = document.querySelector('.bottom .nav-slot'); const app = document.getElementById('app');
-  // Statusleiste des Handys in der Farbe der Seite (der dunkle Kopf ist am Handy weg)
-  try { const m = document.querySelector('meta[name="theme-color"]'); if(m){ if(PH.tc == null) PH.tc = m.getAttribute('content'); const want = on ? getComputedStyle(document.body).backgroundColor : PH.tc; if(m.getAttribute('content') !== want) m.setAttribute('content', want); } } catch(e){}
-  if(!on){ if(slot && slot.querySelector('.hy-nav')){ slot.innerHTML = navHtml(true); navApply(); } if(app){ delete app.dataset.ph; app.classList.remove('hy-kueche'); } if(phSheetOpen()) phSheetClose(true); return; }
+  if(!on){ if(slot && slot.querySelector('.hy-nav')){ slot.innerHTML = navHtml(true); navApply(); } if(phSheetOpen()) phSheetClose(true); return; }
   if(slot && !slot.querySelector('.hy-nav')) slot.innerHTML = phNavHtml();
-  const k = phKey(); if(app) app.dataset.ph = k;
-  const cur = phNavOn(); document.querySelectorAll('.bottom .hy-nav').forEach(b => { const o = b.dataset.ph === cur; b.classList.toggle('on', o); if(o) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  const k = phKey();
+  const cur = phNavOn(); document.querySelectorAll('.bottom .hy-nav').forEach(b => { const o = b.dataset.ph === cur; if(b.classList.contains('on') !== o){ b.classList.toggle('on', o); if(o) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); } });
   // bestehende Seiten ohne eigenen Zurück-Knopf bekommen einen
   if(app && k === 'x' && !app.querySelector('.back, .hy-back')) app.insertAdjacentHTML('afterbegin', phBackBtn(phBackLabel()));
-  if(app) app.classList.toggle('hy-kueche', k === 'rezk' && rzMode(C(view.card)) === 'kueche');
   if(k === 'rezk' && app && !app.querySelector('.hy-rzmore') && rzMode(C(view.card)) === 'kueche' && canEditAll()) app.insertAdjacentHTML('beforeend', `<p class="hy-rzmore"><button type="button" class="hy-lnk" data-act="rzView" data-id="kalk">Kalkulation ansehen</button><button type="button" class="hy-lnk" data-act="rzView" data-id="service">Ansicht für den Service</button></p>`);
   try { if(k === 'heute' && typeof relInd === 'function') relInd(); } catch(e){}
   if(phSheetOpen() && PH.sheet){ if((PH.sheet.kind === 'ord' && !(PH.ord && ORD(PH.ord.id) && ORD(PH.ord.id).status === 'draft')) || (PH.sheet.kind === 'count' && !(PH.cnt && P(PH.cnt.pid)))) phSheetClose(true); else phSheetDraw(); }
 }
 const _renderPh = render;
 render = function(){
+  try { phMarks(); } catch(e){}
   _renderPh();
   try { phApply(); } catch(e){ console.warn('Handy:', e); }
 };
@@ -546,7 +615,7 @@ document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if(!el || !phOn()) return; const act = el.dataset.act, id = el.dataset.id || '';
   if(document.body.classList.contains('gd-help')) return;
   // Aktionen der App, die aus einem Blatt heraus eine andere Seite oder einen Dialog öffnen: Blatt zu
-  if(phSheetOpen() && el.closest('#phSheet') && ['ordRecv', 'moveDlg', 'sales', 'openCard', 'ordCloudSend'].includes(act)){ phSheetClose(true); return; }
+  if(phSheetOpen() && el.closest('#phSheet') && ['ordRecv', 'moveDlg', 'sales', 'plKasse', 'openCard', 'ordCloudSend'].includes(act)){ phSheetClose(true); return; }
   if(act === 'ordMarkSent' && phSheetOpen()){ phSheetClose(true); return; }
   if(!/^ph[A-Z]/.test(act)) return;
   const s = phS();
@@ -555,23 +624,27 @@ document.addEventListener('click', e => {
     case 'phMehr': phGo('mehr'); break;
     case 'phScan': phScan(); break;
     case 'phBack': phBack(); break;
-    case 'phClose': phSheetClose(); render(); break;
+    case 'phClose': phSheetTryClose(); break;
+    case 'phKeep': { const bar = el.closest('.hy-discard'); if(bar) bar.remove(); const i = document.getElementById('phCntV'); if(i) i.focus({preventScroll:true}); break; }
+    case 'phDrop': phSheetClose(); render(); break;
     case 'phTheme': setTheme(themeIcon() ? 'light' : 'dark'); render(); break;
     case 'phLap': s.lap = !s.lap; render(); if(s.lap) setTimeout(() => { const l = document.querySelector('#app .hy-lapl'); if(l) l.scrollIntoView({block:'nearest', behavior:'smooth'}); }, 30); break;
     case 'phLapGo': phLapGo(id); break;
     case 'phAbend': phSheet(phAbendHtml); break;
     case 'phWe': phSheet(phWeHtml); break;
+    case 'phPal': { const x = (PH.palHits || [])[+id]; if(x && x.run){ phSheetClose(true); try { x.run(); } catch(err){ console.warn(err); } } break; }
     case 'phDish': { const m = S.menu.find(x => x.id === id); if(m) phSheet(() => phDishHtml(id)); break; }
-    case 'phArt': phCount(id, {hit:false}); break;
+    case 'phArt': phCount(id); break;
     case 'phArtEdit': { const p = P(id); phSheetClose(true); if(p) prodDialog(p); break; }
     case 'phBf': s.bf = id; render(); break;
     case 'phFc': s.fc = !s.fc; render(); break;
     case 'phBuyAll': s.buyAll = true; s.from = 'best'; render(); window.scrollTo({top:0}); break;
     case 'phOrd': phOrdOpen(id); break;
     case 'phOrdOther': phSheet(phOrdOtherHtml); break;
-    case 'phOl': { const o = PH.ord && ORD(PH.ord.id); if(!o) break; const [i, dir] = id.split(':').map(Number); const l = o.lines[i]; if(!l) break; l.n = Math.max(0, Math.round(((+l.n || 0) + dir) * 100) / 100); PH.ord.touched = true; PH.ord.asked = null; save(); phSheetDraw(); const b = document.querySelector(`#phSheet [data-act="phOl"][data-id="${i}:${dir}"]`); if(b) b.focus({preventScroll:true}); break; }
-    case 'phOrdSend': if(PH.ord){ PH.ord.asked = id; view.opened = PH.ord.id; view.openedVia = id; setTimeout(phSheetDraw, 350); } break;
-    case 'phOrdCopy': { const o = PH.ord && ORD(PH.ord.id); if(!o) break; const txt = orderText(o); const pr = navigator.clipboard && navigator.clipboard.writeText(txt); const ok = () => { toast('Bestelltext kopiert'); if(PH.ord){ PH.ord.asked = 'Text'; phSheetDraw(); } }; if(pr) pr.then(ok, ok); else ok(); break; }
+    case 'phOl': { const o = PH.ord && ORD(PH.ord.id); if(!o) break; const [i, dir] = id.split(':').map(Number); const l = o.lines[i]; if(!l) break; l.n = Math.max(0, Math.round(((+l.n || 0) + dir) * 100) / 100); phOrdKeep(); PH.ord.asked = null; save(); phSheetDraw(); const b = document.querySelector(`#phSheet [data-act="phOl"][data-id="${i}:${dir}"]`); if(b) b.focus({preventScroll:true}); break; }
+    case 'phOrdSave': { const o = phOrdKeep(); save(); phSheetClose(); render(); if(o) toast(`Entwurf ${o.no} gespeichert`); break; }
+    case 'phOrdSend': if(PH.ord){ phOrdKeep(); save(); PH.ord.asked = id; view.opened = PH.ord.id; view.openedVia = id; setTimeout(phSheetDraw, 350); } break;
+    case 'phOrdCopy': { const o = phOrdKeep(); if(!o) break; save(); const txt = orderText(o); const pr = navigator.clipboard && navigator.clipboard.writeText(txt); const ok = () => { toast('Bestelltext kopiert'); if(PH.ord){ PH.ord.asked = 'Text'; phSheetDraw(); } }; if(pr) pr.then(ok, ok); else ok(); break; }
     case 'phOrdNot': if(PH.ord){ PH.ord.asked = null; view.opened = null; phSheetDraw(); } break;
     case 'phOrdDel': { const oid = id; phSheetClose(true); S.orders = S.orders.filter(o => o.id !== oid); save(); render(); toast('Entwurf gelöscht'); break; }
     case 'phCntStep': { const c = PH.cnt; const p = c && P(c.pid); if(!p) break; phCntRead(); const base = c.v === '' ? phCntStock(p) : +c.v; c.v = Math.max(0, Math.round((base + (+id) * phCntStep(p)) * 1000) / 1000); const i = document.getElementById('phCntV'); if(i){ i.value = numIn(c.v); i.classList.remove('bad-in'); } break; }
@@ -586,7 +659,8 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('change', e => {
   const t = e.target; if(!t || !phOn()) return;
-  if(t.id === 'phOlAdd' && t.value && PH.ord){ const o = ORD(PH.ord.id); const p = P(t.value); if(o && p){ o.lines.push(lineFor(p, packSuggest(p) || 1)); PH.ord.touched = true; PH.ord.asked = null; save(); phSheetDraw(); } }
-  if(t.id === 'phCntV') phCntRead();
+  if(t.id === 'phOlAdd' && t.value && PH.ord){ const o = ORD(PH.ord.id); const p = P(t.value); if(o && p){ o.lines.push(lineFor(p, packSuggest(p) || 1)); phOrdKeep(); PH.ord.asked = null; save(); phSheetDraw(); } }
+  // nur das Feld des Artikels, der gerade im Blatt steht (beim Weiterzählen meldet das alte Feld sein „change“ erst, wenn schon der nächste Artikel dasteht)
+  if(t.id === 'phCntV' && PH.cnt && t.dataset.pid === PH.cnt.pid && t.isConnected) phCntRead();
 });
 document.addEventListener('keydown', e => { if(e.key === 'Enter' && e.target && e.target.id === 'phCntV'){ e.preventDefault(); phCntSave(false); } });

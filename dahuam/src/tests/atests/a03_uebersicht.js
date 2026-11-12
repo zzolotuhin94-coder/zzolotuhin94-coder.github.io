@@ -30,9 +30,10 @@ const L = require('./lib');
     L.ok(await ev(() => document.querySelector('#dlgForm [name="guest"]').value === 'Herr Lechner'), 'Tipp auf „Anreise Herr Lechner“ öffnet die Buchung'); await L.dlgClose(p);
     // ---------- Heute ----------
     await L.go(p, 'heute');
-    const dash = await ev(() => { const r = [...document.querySelectorAll('#app .ap-dash')]; const sec = r[0] && r[0].closest('.day-sec'); return {n:r.length, txt:r[0] ? r[0].innerText.replace(/\s+/g, ' ').trim() : '', sec:sec ? sec.querySelector('.day-h').textContent : '', cards:document.querySelectorAll('#app .day-sec').length}; });
-    L.ok(dash.n === 1 && dash.txt === 'Apartments 1 Anreise, 1 Abreise, 1 Reinigung offen, Wechseltag bis 15:00 Uhr Öffnen' && dash.sec === 'Offen', 'Heute: genau eine ruhige Zeile unter „Offen“, kein eigener Abschnitt', dash);
-    await p.click('#app .ap-dash [data-act="apGo"]'); await p.waitForTimeout(250);
+    const dash = await ev(() => { const r = [...document.querySelectorAll('#app .ap-dash')]; const sec = r[0] && r[0].closest('.day-sec'); return {n:r.length, txt:r[0] ? r[0].innerText.replace(/\s+/g, ' ').trim() : '', sec:sec ? sec.querySelector('.dh-l').textContent : '', cards:document.querySelectorAll('#app .day-sec').length}; });
+    // fix-3: die Zeile steht unter „Heute zu tun“ und ist selbst der Knopf
+    L.ok(dash.n === 1 && dash.txt === 'Apartments 1 Anreise, 1 Abreise, 1 Reinigung offen, Wechseltag bis 15:00 Uhr' && dash.sec === 'Heute zu tun', 'Heute: genau eine ruhige Zeile unter „Heute zu tun“, kein eigener Abschnitt', dash);
+    await p.click('#app .ap-dash .dh-b'); await p.waitForTimeout(250);
     L.ok(await ev(() => view.tab === 'apart' && view.ap.tab === 'reinigung' && location.hash === '#apartments/reinigung'), '„Öffnen“ führt zur Reinigung');
     await ev(() => { const a = apS(); a.bookings = a.bookings.filter(x => x.from !== todayStr() && x.to !== todayStr()); Object.keys(a.cleans).forEach(k => { if(k.endsWith(todayStr())) delete a.cleans[k]; }); save(); go('dash'); });
     L.ok(await ev(() => !document.querySelector('#app .ap-dash')), 'nichts an- oder abzureisen, keine Reinigung offen: keine Zeile');

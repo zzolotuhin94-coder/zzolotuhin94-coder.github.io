@@ -5,7 +5,7 @@ const SCREENS = L.SCREENS.concat(['speisekarte/service', 'rezepte/dish_kaiser', 
 const RECV = () => { const o = S.orders.find(x => ['sent', 'confirmed'].includes(x.status)); view.stab = 'bestellung'; view.order = o.id; view.recv = o.id; go('buy'); };
 const ORDER = () => { const o = S.orders.find(x => ['sent', 'confirmed'].includes(x.status)); view.stab = 'bestellung'; view.order = o.id; view.recv = null; go('buy'); };
 // Bereiche, die absichtlich seitlich laufen: Zeitleiste der Aktionen, Regal der Rezepte, Reiter- und Filterleisten
-const SIDEWAYS = '.seg,.chips-row,.pl-days,.rp-units,.tl-wrap,.shelf-row,.gs-ed,.gs-stage';
+const SIDEWAYS = '.seg,.chips-row,.pl-days,.rp-units,.tl-wrap,.shelf-row,.gs-ed,.gs-stage,.hy-chips';   // .hy-chips: Tag- und Filter-Leisten der Handy-Bedienung (phone.js)
 const inner = p => p.evaluate(sel => [...document.querySelectorAll('#app *')].filter(e => { const cs = getComputedStyle(e); return /auto|scroll/.test(cs.overflowX) && e.clientWidth > 0 && e.scrollWidth > e.clientWidth + 2 && !e.matches(sel) && !e.closest(sel); }).map(e => String(e.className).slice(0, 30) + ' ' + e.scrollWidth + '/' + e.clientWidth), SIDEWAYS);
 (async () => { const b = await L.launch(); const errs = [];
   for(const [name, o] of [['handy', L.PHONE], ['ipad-hoch', {vp:{width:768, height:1024}, ctx:{hasTouch:true}}], ['ipad-quer', L.TABLET], ['desktop', {vp:{width:1440, height:900}}]]){
@@ -15,13 +15,20 @@ const inner = p => p.evaluate(sel => [...document.querySelectorAll('#app *')].fi
     L.ok(bad.length === 0, `${name}: keine Seite breiter als der Bildschirm`, bad);
     L.ok(side.length === 0, `${name}: keine Tabelle, die man seitlich wischen muss`, side);
     errs.push(...p.errs); await p.context().close(); }
-  // ---------- Ware › Bestand am Handy ----------
+  // ---------- Ware › Bestand am Handy (bis 700 px: phone.js, eine große Zeile je Artikel) ----------
   { const {p} = await L.open(b, L.PHONE); await L.go(p, 'ware/bestand');
+    const h = await p.evaluate(() => { const row = [...document.querySelectorAll('#app [data-act="phArt"]')].find(x => x.querySelector('.hy-tm b').textContent === 'Butter'); const q = row.querySelector('.hy-n'), n = row.querySelector('.hy-tm b'); const r = q.getBoundingClientRect();
+      return {q:q.textContent.replace(/\s+/g, ' ').trim(), qv:r.width > 0 && r.left >= 0 && r.right <= innerWidth, qfs:parseFloat(getComputedStyle(q).fontSize), nfs:parseFloat(getComputedStyle(n).fontSize), table:!!document.querySelector('#app table'), h:Math.round(row.getBoundingClientRect().height)}; });
+    L.ok(h.q === '6kg' || h.q === '6 kg', 'Handy: Butter mit 6 kg', h);
+    L.ok(h.qv && h.qfs > h.nfs && !h.table && h.h >= 44, 'Handy: keine Tabelle, je Artikel eine Zeile, die Menge groß und ganz sichtbar, Zeile mindestens 44 px', h);
+    await L.shot(p, 'nachher-stock_phone'); errs.push(...p.errs); await p.context().close(); }
+  // ---------- Ware › Bestand schmal (701–900 px, fix-3: je Artikel eine Karte) ----------
+  { const {p} = await L.open(b, L.NARROW); await L.go(p, 'ware/bestand');
     const r = await p.evaluate(() => { const tr = [...document.querySelectorAll('#app table.stock tr.row')].find(x => /Butter$/.test(x.querySelector('.pn').textContent)); const q = tr.children[2], m = tr.children[3], n = tr.children[0];
       const vis = e => { const b = e.getBoundingClientRect(); return b.width > 0 && b.right <= innerWidth && b.left >= 0; };
       return {q:q.textContent.trim(), qv:vis(q), qfs:parseFloat(getComputedStyle(q).fontSize), nfs:parseFloat(getComputedStyle(n.querySelector('.pn')).fontSize), m:getComputedStyle(m, '::before').content.replace(/"/g, '') + m.innerText.trim(), mv:vis(m), wert:getComputedStyle(tr.children[4]).display, btn:[...tr.children[5].querySelectorAll('.icon-btn')].every(vis), head:getComputedStyle(document.querySelector('#app table.stock thead')).display}; });
     L.ok(r.q === '6 kg' && r.qv && r.qfs > r.nfs && r.m === 'Mindest 5 kg' && r.mv && r.btn && r.wert === 'none' && r.head === 'none', 'Handy: je Artikel eine Karte, die Menge groß rechts, „Mindest“ darunter, + und − sichtbar; Wert nur in der Summe', r);
-    await L.shot(p, 'nachher-stock_phone'); errs.push(...p.errs); await p.context().close(); }
+    await L.shot(p, 'nachher-stock_narrow'); errs.push(...p.errs); await p.context().close(); }
   // ---------- iPad quer: Speisekarte, Dienstplan, Wareneingang ----------
   { const {p} = await L.open(b, L.TABLET); const ev = (f, a) => p.evaluate(f, a);
     const rail = await ev(() => ({w:Math.round(document.querySelector('.side').getBoundingClientRect().width), label:getComputedStyle(document.querySelector('.side .nav-i span')).position, name:document.querySelector('.side .nav-i[data-tab="vorb"]').textContent.trim()}));
@@ -45,7 +52,8 @@ const inner = p => p.evaluate(sel => [...document.querySelectorAll('#app *')].fi
     await L.shot(p, 'nachher-recv_ipadp'); errs.push(...p.errs); await p.context().close(); }
   // ---------- Rezept ohne Foto ----------
   for(const [name, o] of [['handy', L.PHONE], ['ipad-hoch', {vp:{width:768, height:1024}, ctx:{hasTouch:true}}], ['desktop', {vp:{width:1440, height:900}}]]){
-    const {p} = await L.open(b, o); await L.go(p, 'rezepte/dish_kaiser');
+    // am Handy öffnet eine Rezeptur in der Küchen-Ansicht (phone.js, fix-2); das Foto gehört zur Kalkulation
+    const {p} = await L.open(b, o); await L.go(p, 'rezepte/dish_kaiser' + (name === 'handy' ? '/kalkulation' : ''));
     const r = await p.evaluate(() => { const ph = document.querySelector('#app .hero .ph-empty').getBoundingClientRect(); const h1 = document.querySelector('#app .hero h1, #app .hero .title-in, #app .hero-main'); const add = document.querySelector('#app .hero [data-act="photoCard"]'); return {w:Math.round(ph.width), h:Math.round(ph.height), title:Math.round(h1.getBoundingClientRect().top), add:add.textContent.trim(), addVis:add.getBoundingClientRect().width > 0}; });
     L.ok(r.w <= 64 && r.h <= 64 && r.title < 400 && r.add === 'Foto hinzufügen' && r.addVis, `Rezept ohne Foto (${name}): kleines Zeichen und „Foto hinzufügen“, der Name steht oben`, r);
     if(name === 'handy') await L.shot(p, 'nachher-rez_phone'); errs.push(...p.errs); await p.context().close(); }

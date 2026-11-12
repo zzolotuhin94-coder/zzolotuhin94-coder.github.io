@@ -54,7 +54,7 @@ html.ph .hy-scan .ico{width:24px;height:24px}
 html.ph .hy-board{list-style:none;margin:14px calc(var(--hy-pad)*-1) 0;padding:0;border-top:1px solid var(--line)}
 html.ph .hy-sec + .hy-board{margin-top:0}
 html.ph .hy-board.hy-in{margin-left:0;margin-right:0}
-html.ph .hy-row{display:grid;grid-template-columns:78px minmax(0,1fr) auto auto;align-items:center;column-gap:0;width:100%;min-height:68px;padding:9px 14px 9px var(--hy-pad);border:0;border-bottom:1px solid var(--line);background:none;color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+html.ph .hy-row{display:grid;grid-template-columns:calc(78px*var(--fz,1)) minmax(0,1fr) auto auto;align-items:center;column-gap:0;width:100%;min-height:68px;padding:9px 14px 9px var(--hy-pad);border:0;border-bottom:1px solid var(--line);background:none;color:var(--fg);font:inherit;text-align:left;cursor:pointer}
 html.ph .hy-in .hy-row{padding-left:0;padding-right:0}
 html.ph .hy-row.hy-static{cursor:default}
 html.ph .hy-row:active{background:var(--surface-2)}
@@ -71,13 +71,21 @@ html.ph .hy-row.now .hy-n{color:var(--accent)}
 html.ph .hy-row.done .hy-n{color:var(--good)}
 html.ph .hy-row.off .hy-n,html.ph .hy-row.off .hy-tm b{color:var(--muted)}
 html.ph .hy-row.off .hy-tm b{font-weight:500}
-html.ph .hy-row.hy-q{grid-template-columns:92px minmax(0,1fr) auto auto}
+html.ph .hy-row.hy-q{grid-template-columns:calc(92px*var(--fz,1)) minmax(0,1fr) auto auto}
 html.ph .hy-row.hy-q .hy-n{font-size:25px}
 html.ph .hy-row.hy-q .hy-n small,html.ph .hy-cq small{display:inline;font:400 15px/1 var(--f-body);margin:0 0 0 4px}
 html.ph .hy-row.hy-w .hy-n{font-size:27px}
 html.ph .hy-row.hy-res{grid-template-columns:44px minmax(0,1fr) auto auto;min-height:62px}
 html.ph .hy-row.hy-res .hy-n{color:var(--muted)}
 html.ph .hy-row.hy-one{grid-template-columns:minmax(0,1fr) auto;min-height:56px}
+/* Zeile mit einem zweiten Knopf darunter (Heute: „Öl gewechselt“ mit einem Tipp) */
+html.ph .hy-hasx{border-bottom:1px solid var(--line)}
+html.ph .hy-hasx > .hy-row{border-bottom:0;padding-bottom:2px;min-height:0}
+html.ph .hy-xw{display:flex;flex-wrap:wrap;gap:8px;padding:2px 14px 10px calc(var(--hy-pad) + 78px*var(--fz,1))}
+html.ph .hy-pill{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 16px;border-radius:22px;border:1px solid var(--hy-line2);background:var(--surface);color:var(--fg);font:600 16px/1.1 var(--f-body);cursor:pointer}
+html.ph .hy-pill .ico{width:18px;height:18px;stroke-width:2.2;color:var(--good)}
+html.ph .hy-pill:active{background:var(--surface-2)}
+html.ph .hy-scanb .ico{width:24px;height:24px;stroke-width:1.8}
 
 /* Abhak-Zeilen (Inventur) */
 html.ph .hy-ck{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;width:100%;min-height:62px;padding:8px var(--hy-pad);border:0;border-bottom:1px solid var(--line);background:none;color:var(--fg);font:inherit;text-align:left;cursor:pointer}
@@ -136,8 +144,6 @@ html.ph .hy-demo .link{min-height:44px;font-family:var(--f-body);font-size:15px}
 #phSheet .hy-body{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:14px 20px calc(22px + env(safe-area-inset-bottom,0px))}
 #phSheet h2{font:600 30px/1.06 var(--f-display);margin:0;padding-right:48px;overflow-wrap:anywhere}
 #phSheet .hy-sub{font-size:16px;line-height:1.35;color:var(--muted);margin:5px 0 0;padding-right:48px}
-#phSheet .hy-hit{display:flex;align-items:center;gap:7px;font-size:15px;font-weight:600;color:var(--good);margin:0 0 6px}
-#phSheet .hy-hit .ico{width:18px;height:18px;stroke-width:2.4}
 #phSheet .hy-lis{list-style:none;margin:12px 0 0;padding:0;border-top:1px solid var(--line)}
 #phSheet .hy-li{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;min-height:66px;padding:6px 0;border-bottom:1px solid var(--line)}
 #phSheet .hy-step{display:flex;align-items:center;gap:2px}
@@ -180,7 +186,7 @@ html.ph .hy-fcline{display:flex;justify-content:space-between;align-items:center
 html.ph .hy-fcline b{font-weight:600}
 html.ph #app[data-ph="vorb"] .pl-prep{margin:0;padding:0;border:0;background:none}
 html.ph #app[data-ph="vorb"] .pl-prep > .day-h{display:flex;align-items:baseline;gap:10px;font:400 15px/1.2 var(--f-body);color:var(--muted);margin:6px 0 0;border:0;padding:0}
-html.ph #app[data-ph="vorb"] .pl-prep > .day-h{font-size:0}
+html.ph .hy-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 html.ph #app[data-ph="vorb"] .pl-prep > .day-h span{font:400 15px/1.2 var(--f-body);color:var(--muted);margin:0}
 html.ph #app[data-ph="vorb"] .pl-prep > .day-h .pl-clear{font:500 15px/1.2 var(--f-body);min-height:44px;margin-left:auto;color:var(--muted)}
 html.ph #app[data-ph="vorb"] .pl-groups{display:block;columns:auto}
@@ -252,3 +258,11 @@ html.ph #app[data-ph="rezk"] .back{font-weight:500}
 html.ph main#app[data-ph="x"]{--hy-pad:16px}
 #phSheet .hy-tenths button{background:var(--surface)}
 html.ph body::before{background:var(--bg)}
+/* „Änderungen verwerfen?“ im Blatt (getippte, noch nicht gespeicherte Zählung) */
+#phSheet .hy-discard{margin:0 0 14px;padding:12px 14px;border-radius:14px;background:var(--bad-bg);border:1px solid var(--bad);padding-right:56px}
+#phSheet .hy-discard > span{display:block;font:600 17px/1.3 var(--f-body);color:var(--fg);margin-bottom:8px}
+#phSheet .hy-discard .hy-btn{min-height:48px;margin:0;background:var(--surface)}
+#phSheet .hy-discard .hy-danger{color:var(--bad);border-color:var(--bad)}
+html.ph #app[data-ph="vorb"] .pl-rest{display:inline-flex;align-items:center;min-height:44px;min-width:44px;font-size:15px}
+html.ph #app[data-ph="vorb"] .pl-chk li .pl-lk{width:100%;justify-content:flex-start;margin:-12px 0 0;padding:0 var(--hy-pad) 2px calc(var(--hy-pad) + 44px);box-sizing:border-box}
+html.ph #app[data-ph="vorb"] .pl-chk li .pl-rest{color:var(--accent);font-weight:500}

@@ -11,3 +11,4 @@ fix1tests … fix3tests = Befunde der Durchsicht (Vorbereitung/Einkauf/Auswertun
 storetests/s01, s12 und btests/b08 brauchen die alten gebauten Stände: vorher einmal sh alte_staende.sh (holt sie aus der Git-Geschichte).
 Anleitung (dahuam/Anleitung-DAHUAM202.pdf): ../anleitung/shots.js macht die Bilder, ../anleitung/make.js das PDF; danach build.py.
 phonetests = Handy-Bedienung bis 700 px (phone.js): Heute auf einem Bildschirm, Suchen und Scannen, Bestellen mit Blatt, Vorbereitung, Inventur je Lagerort, Rezept in der Küche, Mehr, Geräte (iPhone 13 und SE, hell/dunkel, Kontrast, Zielgrößen, Breiten 700/820/1280). Feste Uhr: Do 12.11.2026, 10:30. Bilder: PH_OUT=/pfad node phonetests/shots.js.
+Von 701 bis 900 px gelten Tagesblatt, Leiste und „Mehr“-Blatt aus fix-3 (fix3tests prüfen sie bei 760 px); bis 700 px die Handy-Bedienung.

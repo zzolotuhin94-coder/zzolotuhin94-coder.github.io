@@ -12,7 +12,7 @@ const key = async (p, s) => { for(const k of s) await p.click(`#scSheet .sc-pad 
   await ev(() => { P('butter').ean = ['9001234560026']; P('milk').ean = ['9001234560033']; S.invDraft = {date:new Date().toISOString(), counts:{}}; save(); });
   await L.go(p, 'ware/inventur');
   // zuletzt im Tiefkühler gezählt → Tiefkühler zuerst
-  await p.click('#app [data-scan="invList"]'); await p.waitForTimeout(250);
+  await ev(() => scanOpen('inv', {list:true})); await p.waitForTimeout(250);   // „Ohne Code zählen“ des Scanners (am Handy zählt die Inventur-Seite ohne Code Ort für Ort, phone.js)
   const fries = await ev(() => P('fries').name); await p.fill('#scLq', fries.slice(0, 4)); await p.waitForTimeout(100);
   await p.click(`#scLs [data-id="fries"]`); await key(p, '4'); await p.click('#scSave'); await p.waitForTimeout(200);
   L.ok(await ev(() => S.invDraft.counts.fries === 4 && __scan.lastLoc === 'T'), 'ohne Code gezählt: Pommes im Tiefkühler (merkt sich den Lagerort)');
@@ -46,8 +46,8 @@ const key = async (p, s) => { for(const k of s) await p.click(`#scSheet .sc-pad 
   L.ok(await ev(c => P('bergkase').ean.join() === c && S.invDraft.counts.bergkase === 2.35 && eanFind(c).id === 'bergkase', CODE), 'nach dem Neuladen: Code und Zählung sind gespeichert');
   // ---------- außerhalb der Inventur: Artikel nachschlagen (Bestand) ----------
   await L.go(p, 'ware/bestand');
-  L.ok(await ev(() => !!document.querySelector('#app .toolbar [data-scan="look"]')), 'Bestand: Knopf „Scannen“ neben der Suche');
-  await p.click('#app .toolbar [data-scan="look"]'); await L.wait(p, () => __scan.layer === 'info', null, 20000);
+  L.ok(await ev(() => !!document.querySelector('#app [data-scan="look"]')), 'Bestand am Handy: Knopf „Artikel scannen“ über der Liste');
+  await p.click('#app [data-scan="look"]'); await L.wait(p, () => __scan.layer === 'info', null, 20000);
   const s5 = await ev(() => ({name:document.querySelector('#scSheet .sc-name').textContent, kpi:document.querySelector('#scSheet .sc-kpi').innerText.replace(/\s+/g, ' '), sub:document.querySelector('#scSheet .sc-h small').textContent, codes:document.querySelector('#scSheet .sc-codes').innerText.replace(/\s+/g, ' '), del:document.querySelectorAll('#scSheet [data-sc="eanDel"]').length, edit:!!document.querySelector('#scSheet [data-sc="editProd"]')}));
   L.ok(s5.name === 'Zillertaler Bergkäse' && /BESTAND 7 kg MINDEST.?BESTAND 6 kg LETZTER PREIS € 18,00 je kg · geliefert 10\.11\.2026/i.test(s5.kpi) && /Kühlhaus/.test(s5.sub), 'Artikel-Blatt: Bestand, Mindestbestand, letzter Preis mit Lieferdatum, Lagerort', s5);
   L.ok(s5.del === 1 && s5.edit, 'Chef: Code entfernen und Bearbeiten möglich');
@@ -72,7 +72,7 @@ const key = async (p, s) => { for(const k of s) await p.click(`#scSheet .sc-pad 
   await key(p, '12'); await p.click('#scSave'); await p.waitForTimeout(200);
   L.ok(await ev(() => S.invDraft.counts.onion === 12), 'Team: 12 kg Zwiebeln gezählt');
   await p.click('#scan [data-sc="close"]'); await p.waitForTimeout(200);
-  await L.go(p, 'ware/bestand'); await p.click('#app .toolbar [data-scan="look"]'); await L.wait(p, () => __scan.layer === 'info', null, 20000);
+  await L.go(p, 'ware/bestand'); await p.click('#app [data-scan="look"]'); await L.wait(p, () => __scan.layer === 'info', null, 20000);
   L.ok(await ev(() => document.querySelectorAll('#scSheet [data-sc="eanDel"]').length === 0 && !document.querySelector('#scSheet [data-sc="editProd"]') && !!document.querySelector('#scSheet [data-sc="moveIn"]')), 'Team im Artikel-Blatt: kein Entfernen, kein Bearbeiten; Wareneingang buchen geht');
   L.ok(await ev(c => eanRemove(P('onion'), c) === false && P('onion').ean.length === 1, CODE), 'Team kann einen Code auch sonst nicht entfernen');
   await p.click('#scSheet [data-sc="moveIn"]'); await p.waitForTimeout(250);

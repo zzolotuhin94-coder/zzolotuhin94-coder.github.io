@@ -3,11 +3,11 @@
 // Einrichtung und Datenlücken eingeklappt am Ende. Handy 390, iPad quer und hoch, Desktop, hell und dunkel.
 const L = require('./lib');
 (async () => { const b = await L.launch(); const errs = [];
-  // ---------- Handy, 10:30 ----------
-  { const {p} = await L.open(b, L.PHONE); const ev = (f, a) => p.evaluate(f, a); const w = ms => p.waitForTimeout(ms);
+  // ---------- schmal (760 px, fix-3-Tagesblatt; bis 700 px zeigt phone.js die Handy-Zeilen, siehe phonetests/p01), 10:30 ----------
+  { const {p} = await L.open(b, L.NARROW); const ev = (f, a) => p.evaluate(f, a); const w = ms => p.waitForTimeout(ms);
     await L.go(p, 'heute');
     const h = await ev(() => document.documentElement.scrollHeight);
-    L.ok(h < 1700, 'Handy: Heute ist höchstens zwei Bildschirme lang (vorher rund 2.800 px)', h);
+    L.ok(h < 1700, 'schmal: Heute ist höchstens zwei Bildschirme lang (vorher rund 2.800 px)', h);
     const secs = await ev(() => [...document.querySelectorAll('#app .dh-sec .dh-l')].map(x => x.textContent));
     L.ok(secs.join('|') === 'Heute zu tun|Team|Demnächst', 'drei ruhige Abschnitte: Heute zu tun, Team, Karte', secs);
     const now = await L.rows(p, '#app .dh-now .dh-r .rw-main b');
@@ -51,7 +51,7 @@ const L = require('./lib');
     await L.go(p, 'heute'); await p.click('#app .ck-dash .dh-b'); await w(250); L.ok(await ev(() => view.tab === 'checkl' && ckTpl(view.ck.run).name === 'Öffnen Küche'), 'Checklisten-Zeile öffnet die nächste offene Liste');
     errs.push(...p.errs); await p.context().close(); }
   // ---------- Nachmittag: „Schließen …“ kommt dazu ----------
-  { const {p} = await L.open(b, {...L.PHONE, at:[2026, 11, 12, 15, 10]}); await L.go(p, 'heute');
+  { const {p} = await L.open(b, {...L.NARROW, at:[2026, 11, 12, 15, 10]}); await L.go(p, 'heute');
     const ck = await L.txt(p, '#app .ck-dash .rw-main');
     L.ok(ck === 'Checklisten Öffnen Küche 0/12 · Schließen Küche 0/12 · Öffnen Bar/Service 0/12 · Schließen Bar/Service 0/12', 'ab 14 Uhr stehen auch die „Schließen …“-Listen da', ck);
     const fold = await L.txt(p, '#app .rw-fold');
