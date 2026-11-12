@@ -38,16 +38,17 @@ const check=async(name)=>{await w(200);const s=await sw();if(s[0]!==390||s[1]!==
 let views=0;
 for(const mode of ['']){
   for(let o=0;o<7;o++){await ev(o=>{view.pl.off=o;view.pl.all=o===2;go('vorb')},o);await check(mode+' vorb +'+o);views++;}
-  await ev(()=>{let o=0;while((S.settings.closed||[]).includes(dParse(dAdd(todayStr(),o)).getDay()))o++;view.pl.off=o;render();const pl=vbPlan(vbDay());pl.prods.slice(0,4).forEach(x=>{x.p.stock=0});const i=document.querySelector('#app input[data-plov]');i.value='55';i.dispatchEvent(new Event('change',{bubbles:true}))});await w(200);await ev(()=>{document.querySelectorAll('#app details').forEach(d=>d.open=true)});await check(mode+' vorb fehlt + überschrieben');views++;
+  await ev(()=>{let o=0;while((S.settings.closed||[]).includes(dParse(dAdd(todayStr(),o)).getDay()))o++;view.pl.off=o;render();const pl=vbPlan(vbDay());pl.prods.slice(0,4).forEach(x=>{x.p.stock=0});if(!document.querySelector('#app input[data-plov]')){phS().fc=true;render();}/* Handy: Prognose hinter „Ändern“ (phone.js) */const i=document.querySelector('#app input[data-plov]');i.value='55';i.dispatchEvent(new Event('change',{bubbles:true}))});await w(200);await ev(()=>{document.querySelectorAll('#app details').forEach(d=>d.open=true)});await check(mode+' vorb fehlt + überschrieben');views++;
   await ev(()=>go('dash'));await check(mode+' heute');await ev(()=>go('setup'));await check(mode+' mehr');views+=2;
 }
 ok(bad.length===0,`phone 390: scrollWidth === 390 and controls ≥ 40 px on ${views} views (7 days, missing stock, Heute, Einstellungen)`,bad);
 await ev(()=>go('dash'));await w(200);
-await p.tap('.bottom .nav-i[data-tab="vorb"]');await w(250);ok(await ev(()=>view.tab==='vorb'),'phone: Vorbereitung („Prep“) directly in the bottom bar');
+await p.tap('#phBoard [data-act="plGo"]');await w(250);ok(await ev(()=>view.tab==='vorb'),'phone: Vorbereitung is one tap from Heute (row on the board, phone.js)');
 await ev(()=>{let o=0;while((S.settings.closed||[]).includes(dParse(dAdd(todayStr(),o)).getDay()))o++;view.pl.off=o;render()});await w(200);
 ok(await ev(()=>{const c=document.querySelector('#app .pl-c');return c&&parseFloat(getComputedStyle(c).fontSize)>=16&&c.getBoundingClientRect().height>=48}),'prep list: big type (≥ 16 px), rows ≥ 48 px');
 await p.tap('#app .pl-c');await w(150);ok(await ev(()=>document.querySelector('#app .pl-c').classList.contains('on')),'tap checks an item');
-ok(await ev(()=>{const d=document.querySelector('#app .pl-days');return d.scrollWidth>=d.clientWidth&&getComputedStyle(d).overflowX==='auto'}),'day picker scrolls inside itself, not the page');
-await ev(()=>window.scrollTo(0,0));await p.tap('#app .page-h h1 .wozu-q');await w(250);ok(await ev(()=>!!document.querySelector('#gdHow')&&document.querySelector('#gdHow').getBoundingClientRect().right<=390)&&(await sw())[0]===390,'phone: „So geht’s hier“ card without side scroll');
+ok(await ev(()=>{const d=document.querySelector('#app .pl-days, #app .hy-days');return d.scrollWidth>=d.clientWidth&&getComputedStyle(d).overflowX==='auto'}),'day picker scrolls inside itself, not the page');
+// „So geht’s hier“ steht am Handy nicht mehr im Seitenkopf (phone.js: eigener, ruhiger Kopf; die Anleitung liegt unter „Mehr“)
+ok((await sw())[0]===390&&await ev(()=>!document.querySelector('#app .page-h')&&!!document.querySelector('#app .hy-back')),'phone: Vorbereitung has the quiet phone head with a back button, no side scroll');
 await L.done(b,errs);}
 })();
