@@ -7,6 +7,6 @@ etests = Paket D2 (Rezept für Küche und Service, Service-Liste, Eigenkontrolle
 wtests = Willkommensseite (erster Start, Widmung, Geschenk-Link, Hinweis je Gerät, Anleitung als PDF).
 gtests = Speisekarte-Gestalter (Vorlagen, Verbindung zur Speisekarte, Verschieben mit Zeiger und Tasten, Spalten, Effekte, Rückgängig, echtes PDF je Vorlage, Allergene, Umstellung alter Stände, Handy/Tablet/Desktop, hell/dunkel). Feste Uhr: Do 12.11.2026.
 atests = Apartments (Buchungen, Kalender-Import .ics, Übersicht, Reinigung, Wechseltag, Heute-Zeile, PDF, Sicherung, Umstellung, Geräte).
+fix1tests … fix3tests = Befunde der Durchsicht (Vorbereitung/Einkauf/Auswertung; Aufzeichnungen/Allergene/Dialoge/Rezepte; Heute/Ansicht/Suche). scantests = Strichcode-Scanner.
+storetests/s01, s12 und btests/b08 brauchen die alten gebauten Stände: vorher einmal sh alte_staende.sh (holt sie aus der Git-Geschichte).
 Anleitung (dahuam/Anleitung-DAHUAM202.pdf): ../anleitung/shots.js macht die Bilder, ../anleitung/make.js das PDF; danach build.py.
-fix3tests = Heute als ruhiges Tagesblatt, Schnellsuche (zwei Wörter, Gluten, Öl, Backup, Art je Treffer), Platz auf Handy und Tablet (keine Tabelle zum Wischen), Lesbarkeit (Einstellungen › Anzeige › Schriftgröße, nichts unter 12 px, Kontrast 4,5:1), untere Leiste, Einstellungen (Sicherung oben, ein Name). Feste Uhr: Do 12.11.2026, 10:30. Bilder nach x-out/ (oder SHOTS=Ordner).
-scantests = Strichcode-Scanner (Codes und Prüfziffern, Dekoder ZXing mit selbst gezeichneten Strichcodes, künstliche Kamera aus .y4m-Videos, Inventur zählen, Codes lernen, Artikel-Dialog und Import mit Spalte EAN, ohne Kamera, ohne Code zählen, Wareneingang, offline, Geräte). Server auf :8765. Bilder nach s-out/ und /home/user/review-out/scan/.

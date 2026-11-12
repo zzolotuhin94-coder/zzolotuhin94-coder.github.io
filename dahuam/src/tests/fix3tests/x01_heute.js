@@ -37,8 +37,10 @@ const L = require('./lib');
     // „Öl gewechselt“: ein Tipp
     await L.go(p, 'heute'); const n0 = await ev(() => S.checks.ek.log.length);
     await p.click('#app .dh-oil .dh-x'); await w(250);
-    const o1 = await ev(() => ({r:S.checks.ek.log[0], n:S.checks.ek.log.length, tab:view.tab, row:!!document.querySelector('#app .dh-oil'), toast:document.querySelector('#toast').innerText}));
+    const o1 = await ev(() => ({r:S.checks.ek.log[0], n:S.checks.ek.log.length, tab:view.tab, row:!!document.querySelector('#app .dh-oil'), toast:document.querySelector('#toast').innerText, who:tmWhoName()}));
     L.ok(o1.n === n0 + 1 && o1.r.k === 'oil' && o1.r.t === 'wechsel' && o1.r.d === '2026-11-12' && o1.r.a === '10:30' && o1.tab === 'dash' && !o1.row && /Öl gewechselt, 10:30 Uhr/.test(o1.toast) && /Rückgängig/.test(o1.toast), '„Öl gewechselt“: ein Tipp trägt heute, 10:30 ein; die Zeile verschwindet; Hinweis mit „Rückgängig“', o1);
+    // Zusammenführung fix2/fix3: eingetragen wird, wer an diesem Gerät arbeitet (wie im Dialog „Öl gewechselt“), und der Hinweis sagt, wer
+    L.ok(o1.r.b === o1.who && o1.toast.includes(o1.who), '„Öl gewechselt“ mit einem Tipp: eingetragen von der Person dieses Geräts (wie im Dialog), der Hinweis nennt sie', [o1.r.b, o1.who]);
     await p.click('#toast .toast-act'); await w(250);
     L.ok(await ev(() => S.checks.ek.log.length) === n0 && await ev(() => !!document.querySelector('#app .dh-oil')), '„Rückgängig“ nimmt den Eintrag wieder weg');
     // direkte Sprünge

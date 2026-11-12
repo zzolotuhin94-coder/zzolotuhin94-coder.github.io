@@ -34,11 +34,12 @@ function dhPrep(){
 function dhOrders(){
   const t = todayStr(), w = wd(t);
   const due = (S.suppliers || []).filter(sp => sp.active && sp.orderDays.includes(w)).sort((a, b) => hm(a.cutoff) - hm(b.cutoff)).map(sp => ({sp, st:supToday(sp)}));
-  const low = lowStock();
   const row = ({sp, st}) => {
-    const lowN = low.filter(p => p.supplier === sp.id).length;
-    const sub = [st.state === 'open' ? `<span class="${st.urgent ? 'bad-t' : ''}">${esc(st.label)}</span>` : esc(st.label), st.draft && st.state === 'open' ? 'Entwurf liegt bereit' : `Lieferung ${esc(String(dayLabel(st.delivery)).split(',')[0])}`, lowN ? `${lowN} unter Mindestbestand` : ''].filter(Boolean).join(' · ');
-    const past = st.state !== 'open';
+    // Bedarf wie in der Bestellung (einkauf.js supNeed: Mindestbestand und Prognose); ohne Bedarf ruhig „nichts nötig“, ohne Countdown
+    const need = st.state !== 'open' || st.draft || typeof supNeed !== 'function' ? [] : supNeed(sp.id, st.delivery);
+    const none = st.state === 'open' && !st.draft && typeof supNeed === 'function' && !need.length;
+    const sub = [none ? 'nichts nötig' : st.state === 'open' ? `<span class="${st.urgent ? 'bad-t' : ''}">${esc(st.label)}</span>` : esc(st.label), st.draft && st.state === 'open' ? 'Entwurf liegt bereit' : `Lieferung ${esc(String(dayLabel(st.delivery)).split(',')[0])}`, need.length ? `${need.length} Artikel vorgeschlagen` : ''].filter(Boolean).join(' · ');
+    const past = st.state !== 'open' || none;
     return dhRow({lead:`bis ${esc(sp.cutoff)}`, title:`${esc(sp.name)}`, sub,
       act:st.state === 'sent' ? 'ordList' : st.draft ? 'ordOpen' : 'ordNew', id:st.state === 'sent' ? '' : st.draft ? st.draft.id : sp.id, cls:'dh-ord' + (past ? ' past' : '')});
   };
@@ -76,8 +77,9 @@ function dhEk(D){
 }
 function dhOilNow(fid){
   if(typeof ekS !== 'function') return; const k = ekS(); const f = k.fryers.find(x => x.id === fid) || k.fryers[0]; if(!f) return;
+  // wer: wie im Dialog „Öl gewechselt“ (eigen.js ekRec → tmWhoName: die Person, die an diesem Gerät arbeitet); der Hinweis nennt sie
   const r = ekRec({k:'oil', fr:f.id, t:'wechsel'}); k.log.unshift(r); save(); render();
-  toast(`Öl gewechselt${k.fryers.length > 1 ? ' · ' + f.name : ''}, ${r.a} Uhr`, {label:'Rückgängig', action:() => { k.log = k.log.filter(x => x.id !== r.id); save(); render(); }});
+  toast(`Öl gewechselt${k.fryers.length > 1 ? ' · ' + f.name : ''}, ${r.a} Uhr · ${r.b}`, {label:'Rückgängig', action:() => { k.log = k.log.filter(x => x.id !== r.id); save(); render(); }});
 }
 
 /* ---------- Team: wer heute im Dienst ist (jetzt / später / schon gegangen) ---------- */
@@ -155,7 +157,8 @@ renderDash = function(){
   const line = [closed ? `${DAYNAME[w]} ist Ruhetag` : 'Servicetag', esc(sTitle)].filter(Boolean).join(' · ');
   const backup = dhTry(() => typeof relBackupDue === 'function' && relBackupDue() ? dhRow({lead:ico('download'), title:'Sicherung speichern', sub:esc(relBackupLine()), rel:'backup', cls:'rel-remind'}) : '', 'Sicherung');
   dhOrders.fold = ''; const now = [dhTry(dhPrep, 'Vorbereitung'), dhTry(dhOrders, 'Bestellen'), dhTry(() => dhEk(D), 'Eigenkontrolle'), dhTry(dhDeliveries, 'Lieferungen'), dhTry(dhApart, 'Apartments'),
-    dhOrders.fold || '', dhRow({lead:ico('report'), title:'Verkäufe buchen', sub:'Zutaten werden vom Lager abgebucht', act:'sales', cls:'dh-sales past'}), backup].join('');
+    dhOrders.fold || '', dhRow({lead:ico('report'), title:'Verkäufe buchen', sub:'Zutaten werden vom Lager abgebucht', act:'sales', cls:'dh-sales past'}),
+    dhRow({lead:ico('download'), title:'Kassenbericht importieren', sub:'Artikelumsätze aus der Kasse', act:'plKasse', cls:'dh-kasse past'}), backup].join('');
   const team = [dhTry(dhWho, 'Dienst'), dhTry(() => dhChecks(D), 'Checklisten')].join('');
   const card = dhTry(dhCard, 'Karte');
   const live = specialsFor(t).length || S.menu.some(m => !m.hidden && m.days && m.days.includes(w));

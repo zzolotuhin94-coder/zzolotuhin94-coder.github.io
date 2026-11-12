@@ -1,6 +1,6 @@
-// fix1tests: gemeinsame Helfer (Server auf :8771). Feste Uhr: Donnerstag, 12.11.2026, 10:30, frische Beispieldaten je Browser-Kontext.
+// fix1tests: gemeinsame Helfer (Server auf :8765). Feste Uhr: Donnerstag, 12.11.2026, 10:30, frische Beispieldaten je Browser-Kontext.
 // Bilder vorher/nachher landen in FIX1_OUT (Standard: /home/user/review-out/fix1), sonst in tests/fix1-out.
-process.env.PORT = process.env.PORT || '8771';
+process.env.PORT = process.env.PORT || '8765';
 const E = require('../etests/lib'); const path = require('path'); const fs = require('fs');
 Object.assign(exports, E);
 exports.OUT = process.env.FIX1_OUT || (fs.existsSync('/home/user/review-out') ? '/home/user/review-out/fix1' : path.join(__dirname, '..', 'fix1-out'));

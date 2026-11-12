@@ -15,12 +15,13 @@ start = '/* ---------- Start ---------- */'
 a, b = R('ui2.js').split(start)                   # ui2.js: Oberfläche; der Start-Block läuft erst nach allen Modulen
 js = '\n'.join([R(f) for f in JS_BEFORE] + [a] + [R(f) for f in JS_MODULES] + [start + b])
 # Schriftgröße (Einstellungen › Anzeige): jede Schriftgröße in px wird zu calc(Npx * var(--fz,1)); am Bildschirm nichts unter 12 px.
-# Ausgenommen: Druck und PDF (@media print, #print), der Speisekarte-Gestalter (seine Seite ist ein festes A4-Blatt), @font-face.
+# Ausgenommen: Druck und PDF (@media print, #print), der Speisekarte-Gestalter (seine Seite ist ein festes A4-Blatt), @font-face,
+# das Allergen-Blatt und die Monatsmappe (.ab-*, .mp-*: ebenfalls feste A4-Blätter, deren kleine Schrift sonst auf 12 px wüchse und überliefe).
 FZ_SKIP_FILES = {'fonts.css', 'gestalter.css'}
 def fz(css):
     out = []; stack = []; i = 0; n = len(css); last = 0
     def skip():
-        return any(p.startswith('@media print') or '#print' in p or '.pdf' in p or p.startswith('@font-face') or p.startswith('@page') or p.startswith('@keyframes') for p in stack)
+        return any(p.startswith('@media print') or '#print' in p or '.pdf' in p or p.startswith('@font-face') or p.startswith('@page') or p.startswith('@keyframes') or _re.search(r'\.(ab|mp)-', p) for p in stack)
     def decl(txt):
         if skip(): return txt
         def one(m):

@@ -4,7 +4,7 @@
 :root{--fz:1}
 html[data-fz="2"]{--fz:1.125}
 html[data-fz="3"]{--fz:1.25}
-#print,.gs-page,.gs-sheet{--fz:1}
+#print,.gs-page,.gs-sheet,.ab-page{--fz:1}
 @media print{:root{--fz:1}}
 
 /* <small> ohne eigene Größe: nicht kleiner als 12 px (der Browser setzt sonst „smaller“) */
@@ -154,7 +154,8 @@ dialog form > .dlg-actions{position:sticky;bottom:0;z-index:3;margin:6px -22px -
 .ans-demo{margin:10px 0 0;color:var(--muted)}
 
 /* ---------- Bestellung und Wareneingang auf dem Tablet ---------- */
-@media (max-width:1180px){.grid2{grid-template-columns:minmax(0,1fr)}}
+/* nur die Bestellung: die Rezeptur (Kalkulation) behält am iPad quer Teller links und Kostenstruktur/Produktionsmenge rechts (fix2tests/x05) */
+@media (max-width:1180px){.grid2.ord-grid{grid-template-columns:minmax(0,1fr)}}
 /* Wareneingang bis 1000 px: jede Position eine Zeile mit drei Feldern nebeneinander (Geliefert, Preis, Status), nichts seitlich */
 @media (min-width:701px) and (max-width:1000px){
   .tbl-wrap:has(> table.otab.recv){overflow:visible}
@@ -182,6 +183,12 @@ dialog form > .dlg-actions{position:sticky;bottom:0;z-index:3;margin:6px -22px -
   table.lt td,table.lt th{padding-left:10px;padding-right:10px}
   table.lt th{letter-spacing:.03em}
   table.lt .lt-acts .icon-btn{display:none}
+}
+/* Bestellung, Tablet hoch (601–900 px): alle Spalten bis „Rechnungspreis“ ohne seitliches Wischen (fix1tests/x04) */
+@media (min-width:601px) and (max-width:900px){
+  table.otab th,table.otab td{padding-left:7px;padding-right:7px}
+  table.otab th:first-child,table.otab td:first-child{padding-left:16px}
+  table.otab th{letter-spacing:.02em}
 }
 /* Bestellen, Tablet hoch: Knöpfe der Lieferanten-Zeile in eine eigene Zeile darunter */
 @media (min-width:601px) and (max-width:900px){

@@ -75,7 +75,7 @@ const key = async (p, s) => { for(const k of s) await p.click(`#scSheet .sc-pad 
     L.ok(JSON.stringify(await ev(() => [S.invDraft.counts.weizen, S.invDraft.bar.weizen])) === JSON.stringify([2.6, {f:5, t:2}]), 'dazugezählt 1 + 0,8: 3,4 + 1,8 = 5,2 Flaschen = 2,6 l');
     await p.click('#scan [data-sc="close"]'); await p.waitForTimeout(250);
     L.ok(await ev(() => document.querySelector('#inv-weizen').value === '5' && document.querySelector('#ir-weizen .inv-t button.on').textContent === '0,2'), 'Zählliste: 5 Flaschen, Zehntel 0,2 markiert');
-    L.ok(await ev(() => { const st = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(); return st === '#121416'; }), 'dunkles Design aktiv');
+    L.ok(await ev(() => { const st = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(); return st === '#17181a'; }), 'dunkles Design aktiv'); /* fix3 hob den dunklen Hintergrund von #121416 auf #17181a an (ansicht.css, Kontrast) */
     errs.push(...p.errs); await b.close(); }
   await L.done(await L.launch(), errs);
 })();

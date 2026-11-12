@@ -4,8 +4,10 @@ const L = require('./lib');
   // 09:00: gestern vorbelegt
   let {p} = await run([2026, 11, 12, 9, 0]); const ev = (q, f, a) => q.evaluate(f, a);
   await ev(p, () => go('dash')); await p.waitForTimeout(250);
-  const hd = await ev(p, () => [...document.querySelectorAll('#app .page-h .row-btns button')].map(x => x.dataset.act + ':' + x.textContent.trim() + ':' + x.classList.contains('primary')));
-  L.ok(hd.join('|') === 'sales:Verkäufe buchen:false|plKasse:Kassenbericht importieren:false', 'Heute: „Kassenbericht importieren“ neben „Verkäufe buchen“, beide gleich ruhig', hd);
+  // fix3: das neue Heute hat keine Knopfreihe im Kopf mehr; jede Zeile ist selbst der Knopf. Beide Zeilen stehen direkt nacheinander in „Heute zu tun“, beide gleich ruhig (grau).
+  const hd = await ev(p, () => [...document.querySelectorAll('#app .dh-now .dh-r')].filter(r => r.querySelector('[data-act="sales"],[data-act="plKasse"]')).map(r => { const x = r.querySelector('.dh-b'); return x.dataset.act + ':' + r.querySelector('.rw-main b').textContent.trim() + ':' + (r.classList.contains('past') && !x.classList.contains('primary')); }));
+  const adj = await ev(p, () => { const a = document.querySelector('#app .dh-now [data-act="sales"]'); return !!a && a.closest('li').nextElementSibling === document.querySelector('#app .dh-now [data-act="plKasse"]').closest('li'); });
+  L.ok(hd.join('|') === 'sales:Verkäufe buchen:true|plKasse:Kassenbericht importieren:true' && adj, 'Heute: „Kassenbericht importieren“ neben „Verkäufe buchen“, beide gleich ruhig', hd);
   await p.click('#app [data-act="plKasse"]'); await p.waitForTimeout(250);
   L.ok(await ev(p, () => view.tab === 'report' && view.rp.tab === 'import'), '… öffnet den Kassen-Import');
   await ev(p, () => salesDlg()); await p.waitForTimeout(200);
