@@ -17,7 +17,7 @@ function ovSync(){
   if(on && !h.classList.contains('ov-on')){ const sb = Math.max(0, Math.min(30, Math.round(window.innerWidth - Math.min(h.clientWidth, document.body.getBoundingClientRect().width)))); h.style.setProperty('--sbw', sb + 'px'); h.classList.add('ov-on'); }
   else if(!on && h.classList.contains('ov-on')){ h.classList.remove('ov-on'); h.style.removeProperty('--sbw'); }
 }
-try { const mo = new MutationObserver(ovSync); mo.observe(document.body, {subtree:true, attributes:true, attributeFilter:['hidden', 'open'], childList:true}); } catch(e){}
+try { const mo = new MutationObserver(ovSync); mo.observe(document.body, {subtree:true, attributes:true, attributeFilter:['hidden', 'open']}); } catch(e){}
 
 /* ---------- Schnellsuche ----------
    Jedes Wort zählt für sich (zwei Wörter finden auch „Gästekarte PDF“), Umlaute egal,
