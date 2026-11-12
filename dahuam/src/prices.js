@@ -13,6 +13,15 @@ function priceFixDialog(ids){
     {ok:'Übernehmen', done:()=>`${priceFixDialog.n} Preise übernommen, Wareneinsatz neu berechnet`});
 }
 
+/* Preis je Gebinde oder je Einheit? pr: Preis aus der Liste, old: bisheriger Preis je Einheit, pq: Gebindegröße in der Einheit.
+   sure = aus dem bisherigen Preis eindeutig; sonst ist guess nur eine Vorbelegung und die Vorschau fragt. */
+function gebGuess(pr, old, pq, unitGiven){
+  const ratio = old > 0 ? pr / old : null;
+  if(ratio != null && Math.abs(ratio / pq - 1) <= 0.35 && Math.abs(ratio - 1) > 0.5) return {guess:'pack', sure:true};
+  if(ratio != null && ratio >= 0.6 && ratio <= 1.6) return {guess:'unit', sure:true};
+  // ohne bisherigen Preis: steht die Einheit (kg, l, Stk) in der Liste, gilt der Preis je Einheit (so steht es in der Vorlage); sonst fragen
+  return unitGiven ? {guess:'unit', sure:true} : {guess:'pack', sure:false};
+}
 /* Preisliste importieren */
 function plMatch(name, art){
   if(art){ const p = S.products.find(x => x.artNo && String(x.artNo).trim() === String(art).trim()); if(p) return p; }
@@ -30,9 +39,16 @@ function plAnalyse(text){
   const head = rows[0].map(h=>h.trim()); const idx = re => head.findIndex(h => re.test(h));
   const ci = {name: idx(/^(artikel|bezeichnung|produkt|name|artikelbezeichnung|beschreibung)$/i), art: idx(/^(art(ikel)?\.?\s*-?\s*(nr|nummer)\.?|sku|plu|code)$/i), price: idx(/^(preis|ek|ek-preis|einkaufspreis|netto|preis netto|nettopreis|price|preis\/einheit)$/i), unit: idx(/^(einheit|me|unit|vk-einheit)$/i), pack: idx(/^(gebinde|ve|verpackung|packung|inhalt)$/i)};
   if(ci.name < 0 || ci.price < 0) throw new Error('Spalten „Artikel“ und „Preis“ nicht gefunden. Erwartet z. B. „Artikelnr; Artikel; Einheit; Preis“.');
-  const lines = rows.slice(1).map(r => { const name = (r[ci.name]||'').trim(), art = ci.art>=0 ? (r[ci.art]||'').trim() : '', price = numDE(r[ci.price]); const p = plMatch(name, art); return {name, art, price, unit: ci.unit>=0 ? (r[ci.unit]||'').trim() : '', pack: ci.pack>=0 ? (r[ci.pack]||'').trim() : '', pid: p ? p.id : '', old: p ? +p.price : null}; }).filter(l => l.name && l.price > 0);
+  const lines = rows.slice(1).map(r => { const name = (r[ci.name]||'').trim(), art = ci.art>=0 ? (r[ci.art]||'').trim() : '', price = numDE(r[ci.price]); const p = plMatch(name, art); const unit = ci.unit>=0 ? (r[ci.unit]||'').trim() : '', pack = ci.pack>=0 ? (r[ci.pack]||'').trim() : '';
+    const l = {name, art, price, unit, pack, pid: p ? p.id : '', old: p ? +p.price : null};
+    // Gebinde: „Sack 10 kg“ 9,50 → je kg 0,95 (wenn eindeutig), sonst fragen
+    const bu = p ? p.unit : /^(stk|stück|st)$/i.test(unit) ? 'Stk' : /^(l|liter)$/i.test(unit) ? 'l' : 'kg'; const pq = pack ? impPack(pack, bu) : 0;
+    if(pq > 0 && Math.abs(pq - 1) > 1e-6){ const g = gebGuess(price, l.old || 0, pq, /^(kg|l|liter|stk|stück|st)$/i.test(unit)); l.pq = pq; l.bu = bu; l.gmode = g.guess; l.gsure = g.sure; }
+    return l; }).filter(l => l.name && l.price > 0);
   return {lines};
 }
+function plPer(l){ return l.pq && l.gmode === 'pack' ? l.price / l.pq : l.price; }
+function plJump(l){ if(!(l.old > 0)) return ''; const f = plPer(l) / l.old; return f >= 2 || f <= 0.5 ? `<small class="bad-t">Preis ${eur(l.old)} → ${eur(plPer(l))} (${f > 1 ? '+' : '−'}${num(Math.abs(f - 1) * 100, 0)} %), bitte prüfen</small>` : ''; }
 function plDialog(){
   const sups = (S.suppliers||[]);
   openDialog('Preisliste importieren', `<p class="dlg-p">CSV oder Excel-Liste des Lieferanten (oder aus der Rechnung abgetippt) mit Spalten <b>Artikel</b>, <b>Preis</b> netto und optional Artikelnr, Einheit, Gebinde. Erkannte Artikel werden aktualisiert, die Liste prüfen Sie vorher. Für eine ganze Artikelliste mit Lieferant, Gebinde und Allergenen: Einstellungen › Eigene Daten.</p>
@@ -43,13 +59,15 @@ function plDialog(){
     <div id="plOut"></div>`,
     fd => { const res = plDialog.res; if(!res) { toast('Bitte zuerst „Prüfen“'); return false; } let n = 0, add = 0; const sid = fd.get('sup');
       res.lines.forEach((l, i) => { const sel = fd.get('m_'+i); if(sel === 'skip' || sel == null) return;
-        if(sel === 'new'){ const unit = /^(stk|stück|st)$/i.test(l.unit) ? 'Stk' : /^(l|liter)$/i.test(l.unit) ? 'l' : 'kg'; const p = {id:uid('p'), name:l.name, unit, price:l.price, lossCold:0, lossHot:0, alg:'', algNone:false, pieceG:'', stock:0, minStock:0, loc:'L', supplier:sid||'', artNo:l.art, pack:l.pack, packQty:0}; markPrice(p, 'Preisliste'); S.products.push(p); add++; return; }
+        if(l.pq && (fd.get('g_'+i) || l.gmode) === 'pack'){ l = {...l, price:Math.round(l.price / l.pq * 10000) / 10000}; }
+        if(sel === 'new'){ const unit = /^(stk|stück|st)$/i.test(l.unit) ? 'Stk' : /^(l|liter)$/i.test(l.unit) ? 'l' : 'kg'; const p = {id:uid('p'), name:l.name, unit, price:l.price, lossCold:0, lossHot:0, alg:'', algNone:false, pieceG:'', stock:0, minStock:0, loc:'L', supplier:sid||'', artNo:l.art, pack:l.pack, packQty:l.pq||0}; markPrice(p, 'Preisliste'); S.products.push(p); add++; return; }
         const p = P(sel); if(!p) return; p.price = l.price; if(l.art) p.artNo = l.art; if(sid && !p.supplier) p.supplier = sid; markPrice(p, 'Preisliste'); n++; });
       plDialog.msg = `${n} Preise aktualisiert${add?`, ${add} Artikel neu angelegt`:''}`; plDialog.res = null; },
     {ok:'Preise übernehmen', done:()=>plDialog.msg, after: f => {
       plDialog.res = null;
       const show = () => { const res = plDialog.res; const opts = sel => `<option value="skip">nicht übernehmen</option><option value="new">als neuer Artikel</option>${[...S.products].sort(byName).map(p=>`<option value="${p.id}" ${sel===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}`;
-        $('#plOut').innerHTML = `<p class="hint">${res.lines.filter(l=>l.pid).length} von ${res.lines.length} Artikeln erkannt.</p><ul class="pl-list">${res.lines.map((l,i)=>`<li><span><b>${esc(l.name)}</b><small class="muted">${l.art?'Nr. '+esc(l.art)+' · ':''}${esc(l.unit||'')} ${l.old!=null?`· bisher ${eur(l.old)}`:''}</small></span><b class="mono">${eur(l.price)}</b><select name="m_${i}" class="sm-sel">${opts(l.pid || 'skip')}</select></li>`).join('')}</ul>`; };
+        $('#plOut').innerHTML = `<p class="hint">${res.lines.filter(l=>l.pid).length} von ${res.lines.length} Artikeln erkannt.</p><ul class="pl-list">${res.lines.map((l,i)=>`<li><span><b>${esc(l.name)}</b><small class="muted">${l.art?'Nr. '+esc(l.art)+' · ':''}${esc(l.unit||'')}${l.pack?' '+esc(l.pack):''} ${l.old!=null?`· bisher ${eur(l.old)}${l.bu?' je '+esc(l.bu):''}`:''}</small>${l.pq ? `<label class="imp-ctl pl-g">${eur(l.price)} gilt für<select name="g_${i}" class="sm-sel" data-plg="${i}"><option value="pack" ${l.gmode==='pack'?'selected':''}>${esc(l.pack)}, also ${eur(l.price/l.pq)} je ${esc(l.bu)}</option><option value="unit" ${l.gmode==='unit'?'selected':''}>1 ${esc(l.bu)}</option></select></label>${l.gsure ? '' : '<small class="bad-t">Bitte prüfen: Preis je Gebinde oder je Einheit?</small>'}` : ''}${plJump(l)}</span><b class="mono">${eur(plPer(l))}${l.pq && l.gmode==='pack' ? `<small class="muted" style="display:block;font-weight:400">je ${esc(l.bu)}</small>` : ''}</b><select name="m_${i}" class="sm-sel">${opts(l.pid || 'skip')}</select></li>`).join('')}</ul>`; };
+      f.addEventListener('change', e => { const t = e.target; if(t.dataset && t.dataset.plg != null && plDialog.res){ const l = plDialog.res.lines[+t.dataset.plg]; if(l){ l.gmode = t.value; l.gsure = true; show(); } } });
       const run = () => { try { plDialog.res = plAnalyse($('#plText').value); show(); } catch(x){ $('#plOut').innerHTML = `<p class="hint bad-t">${esc(x.message)}</p>`; } };
       $('#plCheck').onclick = run;
       $('#plSample').onclick = () => { const ex = [['romaine',3.95],['parmesan',19.8],['quail',0.29],['capers',12.4],['bread',3.1]].map(([id,pr]) => { const p = P(id); return p ? `${p.artNo||''};${p.name};${p.unit};${String(pr).replace('.',',')}` : ''; }).filter(Boolean); $('#plText').value = ['Artikelnr;Artikel;Einheit;Preis', ...ex, 'NEU-901;Sardellenfilets;kg;24,00'].join('\n'); run(); };

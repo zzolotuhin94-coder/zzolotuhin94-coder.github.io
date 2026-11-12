@@ -3,7 +3,7 @@
 const L = require('./lib');
 (async () => { const b = await L.launch(); const {p} = await L.open(b, L.TABLET);
   const ev = (f, a) => p.evaluate(f, a); const w = ms => p.waitForTimeout(ms);
-  const weLog = () => ev(() => S.checks.ek.log.filter(r => r.k === 'we' && !r.demo));
+  const weLog = () => ev(() => S.checks.ek.log.filter(r => r.k === 'we' && !r.demo && !r.nm));   // fix2: „ohne Messung“ wird eigens vermerkt und hier gesondert geprüft
   const recv = async id => { await ev(id => { view.stab = 'bestellung'; view.order = id; view.recv = id; go('buy'); }, id); await w(250); };
   // Bestellungen für den Test: nur Trockenware · Kühlware · Kühl- und Tiefkühlware
   const ids = await ev(() => { const mk = (sup, pids) => { const o = newOrder(sup, false); o.lines = pids.map(id => lineFor(P(id), 1)); o.status = 'sent'; o.sentAt = new Date().toISOString(); return o.id; };
@@ -19,7 +19,10 @@ const L = require('./lib');
   L.ok(f1.k && !f1.t && f1.ok && f1.n === 1 && f1.lines === 3 && f1.lim === 'Ihr Grenzwert: höchstens +4 °C' && !/gesetz|Verordnung|HACCP|vorgeschrieben/i.test(f1.txt), 'drei Kühlartikel, EIN Feld „Temperatur Kühlware“; darunter „Ihr Grenzwert: höchstens +4 °C“, kein Verweis auf Vorschriften', f1.lim);
   // überspringen
   await p.click('#app [data-act="rBook"]'); await w(300);
-  L.ok((await weLog()).length === 0 && await ev(id => ORD(id).status === 'delivered' && ORD(id).receipt.temp === '', ids.cold), 'Feld leer gelassen: eingebucht, nichts aufgezeichnet');
+  // fix2: früher „Feld leer gelassen: eingebucht, nichts aufgezeichnet“. Jetzt fragt die App einmal; „ohne Messung“ wird vermerkt.
+  L.ok(await ev(id => document.querySelector('#dlg').open && /Ohne Temperatur einbuchen/.test(document.querySelector('#dlgForm h3').textContent) && ORD(id).status === 'sent', ids.cold), 'Feld leer gelassen: die App fragt „Ohne Temperatur einbuchen?“');
+  await L.dlgOk(p); await w(250);
+  L.ok((await weLog()).length === 0 && await ev(id => { const r = S.checks.ek.log.find(x => x.nm && x.order === id); return ORD(id).status === 'delivered' && ORD(id).receipt.temp === 'Temperatur nicht gemessen' && r && r.kv === null && r.tv === null; }, ids.cold), 'ohne Messung eingebucht: in der Eigenkontrolle als „Temperatur nicht gemessen“ vermerkt');
   // im Bereich
   await recv(ids.cold2); await p.fill('#rTemp', '3,5 °C'); await p.click('#app [data-act="rBook"]'); await w(300);
   let log = await weLog();
@@ -64,7 +67,8 @@ const L = require('./lib');
   L.ok(log.length === 4 && log[0].tv === -12 && log[0].kv === null && log[0].out === 1 && log[0].sup === 'sup_gross' && log[0].ref === 'Pommes frites TK' && await ev(([s, id]) => P('fries').stock === s + 5 && S.moves[0].ek === id && S.moves[0].id === S.checks.ek.log[0].mv, [st0, log[0].id]), 'mit Notiz gebucht: Bestand +5, Eintrag hängt an Buchung und Lieferant', log[0]);
   // ---------- Übersicht und Korrektur ----------
   await L.go(p, 'checklisten');
-  L.ok(/Wareneingang zuletzt Do 12\.11\.: Tiefkühlware −12 °C · außerhalb/.test(await L.txt(p, '#app .ek-l[data-id="we"]')), 'Checklisten → Eigenkontrolle → Wareneingang zeigt den letzten Eintrag', await L.txt(p, '#app .ek-l[data-id="we"]'));
+  // fix2: über dem Grenzwert schaltet die App „Ware in Ordnung“ aus; darum steht jetzt auch „Ware nicht in Ordnung“ dabei
+  L.ok(/Wareneingang zuletzt Do 12\.11\.: Tiefkühlware −12 °C · Ware nicht in Ordnung · außerhalb/.test(await L.txt(p, '#app .ek-l[data-id="we"]')), 'Checklisten → Eigenkontrolle → Wareneingang zeigt den letzten Eintrag', await L.txt(p, '#app .ek-l[data-id="we"]'));
   await p.click('#app .ek-l[data-id="we"]'); await w(200);
   L.ok(await ev(() => document.querySelectorAll('#app .ek-log li').length === S.checks.ek.log.filter(r => r.k === 'we').length && document.querySelectorAll('#app .ek-log li.out').length === 4 && !document.querySelector('#app .ek-log b b') && /Ihr Grenzwert: Kühlware höchstens \+4 °C, Tiefkühlware höchstens −18 °C/.test(document.querySelector('#app .sub').textContent)), 'Seite „Wareneingang“: alle Einträge, Abweichungen erkennbar, Notiz mit <b> bleibt Text');
   await p.click('#app .ek-log li:nth-child(1) .ek-r'); await w(200);
@@ -72,7 +76,7 @@ const L = require('./lib');
   const cor = await ev(() => S.checks.ek.log[0]);
   L.ok(cor.tv === -18.5 && cor.out === 0 && cor.prev.length === 1 && cor.prev[0].tv === -12 && cor.cb === 'Anna' && /^2026-11-12/.test(cor.cat), 'Korrektur: neuer Wert, der alte bleibt am Eintrag (prev), dazu wer und wann', cor);
   const li = await ev(() => { const x = document.querySelector('#app .ek-log li'); return {s:x.querySelector('s').textContent, t:x.innerText.replace(/\s+/g, ' ')}; });
-  L.ok(li.s === 'Tiefkühlware −12 °C' && /Tiefkühlware −18,5 °C/.test(li.t) && /korrigiert von Anna am 12\.11\.2026/.test(li.t), 'in der Liste: alter Wert durchgestrichen, „korrigiert von Anna am 12.11.2026“', li.t);
+  L.ok(li.s === 'Tiefkühlware −12 °C · Ware nicht in Ordnung' && /Tiefkühlware −18,5 °C/.test(li.t) && !/−18,5 °C · Ware nicht/.test(li.t) && /vorher: Fahrer informiert/.test(li.t) && /korrigiert von Anna am 12\.11\.2026/.test(li.t), 'in der Liste: alter Wert durchgestrichen, „korrigiert von Anna am 12.11.2026“', li.t);
   // von Hand nachtragen
   await p.click('#app [data-act="ekWeNew"]'); await w(200); await L.dlgOk(p);
   L.ok(await ev(() => document.querySelector('#dlg').open && /Temperatur eintragen oder/.test(document.querySelector('#dlgForm .f-err').textContent)), 'von Hand: leerer Eintrag wird nicht gespeichert');
@@ -95,6 +99,9 @@ const L = require('./lib');
   await ev(() => { view.ck = {tab:'heute', ek:'we'}; go('checkl'); }); await w(200); await p.click('#app .ek-log li:nth-child(1) .ek-r'); await w(200);
   L.ok(await ev(() => document.querySelector('#dlg').open && !document.querySelector('#dlgDel')), 'Team darf korrigieren, aber nicht löschen');
   await p.click('#dlgCancel'); await L.chef(p); await ev(() => { view.ck = {tab:'heute', ek:'we'}; go('checkl'); }); await w(200);
-  const n0 = (await ev(() => S.checks.ek.log.length)); await p.click('#app .ek-log li:nth-child(1) .ek-r'); await w(200); await p.click('#dlgDel'); await w(200); await L.dlgOk(p); await w(200);
-  L.ok(await ev(n => S.checks.ek.log.length === n - 1, n0), 'Chef löscht einen Eintrag (mit Rückfrage)');
+  // fix2: früher „Chef löscht einen Eintrag (mit Rückfrage)“. Jetzt: stornieren mit Grund, der Eintrag bleibt.
+  const n0 = (await ev(() => S.checks.ek.log.length)); await p.click('#app .ek-log li:nth-child(1) .ek-r'); await w(200); await p.click('#dlgDel'); await w(200); await L.dlgOk(p); await w(150);
+  L.ok(await ev(() => document.querySelector('#dlg').open && /Grund/.test(document.querySelector('#dlgForm .f-err').textContent)), 'Stornieren ohne Grund geht nicht');
+  await p.fill('#dlgForm [name=why]', 'doppelt eingetragen'); await L.dlgOk(p); await w(200);
+  L.ok(await ev(n => S.checks.ek.log.length === n && S.checks.ek.log[0].void && S.checks.ek.log[0].void.why === 'doppelt eingetragen' && !!document.querySelector('#app .ek-log li.void s'), n0), 'Chef storniert einen Eintrag (mit Grund): er bleibt durchgestrichen stehen');
   await L.done(b, p.errs); })();

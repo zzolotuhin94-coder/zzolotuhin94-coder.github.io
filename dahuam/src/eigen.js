@@ -25,7 +25,7 @@ function ekMigrate(d){
   k.clean = (Array.isArray(k.clean) ? k.clean : []).filter(t => obj(t) && t.id && String(t.t || '').trim()).map(t => { t.t = String(t.t).slice(0, 90); t.area = String(t.area || '').slice(0, 30); t.when = EK_RHY[t.when] ? t.when : 'weekly';
     t.wd = t.when === 'weekly' ? (+t.wd >= 0 && +t.wd <= 6 ? +t.wd : 1) : null; t.md = t.when === 'monthly' ? Math.min(31, Math.max(1, Math.round(+t.md) || 1)) : null; if(!TM_DATE.test(t.since || '')) t.since = today; return t; });
   const cut = dAdd(today, -EK_KEEP_DAYS);
-  k.log = (Array.isArray(k.log) ? k.log : []).filter(r => obj(r) && r.id && (r.k === 'we' || r.k === 'oil') && TM_DATE.test(r.d || '') && r.d >= cut);
+  k.log = (Array.isArray(k.log) ? k.log : []).filter(r => obj(r) && r.id && (r.k === 'we' || r.k === 'oil' || r.k === 'ckv') && TM_DATE.test(r.d || '') && r.d >= cut);
   if(fresh && d.demo && d.team && d.team.demo){ try { ekDemo(d); } catch(e){ console.warn('Eigenkontrolle-Beispiel:', e); } }
   return d;
 }
@@ -75,9 +75,26 @@ function ekFryerName(id){ const f = ekFryer(id); return f ? f.name : 'Fritteuse'
 
 /* ---------- Wareneingang-Temperatur ---------- */
 function ekWeOutWhy(kv, tv, okc, lim){ const w = []; if(kv != null && kv > +lim.kuehl + 1e-9) w.push(`Kühlware ${ekT(kv)} (Ihr Grenzwert: ${ekLimTxt(lim.kuehl)})`); if(tv != null && tv > +lim.tk + 1e-9) w.push(`Tiefkühlware ${ekT(tv)} (Ihr Grenzwert: ${ekLimTxt(lim.tk)})`); if(okc === false) w.push('Ware nicht in Ordnung'); return w; }
-function ekLogWe(x){ const k = ekS(); const r = ekRec({k:'we', sup:x.sup || '', order:x.order || '', mv:x.mv || '', ref:x.ref || '', kv:x.kv == null ? null : x.kv, tv:x.tv == null ? null : x.tv, okc:x.okc !== false, note:String(x.note || '').slice(0, 160), lim:{...k.limits}}); if(x.d) r.d = x.d;
+function ekLogWe(x){ const k = ekS(); const r = ekRec({k:'we', sup:x.sup || '', order:x.order || '', mv:x.mv || '', ref:x.ref || '', kv:x.kv == null ? null : x.kv, tv:x.tv == null ? null : x.tv, okc:x.okc !== false, note:String(x.note || '').slice(0, 160), lim:{...k.limits}}); if(x.d) r.d = x.d; if(x.nm) r.nm = 1; if(x.oka && r.okc === false) r.oka = 1; if(x.ls) r.ls = String(x.ls).slice(0, 40); if(x.goods) r.goods = String(x.goods).slice(0, 160);
   r.out = ekWeOutWhy(r.kv, r.tv, r.okc, r.lim).length ? 1 : 0; k.log.unshift(r); return r; }
-function ekWeTxt(r){ return [r.kv != null ? 'Kühlware ' + ekT(r.kv) : '', r.tv != null ? 'Tiefkühlware ' + ekT(r.tv) : '', r.okc === false ? 'Ware nicht in Ordnung' : ''].filter(Boolean).join(' · ') || 'Ware in Ordnung'; }
+function ekWeTxt(r){ return [r.nm ? 'Temperatur nicht gemessen' : '', r.kv != null ? 'Kühlware ' + ekT(r.kv) : '', r.tv != null ? 'Tiefkühlware ' + ekT(r.tv) : '', r.okc === false ? 'Ware nicht in Ordnung' : ''].filter(Boolean).join(' · ') || 'Ware in Ordnung'; }
+/* Stornieren statt Löschen: der Eintrag bleibt durchgestrichen stehen, mit Grund, wer und wann */
+function ekLive(r){ return !r.void; }
+function ekVoidTxt(r){ return r.void ? `storniert von ${r.void.b} am ${fmtDate(r.void.at)}: ${r.void.why}` : ''; }
+function ekVoidDlg(text, onVoid){
+  if(!roGate()) return;
+  tmDialog('Eintrag stornieren', `<p class="dlg-p">${esc(text)}<br>Der Eintrag bleibt durchgestrichen sichtbar, auch in der Monatsmappe.</p><label class="f">Grund<input name="why" maxlength="120" placeholder="z. B. doppelt eingetragen, falsche Lieferung" autocomplete="off"></label>`,
+    (fd, f) => { const why = String(fd.get('why') || '').trim(); if(why.length < 3) return dlgErr(f.elements.why, 'Bitte kurz den Grund nennen.'); onVoid({why, b:tmWhoName(), at:new Date().toISOString()}); },
+    {ok:'Stornieren', done:'Storniert'});
+}
+/* Lieferant, der heute erwartet wird, sonst der zuletzt eingetragene */
+function ekSupGuess(){ const T = isoDate(new Date()); const o = (S.orders || []).find(o => o.status === 'sent' && o.deliveryDate === T && SUP(o.supplier)); if(o) return o.supplier; const r = ekS().log.find(r => r.k === 'we' && r.sup && SUP(r.sup)); return r ? r.sup : ''; }
+/* Wert außerhalb des Grenzwerts: „Ware in Ordnung“ geht aus (und wieder an, wenn der Wert passt und es die App ausgeschaltet hatte) */
+document.addEventListener('input', e => { const t = e.target; if(!t.matches || !t.matches('#rTemp,#rTempT,#ekK,#ekTk,#mvEkT')) return;
+  const box = t.closest('.recv-f,#dlgForm,#mvEk'); const ok = box && box.querySelector('#rOk,[name=okc],[name=ekOk]'); if(!ok) return; const lim = ekS().limits;
+  const out = [...box.querySelectorAll('#rTemp,#rTempT,#ekK,#ekTk,#mvEkT')].some(i => { const v = ekTemp(i.value); const tk = i.id === 'rTempT' || i.id === 'ekTk' || (i.id === 'mvEkT' && i.closest('#mvEk') && i.closest('#mvEk').dataset.kind === 't'); return v != null && !Number.isNaN(v) && v > +(tk ? lim.tk : lim.kuehl) + 1e-9; });
+  if(out && ok.checked){ ok.checked = false; ok.dataset.auto = '1'; } else if(!out && ok.dataset.auto){ ok.checked = true; delete ok.dataset.auto; }
+  const n = box.querySelector('#mvEkN'); if(n && out) n.hidden = false; });
 /* welche Felder eine Lieferung braucht: nur was aus Kühlhaus (K) oder Tiefkühler (T) dabei ist */
 function ekColdOf(pids){ const ps = pids.map(P).filter(Boolean); return {k:ps.some(p => p.loc === 'K'), t:ps.some(p => p.loc === 'T')}; }
 function ekFieldHtml(id, name, label, lim, val){ return `<label class="f ek-tf">${label}<span class="ek-tin"><input id="${id}" name="${name}" type="text" inputmode="text" autocomplete="off" value="${esc(val || '')}" placeholder="–" aria-label="${label}, in Grad Celsius"><span>°C</span></span><small>Ihr Grenzwert: ${esc(ekLimTxt(lim))}</small></label>`; }
@@ -86,17 +103,26 @@ function ekRecvFields(o){
   const cold = ekColdOf(o.lines.map(l => l.pid)); if(!cold.k && !cold.t) return ''; const dr = o.receiptDraft || {}; const lim = ekS().limits;
   return `${cold.k ? ekFieldHtml('rTemp', 'rTemp', 'Temperatur Kühlware', lim.kuehl, dr.temp) : ''}${cold.t ? ekFieldHtml('rTempT', 'rTempT', 'Temperatur Tiefkühlware', lim.tk, dr.tempT) : ''}<label class="tog ek-ok"><input type="checkbox" id="rOk" ${dr.cond === 'no' ? '' : 'checked'}><span></span>Ware in Ordnung</label>`;
 }
-/* vor dem Einbuchen: Eingaben lesen; außerhalb Ihres Grenzwerts oder „nicht in Ordnung“ → kurze Notiz, dann weiter */
+/* vor dem Einbuchen: Eingaben lesen; außerhalb Ihres Grenzwerts oder „nicht in Ordnung“ → kurze Notiz, dann weiter.
+   Mit Kühl- oder Tiefkühlware, aber ohne Temperatur: ausdrücklich „ohne Messung“ wählen; das wird vermerkt. */
+function ekRecvGoods(o){ return o.lines.map(l => P(l.pid)).filter(p => p && (p.loc === 'K' || p.loc === 'T')).map(p => p.name).filter((n, i, a) => a.indexOf(n) === i).join(', '); }
 function ekRecvCheck(o, done){
   const dr = o.receiptDraft || {}; const read = (sel, old) => { const n = $(sel); return n ? n.value : (old || ''); };
-  const kv = ekTemp(read('#rTemp', dr.temp)), tv = ekTemp(read('#rTempT', dr.tempT)); const okEl = $('#rOk'); const okc = okEl ? okEl.checked : dr.cond !== 'no';
+  const kv = ekTemp(read('#rTemp', dr.temp)), tv = ekTemp(read('#rTempT', dr.tempT)); const okEl = $('#rOk'); const okc = okEl ? okEl.checked : dr.cond !== 'no'; const oka = !!(okEl && okEl.dataset.auto);
   const bad = Number.isNaN(kv) ? '#rTemp' : Number.isNaN(tv) ? '#rTempT' : '';
   if(bad){ const n = $(bad); if(n){ n.classList.add('bad-in'); n.focus(); setTimeout(() => n.classList.remove('bad-in'), 1800); } toast('Temperatur bitte als Zahl eingeben, zum Beispiel 3,5 oder -18. Oder das Feld leer lassen.'); return; }
-  if(kv == null && tv == null && okc){ done(null); return; }
+  const cold = ekColdOf(o.lines.map(l => l.pid)); if(!cold.k && !cold.t){ done(null); return; }
+  const extra = {ls:String(read('#rNo', dr.noteNo) || '').trim(), goods:ekRecvGoods(o), oka};
+  if(kv == null && tv == null){
+    tmDialog('Ohne Temperatur einbuchen?', `<p class="dlg-p">In dieser Lieferung ist ${cold.k && cold.t ? 'Kühl- und Tiefkühlware' : cold.t ? 'Tiefkühlware' : 'Kühlware'}${extra.goods ? `: ${esc(extra.goods)}` : ''}. In der Eigenkontrolle steht dann „Temperatur nicht gemessen“.</p>
+      <label class="f">${okc ? 'Grund (freiwillig)' : 'Ware nicht in Ordnung: was haben Sie getan?'}<input name="note" maxlength="160" placeholder="${okc ? 'z. B. Thermometer nicht zur Hand' : 'z. B. Ware zurückgegeben, Chef informiert'}" autocomplete="off"></label>`,
+      (fd, f) => { const note = String(fd.get('note') || '').trim(); if(!okc && note.length < 3) return dlgErr(f.elements.note, 'Bitte kurz notieren, was getan wurde.'); setTimeout(() => done({kv:null, tv:null, okc, note, nm:1, ...extra}), 0); },
+      {ok:'Ohne Messung einbuchen', cancel:'Zurück und messen', toast:false});
+    return; }
   const why = ekWeOutWhy(kv, tv, okc, ekS().limits);
-  if(!why.length){ done({kv, tv, okc}); return; }
+  if(!why.length){ done({kv, tv, okc, ...extra}); return; }
   tmDialog('Wareneingang: außerhalb Ihres Grenzwerts', `<p class="dlg-p"><b>${why.map(esc).join('<br>')}</b><br>Was haben Sie getan?</p><label class="f">Kurze Notiz<input name="note" maxlength="160" placeholder="z. B. Ware zurückgegeben, Chef informiert" autocomplete="off"></label>`,
-    (fd, f) => { const note = String(fd.get('note') || '').trim(); if(note.length < 3) return dlgErr(f.elements.note, 'Bitte kurz notieren, was getan wurde.'); setTimeout(() => done({kv, tv, okc, note}), 0); }, {ok:'Mit Notiz einbuchen', toast:false});
+    (fd, f) => { const note = String(fd.get('note') || '').trim(); if(note.length < 3) return dlgErr(f.elements.note, 'Bitte kurz notieren, was getan wurde.'); setTimeout(() => done({kv, tv, okc, note, ...extra}), 0); }, {ok:'Mit Notiz einbuchen', toast:false});
 }
 /* Lieferung ohne Bestellung (ein Artikel): Feld nur bei Kühl- oder Tiefkühlware */
 function ekMoveFields(p){
@@ -107,35 +133,39 @@ function ekMoveFields(p){
 function ekMoveRead(fd, f, p){
   const box = f.querySelector('#mvEk'); if(!box || box.hidden) return null; const t = box.dataset.kind === 't';
   const v = ekTemp(fd.get('ekT')); if(Number.isNaN(v)) return dlgErr('ekT', 'Temperatur bitte als Zahl eingeben, zum Beispiel 3,5 oder -18. Oder das Feld leer lassen.');
-  const okc = !!fd.get('ekOk'); if(v == null && okc) return null;
-  const x = {kv:t ? null : v, tv:t ? v : null, okc, note:String(fd.get('ekNote') || '').trim()};
+  const okc = !!fd.get('ekOk'); if(v == null && okc) return null; const okb = f.querySelector('[name=ekOk]');
+  const x = {kv:t ? null : v, tv:t ? v : null, okc, oka:!!(okb && okb.dataset.auto), note:String(fd.get('ekNote') || '').trim(), goods:p ? p.name : ''};
   const why = ekWeOutWhy(x.kv, x.tv, okc, ekS().limits);
   if(why.length && x.note.length < 3){ f.querySelector('#mvEkN').hidden = false; return dlgErr('ekNote', `${why.join(' · ')}. Bitte kurz notieren, was getan wurde.`); }
   return x;
 }
-/* von Hand nachtragen oder korrigieren. Der alte Wert bleibt sichtbar. */
+/* von Hand nachtragen oder korrigieren. Der alte Wert bleibt sichtbar, mit seiner Notiz; die Korrektur bekommt ihre eigene. */
 function ekWeDlg(id){
-  const k = ekS(); const r = id ? k.log.find(x => x.id === id && x.k === 'we') : null; const lim = k.limits; const sups = (S.suppliers || []).filter(s => s.active !== false || (r && r.sup === s.id));
-  tmDialog(r ? 'Eintrag korrigieren' : 'Temperatur eintragen', `${r ? `<p class="dlg-p">${esc(ekDateTxt(r.d))}, ${esc(r.a)} Uhr · ${esc(r.b)}. Der bisherige Wert bleibt durchgestrichen sichtbar.</p>` : ''}
-    <label class="f">Lieferant<select name="sup"><option value="">ohne Angabe</option>${sups.map(s => `<option value="${s.id}" ${r && r.sup === s.id ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select></label>
+  const k = ekS(); const r = id ? k.log.find(x => x.id === id && x.k === 'we') : null; if(r && r.void) return; const lim = k.limits; const sup0 = r ? r.sup : ekSupGuess(); const sups = (S.suppliers || []).filter(s => s.active !== false || s.id === sup0);
+  tmDialog(r ? 'Eintrag korrigieren' : 'Temperatur eintragen', `${r ? `<p class="dlg-p">${esc(ekDateTxt(r.d))}, ${esc(r.a)} Uhr · ${esc(r.b)}: ${esc(ekWeTxt(r))}${r.note ? ` · ${esc(r.note)}` : ''}. Der bisherige Eintrag bleibt mit seiner Notiz durchgestrichen sichtbar.</p>` : ''}
+    <label class="f">Lieferant<select name="sup"><option value="">ohne Angabe</option>${sups.map(s => `<option value="${s.id}" ${sup0 === s.id ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select></label>
+    <div class="fields"><label class="f">Ware<input name="goods" maxlength="160" value="${esc(r ? r.goods || '' : '')}" placeholder="z. B. Faschiertes, Milch" autocomplete="off"></label><label class="f">Lieferschein-Nr.<input name="ls" maxlength="40" value="${esc(r ? r.ls || '' : '')}" placeholder="freiwillig" autocomplete="off"></label></div>
     <div class="fields">${ekFieldHtml('ekK', 'kv', 'Temperatur Kühlware', lim.kuehl, r && r.kv != null ? numIn(r.kv) : '')}${ekFieldHtml('ekTk', 'tv', 'Temperatur Tiefkühlware', lim.tk, r && r.tv != null ? numIn(r.tv) : '')}</div>
-    <label class="tog ek-ok"><input type="checkbox" name="okc" ${!r || r.okc !== false ? 'checked' : ''}><span></span>Ware in Ordnung</label>
-    <label class="f">Notiz<input name="note" maxlength="160" value="${esc(r ? r.note || '' : '')}" placeholder="bei Abweichung: was getan wurde" autocomplete="off"></label>`,
+    <label class="tog ek-ok"><input type="checkbox" name="okc" ${!r || r.okc !== false ? 'checked' : ''} ${r && r.oka ? 'data-auto="1"' : ''}><span></span>Ware in Ordnung</label>
+    <label class="f">${r ? 'Notiz zur Korrektur' : 'Notiz'}<input name="note" maxlength="160" value="" placeholder="${r ? 'z. B. nachgemessen, Tippfehler' : 'bei Abweichung: was getan wurde'}" autocomplete="off"></label>`,
     (fd, f) => { const kv = ekTemp(fd.get('kv')), tv = ekTemp(fd.get('tv')); if(Number.isNaN(kv)) return dlgErr('kv', 'Bitte eine Zahl eingeben, zum Beispiel 3,5.'); if(Number.isNaN(tv)) return dlgErr('tv', 'Bitte eine Zahl eingeben, zum Beispiel -18.');
-      const okc = !!fd.get('okc'), note = String(fd.get('note') || '').trim().slice(0, 160), sup = fd.get('sup') || '';
+      const okc = !!fd.get('okc'), oka = !!f.elements.okc.dataset.auto, note = String(fd.get('note') || '').trim().slice(0, 160), sup = fd.get('sup') || '', goods = String(fd.get('goods') || '').trim(), ls = String(fd.get('ls') || '').trim();
       if(kv == null && tv == null && okc) return dlgErr('kv', 'Bitte eine Temperatur eintragen oder „Ware in Ordnung“ abwählen.');
       const why = ekWeOutWhy(kv, tv, okc, lim); if(why.length && note.length < 3) return dlgErr('note', `${why.join(' · ')}. Bitte kurz notieren, was getan wurde.`);
-      if(!r){ ekLogWe({kv, tv, okc, note, sup}); return; }
-      if(r.kv === kv && r.tv === tv && r.okc === okc && (r.note || '') === note && (r.sup || '') === sup) return;
-      r.prev = (r.prev || []).concat([{kv:r.kv, tv:r.tv, okc:r.okc, note:r.note || '', sup:r.sup || '', b:r.cb || r.b, at:r.cat || r.at}]).slice(-8);
-      Object.assign(r, {kv, tv, okc, note, sup, cb:tmWhoName(), cat:new Date().toISOString(), lim:{...lim}}); r.out = why.length ? 1 : 0; },
-    {done:r ? 'Korrektur gespeichert' : 'Eingetragen', del: r && canEditAll() ? () => ask('Diesen Eintrag löschen? Er fehlt dann auch in der Monatsmappe.', () => { k.log = k.log.filter(x => x !== r); }) : null});
+      if(!r){ ekLogWe({kv, tv, okc, oka, note, sup, goods, ls}); return; }
+      const same = r.kv === kv && r.tv === tv && r.okc === okc && (r.sup || '') === sup;
+      if(same && !note){ if((r.goods || '') !== goods || (r.ls || '') !== ls){ r.goods = goods; r.ls = ls; } return; }
+      r.prev = (r.prev || []).concat([{kv:r.kv, tv:r.tv, okc:r.okc, note:r.note || '', sup:r.sup || '', nm:r.nm || 0, out:r.out || 0, b:r.cb || r.b, at:r.cat || r.at}]).slice(-8);
+      Object.assign(r, {kv, tv, okc, note, sup, goods, ls, cb:tmWhoName(), cat:new Date().toISOString(), lim:{...lim}}); delete r.nm; if(oka && !okc) r.oka = 1; else delete r.oka; r.out = why.length ? 1 : 0; },
+    {done:r ? 'Korrektur gespeichert' : 'Eingetragen', del: r && canEditAll() ? () => ekVoidDlg(`${ekDateTxt(r.d)}, ${r.a} Uhr: ${ekWeTxt(r)}`, v => { r.void = v; }) : null,
+     after: f => { const d = $('#dlgDel'); if(d) d.textContent = 'Stornieren'; }});
 }
 function ekCorrTxt(r){ return r.cb ? `korrigiert von ${r.cb} am ${fmtDate(r.cat)}` : ''; }
 function ekWePageHtml(){
   const k = ekS(); const list = k.log.filter(r => r.k === 'we').sort((a, b) => String(b.at).localeCompare(String(a.at))).slice(0, 60);
   const row = r => { const old = (r.prev || []).length ? r.prev[r.prev.length - 1] : null;
-    return `<li class="${r.out ? 'out' : ''}"><button type="button" class="ek-r" data-act="ekWeEdit" data-id="${r.id}"><span class="ek-rd"><b>${esc(ekDateTxt(r.d))}</b><small>${esc(r.a)} Uhr</small></span><span class="ek-rm"><b>${old ? `<s>${esc(ekWeTxt(old))}</s> ` : ''}${esc(ekWeTxt(r))}</b><small>${esc([ekSupName(r.sup) || r.ref || 'ohne Lieferant', r.b].filter(Boolean).join(' · '))}${r.note ? ` · <span class="ck-note">${esc(r.note)}</span>` : ''}${r.cb ? ` · ${esc(ekCorrTxt(r))}` : ''}</small></span></button></li>`; };
+    const inner = `<span class="ek-rd"><b>${esc(ekDateTxt(r.d))}</b><small>${esc(r.a)} Uhr</small></span><span class="ek-rm"><b>${old ? `<s>${esc(ekWeTxt(old))}</s> ` : ''}${r.void ? `<s>${esc(ekWeTxt(r))}</s>` : esc(ekWeTxt(r))}</b><small>${esc([ekSupName(r.sup) || r.ref || 'ohne Lieferant', r.goods || '', r.ls ? 'Lieferschein ' + r.ls : '', r.b].filter(Boolean).join(' · '))}${old && old.note ? ` · vorher: <span class="ck-note">${esc(old.note)}</span>` : ''}${r.note ? ` · <span class="ck-note">${esc(r.note)}</span>` : ''}${r.cb ? ` · ${esc(ekCorrTxt(r))}` : ''}${r.void ? ` · <span class="ek-void">${esc(ekVoidTxt(r))}</span>` : ''}</small></span>`;
+    return r.void ? `<li class="void"><div class="ek-r">${inner}</div></li>` : `<li class="${r.out ? 'out' : ''}"><button type="button" class="ek-r" data-act="ekWeEdit" data-id="${r.id}">${inner}</button></li>`; };
   return `<button type="button" class="back" data-act="ckBack">${ico('arrow')}Alle Listen</button>
     <div class="page-h ck-rh"><div><h1>Wareneingang</h1><p class="sub">Temperatur je Lieferung. Ihr Grenzwert: Kühlware ${esc(ekLimTxt(k.limits.kuehl))}, Tiefkühlware ${esc(ekLimTxt(k.limits.tk))}.</p></div><div class="row-btns"><button type="button" class="btn primary" data-act="ekWeNew">${ico('plus')}Temperatur eintragen</button></div></div>
     ${list.length ? `<ul class="ek-log">${list.map(row).join('')}</ul>` : '<section class="panel empty">Noch kein Eintrag. Beim Einbuchen einer Lieferung mit Kühl- oder Tiefkühlware fragt die App nach der Temperatur.</section>'}`;
@@ -143,7 +173,7 @@ function ekWePageHtml(){
 
 /* ---------- Frittieröl ---------- */
 function ekOilState(fr, D){
-  const k = ekS(); const log = k.log.filter(r => r.k === 'oil' && r.fr === fr.id).sort((a, b) => String(b.at).localeCompare(String(a.at)));
+  const k = ekS(); const log = k.log.filter(r => r.k === 'oil' && r.fr === fr.id && ekLive(r)).sort((a, b) => String(b.at).localeCompare(String(a.at)));
   const ch = log.find(r => r.t === 'wechsel') || null; const chk = log.find(r => r.t === 'check' && (!ch || String(r.at) > String(ch.at))) || null;
   const days = ch ? Math.max(0, ekDayDiff(ch.d, D)) : null; const I = +k.oilDays > 0 ? +k.oilDays : 0;
   const byCheck = !!(chk && chk.res === 'wechseln'); const byDays = !!(ch && I && days >= I);
@@ -151,13 +181,19 @@ function ekOilState(fr, D){
 }
 function ekOilTxt(st, D){ return st.ch ? `letzter Wechsel ${ekWhenTxt(st.ch.d, D)}` : 'noch kein Wechsel eingetragen'; }
 function ekOilDueTxt(st){ return !st.due ? '' : st.byCheck ? 'geprüft: wechseln' : st.over === 0 ? 'Wechsel heute fällig' : `Wechsel seit ${st.over === 1 ? '1 Tag' : st.over + ' Tagen'} fällig`; }
+/* wer trägt ein: vorgewählt ist, wer an diesem Gerät arbeitet; ein Tipp wählt jemand anderen aus dem Team */
+function ekWhoOpts(){ const me0 = tmWhoName(); const names = [me0].concat(tmS().people.filter(p => p.active).map(p => p.name)).filter((n, i, a) => n && a.indexOf(n) === i); return {me0, names}; }
+function ekOilResTxt(r){ return r.t === 'wechsel' ? 'Öl gewechselt' : 'Öl geprüft: ' + (r.res === 'wechseln' ? 'wechseln' : 'in Ordnung') + (r.tpm != null ? ` · ${num(r.tpm, 1)} % polare Anteile` : ''); }
 function ekOilDlg(kind){
-  const k = ekS(); if(!k.fryers.length) return; const D = isoDate(new Date());
-  tmDialog(kind === 'check' ? 'Öl geprüft' : 'Öl gewechselt', `${k.fryers.length > 1 ? `<label class="f">Fritteuse<select name="fr">${k.fryers.map(f => `<option value="${f.id}">${esc(f.name)}</option>`).join('')}</select></label>` : ''}
-    <label class="f">Datum<input name="d" type="date" max="${D}" value="${D}" required></label>
-    ${kind === 'check' ? `<fieldset class="ek-res"><legend>Ergebnis</legend><div class="togs"><label class="tog"><input type="radio" name="res" value="ok" checked><span></span>in Ordnung</label><label class="tog"><input type="radio" name="res" value="wechseln"><span></span>wechseln</label></div></fieldset>` : ''}`,
+  const k = ekS(); if(!k.fryers.length) return; const D = isoDate(new Date()); const w = ekWhoOpts();
+  tmDialog(kind === 'check' ? 'Öl geprüft' : 'Öl gewechselt', `${kind === 'check' ? `<fieldset class="ek-pick"><legend>Ergebnis</legend><label><input type="radio" name="res" value="ok" checked><span>In Ordnung</span></label><label><input type="radio" name="res" value="wechseln"><span>Wechseln</span></label></fieldset>` : ''}
+    ${k.fryers.length > 1 ? `<label class="f">Fritteuse<select name="fr">${k.fryers.map(f => `<option value="${f.id}">${esc(f.name)}</option>`).join('')}</select></label>` : ''}
+    <div class="fields">${kind === 'check' ? '<label class="f">Messwert, % polare Anteile<input name="tpm" type="text" inputmode="decimal" autocomplete="off" placeholder="freiwillig"></label>' : ''}<label class="f">Datum<input name="d" type="date" max="${D}" value="${D}" required></label></div>
+    <label class="f">Eingetragen von<select name="who">${w.names.map(n => `<option ${n === w.me0 ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></label>`,
     fd => { const d = String(fd.get('d') || ''); if(!TM_DATE.test(d) || d > D) return dlgErr('d', 'Bitte ein Datum bis heute wählen.');
-      const r = ekRec({k:'oil', fr:fd.get('fr') || k.fryers[0].id, t:kind === 'check' ? 'check' : 'wechsel'}); if(d !== r.d){ r.d = d; r.at = d + 'T23:59:00'; r.late = 1; } if(kind === 'check') r.res = fd.get('res') === 'wechseln' ? 'wechseln' : 'ok';
+      let tpm = null; if(kind === 'check' && String(fd.get('tpm') || '').trim()){ tpm = numParse(String(fd.get('tpm')).replace('%', '').trim()); if(!(tpm >= 0 && tpm <= 100)) return dlgErr('tpm', 'Bitte eine Zahl von 0 bis 100 eingeben, zum Beispiel 18.'); tpm = Math.round(tpm * 10) / 10; }
+      const r = ekRec({k:'oil', fr:fd.get('fr') || k.fryers[0].id, t:kind === 'check' ? 'check' : 'wechsel'}); const who = String(fd.get('who') || ''); if(who && w.names.includes(who)) r.b = who;
+      if(d !== r.d){ r.d = d; r.at = d + 'T23:59:00'; r.late = 1; } if(kind === 'check'){ r.res = fd.get('res') === 'wechseln' ? 'wechseln' : 'ok'; if(tpm != null) r.tpm = tpm; }
       k.log.unshift(r); ekOilDlg.last = r.id; },
     {toast:false});
   $('#dlg').addEventListener('close', () => { const id = ekOilDlg.last; ekOilDlg.last = null; if(!id) return; setTimeout(() => toast('Eingetragen', {action:() => { k.log = k.log.filter(x => x.id !== id); save(); render(); }}), 30); }, {once:true});
@@ -165,7 +201,7 @@ function ekOilDlg(kind){
 function ekOilPageHtml(D){
   const k = ekS(); const many = k.fryers.length > 1; const log = k.log.filter(r => r.k === 'oil').sort((a, b) => String(b.at).localeCompare(String(a.at))).slice(0, 40);
   const stat = k.fryers.map(f => { const st = ekOilState(f, D); return `<li class="${st.due ? 'due' : ''}"><span class="ek-rm"><b>${many ? esc(f.name) + ': ' : ''}${esc(ekOilTxt(st, D).replace(/^l/, 'L').replace(/^n/, 'N'))}</b><small>${st.due ? `<span class="bad-t">${esc(ekOilDueTxt(st))}</span>` : st.I ? `nächster Wechsel ${st.ch ? 'in ' + (st.I - st.days === 1 ? '1 Tag' : (st.I - st.days) + ' Tagen') : 'nach dem ersten Eintrag'}` : ''}${st.chk && !st.byCheck ? `${st.due || st.I ? ' · ' : ''}geprüft ${esc(ekWhenTxt(st.chk.d, D))}: in Ordnung` : ''}</small></span></li>`; }).join('');
-  const row = r => `<li><span class="ek-rd"><b>${esc(ekDateTxt(r.d))}</b><small>${r.late ? 'nachgetragen' : esc(r.a) + ' Uhr'}</small></span><span class="ek-rm"><b>${r.t === 'wechsel' ? 'Öl gewechselt' : 'Öl geprüft: ' + (r.res === 'wechseln' ? 'wechseln' : 'in Ordnung')}</b><small>${esc([many ? ekFryerName(r.fr) : '', r.b].filter(Boolean).join(' · '))}</small></span>${canEditAll() ? `<button type="button" class="icon-btn" data-act="ekDel" data-id="${r.id}" aria-label="Eintrag löschen" title="Eintrag löschen">${ico('trash')}</button>` : ''}</li>`;
+  const row = r => `<li class="${r.void ? 'void' : ''}"><span class="ek-rd"><b>${esc(ekDateTxt(r.d))}</b><small>${r.late ? 'nachgetragen' : esc(r.a) + ' Uhr'}</small></span><span class="ek-rm"><b>${r.void ? `<s>${esc(ekOilResTxt(r))}</s>` : esc(ekOilResTxt(r))}</b><small>${esc([many ? ekFryerName(r.fr) : '', r.b].filter(Boolean).join(' · '))}${r.void ? ` · <span class="ek-void">${esc(ekVoidTxt(r))}</span>` : ''}</small></span>${canEditAll() && !r.void ? `<button type="button" class="icon-btn" data-act="ekDel" data-id="${r.id}" aria-label="Eintrag stornieren" title="Eintrag stornieren">${ico('x')}</button>` : ''}</li>`;
   return `<button type="button" class="back" data-act="ckBack">${ico('arrow')}Alle Listen</button>
     <div class="page-h ck-rh"><div><h1>Frittieröl</h1><p class="sub">${k.oilDays ? `Ihr Intervall: Wechsel alle ${k.oilDays === 1 ? '1 Tag' : k.oilDays + ' Tage'}.` : 'Kein Intervall festgelegt.'}</p></div>
       <div class="row-btns"><button type="button" class="btn" data-act="ekOil" data-id="check">Öl geprüft</button><button type="button" class="btn primary" data-act="ekOil" data-id="wechsel">${ico('check')}Öl gewechselt</button></div></div>
@@ -264,7 +300,7 @@ function ekOverviewHtml(D){
   if(k.clean.some(t => !t.gone)) rows.push(li('clean', 'Reinigungsplan', ekCleanSub(d), d.cl.length > 0 && !d.open.length));
   if(k.fryers.length){ const sts = k.fryers.map(f => ({f, st:ekOilState(f, T)})); const many = sts.length > 1;
     rows.push(li('oil', 'Frittieröl', sts.map(x => `${many ? esc(x.f.name) + ': ' : ''}${esc(ekOilTxt(x.st, T))}${x.st.due ? ` · <span class="bad-t">${esc(ekOilDueTxt(x.st))}</span>` : ''}`).join(' · '), false)); }
-  const we = k.log.filter(r => r.k === 'we').sort((a, b) => String(b.at).localeCompare(String(a.at)))[0];
+  const we = k.log.filter(r => r.k === 'we' && ekLive(r)).sort((a, b) => String(b.at).localeCompare(String(a.at)))[0];
   rows.push(li('we', 'Wareneingang', we ? `zuletzt ${esc(ekDateTxt(we.d))}: ${esc(ekWeTxt(we))}${we.out ? ' · <span class="bad-t">außerhalb</span>' : ''}` : 'noch keine Temperatur eingetragen', false));
   return `<h2 class="ek-h">Eigenkontrolle</h2><ul class="ek-lists">${rows.join('')}</ul>`;
 }
@@ -286,7 +322,8 @@ function ekPageHtml(kind, D){ return kind === 'oil' ? ekOilPageHtml(isoDate(new 
 function ekHistDetail(D){
   const k = ekS(); const run = ckRun(D, EK_RUN); const rows = [];
   if(run) Object.keys(run.items).forEach(id => { const r = run.items[id]; const t = k.clean.find(x => x.id === id); rows.push(`<li class="on"><span class="ck-hs" aria-hidden="true">${ico('check')}</span><span class="ck-ht">${esc(t ? t.t : 'Gelöschte Aufgabe')}${r.due && r.due !== D ? `<small>fällig war ${esc(ekDateTxt(r.due))}</small>` : ''}</span><span class="ck-hw">${esc(r.b)} · ${r.a}</span></li>`); });
-  k.log.filter(r => r.d === D).forEach(r => rows.push(`<li class="on ${r.out ? 'out' : ''}"><span class="ck-hs" aria-hidden="true">${ico('check')}</span><span class="ck-ht">${r.k === 'we' ? `Wareneingang${ekSupName(r.sup) ? ' ' + esc(ekSupName(r.sup)) : ''}: ${esc(ekWeTxt(r))}` : `${esc(ekFryerName(r.fr))}: ${r.t === 'wechsel' ? 'Öl gewechselt' : 'Öl geprüft, ' + (r.res === 'wechseln' ? 'wechseln' : 'in Ordnung')}`}${r.note ? `<small>${esc(r.note)}</small>` : ''}</span><span class="ck-hw">${esc(r.b)} · ${r.late ? 'nachgetragen' : r.a}</span></li>`));
+  k.log.filter(r => r.d === D).forEach(r => { const what = r.k === 'we' ? `Wareneingang${ekSupName(r.sup) ? ' ' + esc(ekSupName(r.sup)) : ''}: ${esc(ekWeTxt(r))}` : r.k === 'ckv' ? `${esc(r.t)}: ${esc(ckVal(r.v))} ${esc(r.unit || '')}` : `${esc(ekFryerName(r.fr))}: ${r.t === 'wechsel' ? 'Öl gewechselt' : 'Öl geprüft, ' + (r.res === 'wechseln' ? 'wechseln' : 'in Ordnung')}`;
+    rows.push(`<li class="on ${r.out ? 'out' : ''} ${r.void ? 'void' : ''}"><span class="ck-hs" aria-hidden="true">${r.void ? '' : ico('check')}</span><span class="ck-ht">${r.void ? `<s>${what}</s>` : what}${r.note ? `<small>${esc(r.note)}</small>` : ''}${r.void ? `<small>${esc(ekVoidTxt(r))}</small>` : ''}</span><span class="ck-hw">${esc(r.b)} · ${r.late ? 'nachgetragen' : r.a}</span></li>`); });
   return rows.length ? `<div class="ck-hd"><h3>Eigenkontrolle<span>${rows.length === 1 ? '1 Eintrag' : rows.length + ' Einträge'}</span></h3><ul>${rows.join('')}</ul></div>` : '';
 }
 
@@ -300,30 +337,45 @@ function ekTempCols(days){
     if(has || due) cols.push({tp, it, cur}); }); });
   return cols;
 }
+/* erster Tag mit irgendeinem Eintrag (Checklisten, Reinigungsplan, Eigenkontrolle); vorher gibt es keine Aufzeichnung in der App */
+function ekFirstDay(){ const runs = ckS().runs; const ds = Object.keys(runs).filter(D => TM_DATE.test(D) && Object.keys(runs[D] || {}).length).concat(ekS().log.map(r => r.d)).sort(); return ds[0] || ''; }
 function ekMappeBlocks(ym){
   const c = ckS(), k = ekS(); const days = ekMonthDays(ym); const dev = []; const blocks = [];
   const dayCell = D => `<td class="mp-d">${esc(ekDateTxt(D))}</td>`;
+  // Tage vor dem ersten Eintrag in der App: ehrlich als „vor Beginn der Aufzeichnung“, eine Zeile statt vieler leerer
+  const first = ekFirstDay(); const pre = days.filter(D => !first || D < first), live = days.filter(D => first && D >= first);
+  const preRow = n => pre.length ? [`<tr class="mp-pre"><td colspan="${n + 1}">${esc(tmDm(pre[0]))}${pre.length > 1 ? '–' + esc(tmDm(pre[pre.length - 1])) : ''}: vor Beginn der Aufzeichnung${first ? ` (erster Eintrag am ${esc(tmDm(first))})` : ' (noch kein Eintrag)'}</td></tr>`] : [];
+  const voids = k.log.filter(r => r.k === 'ckv' && r.void && r.d.slice(0, 7) === ym);
+  voids.forEach(r => dev.push({D:r.d, what:r.t, val:`storniert: ${ckVal(r.v)} ${r.unit || ''}`, lim:'', note:`Grund: ${r.void.why}${r.note ? ' · Notiz damals: ' + r.note : ''}`, who:`${r.void.b}, ${fmtDate(r.void.at)} (eingetragen von ${r.b}, ${r.a})`}));
   // 1 · Temperaturen: je Tag eine Zeile, auch ohne Eintrag
   const cols = ekTempCols(days);
   for(let i = 0; i < Math.max(1, cols.length); i += 4){ const part = cols.slice(i, i + 4);
-    const rows = days.map(D => `<tr>${dayCell(D)}${part.map(({tp, it, cur}) => { const run = ckRun(D, tp.id); const r = run && run.items[it.id];
-      if(r && r.v != null){ if(r.out) dev.push({D, what:`${tp.name}: ${it.t}`, val:`${ckVal(r.v)} ${it.val.unit || ''}`, lim:`erlaubt ${ckRangeTxt(it.val)}`, note:r.note || '', who:`${r.b}, ${r.a}`});
-        (r.prev || []).forEach(p => dev.push({D, what:`${tp.name}: ${it.t}`, val:`korrigiert: ${ckVal(p.v)} → ${ckVal(r.v)} ${it.val.unit || ''}`, lim:'', note:`zuerst eingetragen von ${p.b}, ${p.a} Uhr`, who:`${r.b}, ${r.a}`}));
-        return `<td class="mp-v ${r.out ? 'out' : ''}"><b>${ckVal(r.v).replace('-', '−')}${r.out ? ' !' : ''}</b> <small>${esc(r.b)} ${r.a}</small></td>`; }
-      return cur && ckApplies(tp, D) ? '<td class="mp-v gap">kein Eintrag</td>' : '<td class="mp-v na">·</td>'; }).join('')}</tr>`);
+    const rows = preRow(part.length).concat(live.map(D => `<tr>${dayCell(D)}${part.map(({tp, it, cur}) => { const run = ckRun(D, tp.id); const r = run && run.items[it.id]; const u = it.val.unit || '';
+      if(r && r.v != null){ if(r.out) dev.push({D, what:`${tp.name}: ${it.t}`, val:`${ckVal(r.v)} ${u}`, lim:`erlaubt ${ckRangeTxt(it.val)}`, note:r.note || '', who:`${r.b}, ${r.a}`});
+        const ps = r.prev || [];
+        ps.forEach((p, j) => { if(p.out) dev.push({D, what:`${tp.name}: ${it.t}`, val:`${ckVal(p.v)} ${u}`, lim:`erlaubt ${ckRangeTxt(it.val)}`, note:p.note || '', who:`${p.b}, ${p.a}`});
+          const nx = ps[j + 1] || r; dev.push({D, what:`${tp.name}: ${it.t}`, val:`korrigiert: ${ckVal(p.v)} → ${ckVal(nx.v)} ${u}${nx.ck === 'nach' ? ' · Nachmessung' : nx.ck === 'tipp' ? ' · Tippfehler' : ''}`, lim:'', note:[`zuerst eingetragen von ${p.b}, ${p.a} Uhr`, !nx.out && nx.note ? nx.note : ''].filter(Boolean).join(' · '), who:`${nx.b}, ${nx.a}`}); });
+        const bang = r.out || (ps.some(p => p.out) && r.ck !== 'tipp');
+        return `<td class="mp-v ${bang ? 'out' : ''}"><b>${ckVal(r.v).replace('-', '−')}${bang ? ' !' : ''}</b> <small>${esc(r.b)} ${r.a}${ps.length ? ' · korr.' : ''}</small></td>`; }
+      if(voids.some(x => x.d === D && x.tp === tp.id && x.it === it.id)) return '<td class="mp-v gap">storniert</td>';
+      return cur && ckApplies(tp, D) ? '<td class="mp-v gap">kein Eintrag</td>' : '<td class="mp-v na">·</td>'; }).join('')}</tr>`));
     blocks.push({title:'Temperaturen' + (cols.length > 4 ? ` (${i / 4 + 1})` : ''), cls:'mp-temp', head:`<tr><th class="mp-d">Tag</th>${part.map(({tp, it}) => `<th>${esc(it.t)}<small>${esc(tp.name)} · ${esc(ckRangeTxt(it.val))}</small></th>`).join('')}</tr>`,
-      rows:cols.length ? rows : [], empty:'In den Checklisten gibt es keinen Messwert.', note:cols.length ? '„kein Eintrag“: Die Liste war fällig, der Wert wurde nicht eingetragen. · : an dem Tag nicht fällig. ! : außerhalb des Bereichs, siehe Abweichungen.' : ''}); }
+      rows:cols.length ? rows : [], empty:'In den Checklisten gibt es keinen Messwert.', note:cols.length ? '„kein Eintrag“: Die Liste war fällig, der Wert wurde nicht eingetragen. · : an dem Tag nicht fällig (Ruhetag oder nicht auf dem Plan). ! : außerhalb des Bereichs, siehe Abweichungen. korr.: korrigiert, siehe Abweichungen und Korrekturen.' : ''}); }
   // 2 · Wareneingang
   const we = k.log.filter(r => r.k === 'we' && r.d.slice(0, 7) === ym).sort((a, b) => String(a.at).localeCompare(String(b.at)));
-  we.forEach(r => { if(r.out) dev.push({D:r.d, what:'Wareneingang' + (ekSupName(r.sup) ? ' ' + ekSupName(r.sup) : ''), val:ekWeTxt(r), lim:`Ihr Grenzwert: Kühlware ${ekLimTxt((r.lim || k.limits).kuehl)}, Tiefkühlware ${ekLimTxt((r.lim || k.limits).tk)}`, note:r.note || '', who:`${r.b}, ${r.a}`});
-    (r.prev || []).forEach(p => dev.push({D:r.d, what:'Wareneingang' + (ekSupName(r.sup) ? ' ' + ekSupName(r.sup) : ''), val:`korrigiert: ${ekWeTxt(p)} → ${ekWeTxt(r)}`, lim:'', note:`zuerst eingetragen von ${p.b}`, who:`${r.cb || r.b}, ${fmtDate(r.cat || r.at)}`})); });
+  we.forEach(r => { const what = 'Wareneingang' + (ekSupName(r.sup) ? ' ' + ekSupName(r.sup) : ''); const limT = `Ihr Grenzwert: Kühlware ${ekLimTxt((r.lim || k.limits).kuehl)}, Tiefkühlware ${ekLimTxt((r.lim || k.limits).tk)}`;
+    if(r.out) dev.push({D:r.d, what, val:ekWeTxt(r), lim:limT, note:r.note || '', who:`${r.b}, ${r.a}`});
+    (r.prev || []).forEach(p => { if(p.out) dev.push({D:r.d, what, val:ekWeTxt(p) + ' (vor der Korrektur)', lim:limT, note:p.note || '', who:`${p.b}, ${p.at ? fmtDate(p.at) : r.a}`});
+      dev.push({D:r.d, what, val:`korrigiert: ${ekWeTxt(p)} → ${ekWeTxt(r)}`, lim:'', note:[`zuerst eingetragen von ${p.b}`, !r.out && r.note ? r.note : ''].filter(Boolean).join(' · '), who:`${r.cb || r.b}, ${fmtDate(r.cat || r.at)}`}); });
+    if(r.void) dev.push({D:r.d, what, val:'storniert: ' + ekWeTxt(r), lim:'', note:'Grund: ' + r.void.why, who:`${r.void.b}, ${fmtDate(r.void.at)} (eingetragen von ${r.b}, ${r.a})`}); });
   blocks.push({title:'Wareneingang', cls:'mp-we', head:'<tr><th class="mp-d">Tag</th><th>Lieferant</th><th class="mp-n">Kühlware</th><th class="mp-n">Tiefkühlware</th><th>Zustand</th><th>Wer, wann</th></tr>',
-    rows:we.map(r => `<tr>${dayCell(r.d)}<td>${esc(ekSupName(r.sup) || r.ref || 'ohne Angabe')}</td><td class="mp-n">${r.kv != null ? esc(ekT(r.kv)) + (r.kv > +(r.lim || k.limits).kuehl ? ' !' : '') : '–'}</td><td class="mp-n">${r.tv != null ? esc(ekT(r.tv)) + (r.tv > +(r.lim || k.limits).tk ? ' !' : '') : '–'}</td><td>${r.okc === false ? 'nicht in Ordnung !' : 'in Ordnung'}</td><td>${esc(r.b)}, ${r.a}${r.cb ? ' · korrigiert' : ''}</td></tr>`),
+    rows:we.map(r => `<tr class="${r.void ? 'mp-void' : ''}">${dayCell(r.d)}<td>${esc(ekSupName(r.sup) || r.ref || 'ohne Angabe')}${r.goods || r.ls ? `<small>${esc([r.goods || '', r.ls ? 'Lieferschein ' + r.ls : ''].filter(Boolean).join(' · '))}</small>` : ''}</td>${r.nm ? '<td class="mp-n gap" colspan="2">nicht gemessen</td>' : `<td class="mp-n">${r.kv != null ? esc(ekT(r.kv)) + (r.kv > +(r.lim || k.limits).kuehl ? ' !' : '') : '–'}</td><td class="mp-n">${r.tv != null ? esc(ekT(r.tv)) + (r.tv > +(r.lim || k.limits).tk ? ' !' : '') : '–'}</td>`}<td>${r.void ? 'storniert' : r.okc === false ? 'nicht in Ordnung !' : 'in Ordnung'}</td><td>${esc(r.b)}, ${r.a}${r.cb ? ' · korrigiert' : ''}</td></tr>`),
     empty:'In diesem Monat wurde keine Temperatur einer Lieferung eingetragen.'});
   // 3 · Frittieröl
   if(k.fryers.length || k.log.some(r => r.k === 'oil')){ const oil = k.log.filter(r => r.k === 'oil' && r.d.slice(0, 7) === ym).sort((a, b) => String(a.at).localeCompare(String(b.at)));
+    oil.filter(r => r.void).forEach(r => dev.push({D:r.d, what:ekFryerName(r.fr), val:'storniert: ' + ekOilResTxt(r), lim:'', note:'Grund: ' + r.void.why, who:`${r.void.b}, ${fmtDate(r.void.at)} (eingetragen von ${r.b}, ${r.a})`}));
     blocks.push({title:'Frittieröl', cls:'mp-oil', head:'<tr><th class="mp-d">Tag</th><th>Fritteuse</th><th>Eintrag</th><th>Wer, wann</th></tr>',
-      rows:oil.map(r => `<tr>${dayCell(r.d)}<td>${esc(ekFryerName(r.fr))}</td><td>${r.t === 'wechsel' ? 'Öl gewechselt' : 'Öl geprüft: ' + (r.res === 'wechseln' ? 'wechseln' : 'in Ordnung')}</td><td>${esc(r.b)}${r.late ? ', nachgetragen' : ', ' + r.a}</td></tr>`),
+      rows:oil.map(r => `<tr class="${r.void ? 'mp-void' : ''}">${dayCell(r.d)}<td>${esc(ekFryerName(r.fr))}</td><td>${esc(ekOilResTxt(r))}${r.void ? ' · storniert' : ''}</td><td>${esc(r.b)}${r.late ? ', nachgetragen' : ', ' + r.a}</td></tr>`),
       empty:'In diesem Monat wurde kein Ölwechsel und keine Prüfung eingetragen.'}); }
   // 4 · Reinigungsplan
   const recs = new Map(); Object.keys(c.runs).forEach(D => { const r = c.runs[D][EK_RUN]; if(r) Object.keys(r.items).forEach(id => { const x = r.items[id]; recs.set(id + '|' + (x.due || D), Object.assign({d:D}, x)); }); });
@@ -334,7 +386,7 @@ function ekMappeBlocks(ym){
     else occ.forEach(D => { const r = recs.get(t.id + '|' + D); cr.push(`<tr>${head}<td>${esc(ekDateTxt(D))}</td>${r ? `<td>${esc(ekDateTxt(r.d))} · ${esc(r.b)}, ${r.a}</td>` : '<td class="gap">nicht abgehakt</td>'}</tr>`); }); });
   if(k.clean.length) blocks.push({title:'Reinigungsplan', cls:'mp-cl', head:'<tr><th>Aufgabe</th><th>Fällig</th><th>Erledigt</th></tr>', rows:cr, empty:'In diesem Monat war keine Aufgabe fällig.'});
   // 5 · Checklisten Tag für Tag
-  const lr = []; days.forEach(D => { const due = ckDue(D); if(!due.length){ lr.push(`<tr class="cp-d mp-gap">${dayCell(D)}<td colspan="4">${tmClosed(D) ? 'Ruhetag, keine Liste fällig' : 'keine Liste fällig'}</td></tr>`); return; }
+  const lr = preRow(4); live.forEach(D => { const due = ckDue(D); if(!due.length){ lr.push(`<tr class="cp-d mp-gap">${dayCell(D)}<td colspan="4">${tmClosed(D) ? 'Ruhetag, keine Liste fällig' : 'keine Liste fällig'}</td></tr>`); return; }
     due.forEach((tp, i) => { const run = ckRun(D, tp.id) || {items:{}}; const pr = ckProg(tp, D); const rs = Object.values(run.items); const who = [...new Set(rs.map(r => r.b))].join(', '); const times = rs.map(r => r.a).sort(); const first = times[0], last = times[times.length - 1];
       const open = pr.full ? [] : tp.items.filter(it => !run.items[it.id]).map(it => esc(it.t));
       lr.push(`<tr class="${i ? '' : 'cp-d'}">${i ? '<td class="mp-d"></td>' : dayCell(D)}<td>${esc(tp.name)}</td><td class="cp-n">${pr.done} von ${pr.total}${pr.full ? '' : pr.over ? (pr.started ? ' · nicht fertig' : ' · nicht gemacht') : ' · offen'}</td><td>${who ? `${esc(who)}${first ? `, ${first}${last !== first ? '–' + last : ''} Uhr` : ''}` : '<span class="gap">kein Eintrag</span>'}</td><td class="cp-o">${open.length && pr.started ? 'Offen: ' + open.join('; ') : ''}</td></tr>`); }); });
@@ -349,12 +401,12 @@ function ekMappeBlocks(ym){
 function ekMappe(ym){
   const {blocks, days, nDev} = ekMappeBlocks(ym); const [y, m] = ym.split('-').map(Number); const part = ym === ckToday().slice(0, 7);
   const head = `<header class="ab-h"><div><b>${abU(S.settings.name)}</b><h1>Eigenkontrolle · ${MONTHS[m - 1]} ${y}</h1></div><div class="ab-meta"><span>${days.length ? `${tmDm(days[0])} bis ${tmDm(days[days.length - 1])}${part ? ' (laufender Monat)' : ''}` : 'noch keine Tage'}</span><span>erstellt am ${fmtDate(new Date().toISOString())} von ${esc(me().name)}</span><span class="ab-pn" data-ab-n="1"></span></div></header>`;
-  const foot = '<footer class="ab-f"><p>Eigene Aufzeichnung des Betriebs, erstellt mit der Küchen-App. Die Angaben stammen aus den Einträgen des Teams. Wo nichts eingetragen wurde, steht „kein Eintrag“.</p></footer>';
+  const foot = '<footer class="ab-f"><p>Eigene Aufzeichnung des Betriebs, erstellt mit der Küchen-App. Die Angaben stammen aus den Einträgen des Teams. Wo nichts eingetragen wurde, steht „kein Eintrag“.</p><div class="mp-sig-l"><span>Geprüft (Name)</span><span>Datum</span><span>Unterschrift</span></div></footer>';
   let host = document.getElementById('abMeasure'); if(!host){ host = document.createElement('div'); host.id = 'abMeasure'; host.className = 'ab-measure'; host.setAttribute('aria-hidden', 'true'); document.body.appendChild(host); }
   host.innerHTML = ''; const pages = []; let body = null;
   const newPage = () => { const p = document.createElement('article'); p.className = 'ab-page mp-page'; p.innerHTML = `${head}<div class="ab-body"></div>${foot}`; host.appendChild(p); pages.push(p); body = p.querySelector('.ab-body'); };
   const fits = () => { const last = body.lastElementChild; return !last || last.getBoundingClientRect().bottom <= body.getBoundingClientRect().bottom - 4; };   // etwas Luft am Blattende
-  const open = (b, cont) => { const s = document.createElement('section'); s.className = 'mp-sec ' + b.cls; s.innerHTML = `<h2>${esc(b.title)}${cont ? '<span>Fortsetzung</span>' : ''}</h2>${b.rows.length ? `<table class="mp-t"><thead>${b.head}</thead><tbody></tbody></table>` : `<p class="mp-empty">${esc(b.empty)}</p>`}`; body.appendChild(s); return s; };
+  const open = (b, cont) => { const s = document.createElement('section'); s.className = 'mp-sec ' + b.cls; s.innerHTML = `<h2>${esc(b.title)}${cont ? '<span>Fortsetzung</span>' : ''}</h2>${b.html ? b.html : b.rows.length ? `<table class="mp-t"><thead>${b.head}</thead><tbody></tbody></table>` : `<p class="mp-empty">${esc(b.empty)}</p>`}`; body.appendChild(s); return s; };
   newPage();
   blocks.forEach(b => {
     if(b.page && body.children.length) newPage();
@@ -394,11 +446,17 @@ document.addEventListener('click', e => {
     case 'ekOil': ekOilDlg(id === 'check' ? 'check' : 'wechsel'); break;
     case 'ekWeNew': ekWeDlg(null); break;
     case 'ekWeEdit': ekWeDlg(id); break;
-    case 'ekDel': { if(!roGate()) break; const k = ekS(); const r = k.log.find(x => x.id === id); if(r) ask('Diesen Eintrag löschen? Er fehlt dann auch in der Monatsmappe.', () => { k.log = k.log.filter(x => x !== r); }); break; }
+    case 'ekDel': { const k = ekS(); const r = k.log.find(x => x.id === id); if(r && !r.void) ekVoidDlg(`${ekDateTxt(r.d)}: ${r.k === 'oil' ? ekOilResTxt(r) : ekWeTxt(r)}`, v => { r.void = v; }); break; }
     case 'ekCleanEdit': ekCleanDlg(); break;
     case 'ekSetup': ekSetupDlg(); break;
   }
 });
+
+/* von Hand umgeschaltet: die App schaltet „Ware in Ordnung“ nicht mehr von selbst um */
+document.addEventListener('change', e => { const t = e.target; if(t && t.matches && t.matches('#rOk,[name=okc],[name=ekOk]')) delete t.dataset.auto; });
+/* Checklisten in der Navigation noch einmal antippen: zurück zur Übersicht */
+const _navGoCk = navGo;
+navGo = function(k){ if(k === 'checkl' && view.tab === 'checkl' && view.ck){ view.ck.run = null; view.ck.ek = null; view.ck.tab = 'heute'; } return _navGoCk(k); };
 
 /* ---------- Hilfe ---------- */
 H('eigenkontrolle','Eigenkontrolle','Was Sie für sich selbst aufschreiben: Temperaturen, Reinigung, Frittieröl. Die App hilft beim Aufschreiben und Sammeln. Sie prüft nichts und ersetzt keine behördlich verlangten Aufzeichnungen.',1);

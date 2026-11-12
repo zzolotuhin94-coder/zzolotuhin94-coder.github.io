@@ -191,3 +191,8 @@ table.recv td[data-l="Preis lt. Rechnung"] .qty{display:inline-grid;grid-templat
 }
 .sh-chip.used{opacity:1;background:var(--surface-2);border-style:dashed}
 .sh-chip.used b{color:var(--muted);font-weight:500}
+/* Ungespeicherte Eingaben: eine ruhige Rückfrage an der Stelle der Knöpfe */
+.dlg-discard{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:6px;padding-top:10px;border-top:1px solid var(--line-strong)}
+.dlg-discard span{flex:1 1 160px;font-weight:600}
+.dlg-discard .btn{min-height:40px}
+.dlg-actions[hidden]{display:none}

@@ -17,9 +17,10 @@ Die vollständigen Lizenztexte liegen im Ordner `licenses/`.
 | html2canvas.min.js | Bibliothek | html2canvas 1.4.1 | MIT | 194 KB |
 | jspdf.umd.min.js | Bibliothek | jspdf 2.5.1 | MIT | 356 KB |
 | xlsx.full.min.js | Bibliothek | xlsx 0.18.5 | Apache-2.0 | 861 KB |
+| zxing-library.min.js | Bibliothek | @zxing/library 0.21.3 | Apache-2.0 | 328 KB |
 
 - **OFL-1.1** (SIL Open Font License): Schriften dürfen verwendet, eingebettet und weitergegeben werden; die Lizenz muss beiliegen, die Schriften dürfen nicht einzeln verkauft werden.
 - **MIT** (html2canvas © Niklas von Hertzen, jsPDF © James Hall, yWorks GmbH und Mitwirkende): Verwendung frei, Copyright-Hinweis muss erhalten bleiben.
-- **Apache-2.0** (SheetJS Community Edition © SheetJS LLC): Verwendung frei, Lizenz- und Copyright-Hinweis müssen erhalten bleiben.
+- **Apache-2.0** (SheetJS Community Edition © SheetJS LLC; ZXing © ZXing-Autoren, TypeScript-Fassung © zxing-js-Mitwirkende): Verwendung frei, Lizenz- und Copyright-Hinweis müssen erhalten bleiben.
 
 Von den Schriften sind nur die Teile „latin“ und „latin-ext“ und nur die Schnitte enthalten, die die App zeichnet.

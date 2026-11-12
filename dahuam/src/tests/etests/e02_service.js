@@ -75,7 +75,7 @@ const L = require('./lib');
   await ev(() => { S.menu.find(m => m.name === 'Elsässer').hidden = true; save(); render(); });
   L.ok(await row('Elsässer') === null, 'von der Karte genommen: nicht mehr in der Service-Liste');
   // ---------- Rezepte → Service ----------
-  await L.go(p, 'rezepte'); await p.click('#app .rz-sw [data-id="service"]'); await w(150);
+  await L.go(p, 'rezepte'); await ev(() => { view.ctype = 'all'; render(); }); await p.click('#app .rz-sw [data-id="service"]'); await w(150);   // fix2: Filter steht sonst auf „Gerichte“
   L.ok(await ev(() => { const t = document.querySelector('#app .lt-wrap').innerText; return /Allergene/i.test(t) && !/Wareneinsatz/i.test(t) && document.querySelectorAll('#app table.lt tbody tr').length === S.cards.filter(c => c.type !== 'semi').length && /nicht auf der Karte/i.test(t.replace(/\s+/g, ' ')); }), 'Rezepte, Schalter „Service“: Gerichte und Getränke mit Allergenen und Kartenpreis, keine Basisrezepte');
   await p.click('#app [data-act="svGo"]'); await w(200);
   L.ok(await ev(() => location.hash) === '#speisekarte/service', 'von dort ein Link zur Service-Liste');

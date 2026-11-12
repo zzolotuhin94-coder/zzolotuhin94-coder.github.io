@@ -38,7 +38,7 @@ await ev(()=>{view.stab='bestand';go('stock')});await p.waitForTimeout(200);ok(a
 await ev(()=>go('cards'));await p.waitForTimeout(200);await p.locator('#app tr.row .row-open').first().focus();await p.keyboard.press('Enter');await p.waitForTimeout(250);ok(await ev(()=>!!view.card),'Enter on a focused row opens the recipe');
 ok(await ev(()=>{go('menu');return [...document.querySelectorAll('#app input[type=search]')].every(i=>i.getAttribute('aria-label'))}),'search inputs have aria-labels');
 await ev(()=>palOpen());await p.fill('#palIn','schn');await p.waitForTimeout(150);
-const pal=await ev(()=>palItems.slice(0,6).map(x=>x.n));ok(/^Wiener Schnitzel · vom/.test(pal.find(x=>/Schnitzel/.test(x)))&&pal.slice(0,3).every(n=>/(^|[\s„-])schn/i.test(n)),'palette: word-start matches first, variant shown',pal);
+const pal=await ev(()=>palItems.slice(0,6).map(x=>x.n));const ws=pal.map(n=>/(^|[\s„-])schn/i.test(n));ok(/^Wiener Schnitzel · vom/.test(pal.find(x=>/Schnitzel/.test(x)))&&ws[0]&&ws[1]&&ws.slice(ws.indexOf(false)).every(x=>!x),'palette: word-start matches first, variant shown',pal); // fix-3: je Gericht nur ein Treffer, daher stehen weniger Wortanfang-Treffer oben
 const ono=await ev(()=>S.orders[2].no);await p.fill('#palIn',ono.slice(-4));await p.waitForTimeout(150);ok(await ev(n=>palItems.some(x=>x.g==='Bestellung'&&x.n===n),ono),'palette finds orders by number',ono);
 await p.keyboard.press('Enter');await p.waitForTimeout(250);ok(await ev(()=>view.tab==='buy'&&!!view.order),'…and opens it');
 // dialog closes on backdrop click, not when dragging out
@@ -48,16 +48,16 @@ ok(await ev(()=>$('#dlg').open),'drag from field to outside keeps the dialog ope
 await p.mouse.click(5,5);await p.waitForTimeout(150);ok(!(await ev(()=>$('#dlg').open)),'click on the backdrop closes the dialog');
 // ---------- 14/15 Heute & Einkauf agree
 for(const [h,m] of [[9,30],[23,30]]){await ev(([h,m])=>{nowMin=()=>h*60+m;go('dash')},[h,m]);await p.waitForTimeout(200);
- const d=await ev(()=>{const t=todayStr();const due=S.suppliers.filter(s=>s.active&&s.orderDays.includes(wd(t)));return {states:due.map(s=>s.name+':'+supToday(s).state),sub:document.querySelector('.page-h .sub').textContent,secs:[...document.querySelectorAll('.day-h')].map(h=>h.firstChild.textContent),fold:document.querySelector('.rw-more')?.textContent||'',rows:[...document.querySelectorAll('.day-sec:has(.rw-more) .rw:not(.rw-fold) .rw-main b, .day-sec .rw:not(.past) .rw-main b')].length}});
+ const d=await ev(()=>{const t=todayStr();const due=S.suppliers.filter(s=>s.active&&s.orderDays.includes(wd(t)));return {states:due.map(s=>s.name+':'+supToday(s).state),sub:document.querySelector('.page-h .dh-sub').textContent,rows:[...document.querySelectorAll('#app .dh-now > .rows > li')].map(li=>li.matches('.dh-ord:not(.past)')?'Bestellen':li.matches('.rw-fold')?'vorbei':li.matches('.dh-recv')?'Lieferungen prüfen':li.matches('.ek-dash')?'Eigenkontrolle':'sonst'),fold:document.querySelector('.rw-more')?.textContent||''}});
  await ev(()=>{view.stab='bestellung';view.order=null;go('buy')});await p.waitForTimeout(200);
  const e=await ev(()=>[...document.querySelectorAll('.oc')].map(c=>c.querySelector('h3').textContent+':'+c.querySelector('.cd').textContent));
  const agree=d.states.every(s=>{const [n,st]=s.split(':');const c=e.find(x=>x.startsWith(n+':'))||'';return st==='sent'?/heute bestellt/.test(c):st==='past'?/Annahmeschluss vorbei/.test(c):/noch/.test(c)});
  ok(agree,`${h}:${m} Heute and Einkauf show the same supplier state`,[d.states,e]);
- if(h===23){ok(/Annahmeschluss vorbei/.test(d.sub)&&!/offen|bis \d\d:\d\d/.test(d.sub),'after cut-off: subtitle does not claim open orders',d.sub);
-  ok(/Annahmeschluss heute vorbei: \d+ Lieferant(en)? · anzeigen/.test(d.fold),'past rows collapsed into one line',d.fold);
-  ok(d.secs.indexOf('Lieferungen prüfen')>=0&&d.secs.indexOf('Lieferungen prüfen')<d.secs.lastIndexOf('Bestellen'),'actionable „Lieferungen prüfen“ comes first',d.secs);
+ if(h===23){ok(!/offen|bis \d\d:\d\d/.test(d.sub)&&!d.rows.includes('Bestellen'),'after cut-off: Heute does not claim open orders',[d.sub,d.rows]); // fix-3: Heute ohne Bestell-Satz im Kopf, je Lieferant eine Zeile
+  ok(/Annahmeschluss vorbei: \d+ Lieferant(en)? · anzeigen/.test(d.fold),'past rows collapsed into one line',d.fold);
+  ok(d.rows.indexOf('Lieferungen prüfen')>=0&&d.rows.indexOf('Lieferungen prüfen')<d.rows.indexOf('vorbei'),'actionable „Lieferungen prüfen“ comes first',d.rows);
   await ev(()=>go('dash'));await p.click('.rw-more');await p.waitForTimeout(200);ok(await p.locator('.rw.past:not(.rw-fold)').count()>=1&&/ausblenden/.test(await p.locator('.rw-more').innerText()),'„anzeigen“ expands the past rows');}
- else ok(/offen, bis/.test(d.sub)&&d.secs[0]==='Bestellen','before cut-off: open orders first',[d.sub,d.secs]);}
+ else ok(d.rows.indexOf('Bestellen')>=0&&d.rows.indexOf('Bestellen')<d.rows.indexOf('Eigenkontrolle')&&d.rows.indexOf('Bestellen')<d.rows.indexOf('Lieferungen prüfen'),'before cut-off: open orders first',d.rows);} // fix-3: oben steht die Vorbereitung, dann je offenem Lieferanten eine Zeile
 await ev(()=>{view.stab='bestellung';view.order=null;setV('buy','list');go('buy')});await p.waitForTimeout(250);
 ok(await ev(()=>[...document.querySelectorAll('.oc .row-btns .btn')].every(b=>{const r=b.getBoundingClientRect(),c=b.closest('.oc').getBoundingClientRect();return r.right<=c.right+1&&r.left>=c.left-1})),'„Wie zuletzt“ not clipped at 1440');
 ok(await ev(()=>[...document.querySelectorAll('.lo .tot-l, .olist .tot-l')].length>3&&[...document.querySelectorAll('.tot-l')].every(x=>/bestellt|geliefert/.test(x.textContent))),'order totals labelled bestellt / geliefert');

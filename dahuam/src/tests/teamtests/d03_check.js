@@ -61,9 +61,11 @@ await ev(()=>{S.settings.currentUser='u_chef';save()});
 // ---------- Heute ----------
 await ev(()=>go('dash'));await w(300);
 const dash=await ev(()=>[...document.querySelectorAll('#app .tm-dash .ck-dash')].map(r=>r.innerText.replace(/\s+/g,' ')));
-ok(dash.length===4&&/^Öffnen Küche 12 von 12 erledigt · zuletzt Florian, 10:30 Uhr 1 Wert außerhalb Ansehen$/.test(dash[0])&&/^0\/12 Schließen Küche 0 von 12 erledigt Abhaken$/.test(dash[1]),'Heute: one compact row per list due today („Öffnen Küche … 12 von 12 erledigt“) with a button',dash);
-await p.click('#app .tm-dash li.ck-dash:nth-of-type(3) [data-act="ckGo"]');await w(250);ok(await ev(()=>view.tab==='checkl'&&$('#app h1').firstChild.textContent==='Schließen Küche'),'button opens the list');
-await p.click(item(0)+' .ck-c');await w(150);await ev(()=>go('dash'));await w(250);ok(await ev(()=>/^1\/12 Schließen Küche 1 von 12 erledigt · zuletzt Anna, 10:30 Uhr Abhaken$/.test(document.querySelectorAll('#app .tm-dash .ck-dash')[1].innerText.replace(/\s+/g,' '))),'Heute follows the progress');
+// fix-3: eine Zeile für alle Listen; „Schließen …“ erst ab 14 Uhr oder sobald begonnen; die Zeile öffnet die nächste offene Liste
+ok(dash.length===1&&dash[0]==='1/2 Checklisten Öffnen Küche ✓ · Öffnen Bar/Service 0/12 1 Wert außerhalb','Heute: one compact row for the lists due now („Öffnen Küche ✓ · Öffnen Bar/Service 0/12“)',dash);
+await p.click('#app .tm-dash li.ck-dash .dh-b');await w(250);ok(await ev(()=>view.tab==='checkl'&&$('#app h1').firstChild.textContent==='Öffnen Bar/Service'),'the row opens the next open list');
+await ev(()=>{view.ck.run='ck_close_k';render()});await w(200);
+await p.click(item(0)+' .ck-c');await w(150);await ev(()=>go('dash'));await w(250);ok(await ev(()=>document.querySelector('#app .tm-dash .ck-dash').innerText.replace(/\s+/g,' ')==='1/3 Checklisten Öffnen Küche ✓ · Schließen Küche 1/12 · Öffnen Bar/Service 0/12 1 Wert außerhalb'),'Heute follows the progress (a started evening list shows up)',await ev(()=>document.querySelector('#app .tm-dash .ck-dash').innerText));
 // ---------- Verlauf ----------
 await ev(()=>{view.ck.tab='verlauf';view.ck.run=null;go('checkl')});await w(300);
 const hs=await ev(()=>({rows:[...document.querySelectorAll('#app .ck-hr')].map(r=>r.querySelector('.ck-hb').innerText.replace(/\s+/g,' ')),head:$('#app .ck-hhead').innerText.replace(/\s+/g,' '),late:[...document.querySelectorAll('#app .ck-hc.late')].map(x=>x.closest('.ck-hr').querySelector('.ck-hday b').textContent+' '+x.textContent),out:[...document.querySelectorAll('#app .ck-hc .ck-od')].map(x=>x.closest('.ck-hr').querySelector('.ck-hday b').textContent),todayLate:!!document.querySelector('#app .ck-hr .ck-hc.late')&&document.querySelector('#app .ck-hr').querySelectorAll('.ck-hc.late').length}));
@@ -82,7 +84,7 @@ const mappe=ym=>ev(ym=>{const r=ekMappe(ym);const host=document.createElement('d
 const pr=await mappe(await ev(()=>$('#app [data-ckmonth]').value));
 ok(months.join()==='November 2026,Oktober 2026'&&await ev(()=>!!$('#app [data-pdf="ckPrint"]'))&&pr.n>3000&&pr.name==='Monatsmappe-2026-11.pdf'&&pr.h==='Eigenkontrolle · November 2026'&&pr.days.length===12&&pr.days[0]==='So 1.11.'&&pr.days[11]==='Do 12.11.','„Monatsmappe als PDF“ for the chosen month: one block per day up to today, file name Monatsmappe-<Monat>.pdf',pr.days.length);
 ok(/Öffnen Küche12 von 12Anna, 07:\d\d–08:\d\d Uhr/.test(pr.t)&&/Kühlhaus-Temperatur notieren6,4 °Cerlaubt 0 bis 5 °CTür stand offen/.test(pr.t)&&/9 von 12 · nicht fertig/.test(pr.t)&&/Offen: .*Eingangstür abschließen/.test(pr.t)&&/Anna, Florian, 10:30 Uhr/.test(pr.t)&&/Eigene Aufzeichnung des Betriebs/.test(pr.t)&&!/HACCP/.test(pr.t),'PDF content: who and when, measured values with notes, open points; no compliance claim',pr.t.slice(0,160));
-await p.selectOption('#app [data-ckmonth]','2026-10');const pr2=await mappe(await ev(()=>view.ck.month));ok(pr2.name==='Monatsmappe-2026-10.pdf'&&pr2.h==='Eigenkontrolle · Oktober 2026'&&pr2.days.length===31&&pr2.withLists===4,'another month can be chosen',[pr2.name,pr2.days.length,pr2.withLists]);
+await p.selectOption('#app [data-ckmonth]','2026-10');const pr2=await mappe(await ev(()=>view.ck.month));ok(pr2.name==='Monatsmappe-2026-10.pdf'&&pr2.h==='Eigenkontrolle · Oktober 2026'&&pr2.days.length===4&&/1\.10\.–27\.10\.: vor Beginn der Aufzeichnung/.test(pr2.t)&&pr2.withLists===4,/* fix2: früher 31 Tageszeilen; Tage vor dem ersten Eintrag stehen jetzt in einer Zeile „vor Beginn der Aufzeichnung“ */'another month can be chosen',[pr2.name,pr2.days.length,pr2.withLists]);
 // ---------- Vorlagen bearbeiten ----------
 await p.click('#app [data-act="ckTab"][data-id="vorlagen"]');await w(250);
 ok(await ev(()=>document.querySelectorAll('#app .ck-tpls li').length===5&&/jeden Öffnungstag · 12 Punkte, davon 2 Messwerte · Vorschlag, bitte anpassen/.test($('#app .ck-tpls li').textContent)&&/jede Woche am Mittwoch/.test($('#app .ck-tpls').textContent)&&/Passen Sie sie an Ihren Betrieb an/.test($('#app .ck-tph').textContent)),'template list: rhythm, number of items, „Vorschlag, bitte anpassen“');
@@ -113,7 +115,7 @@ await b.close();
 // ---------- nach Mitternacht gehört noch zum Vortag; Ruhetag ----------
 {const {b,p,errs:e2}=await L.open({at:[2026,11,13,1,40]});const ev=(f,a)=>p.evaluate(f,a);
 ok(await ev(()=>todayStr()==='2026-11-13'&&ckToday()==='2026-11-12'),'01:40 at night still counts as the day before (until 5 o’clock), so closing lists can be finished');
-await ev(()=>go('dash'));await p.waitForTimeout(250);ok(await ev(()=>/Checklisten noch vom Vortag/.test($('#app .tm-dash .day-h').textContent)),'Heute says so');errs.push(...e2);await b.close();}
+await ev(()=>go('dash'));await p.waitForTimeout(250);ok(await ev(()=>/Checklisten noch vom Vortag/.test($('#app .tm-dash .dh-l').textContent)),'Heute says so');errs.push(...e2);await b.close();}
 {const {b,p,errs:e2}=await L.open({at:[2026,11,11,9,0]});const ev=(f,a)=>p.evaluate(f,a);await ev(()=>go('checkl'));await p.waitForTimeout(250);
 ok(await ev(()=>document.querySelectorAll('#app .ck-l').length===1&&/Wochenputz/.test($('#app .ck-l').textContent)&&/jede Woche am Mittwoch/.test($('#app .ck-l').textContent)),'on the Ruhetag (Wednesday) only the Wochenputz is offered');
 await ev(()=>{ckTpl('ck_week').wd=1;render()});ok(await ev(()=>/Heute ist keine Liste fällig/.test($('#app .ck-none').textContent)&&/Ruhetag/.test($('#app .ck-none').textContent)),'nothing due: said plainly');

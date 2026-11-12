@@ -13,7 +13,7 @@ const {L,ok,done,settle,PHONE,bub}=require('./h');
  // einschalten
  await p.evaluate(()=>go('setup'));await p.click('.side [data-act="helpMode"]');await settle(p,200);
  ok(await p.evaluate(()=>HELP_ON&&document.body.classList.contains('gd-help')&&!!document.querySelector('.gd-helpbar')&&document.querySelector('.side [data-act="helpMode"]').getAttribute('aria-pressed')==='true'),'Schalter stellt die Hilfe an (Leiste, aria-pressed)');
- await p.click('#app [data-act="reset"]');await settle(p,250);let bb=await bub(p);
+ await p.evaluate(()=>{document.querySelector('#app details.setup-more').open=true});/* fix-3: „Beispieldaten wiederherstellen“ steht unter „Weitere Einstellungen“ */await p.click('#app [data-act="reset"]');await settle(p,250);let bb=await bub(p);
  ok(await p.evaluate(()=>!document.querySelector('#dlg').open)&&bb&&bb.t==='Beispieldaten wiederherstellen'&&/nichts ausgeführt/.test(bb.note),'„Beispieldaten wiederherstellen“: erklärt, nicht ausgeführt',bb);
  await p.evaluate(()=>go('cards','dish_schnitzel_pork'));await settle(p,250);
  await p.click('#app [data-act="delCard"]');await settle(p,250);bb=await bub(p);
@@ -37,7 +37,7 @@ const {L,ok,done,settle,PHONE,bub}=require('./h');
  await p.evaluate(()=>{view.more={};render()});await settle(p,200);await p.click('#app details.more > summary');await settle(p,250);bb=await bub(p);ok(bb&&bb.t==='Mehr Optionen'&&await p.evaluate(()=>document.querySelector('#app details.more').open),'„Mehr Optionen“: klappt auf und erklärt sich',bb&&bb.t);
  await p.keyboard.press('Escape');await settle(p,200);
  ok(await p.evaluate(()=>!HELP_ON&&!document.body.classList.contains('gd-help')&&!document.querySelector('.gd-helpbar')&&!document.querySelector('.gd-bub')),'Esc stellt die Hilfe ab');
- await p.evaluate(()=>go('setup'));await p.click('#app [data-act="reset"]');await settle(p,250);
+ await p.evaluate(()=>{go('setup');document.querySelector('#app details.setup-more').open=true});await p.click('#app [data-act="reset"]');await settle(p,250);
  ok(await p.evaluate(()=>document.querySelector('#dlg').open),'danach geht der Knopf wieder');await p.keyboard.press('Escape');
  // Team + Hilfe: Erklärung statt Sperre
  await p.evaluate(()=>{S.settings.currentUser='u_staff';save();view.mtab='calc';go('menu');helpSet(true)});await settle(p,250);

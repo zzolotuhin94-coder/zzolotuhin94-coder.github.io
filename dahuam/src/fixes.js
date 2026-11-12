@@ -28,7 +28,7 @@ function fixesMigrate(d){
   return d;
 }
 
-/* ---------- Rollen: Der Chef darf alles. Das Team sieht alles, hakt Checklisten und Prep-Liste ab,
+/* ---------- Rollen: Der Chef darf alles. Das Team sieht alles, hakt Checklisten und Vorbereitungsliste ab,
    trägt den eigenen Frei-Wunsch ein, bereitet Bestellungen vor, bucht Wareneingang (mit und ohne Bestellung)
    und Schwund und zählt in einer laufenden Inventur mit. Inventur starten, abschließen und verwerfen, Preise,
    Rezepturen, Karte, Einstellungen, Importe und der Neustart bleiben beim Chef. ---------- */

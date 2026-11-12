@@ -254,18 +254,20 @@ const IMP_PROD_FIELDS = [
   {k:'stock', label:'Anfangsbestand', syn:['anfangsbestand','bestand','lagerbestand','istbestand','menge']},
   {k:'pfand', label:'Pfand', syn:['pfand','pfandbetrag','flaschenpfand','kistenpfand','fasspfand','einsatz','pfandjegebinde']},
   {k:'pourLoss', label:'Schankverlust, %', syn:['schankverlust','schankverlustprozent','zapfverlust','ausschankverlust']},
+  {k:'ean', label:'EAN / Barcode', syn:['ean','gtin','barcode','strichcode','eancode','ean13','ean8','gtin13','gtin14','eangtin','gtinean','upc','eannummer','eannr','barcodenummer','strichcodenummer','barcodes','strichcodes','eancodes']},   // Scanner (scan.js): mehrere Codes mit Komma oder Leerzeichen
 ];
 /* sicherer Treffer: gleiche Artikelnummer oder gleicher Name (auch ohne Klammerzusatz). Sonst nur ein Vorschlag. */
-function impProdMatch(name, art, pool){
+function impProdMatch(name, art, pool, codes){
   pool = pool || S.products; const base = x => normName(String(x).split('(')[0]);
   if(art){ const p = pool.find(x => x.artNo && String(x.artNo).trim().toLowerCase() === String(art).trim().toLowerCase()); if(p) return {p, exact:true}; }
+  if(codes && codes.length){ const p = codes.map(c => eanFind(c, pool)).find(Boolean); if(p) return {p, exact:true}; }   // gleicher Strichcode
   const n = normName(name); if(!n) return {p:null};
   let p = pool.find(x => normName(x.name) === n) || pool.find(x => base(x.name) === base(name) && base(name)); if(p) return {p, exact:true};
   p = plMatch(name, ''); return {p: p && pool.includes(p) ? p : null, exact:false};
 }
 function impSupMatch(name){ const n = normName(name); if(!n) return null; return (S.suppliers || []).find(s => normName(s.name) === n) || (S.suppliers || []).find(s => { const a = normName(s.name); return a.length >= 4 && n.length >= 4 && (a.includes(n) || n.includes(a)); }) || null; }
 function impProdAnalyse(d){
-  const map = d.map, rows = d.rows, items = [], seen = new Map(), sups = new Map();
+  const map = d.map, rows = d.rows, items = [], seen = new Map(), sups = new Map(), seenEan = new Map();
   if(!impHas(map, 'name')) throw new Error('Es fehlt die Spalte „Artikel“. Bitte unten zuordnen.');
   const pct = (it, k, label) => { if(!impHas(map, k)) return undefined; const raw = impCell(it.raw, map, k); if(raw === '') return undefined; const v = impNum(raw); if(!isFinite(v) || v < 0 || v >= 100){ it.notes.push(`${label} „${raw}“ nicht lesbar (0 bis 99 %)`); return undefined; } return v; };
   const qty = (it, k, label) => { if(!impHas(map, k)) return undefined; const raw = impCell(it.raw, map, k); if(raw === '') return undefined; const v = impNum(raw); if(!isFinite(v) || v < 0){ it.notes.push(`${label} „${raw}“ nicht lesbar`); return undefined; } return v; };
@@ -287,6 +289,11 @@ function impProdAnalyse(d){
     else { if(u.other) it.notes.push(`Einheit „${u.other}“ wird als Stück geführt` + (u.geb ? ` (für ein Getränk bei „Gebinde“ den Inhalt angeben, zum Beispiel ${u.geb === 'kiste' ? '„20×0,5 l“' : u.geb === 'fass' ? '„30 l“' : '„0,75 l“'})` : '')); if(!u.empty) data.unit = u.u; }
     if(rawPrice !== ''){ const pr = impNum(rawPrice); if(!isFinite(pr)){ fail(`Preis nicht lesbar: „${rawPrice}“`); continue; } if(pr < 0){ fail(`Preis ist negativ: „${rawPrice}“`); continue; } data.price = Math.round(pr * 10000) / 10000; it.price = data.price; if(pr > 500) it.notes.push('Preis ungewöhnlich hoch, bitte prüfen'); if(dv && u.geb){ data.gprice = data.price; data.price = Math.round(pr / (dv.L * dv.N) * 10000) / 10000; } }
     if(art) data.artNo = art;
+    if(impHas(map, 'ean')){ const raw = impCell(r, map, 'ean');
+      if(/^\d+([.,]\d+)?e\+?\d+$/i.test(raw.replace(/\s/g, ''))) it.notes.push(`EAN „${raw}“ hat Excel gekürzt (Spalte als Text formatieren): nicht übernommen`);
+      else if(raw){ const codes = eanSplit(raw).filter(c => { const k = eanKey(c); if(seenEan.has(k)){ it.notes.push(`Code ${c} steht schon in Zeile ${seenEan.get(k)}: nicht übernommen`); return false; } seenEan.set(k, r.n); return true; });
+        const bad = codes.filter(c => gtinInfo(c).ok === false); if(bad.length) it.notes.push(`Prüfziffer passt nicht: ${bad.join(', ')} (trotzdem übernommen, bitte prüfen)`);
+        if(codes.length) data.ean = codes; } }
     const pg = qty(it, 'pieceG', 'Stückgewicht'); if(pg != null) data.pieceG = pg;
     const lc = pct(it, 'lossCold', 'Putzverlust'); if(lc != null) data.lossCold = lc; const lh = pct(it, 'lossHot', 'Garverlust'); if(lh != null) data.lossHot = lh;
     const cf = dv && u.geb ? dv.L : 1;   /* Bestände bei Einheit Flasche/Fass/Kiste: in Flaschen bzw. Fässern */
@@ -298,7 +305,7 @@ function impProdAnalyse(d){
     if(impHas(map, 'loc')){ const l = impLoc(impCell(r, map, 'loc')); if(l.bad) it.notes.push(`Lagerort „${impCell(r, map, 'loc')}“ nicht erkannt: Trockenlager`); if(l.v) data.loc = l.v; }
     if(impHas(map, 'alg')){ const a = impAlg(impCell(r, map, 'alg')); if(a.bad) it.notes.push(`Allergen „${a.bad.join(', ')}“ unbekannt: Angabe nicht übernommen`); else if(a.state !== 'open'){ data.alg = a.alg; data.algNone = a.state === 'none'; } }
     const supName0 = impCell(r, map, 'supplier'); if(supName0){ const sp = impSupMatch(supName0); data.supName = supName0; if(sp) data.supplier = sp.id; else { const k = normName(supName0); if(!sups.has(k)) sups.set(k, supName0); data.supNew = k; } }
-    const mt = impProdMatch(name, art); const dk = 'p' + r.n; let dec = d.dec[dk];
+    const mt = impProdMatch(name, art, null, data.ean); const dk = 'p' + r.n; let dec = d.dec[dk];
     if(dec && dec !== 'new' && dec !== 'skip' && !P(dec)) dec = undefined;
     if(dec === undefined) dec = mt.p && mt.exact ? mt.p.id : 'new';
     if(mt.p && !mt.exact || d.dec[dk] !== undefined) it.ctl = {key:dk, value:dec, sug:mt.p && !mt.exact ? mt.p : null};
@@ -306,12 +313,29 @@ function impProdAnalyse(d){
     const ex = dec !== 'new' ? P(dec) : null; it.ex = ex; const unit = data.unit || (ex ? ex.unit : 'kg');
     if(ex && data.unit && data.unit !== ex.unit){ fail(`Einheit ${data.unit} passt nicht zum vorhandenen Artikel „${ex.name}“ (${ex.unit}). Rezepturen rechnen in ${ex.unit}.`); continue; }
     if(data.pack && data.packQty == null){ const q = impPack(data.pack, unit); if(q){ data.packQty = q; data.packAuto = true; } }
+    impGebPrice(it, data, d, {key:'g' + r.n, old: ex && +ex.price > 0 ? +ex.price : 0, unit, unitGiven: impHas(map, 'unit') && !u.empty, drink: !!dv});
+    if(data.ean){ data.ean = data.ean.filter(c => { const o = eanFind(c); if(o && o !== ex){ it.notes.push(`Code ${c} gehört schon zu „${o.name}“: nicht übernommen`); return false; } return true; }); if(!data.ean.length) delete data.ean; }
     it.data = data; it.unit = unit;
-    it.sub = [dv ? `${data.pack}${data.price != null ? ' · ' + eur(data.price) + ' je Liter' : ''}${data.pfand ? ' · Pfand ' + eur(data.pfand) : ''}${data.pourLoss ? ' · Schankverlust ' + num(data.pourLoss, 1) + ' %' : ''}` : `je ${unit}${unit === 'Stk' && data.pieceG ? ' · ' + num(data.pieceG) + ' g' : ''}`, data.supName ? data.supName + (data.supNew ? ' (neuer Lieferant)' : '') : '', data.artNo ? 'Nr. ' + data.artNo : '', data.pack && !dv ? data.pack + (data.packQty ? ` = ${num(data.packQty, 3)} ${unit}` : '') : '', data.alg ? 'Allergene ' + data.alg : data.algNone ? 'keine Allergene' : ''].filter(Boolean).join(' · ');
+    it.sub = [dv ? `${data.pack}${data.price != null ? ' · ' + eur(data.price) + ' je Liter' : ''}${data.pfand ? ' · Pfand ' + eur(data.pfand) : ''}${data.pourLoss ? ' · Schankverlust ' + num(data.pourLoss, 1) + ' %' : ''}` : `je ${unit}${unit === 'Stk' && data.pieceG ? ' · ' + num(data.pieceG) + ' g' : ''}`, data.supName ? data.supName + (data.supNew ? ' (neuer Lieferant)' : '') : '', data.artNo ? 'Nr. ' + data.artNo : '', data.pack && !dv ? data.pack + (data.packQty ? ` = ${num(data.packQty, 3)} ${unit}` : '') : '', data.alg ? 'Allergene ' + data.alg : data.algNone ? 'keine Allergene' : '', data.ean ? 'EAN ' + data.ean.join(', ') : ''].filter(Boolean).join(' · ');
     if(ex){ const ch = impProdDiff(ex, data); it.st = ch.length ? 'akt' : 'gleich'; if(ch.length) it.why = (mt.exact ? '' : `„${ex.name}“: `) + ch.join(' · '); if(data.stock != null) it.notes.push('Bestand vorhandener Artikel ändert nur die Inventur'); }
     else if(data.price == null) it.notes.push('ohne Preis: erscheint im Preis-Check als „Preis fehlt“');
   }
   return {items, sups:[...sups.values()]};
+}
+/* Preis je Gebinde oder je Einheit? Großhändler-Listen nennen den Preis meist je Verpackungseinheit („Sack 10 kg“ 9,50).
+   Passt das Verhältnis zum bisherigen Preis genau zur Gebindegröße, wird umgerechnet; passt es zu 1, bleibt es;
+   sonst fragt die Vorschau. Jeder große Sprung wird gezeigt. */
+function impGebPrice(it, data, d, o){
+  if(data.price == null || o.drink) return;
+  const pq = +data.packQty || 0; const pr = data.price;
+  if(pq > 0 && Math.abs(pq - 1) > 1e-6 && data.pack){
+    const {guess, sure} = gebGuess(pr, o.old, pq, o.unitGiven);
+    const dec = d.dec[o.key] === 'pack' || d.dec[o.key] === 'unit' ? d.dec[o.key] : guess;
+    if(dec === 'pack'){ data.price = Math.round(pr / pq * 10000) / 10000; it.price = data.price; it.sub2 = `${eur(pr)} je ${data.pack} = ${eur(data.price)} je ${o.unit}`; }
+    if(!sure || d.dec[o.key]) it.gctl = {key:o.key, mode:dec, pr, pq, pack:data.pack, unit:o.unit};
+    if(!sure && !d.dec[o.key]) it.notes.push(`Gilt ${eur(pr)} für ${data.pack} oder für 1 ${o.unit}? Bitte unten wählen.`);
+  }
+  if(o.old > 0){ const f = data.price / o.old; if(f >= 2 || f <= 0.5) it.notes.push(`Preis ${eur(o.old)} → ${eur(data.price)} je ${o.unit} (${f > 1 ? '+' : '−'}${num(Math.abs(f - 1) * 100, 0)} %), bitte prüfen`); }
 }
 function impProdDiff(p, x){
   const ch = [];
@@ -328,10 +352,11 @@ function impProdDiff(p, x){
   if(x.geb && (x.geb !== p.geb || +x.gebL !== +p.gebL || +x.gebN !== +(p.gebN || 1)) && !ch.includes('Gebinde')) ch.push('Gebinde');
   if(x.pfand != null && +x.pfand !== +(p.pfand || 0)) ch.push(`Pfand ${eur(x.pfand)}`);
   if(x.pourLoss != null && +x.pourLoss !== +(p.pourLoss || 0)) ch.push(`Schankverlust ${num(x.pourLoss, 1)} %`);
+  if(x.ean){ const have = eanOf(p).map(eanKey); const n = x.ean.filter(c => !have.includes(eanKey(c))).length; if(n) ch.push(n === 1 ? 'neuer Code' : `${n} neue Codes`); }
   return ch;
 }
 function supNew(name){ return {id:uid('sup'), name, cat:'gross', channel:'email', contact:'', phone:'', whatsapp:'', email:'', shopUrl:'', customerNo:'', orderDays:[], cutoff:'12:00', deliveryDays:[], minOrder:0, freight:0, note:'', prefix:'', active:true}; }
-function prodNew(name, unit){ return {id:uid('p'), name, unit:unit || 'kg', price:0, lossCold:0, lossHot:0, alg:'', algNone:false, pieceG:'', stock:0, minStock:0, loc:'L', supplier:'', artNo:'', pack:'', packQty:0, priceDemo:true}; }
+function prodNew(name, unit){ return {id:uid('p'), name, unit:unit || 'kg', price:0, lossCold:0, lossHot:0, alg:'', algNone:false, pieceG:'', stock:0, minStock:0, loc:'L', supplier:'', artNo:'', pack:'', packQty:0, priceDemo:true, ean:[]}; }
 function impProdApply(res, d){
   const out = {neu:0, akt:0, gleich:0, fehler:0, lieferanten:0}; const supId = new Map();
   for(const it of res.items){
@@ -345,6 +370,7 @@ function impProdApply(res, d){
     if(x.lossCold != null) p.lossCold = x.lossCold; if(x.lossHot != null) p.lossHot = x.lossHot; if(x.loc) p.loc = x.loc; if(x.minStock != null) p.minStock = x.minStock;
     if(x.alg != null){ p.alg = x.alg; p.algNone = !!x.algNone; }
     if(x.geb){ p.geb = x.geb; p.gebL = x.gebL; p.gebN = x.gebN; if(isNew && !x.loc) p.loc = 'W'; } if(x.pfand != null && isDrink(p)) p.pfand = x.pfand; if(x.pourLoss != null && isDrink(p)) p.pourLoss = x.pourLoss;
+    if(x.ean){ if(!Array.isArray(p.ean)) p.ean = []; x.ean.forEach(c => { if(!eanFind(c)) p.ean.push(c); }); }   // Codes nur ergänzen, nie entfernen
     if(isNew && x.stock) addMove('in', p.id, x.stock, 'Anfangsbestand (Import)');
   }
   return out;
@@ -558,15 +584,15 @@ const IMP_TPL = {
     ['Getränke','Mineralwasser 0,33 l','','','3,40','vegan','','keine','',''],
   ]]]},
   prod:{file:'Vorlage-Artikel', sheets:[['Artikel', [
-    ['Artikel','Einheit','Stückgewicht','Preis netto','Lieferant','Artikelnummer','Gebinde','Gebindegröße','Putzverlust','Garverlust','Allergene','Lagerort','Mindestbestand','Anfangsbestand','Pfand','Schankverlust'],
-    ['Schweinsschnitzel','kg','','9,80','Metzgerei Muster','MM-1001','Vakuum 5 kg','5','4','15','keine','Kühlhaus','8','10','',''],
-    ['Mehl glatt','kg','','0,89','Großhandel Muster','4401','Sack 10 kg','10','0','0','A','Trockenlager','15','20','',''],
-    ['Ei M','Stk','60','0,27','Hof Muster','','Tray 30 Stk','30','12','0','C','Kühlhaus','90','180','',''],
-    ['Schlagobers 36 %','l','','4,40','Molkerei Muster','7712','Karton 6×1 l','','0','0','G','Kühlhaus','6','12','',''],
-    ['Zwiebel','kg','','1,15','Gemüsehof Muster','','Sack 10 kg','10','12','0','keine','Gemüselager','10','20','',''],
-    ['Märzen vom Fass','Fass','','87,00','Getränke Muster','GM-30','30 l','','','','A','Bar','2','2','30,00','5'],
-    ['Weißbier 0,5 l','Kiste','','19,00','Getränke Muster','GM-52','20×0,5 l','','','','A','Bar','20','40','4,50',''],
-    ['Grüner Veltliner 0,75 l','Flasche','','6,40','Weinhandel Muster','','0,75 l','','','','O','Bar','6','12','',''],
+    ['Artikel','Einheit','Stückgewicht','Preis netto','Lieferant','Artikelnummer','Gebinde','Gebindegröße','Putzverlust','Garverlust','Allergene','Lagerort','Mindestbestand','Anfangsbestand','Pfand','Schankverlust','EAN'],
+    ['Schweinsschnitzel','kg','','9,80','Metzgerei Muster','MM-1001','Vakuum 5 kg','5','4','15','keine','Kühlhaus','8','10','','',''],
+    ['Mehl glatt','kg','','0,89','Großhandel Muster','4401','Sack 10 kg','10','0','0','A','Trockenlager','15','20','','','9001234560019'],
+    ['Ei M','Stk','60','0,27','Hof Muster','','Tray 30 Stk','30','12','0','C','Kühlhaus','90','180','','',''],
+    ['Schlagobers 36 %','l','','4,40','Molkerei Muster','7712','Karton 6×1 l','','0','0','G','Kühlhaus','6','12','','','9001234560026'],
+    ['Zwiebel','kg','','1,15','Gemüsehof Muster','','Sack 10 kg','10','12','0','keine','Gemüselager','10','20','','',''],
+    ['Märzen vom Fass','Fass','','87,00','Getränke Muster','GM-30','30 l','','','','A','Bar','2','2','30,00','5',''],
+    ['Weißbier 0,5 l','Kiste','','19,00','Getränke Muster','GM-52','20×0,5 l','','','','A','Bar','20','40','4,50','','9007654321018, 19007654321015'],
+    ['Grüner Veltliner 0,75 l','Flasche','','6,40','Weinhandel Muster','','0,75 l','','','','O','Bar','6','12','','','9002223330019'],
   ]]]},
   rec:{file:'Vorlage-Rezepturen', sheets:[['Zutaten', [
     ['Rezeptur','Typ','Zutat','Menge','Einheit','Ausbeute','Portionsgewicht','Gericht auf der Karte'],
@@ -605,7 +631,7 @@ const IMPS = {
   menu:{title:'Speisekarte importieren', short:'Speisekarte', one:'Gericht', many:'Gerichte', fields:IMP_MENU_FIELDS, analyse:impMenuAnalyse, apply:impMenuApply,
     intro:'Eine Zeile je Gericht. Pflicht sind <b>Gericht</b> und <b>Preis</b> (inkl. MwSt.). Dazu, wenn vorhanden: Kategorie, Beschreibung, Variante, vegetarisch/vegan, Saison, Allergene (Buchstaben A–R oder „keine“), Empfehlung, Wochentage.'},
   prod:{title:'Artikel & Preise importieren', short:'Artikel & Preise', one:'Artikel', many:'Artikel', fields:IMP_PROD_FIELDS, analyse:impProdAnalyse, apply:impProdApply,
-    intro:'Eine Zeile je Artikel. Pflicht ist <b>Artikel</b>. Dazu, wenn vorhanden: Einheit (kg, l, Stk), Stückgewicht, Preis netto je Einheit, Lieferant, Artikelnummer, Gebinde und Gebindegröße, Putzverlust, Garverlust, Allergene, Lagerort, Mindestbestand, Anfangsbestand. Getränke: Einheit <b>Flasche</b>, <b>Fass</b> oder <b>Kiste</b>, bei Gebinde der Inhalt („0,75 l“, „30 l“, „20×0,5 l“), der Preis je Flasche, Fass oder Kiste; dazu Pfand und Schankverlust.'},
+    intro:'Eine Zeile je Artikel. Pflicht ist <b>Artikel</b>. Dazu, wenn vorhanden: Einheit (kg, l, Stk), Stückgewicht, Preis netto je Einheit, Lieferant, Artikelnummer, Gebinde und Gebindegröße, Putzverlust, Garverlust, Allergene, Lagerort, Mindestbestand, Anfangsbestand. Getränke: Einheit <b>Flasche</b>, <b>Fass</b> oder <b>Kiste</b>, bei Gebinde der Inhalt („0,75 l“, „30 l“, „20×0,5 l“), der Preis je Flasche, Fass oder Kiste; dazu Pfand und Schankverlust. Für den Scanner: <b>EAN</b> (auch GTIN, Barcode, Strichcode), mehrere Codes mit Komma getrennt, zum Beispiel Flasche und Karton.'},
   rec:{title:'Rezepturen importieren', short:'Rezepturen', one:'Rezeptur', many:'Rezepturen', fields:IMP_REC_FIELDS, analyse:impRecAnalyse, apply:impRecApply,
     intro:'Eine Zeile je Zutat: <b>Rezeptur</b>, <b>Zutat</b>, <b>Menge</b>, Einheit (g, kg, ml, cl, l, Stk, EL, TL, Prise). Dazu, wenn vorhanden: Typ (Gericht, Basisrezept oder Getränk), Ausbeute, Portionen, Portionsgewicht, Schritt, Gericht auf der Karte.'},
   team:{title:'Team importieren', short:'Team', one:'Person', many:'Personen', fields:IMP_TEAM_FIELDS, analyse:impTeamAnalyse, apply:impTeamApply,
@@ -672,9 +698,10 @@ function impRawPrice(it){ return it.rawPrice != null && it.rawPrice !== '' ? `<s
 function impRowHtml(it, d){
   const stTxt = it.skip ? 'ausgelassen' : IMP_ST[it.st];
   const right = it.price != null && isFinite(it.price) ? `<span class="imp-x"><b class="mono">${eur(it.price)}</b>${impRawPrice(it)}</span>` : it.rawPrice ? `<span class="imp-x">${impRawPrice(it)}</span>` : '<span class="imp-x"></span>';
+  const g = it.gctl; const gctl = g ? `<label class="imp-ctl">${eur(g.pr)} gilt für<select class="sm-sel" data-impdec="${g.key}" aria-label="Preis gilt für"><option value="pack" ${g.mode === 'pack' ? 'selected' : ''}>${esc(g.pack)}, also ${eur(g.pr / g.pq)} je ${esc(g.unit)}</option><option value="unit" ${g.mode === 'unit' ? 'selected' : ''}>1 ${esc(g.unit)}</option></select></label>` : '';
   const ctl = it.ctl ? `<label class="imp-ctl">${it.ctl.sug ? `ähnlich wie „${esc(it.ctl.sug.name)}“` : 'Zuordnung'}<select class="sm-sel" data-impdec="${it.ctl.key}"><option value="new" ${it.ctl.value === 'new' ? 'selected' : ''}>als neuer Artikel</option>${it.ctl.sug ? `<option value="${it.ctl.sug.id}" ${it.ctl.value === it.ctl.sug.id ? 'selected' : ''}>„${esc(it.ctl.sug.name)}“ aktualisieren</option>` : ''}${it.ctl.value !== 'new' && it.ctl.value !== 'skip' && (!it.ctl.sug || it.ctl.sug.id !== it.ctl.value) && P(it.ctl.value) ? `<option value="${it.ctl.value}" selected>„${esc(P(it.ctl.value).name)}“ aktualisieren</option>` : ''}<option value="skip" ${it.ctl.value === 'skip' ? 'selected' : ''}>nicht übernehmen</option></select></label>` : '';
   return `<li class="imp-r st-${it.st}" data-n="${it.n}"><span class="imp-st">${stTxt}<small>Zeile ${it.n}</small></span>
-    <span class="imp-m"><b>${esc(it.title)}</b>${it.sub ? `<small>${esc(it.sub)}</small>` : ''}${it.sub2 ? `<small>${esc(it.sub2)}</small>` : ''}${it.why ? `<small class="imp-why">${esc(it.why)}</small>` : ''}${(it.notes || []).map(n => `<small class="imp-note">${esc(n)}</small>`).join('')}${ctl}</span>${right}</li>`;
+    <span class="imp-m"><b>${esc(it.title)}</b>${it.sub ? `<small>${esc(it.sub)}</small>` : ''}${it.sub2 ? `<small>${esc(it.sub2)}</small>` : ''}${it.why ? `<small class="imp-why">${esc(it.why)}</small>` : ''}${(it.notes || []).map(n => `<small class="imp-note">${esc(n)}</small>`).join('')}${gctl}${ctl}</span>${right}</li>`;
 }
 /* Rezeptur in der Vorschau: Kopf, Verknüpfung, Zeilen mit Umrechnung */
 function impRecHtml(it, d){

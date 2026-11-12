@@ -1,0 +1,18 @@
+BEGIN:VCALENDAR
+PRODID:-//Airbnb Inc//Hosting Calendar 0.8.8//EN
+CALSCALE:GREGORIAN
+VERSION:2.0
+BEGIN:VEVENT
+DTEND;VALUE=DATE:20261117
+DTSTART;VALUE=DATE:20261114
+UID:1418fb94e984-beispiel@airbnb.com
+DESCRIPTION:Reservation URL: https://www.airbnb.com/hosting/reservations/details/HMBEISPIEL\nPhone Number (Last 4 Digits): 0000
+SUMMARY:Reserved
+END:VEVENT
+BEGIN:VEVENT
+DTEND;VALUE=DATE:20261130
+DTSTART;VALUE=DATE:20261125
+UID:7f3a-beispiel-block@airbnb.com
+SUMMARY:Airbnb (Not available)
+END:VEVENT
+END:VCALENDAR

@@ -124,7 +124,13 @@ function pcStep(kind){
     else { const v = numParse(raw);
       if(!isFinite(v) || v <= 0){ pc.sure = null; return stay(v === 0 ? 'Ein Preis von 0 ist nicht möglich. Bitte den Einkaufspreis eintippen oder „Richtwert stimmt“ wählen.' : 'Das ist kein gültiger Preis. Bitte eine Zahl eintippen, zum Beispiel 12,50.'); }
       const pu = priceUnit(p); val = Math.round(v*100)/100; const ref = +p.price*pu.f;
-      if(ref > 0 && (val > ref*5 || val < ref/5) && pc.sure !== val){ pc.sure = val; return stay(`Wirklich ${eur(val)} je ${esc(pu.word)}? Der Richtwert ist ${eur(ref)}. <button type="button" class="btn sm" data-act="pcSave">Ja, übernehmen</button>`); } }
+      // Preis für den ganzen Sack/Karton eingetippt? (Faktor passt zur Gebindegröße)
+      const pq = pu.f === 1 && +p.packQty > 0 && Math.abs(+p.packQty - 1) > 1e-6 && p.pack ? +p.packQty : 0;
+      if(ref > 0 && pq && Math.abs(val / ref / pq - 1) <= 0.25 && pc.sure !== val){ pc.sure = val; pc.packVal = Math.round(val / pq * 100) / 100;
+        return stay(`Meinten Sie ${eur(val)} für ${esc(p.pack)}? Das sind ${eur(val / pq)} je ${esc(pu.word)}. Bisher ${eur(ref)} je ${esc(pu.word)}. <span class="pc-ch"><button type="button" class="btn sm primary" data-act="pcPack">Ja, ${eur(val / pq)} je ${esc(pu.word)}</button><button type="button" class="btn sm" data-act="pcSave">Nein, ${eur(val)} je ${esc(pu.word)}</button></span>`); }
+      // großer Sprung: erst nach Bestätigung, mit alt und neu je Einheit
+      if(ref > 0 && (val >= ref*2 || val <= ref/2) && pc.sure !== val){ pc.sure = val; const pct = (val / ref - 1) * 100;
+        return stay(`Wirklich ${eur(val)} je ${esc(pu.word)}? Bisher ${eur(ref)} je ${esc(pu.word)}, das wären ${pct > 0 ? '+' : '−'}${num(Math.abs(pct), 0)} %. <button type="button" class="btn sm" data-act="pcSave">Ja, übernehmen</button>`); } }
   }
   if(kind === 'ok' && !(+p.price > 0)) return stay('Dieser Artikel hat noch keinen Preis. Bitte den Einkaufspreis eintippen oder überspringen.');
   pc.msg = ''; pc.sure = null;
@@ -283,6 +289,7 @@ document.addEventListener('click', e => {
     case 'pcSkip': pcStep('skip'); break;
     case 'pcOk': pcStep('ok'); break;
     case 'pcSave': pcStep('save'); break;
+    case 'pcPack': { const pc = view.pc; const i = $('#pcIn'); if(pc && i && pc.packVal > 0){ i.value = num2(pc.packVal); pc.sure = null; pcStep('save'); } break; }
     case 'pcEnd': pcLeave(); break;
     case 'pcBack': pcBack(); break;
     case 'tellerMode': setV('teller', id); render(); break;

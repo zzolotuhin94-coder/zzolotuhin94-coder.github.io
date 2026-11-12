@@ -1,7 +1,7 @@
 /* =====================================================================
    Vorbereitung: Was brauche ich heute, was morgen?
    Prognose je Gericht aus den Verkäufen, daraus Basisrezepte in Chargen,
-   Zutaten gegen den Lagerstand und eine Prep-Liste zum Abhaken.
+   Zutaten gegen den Lagerstand und eine Vorbereitungsliste zum Abhaken.
    Eigener Zustand: S.plan (je Datum: Korrekturen, Tagesfaktor, Häkchen).
    ===================================================================== */
 
@@ -10,15 +10,17 @@ function plusMigrate(d){
   if(!d || typeof d !== 'object') return d;
   if(!d.plan || typeof d.plan !== 'object' || Array.isArray(d.plan)) d.plan = {};
   const p = d.plan;
-  ['ov','fac','chk'].forEach(k => { if(!p[k] || typeof p[k] !== 'object' || Array.isArray(p[k])) p[k] = {}; });
+  ['ov','fac','chk','cook','rest'].forEach(k => { if(!p[k] || typeof p[k] !== 'object' || Array.isArray(p[k])) p[k] = {}; });
   // alte Tage aufräumen: Korrekturen und Häkchen sind nach drei Wochen nichts mehr wert
   const cut = dAdd(isoDate(new Date()), -21);
-  ['ov','fac','chk'].forEach(k => Object.keys(p[k]).forEach(day => { if(!/^\d{4}-\d{2}-\d{2}$/.test(day) || day < cut) delete p[k][day]; }));
-  // Beispieldaten: Salz, Gewürze, Öl sind Grundzutaten und stehen nicht auf der Prep-Liste
+  ['ov','fac','chk','cook'].forEach(k => Object.keys(p[k]).forEach(day => { if(!/^\d{4}-\d{2}-\d{2}$/.test(day) || day < cut) delete p[k][day]; }));
+  // „noch da“ je Basisrezept: alte oder kaputte Einträge weg
+  Object.keys(p.rest).forEach(id => { const r = p.rest[id]; if(!r || typeof r !== 'object' || !/^\d{4}-\d{2}-\d{2}$/.test(r.s || '') || r.s < cut || !(+r.g >= 0)) delete p.rest[id]; });
+  // Beispieldaten: Salz, Gewürze, Öl sind Grundzutaten und stehen nicht auf der Vorbereitungsliste
   if(d.demo) (d.products || []).forEach(x => { if(x && x.basic === undefined && PL_BASIC.includes(x.id)) x.basic = true; });
   return d;
 }
-function planState(){ if(!S.plan || !S.plan.ov || !S.plan.chk || !S.plan.fac) plusMigrate(S); return S.plan; }
+function planState(){ if(!S.plan || !S.plan.ov || !S.plan.chk || !S.plan.fac || !S.plan.cook || !S.plan.rest) plusMigrate(S); return S.plan; }
 
 /* ---------- Zwischenspeicher: gilt, bis gespeichert wird oder die Daten ersetzt werden ---------- */
 const PLC = {S:null, m:new Map()};
@@ -56,7 +58,7 @@ const PL_PICK = 8;       // so viele gleiche Wochentage zählen höchstens
 const PL_DECAY = 0.8;    // jede ältere Woche zählt um ein Fünftel weniger
 const PL_TOP = 12;       // so viele Gerichte zeigt die Prognose, der Rest klappt auf
 const PL_BACK = 430;     // so viele Tage zurück wird gesucht
-const PL_MINOR = 0.2;    // unter 200 g oder 200 ml am Tag ist es eine Kleinmenge (Salz, Gewürze): steht nicht auf der Prep-Liste
+const PL_MINOR = 0.2;    // unter 200 g oder 200 ml am Tag ist es eine Kleinmenge (Salz, Gewürze): steht nicht auf der Vorbereitungsliste
 const PL_BASIC = ['salt','pepper','oil','sugar','icing','cinnamon','paprika','caraway','starch','water'];   // Beispieldaten: Grundzutaten
 function plMinor(x){ if(x.st === 'miss') return false; const p = x.p; if(p.basic === true) return true; if(p.basic === false) return false; return p.unit !== 'Stk' && x.need < PL_MINOR; }
 
@@ -83,7 +85,7 @@ function vbForecastRaw(D){
   const maps = pick.map(plDayMap); const av = pick.map(d => [ix.seaOf[d], ix.wdOf[d]]);
   const items = [];
   for(const m of S.menu){
-    if(m.hidden || !plAvail(m, sea, w) || isDrinkEntry(m)) continue;   // die Prep-Liste ist für die Küche: Getränke stehen nicht darauf
+    if(m.hidden || !plAvail(m, sea, w) || isDrinkEntry(m)) continue;   // die Vorbereitungsliste ist für die Küche: Getränke stehen nicht darauf
     let nu = 0, den = 0; const vals = [];
     pick.forEach((d, i) => { if(!plAvail(m, av[i][0], av[i][1])) return; const q = maps[i].get(m.id) || 0; nu += wts[i] * q; den += wts[i]; vals.push([q, wts[i]]); });
     let f = 0, sd = 0, flag = '';
@@ -124,7 +126,8 @@ function vbPacks(p, q){ if(!(q > 0)) return 0; if(+p.packQty > 0) return Math.ce
 function vbUses(c, id, d=0){ if(!c || d > 6) return false; return c.items.some(it => { const r = refObj(it.ref); return r && r.t === 'c' && (r.o.id === id || vbUses(r.o, id, d + 1)); }); }
 /* Aus Portionen je Gericht: Basisrezepte in ganzen Chargen und Rohzutaten in kg / l / Stk.
    rows: [[Rezeptur, Portionen], …] */
-function vbExplode(rows){
+function vbExplode(rows, lots, cooked, D, past){
+  lots = lots || new Map(); cooked = cooked || {};
   const semi = new Map(), prod = new Map();
   const walk = (c, f) => { c.items.forEach(it => { const r = refObj(it.ref); if(!r) return; const q = (+it.qty || 0) * f; if(!(q > 0)) return;
     if(r.t === 'p'){ if(r.o.noStock) return; prod.set(r.o.id, (prod.get(r.o.id) || 0) + (r.o.unit === 'Stk' ? q : q / 1000)); }
@@ -136,19 +139,70 @@ function vbExplode(rows){
     // zuerst die Basisrezepte, die kein anderes offenes Basisrezept mehr braucht
     const id = open.find(a => !open.some(b => b !== a && vbUses(C(b), a))) || open[0];
     done.add(id); const c = C(id); if(!c) continue; const need = semi.get(id); const y = +c.yieldG || totals(c).out; if(!(y > 0)) continue;
-    const n = Math.ceil(need / y - 1e-9); batches.push({c, need, y, n}); walk(c, n);
+    // was vom Basisrezept noch da ist, zählt zuerst; gekocht wird nur, was fehlt (abgehakt: so viel, wie gekocht wurde)
+    const have = (lots.get(id) || []).reduce((a, l) => a + l.g, 0); const ck = cooked[id];
+    const n = ck ? Math.max(0, +ck.n || 0) : past ? 0 : Math.max(0, Math.ceil((need - have) / y - 1e-9));
+    batches.push({c, need, y, n, have, done:!!ck}); if(n > 0) walk(c, n);
   }
-  return {batches, prod};
+  // was am Ende des Tages übrig ist: zuerst wird verbraucht, was am frühesten abläuft
+  const end = new Map();
+  new Set([...lots.keys(), ...batches.map(b => b.c.id)]).forEach(id => { const b = batches.find(x => x.c.id === id); let use = b ? b.need : 0;
+    const ls = (lots.get(id) || []).map(l => ({...l, est:true})).sort((a, z) => (a.exp || '9999').localeCompare(z.exp || '9999'));
+    for(const l of ls){ const t = Math.min(l.g, use); l.g -= t; use -= t; }
+    const out = ls.filter(l => l.g > 0.5);
+    if(b && b.n > 0){ const ck = cooked[id]; const made = ck && +ck.g > 0 ? +ck.g : b.n * b.y; const left = made - use; if(left > 0.5) out.push({g:left, exp: ck && ck.exp !== undefined ? ck.exp : vbExp(b.c, D), est:true}); }
+    if(out.length) end.set(id, out); });
+  return {batches, prod, end};
 }
+/* Haltbarkeit eines Basisrezepts in Tagen, nur wenn die Rezeptur sie nennt („Haltbarkeit 72 h“, „Haltbarkeit 3 Tage“) */
+function vbShelf(c){
+  if(!c) return null; if(+c.keepH > 0) return {h:+c.keepH, d:Math.max(1, Math.ceil(+c.keepH / 24))};
+  const t = (c.steps || []).map(s => s && s.t || '').join(' '); const m = t.match(/haltbar(?:keit)?\D{0,14}?(\d+(?:[.,]\d+)?)\s*(h|std\.?|stunden|tage?n?|d)(?![a-zäöü])/i); if(!m) return null;
+  const v = +m[1].replace(',', '.'); const h = /^(h|std|stunden)/i.test(m[2]) ? v : v * 24; if(!(h > 0)) return null; return {h, d:Math.max(1, Math.ceil(h / 24 - 1e-9))};
+}
+/* letzter Tag, an dem eine Charge vom Tag D noch verwendet wird (72 h: gekocht Do, verwenden bis Sa). Ohne Angabe: null */
+function vbExp(c, D){ const sh = D ? vbShelf(c) : null; return sh ? dAdd(D, sh.d - 1) : null; }
+/* ---------- „noch da“: Bestand je Basisrezept über die Tage fortgeschrieben ---------- */
+function vbFirst(){ const st = planState(); const cap = dAdd(todayStr(), -7); const ds = Object.values(st.rest).map(r => r.s).concat(Object.keys(st.cook)).filter(Boolean).map(d => d < cap ? cap : d).sort(); return ds[0] || null; }
+function vbLots(D){
+  return plCache('lots|' + D, () => {
+    const st = planState(); const first = vbFirst(); if(!first || D < first) return new Map(); const cap = dAdd(todayStr(), -7);
+    const prev = D === first ? new Map() : vbSemiDay(dAdd(D, -1)).ex.end; const m = new Map();
+    prev.forEach((ls, id) => { const v = ls.filter(l => !l.exp || l.exp >= D).map(l => ({...l, est:true})); if(v.length) m.set(id, v); });
+    Object.entries(st.rest).forEach(([id, r]) => { if((r.s < cap ? cap : r.s) !== D) return; m.delete(id); if(+r.g > 0 && (!r.exp || r.exp >= D)) m.set(id, [{g:+r.g, exp:r.exp || null, est:r.s < D, man:true}]); });
+    return m; });
+}
+function vbSemiDay(D){
+  return plCache('sd|' + D, () => {
+    const t = todayStr(); const lots = vbLots(D); const closed = (S.settings.closed || []).includes(dParse(D).getDay()); let rows = [];
+    if(!closed){ const sold = D < t ? (S.salesDays || {})[D] : null;
+      if(sold && sold.length) sold.forEach(([mid, q]) => { const m = S.menu.find(x => x.id === mid); const c = m && m.card && C(m.card); if(c && q > 0) rows.push([c, q]); });
+      else rows = vbDishes(D).dishes.filter(x => x.q > 0 && x.card && C(x.card)).map(x => [C(x.card), x.q]); }
+    return {lots, ex:vbExplode(rows, lots, planState().cook[D] || {}, D, D < t)}; });
+}
+/* bis wann reicht, was vom Basisrezept da ist? letzter offener Tag ohne neue Charge */
+function vbReach(id, D){
+  const end = dAdd(todayStr(), 6); let last = D;
+  for(let d = dAdd(D, 1); d <= end; d = dAdd(d, 1)){ if((S.settings.closed || []).includes(dParse(d).getDay())) continue;
+    const sd = vbSemiDay(d); const b = sd.ex.batches.find(x => x.c.id === id); if(b && b.n > 0) break; const ls = sd.lots.get(id); if(!ls || !ls.length) break; last = d; }
+  return last;
+}
+function vbDayWord(d){ const t = todayStr(); return d === t ? 'heute' : d === dAdd(t, 1) ? 'morgen' : PL_WD[dParse(d).getDay()] + ' ' + plShortDate(d); }
 function vbQty(it, st, D){ const ov = (st.ov[D] || {})[it.key]; const fac = +st.fac[D] || 1; return ov != null && isFinite(+ov) ? {q:+ov, ov:true} : {q:Math.round(it.f * fac), ov:false}; }
-function vbPlan(D){
-  return plCache('plan|' + D, () => {
+function vbDishes(D){
+  return plCache('dish|' + D, () => {
     const fc = vbForecast(D); const st = planState(); const fac = +st.fac[D] || 1;
     const dishes = fc.items.concat(fc.specials).map(it => { const x = vbQty(it, st, D); return {...it, q:x.q, ov:x.ov, auto:Math.round(it.f * fac), rlo:Math.floor(it.lo * fac), rhi:Math.ceil(it.hi * fac)}; })
       .sort((a,b) => (b.flag === 'aktion') - (a.flag === 'aktion') || b.q - a.q || b.f - a.f || a.name.localeCompare(b.name, 'de'));
+    return {fc, fac, dishes};
+  });
+}
+function vbPlan(D){
+  return plCache('plan|' + D, () => {
+    const {fc, fac, dishes} = vbDishes(D);
     const total = dishes.reduce((a,x) => a + x.q, 0);
     const noCard = dishes.filter(x => x.q > 0 && !(x.card && C(x.card)));
-    const ex = fc.closed ? {batches:[], prod:new Map()} : vbExplode(dishes.filter(x => x.q > 0 && x.card && C(x.card)).map(x => [C(x.card), x.q]));
+    const ex = fc.closed ? {batches:[], prod:new Map()} : vbSemiDay(D).ex;
     // was bis zu diesem Tag noch geliefert wird, und was schon in einem Entwurf liegt
     const inc = new Map(), drf = new Map();
     (S.orders || []).forEach(o => { const tgt = ['sent','confirmed'].includes(o.status) && o.deliveryDate <= D ? inc : (o.status === 'draft' || o.status === 'approval') ? drf : null; if(!tgt) return; (o.lines || []).forEach(l => tgt.set(l.pid, (tgt.get(l.pid) || 0) + (+l.n || 0) * (+l.f || 1))); });
@@ -158,12 +212,21 @@ function vbPlan(D){
     const bySup = new Map(); prods.filter(x => x.st === 'miss').forEach(x => { const k = SUP(x.p.supplier) ? x.p.supplier : ''; if(!bySup.has(k)) bySup.set(k, []); bySup.get(k).push(x); });
     const sups = [...bySup.entries()].map(([sid, list]) => { const sp = SUP(sid) || null; let od = null, dl = null; if(sp){ od = nextOrderDate(sp); dl = nextDelivery(sp, od); }
       return {sid, sp, list, od, dl, late: !!dl && dl > D, drafted: list.every(x => x.drafted >= x.miss - 0.0005), draft: sp ? draftFor(sid) : null}; }).sort((a,b) => (a.sp ? 0 : 1) - (b.sp ? 0 : 1) || (a.od || '').localeCompare(b.od || '') || hm(a.sp && a.sp.cutoff) - hm(b.sp && b.sp.cutoff));
-    // Prep-Liste: Vorkochen, dann je Lagerort
-    const groups = [];
-    if(ex.batches.length) groups.push({k:'b', t:'Vorkochen', items:ex.batches.map(b => ({key:'b:' + b.c.id, card:b.c.id, name:b.c.name, qty:`${num(b.n)} ${b.n === 1 ? 'Charge' : 'Chargen'} à ${plG(b.y)}`, sub:`gebraucht ${plG(b.need)}${b.n * b.y - b.need > 1 ? ` · bleibt ${plG(b.n * b.y - b.need)} übrig` : ''}`}))});
+    // Vorbereitungsliste: Vorkochen, dann je Lagerort
+    const groups = []; const cookB = ex.batches.filter(b => b.n > 0);
+    if(cookB.length) groups.push({k:'b', t:'Vorkochen', items:cookB.map(b => { const left = b.have + b.n * b.y - b.need;
+      return {key:'b:' + b.c.id, card:b.c.id, name:b.c.name, qty:`${num(b.n)} ${b.n === 1 ? 'Charge' : 'Chargen'} à ${plG(b.y)}`, sub:[`gebraucht ${plG(b.need)}`, b.have > 0.5 ? `noch da ${plG(b.have)}` : '', left > 1 ? `bleibt ${plG(left)} übrig` : ''].filter(Boolean).join(' · ')}; })});
+    // Basisrezepte, von denen noch genug da ist: keine neue Charge
+    const have = ex.batches.filter(b => b.n === 0 && b.need > 0).map(b => { const ls = vbLots(D).get(b.c.id) || []; return {c:b.c, need:b.need, have:b.have, est:ls.some(l => l.est), exp:ls.map(l => l.exp).filter(Boolean).sort()[0] || null}; });
     Object.entries(LOCS).concat([['', 'Ohne Lagerort']]).forEach(([k, t]) => { const l = prods.filter(x => (LOCS[x.p.loc] ? x.p.loc : '') === k); if(l.length) groups.push({k:'l:' + k, t, items:l.map(x => ({key:'p:' + x.p.id, name:x.p.name, qty:plQty(x.need, x.p), sub: x.st === 'miss' ? `fehlt ${plQty(x.miss, x.p)}` : '', bad: x.st === 'miss', minor: plMinor(x)}))}); });
-    return {D, fc, fac, dishes, total, noCard, batches:ex.batches, prods, sups, groups, nMiss: prods.filter(x => x.st === 'miss').length};
+    return {D, fc, fac, dishes, total, noCard, batches:ex.batches, cook:cookB, have, prods, sups, groups, nMiss: prods.filter(x => x.st === 'miss').length};
   });
+}
+/* Bedarf laut Prognose ab heute bis vor dem Tag „until“ (höchstens eine Woche), je Artikel in kg / l / Stk. Für den Bestellvorschlag. */
+function vbNeedUntil(until){
+  return plCache('need|' + until, () => { const t = todayStr(); const end = dAdd(t, 7); const m = new Map(); if(!plIdx().days.length) return m;
+    for(let d = t; d < until && d < end; d = dAdd(d, 1)){ const fc = vbForecast(d); if(fc.closed || fc.mode === 'none') continue; vbSemiDay(d).ex.prod.forEach((q, pid) => m.set(pid, (m.get(pid) || 0) + q)); }
+    return m; });
 }
 /* Fehlendes eines Lieferanten in dessen Entwurf legen (Menge wird nie verringert) */
 function vbToDraft(sid, D){
@@ -203,7 +266,7 @@ function vbFcHtml(pl, ro, facSeg){
   pl.dishes.forEach(x => { if(keep(x) || (x.q > 0 && nTop < PL_TOP)){ big.push(x); if(!keep(x)) nTop++; } else small.push(x); });
   const smallQ = small.reduce((a,x) => a + x.q, 0);
   return `<section class="pl-sec pl-fc"><h2 class="day-h">Prognose<span>${num(pl.total)} Portionen. Die Zahl können Sie überschreiben.</span></h2>
-    <div class="pl-facrow"><span class="muted">Wie wird der Tag?</span>${facSeg}</div>
+    ${facSeg ? `<div class="pl-facrow"><span class="muted">Wie wird der Tag?</span>${facSeg}</div>` : ''}
     <ul class="vb-list">${big.map(x => vbFcRow(x, ro)).join('') || '<li class="pl-none">Für diesen Tag erwartet die Prognose nichts.</li>'}</ul>
     ${small.length ? `<button type="button" class="link pl-more" data-act="plAll" aria-expanded="${!!view.pl.all}">${view.pl.all ? 'Weniger anzeigen' : `${small.length} weitere ${small.length === 1 ? 'Gericht' : 'Gerichte'} anzeigen, zusammen ${num(smallQ)} ${smallQ === 1 ? 'Portion' : 'Portionen'}`}</button>${view.pl.all ? `<ul class="vb-list">${small.map(x => vbFcRow(x, ro)).join('')}</ul>` : ''}` : ''}
   </section>`;
@@ -219,7 +282,7 @@ function vbMiseHtml(pl){
   const ing = pl.prods.length ? `<p class="pl-ing-sum">${num(pl.prods.length)} ${pl.prods.length === 1 ? 'Zutat' : 'Zutaten'} gebraucht: ${num(nOk)} ${nOk === 1 ? 'reicht' : 'reichen'}${nCome ? `, ${num(nCome)} ${nCome === 1 ? 'reicht' : 'reichen'} mit der bestellten Lieferung` : ''}${pl.nMiss ? `, <b>${num(pl.nMiss)} ${pl.nMiss === 1 ? 'fehlt' : 'fehlen'}</b>` : ''}.</p>
     ${sups}
     ${okList.length ? `<details class="pl-ok" data-open="plok" ${view.pl.okOpen ? 'open' : ''}><summary>${num(okList.length)} ${okList.length === 1 ? 'Zutat reicht' : 'Zutaten reichen'}</summary><ul class="pl-okl">${okList.map(x => `<li><span>${esc(x.p.name)}</span><span>${plQty(x.need, x.p)}</span><span class="muted">${x.st === 'coming' ? `Lager ${plQty(x.stock, x.p)} + Lieferung` : `Lager ${plQty(x.stock, x.p)}`}</span></li>`).join('')}</ul></details>` : ''}
-    <p class="hint">Gerechnet mit dem Lagerstand von jetzt. Was bis dahin noch verkauft wird, ist nicht abgezogen. Basisrezepte zählen in ganzen Chargen, Reste von gestern kennt die App nicht.</p>` : '';
+    <p class="hint">Gerechnet mit dem Lagerstand von jetzt. Was bis dahin noch verkauft wird, ist nicht abgezogen. Basisrezepte zählen in ganzen Chargen. Was davon noch da ist, tragen Sie in der Vorbereitungsliste ein.</p>` : '';
   const none = pl.noCard.length ? `<p class="hint pl-nocard">${pl.noCard.length === 1 ? 'Ein Gericht' : pl.noCard.length + ' Gerichte'} mit ${num(pl.noCard.reduce((a,x) => a + x.q, 0))} Portionen ${pl.noCard.length === 1 ? 'hat' : 'haben'} keine Rezeptur und ${pl.noCard.length === 1 ? 'fehlt' : 'fehlen'} darum hier: ${pl.noCard.slice(0, 4).map(x => esc(x.name)).join(', ')}${pl.noCard.length > 4 ? ' und weitere' : ''}.</p>` : '';
   return `<section class="pl-sec pl-mise"><h2 class="day-h">Reicht die Ware?<span>aus den Rezepturen gerechnet</span></h2>
     ${ing ? ing : '<p class="pl-empty">Für die erwarteten Gerichte gibt es noch keine Rezepturen. Darum lässt sich nichts ausrechnen.</p>'}${none}</section>`;
@@ -230,11 +293,37 @@ function vbPrepHtml(pl){
   const groups = pl.groups.map(g => ({...g, items:g.items.filter(vis)})).filter(g => g.items.length);
   const nMinor = pl.groups.reduce((a,g) => a + g.items.filter(i => i.minor).length, 0);
   const all = groups.reduce((a,g) => a + g.items.length, 0); const done = groups.reduce((a,g) => a + g.items.filter(i => chk[i.key]).length, 0);
-  if(!all && !nMinor) return `<section class="pl-sec pl-prep" id="plPrep"><h2 class="day-h">Prep-Liste</h2><p class="pl-empty">Noch leer. Die Liste füllt sich, sobald die erwarteten Gerichte eine Rezeptur haben.</p></section>`;
-  const item = i => `<li><button type="button" role="checkbox" aria-checked="${chk[i.key] ? 'true' : 'false'}" class="pl-c ${chk[i.key] ? 'on' : ''}" data-act="plChk" data-id="${esc(i.key)}"><i aria-hidden="true">${ico('check')}</i><span class="pl-c-n">${esc(i.name)}${i.sub ? `<small class="${i.bad ? 'bad-t' : ''}">${esc(i.sub)}</small>` : ''}</span><b>${esc(i.qty)}</b></button>${i.card ? `<button type="button" class="link pl-rz" data-act="openCard" data-id="${i.card}">Rezeptur</button>` : ''}</li>`;
-  return `<section class="pl-sec pl-prep" id="plPrep"><h2 class="day-h">Prep-Liste<span id="plProg">${done} von ${all} erledigt</span>${done ? `<button type="button" class="link pl-clear" data-act="plChkClear">Häkchen löschen</button>` : ''}</h2>
-    <div class="pl-groups">${groups.map(g => `<div class="pl-grp ${g.k === 'b' ? 'vk' : ''}"><h3 class="pl-h3">${esc(g.t)}</h3><ul class="pl-chk">${g.items.map(item).join('')}</ul></div>`).join('')}</div>
+  if(!all && !nMinor && !pl.have.length) return `<section class="pl-sec pl-prep" id="plPrep"><h2 class="day-h">Vorbereitungsliste</h2><p class="pl-empty">Noch leer. Die Liste füllt sich, sobald die erwarteten Gerichte eine Rezeptur haben.</p></section>`;
+  const ro = !canEditAll();
+  const item = i => `<li><button type="button" role="checkbox" aria-checked="${chk[i.key] ? 'true' : 'false'}" class="pl-c ${chk[i.key] ? 'on' : ''}" data-act="plChk" data-id="${esc(i.key)}"><i aria-hidden="true">${ico('check')}</i><span class="pl-c-n">${esc(i.name)}${i.sub ? `<small class="${i.bad ? 'bad-t' : ''}">${esc(i.sub)}</small>` : ''}</span><b>${esc(i.qty)}</b></button>${i.card ? `<span class="pl-lk">${ro ? '' : `<button type="button" class="link pl-rest" data-act="plRest" data-id="${i.card}">Rest eintragen</button>`}<button type="button" class="link pl-rz" data-act="openCard" data-id="${i.card}">Rezeptur</button></span>` : ''}</li>`;
+  const haveHtml = vbHaveHtml(pl, ro);
+  return `<section class="pl-sec pl-prep" id="plPrep"><h2 class="day-h">Vorbereitungsliste<span id="plProg">${done} von ${all} erledigt</span>${done ? `<button type="button" class="link pl-clear" data-act="plChkClear">Häkchen löschen</button>` : ''}</h2>
+    <div class="pl-groups">${haveHtml && !groups.some(g => g.k === 'b') ? haveHtml : ''}${groups.map(g => `<div class="pl-grp ${g.k === 'b' ? 'vk' : ''}"><h3 class="pl-h3">${esc(g.t)}</h3><ul class="pl-chk">${g.items.map(item).join('')}</ul>${g.k === 'b' ? haveHtml : ''}</div>`).join('')}</div>
     ${nMinor ? `<button type="button" class="link pl-alling" data-act="plAllIng" aria-expanded="${showAll}">${showAll ? 'Nur Hauptzutaten zeigen' : `Alle Zutaten zeigen · ${nMinor} ${nMinor === 1 ? 'Kleinmenge' : 'Kleinmengen'} wie Salz, Gewürze, Öl`}</button>` : ''}</section>`;
+}
+/* „Noch da“: Basisrezepte ohne neue Charge, mit „reicht bis …“ */
+function vbHaveRow(h, D){ const until = vbReach(h.c.id, D); const rt = until === D ? (D === todayStr() ? 'reicht für heute' : 'reicht für diesen Tag') : 'reicht bis ' + vbDayWord(until);
+  return {name:h.c.name, sub:`gebraucht ${plG(h.need)} · noch da ${h.est ? '≈ ' : ''}${plG(h.have)}${h.exp ? ' · verwenden bis ' + vbDayWord(h.exp) : ''}`, qty:rt}; }
+function vbHaveHtml(pl, ro){
+  if(!pl.have.length) return '';
+  return `<div class="pl-have"><h3 class="pl-h3">Noch da, keine neue Charge</h3><ul class="pl-hl">${pl.have.map(h => { const r = vbHaveRow(h, pl.D);
+    return `<li><span class="pl-c-n"><b>${esc(r.name)}</b><small>${esc(r.sub)}</small></span><b class="pl-reach">${esc(r.qty)}</b><span class="pl-lk">${ro ? '' : `<button type="button" class="link pl-rest" data-act="plRest" data-id="${h.c.id}">ändern</button>`}<button type="button" class="link pl-rz" data-act="openCard" data-id="${h.c.id}">Rezeptur</button></span></li>`; }).join('')}</ul></div>`;
+}
+/* „Noch da“ eintragen: Menge, gekocht am, verwenden bis (aus der Haltbarkeit der Rezeptur, änderbar) */
+function vbRestDialog(id){
+  const c = C(id); if(!c || !roGate()) return; const st = planState(); const t = todayStr(); const r = st.rest[id];
+  const ls = vbLots(t).get(id) || []; const g0 = ls.reduce((a, l) => a + l.g, 0); const sh = vbShelf(c);
+  const cooked = r && r.d ? r.d : t; const exp0 = r && r.s === t ? (r.exp || '') : (ls.map(l => l.exp).filter(Boolean).sort()[0] || vbExp(c, cooked) || '');
+  openDialog('Noch da: ' + c.name, `<p class="dlg-p">Wie viel ist jetzt im Kühlhaus, vor dem Service? Die App zieht davon ab, was ab heute gebraucht wird, und schlägt erst wieder eine Charge vor, wenn es nicht mehr reicht.</p>
+    <label class="f">Menge in kg<input name="kg" class="num-in" type="text" inputmode="decimal" data-msg="Bitte eine Menge in kg eingeben, zum Beispiel 2,5" value="${g0 > 0.5 ? numIn(Math.round(g0 / 10) / 100) : ''}" placeholder="0" autocomplete="off"></label>
+    <div class="fields two"><label class="f">Gekocht am<input name="d" type="date" max="${t}" value="${esc(cooked)}"></label><label class="f">Verwenden bis<input name="exp" type="date" value="${esc(exp0)}"></label></div>
+    <p class="hint">${sh ? `Haltbarkeit laut Rezeptur: ${num(sh.h)} h.` : 'Die Rezeptur nennt keine Haltbarkeit. Tragen Sie bei Bedarf selbst ein Datum ein.'} 0 heißt: nichts mehr da.</p>`,
+    fd => { const raw = String(fd.get('kg') || '').trim(); const kg = raw === '' ? 0 : +raw; if(!isFinite(kg) || kg < 0 || kg > 9999) return dlgErr('kg', 'Bitte eine Menge in kg eingeben, zum Beispiel 2,5'), false;
+      const d = fd.get('d') || t; const exp = fd.get('exp') || ''; if(exp && exp < d) return dlgErr('exp', '„Verwenden bis“ liegt vor dem Kochtag.'), false;
+      st.rest[id] = {g:Math.round(kg * 1000), s:t, d: d > t ? t : d, exp: exp || null};
+      if(st.cook[t]){ delete st.cook[t][id]; if(!Object.keys(st.cook[t]).length) delete st.cook[t]; }   // „noch da“ enthält, was heute schon gekocht wurde
+      vbRestDialog.msg = kg > 0 ? `${c.name}: noch da ${plG(kg * 1000)}` : `${c.name}: nichts mehr da`; },
+    {ok:'Speichern', done:() => vbRestDialog.msg, after: f => { const di = f.elements.d, ei = f.elements.exp; di.onchange = () => { const e = vbExp(c, di.value || t); if(e) ei.value = e; }; }});
 }
 function renderVorb(){
   const ix = plIdx(); const t = todayStr(); const off = Math.max(0, Math.min(6, +view.pl.off || 0)); const D = dAdd(t, off);
@@ -249,8 +338,9 @@ function renderVorb(){
   const facSeg = `<div class="seg pl-fac" role="group" aria-label="Wie wird der Tag?">${PL_FACS.map(([f, l]) => `<button type="button" class="${Math.abs(pl.fac - f) < 0.001 ? 'on' : ''}" data-act="plFac" data-id="${f}" aria-pressed="${Math.abs(pl.fac - f) < 0.001}">${l}</button>`).join('')}</div>`;
   return head(`${esc(dLong)}${sk ? ' · ' + esc(sk) : ''}${live.length ? ' · Aktion: ' + live.map(s => esc(s.name)).join(', ') : ''} · ${num(pl.total)} Portionen erwartet${pl.fac !== 1 ? `, ${pl.fac > 1 ? 'volles Haus' : 'ruhiger Tag'} eingerechnet` : ''}`, `<button type="button" class="btn primary" data-pdf="plPrint">${ico('download')}Als PDF speichern</button>`)
     + days
+    + `<div class="pl-dayrow"><span class="pl-dayn"><b>≈ ${num(pl.total)}</b> Portionen erwartet<button type="button" class="link" data-act="plToFc">einzeln ändern</button></span><span class="pl-facrow"><span class="muted">Wie wird der Tag?</span>${facSeg}</span></div>`
     + vbPrepHtml(pl)
-    + `<div class="pl-grid">${vbFcHtml(pl, ro, facSeg)}${vbMiseHtml(pl)}</div>`
+    + `<div class="pl-grid">${vbFcHtml(pl, ro, '')}${vbMiseHtml(pl)}</div>`
     + `<details class="more pl-how" data-more="plhow" ${(view.more || {}).plhow ? 'open' : ''}><summary>Wie die Prognose rechnet</summary><p class="pl-basis">${vbBasisHtml(pl)}</p></details>`;
 }
 
@@ -259,13 +349,14 @@ function vbPrintHtml(D){
   const pl = vbPlan(D); const dLong = dParse(D).toLocaleDateString('de-AT', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
   const dishes = pl.dishes.filter(x => x.q > 0);
   return `<div class="pl-print"><div class="meta"><span>${esc(S.settings.name)}</span><span>Erstellt ${fmtDate(new Date().toISOString())}</span></div>
-    <h1>Prep-Liste · ${esc(dLong)}</h1><p class="pp-sub">${num(pl.total)} Portionen erwartet${pl.fac !== 1 ? ` (${pl.fac > 1 ? 'volles Haus' : 'ruhiger Tag'})` : ''}. Prognose aus den Verkäufen, geschätzt.</p>
+    <h1>Vorbereitungsliste · ${esc(dLong)}</h1><p class="pp-sub">${num(pl.total)} Portionen erwartet${pl.fac !== 1 ? ` (${pl.fac > 1 ? 'volles Haus' : 'ruhiger Tag'})` : ''}. Prognose aus den Verkäufen, geschätzt.</p>
     ${pl.groups.map(g => ({...g, items:g.items.filter(i => !i.minor || view.pl.allIng)})).filter(g => g.items.length).map(g => `<h2>${esc(g.t)}</h2><ul class="pp-l">${g.items.map(i => `<li><i></i><span>${esc(i.name)}${i.sub ? ` <small>${esc(i.sub)}</small>` : ''}</span><b>${esc(i.qty)}</b></li>`).join('')}</ul>`).join('')}
+    ${pl.have.length ? `<h2>Noch da, keine neue Charge</h2><ul class="pp-l pp-d">${pl.have.map(h => { const r = vbHaveRow(h, D); return `<li><span>${esc(r.name)} <small>${esc(r.sub)}</small></span><b>${esc(r.qty)}</b></li>`; }).join('')}</ul>` : ''}
     <h2>Erwartete Portionen</h2><ul class="pp-l pp-d">${dishes.map(x => `<li><span>${esc(x.name)}</span><b>${num(x.q)}</b></li>`).join('')}</ul></div>`;
 }
 function vbPrint(){
-  const D = vbDay(); const fc = vbForecast(D); if(fc.closed || fc.mode === 'none'){ toast(fc.closed ? 'Ruhetag: keine Prep-Liste' : 'Noch keine Verkäufe, keine Prep-Liste'); return; }
-  PDF_NAME = pdfFileName('Prep-Liste-' + D); $('#print').classList.remove('hs-print'); $('#print').innerHTML = vbPrintHtml(D); document.body.classList.remove('print-menu', 'print-report'); window.print();
+  const D = vbDay(); const fc = vbForecast(D); if(fc.closed || fc.mode === 'none'){ toast(fc.closed ? 'Ruhetag: keine Vorbereitungsliste' : 'Noch keine Verkäufe, keine Vorbereitungsliste'); return; }
+  PDF_NAME = pdfFileName('Vorbereitungsliste-' + D); $('#print').classList.remove('hs-print'); $('#print').innerHTML = vbPrintHtml(D); document.body.classList.remove('print-menu', 'print-report'); window.print();
 }
 document.addEventListener('click', e => { const b = e.target.closest('[data-pdf="plPrint"]'); if(b) vbPrint(); }, true);
 
@@ -273,11 +364,13 @@ document.addEventListener('click', e => { const b = e.target.closest('[data-pdf=
 const _renderDashPlus = renderDash;
 renderDash = function(){
   let h = _renderDashPlus();
+  // neben „Verkäufe buchen“: Kassenbericht importieren (gleich gewichtet, kein zweiter Hauptknopf)
+  h = h.replace('<button type="button" class="btn" data-act="sales">Verkäufe buchen</button>', '<button type="button" class="btn" data-act="sales">Verkäufe buchen</button><button type="button" class="btn" data-act="plKasse">Kassenbericht importieren</button>');
   try {
     const ix = plIdx(); if(!ix.days.length) return h; const t = todayStr();
     let off = 0; if(vbForecast(t).closed) off = 1; const D = dAdd(t, off); const fc = vbForecast(D); if(fc.closed || fc.mode === 'none') return h;
     const pl = vbPlan(D); const top = pl.dishes.filter(x => x.q > 0).slice(0, 3).map(x => `${esc(dishShort(x.m || {name:x.name}, 22))} ${num(x.q)}`).join(' · ');
-    const meta = [pl.batches.length ? `${pl.batches.length} ${pl.batches.length === 1 ? 'Basisrezept' : 'Basisrezepte'} vorkochen` : '', pl.nMiss ? `<span class="bad-t">${pl.nMiss} ${pl.nMiss === 1 ? 'Zutat fehlt' : 'Zutaten fehlen'}</span>` : pl.prods.length ? 'Zutaten reichen' : ''].filter(Boolean).join(' · ');
+    const meta = [pl.cook.length ? `${pl.cook.length} ${pl.cook.length === 1 ? 'Basisrezept' : 'Basisrezepte'} vorkochen` : '', pl.nMiss ? `<span class="bad-t">${pl.nMiss} ${pl.nMiss === 1 ? 'Zutat fehlt' : 'Zutaten fehlen'}</span>` : pl.prods.length ? 'Zutaten reichen' : ''].filter(Boolean).join(' · ');
     const block = daySec('Vorbereitung', off ? 'Prognose für morgen' : 'Prognose für heute', dayRow(`≈ ${num(pl.total)}`, 'Portionen erwartet', top, meta, `<button type="button" class="btn sm" data-act="plGo" data-id="${off}">Vorbereitung</button>`)).replace('<section class="day-sec">', '<section class="day-sec pl-dash">');
     const i = h.indexOf('<!--dash-extra-->'); if(i >= 0) h = h.slice(0, i) + block + h.slice(i);
   } catch(err){ console.warn('Vorbereitung:', err); }
@@ -302,7 +395,12 @@ document.addEventListener('click', e => {
     case 'plAllIng': view.pl.allIng = !view.pl.allIng; render(); break;
     case 'plFac': { if(!roGate()) break; const f = +id; if(Math.abs(f - 1) < 0.001) delete st.fac[D]; else st.fac[D] = f; save(); render(); break; }
     case 'plOvReset': { if(!roGate()) break; if(st.ov[D]){ delete st.ov[D][id]; if(!Object.keys(st.ov[D]).length) delete st.ov[D]; } save(); render(); break; }
+    case 'plToFc': { const s = $('#app .pl-fc'); if(s) s.scrollIntoView({behavior:'smooth', block:'start'}); break; }
+    case 'plRest': vbRestDialog(id); break;
     case 'plChk': { const c = st.chk[D] = st.chk[D] || {}; const on = !c[id]; if(on) c[id] = 1; else delete c[id]; if(!Object.keys(c).length) delete st.chk[D];
+      // abgehakte Charge: gekocht, zählt ab jetzt als „noch da“ (mit Ablauf aus der Haltbarkeit)
+      if(String(id).startsWith('b:')){ const cid = id.slice(2); if(on){ const bt = vbPlan(D).batches.find(x => x.c.id === cid); if(bt && bt.n > 0){ (st.cook[D] = st.cook[D] || {})[cid] = {n:bt.n, g:Math.round(bt.n * bt.y), exp:vbExp(bt.c, D)}; } }
+        else if(st.cook[D]){ delete st.cook[D][cid]; if(!Object.keys(st.cook[D]).length) delete st.cook[D]; } }
       el.classList.toggle('on', on); el.setAttribute('aria-checked', on ? 'true' : 'false'); save(); vbChkPatch();
       if(!!$('#app .pl-clear') !== !!st.chk[D]) render(); break; }
     case 'plChkClear': delete st.chk[D]; save(); render(); break;
@@ -336,19 +434,20 @@ H('tagesfaktor','Ruhig oder volles Haus','Sie wissen mehr als die Zahlen: Feiert
 H('pl_menge','Menge überschreiben','Tippen Sie Ihre eigene Zahl ein, zum Beispiel bei einer Reservierung. „zurück“ holt die Prognose wieder.');
 H('charge','Charge','Eine ganze Menge von einem Basisrezept, so wie es in der Rezeptur steht. Zwei Chargen Dressing heißt: die Rezeptur zweimal ansetzen.',1);
 H('mise','Reicht die Ware?','Die App vergleicht, was die erwarteten Gerichte brauchen, mit dem Lager und den bestellten Lieferungen. Was fehlt, legen Sie mit einem Tipp in die Bestellung.');
-H('prepliste','Prep-Liste','Die Liste für die Küche zum Abhaken: was vorzukochen ist und was aus welchem Lager geholt wird.',1);
+H('prepliste','Vorbereitungsliste','Die Liste für die Küche zum Abhaken: was vorzukochen ist und was aus welchem Lager geholt wird.',1);
 H('pl_abhaken','Abhaken','Ein Tipp setzt das Häkchen, noch ein Tipp nimmt es weg. Die Häkchen gelten für diesen Tag und bleiben gespeichert.');
 H('pl_bestellung','In Bestellung legen','Legt alles, was bei diesem Lieferanten fehlt, in seinen Bestell-Entwurf. Gerundet auf ganze Gebinde. Gesendet wird noch nichts.');
 H('rueckblick','Rückblick','Die App rechnet für die letzten vier Wochen nach, was sie am Vorabend vorhergesagt hätte, und vergleicht es mit dem echten Verkauf.',1);
+H('pl_rest','Noch da','Was von einem Basisrezept noch im Kühlhaus ist. Die App zieht davon ab, was gebraucht wird, und schlägt erst wieder eine Charge vor, wenn es nicht mehr reicht. Eine abgehakte Charge zählt automatisch dazu.');
 H('pl_tag','Tag wählen','Die Prognose gibt es für heute und die nächsten sechs Tage. Am Ruhetag gibt es keine Vorbereitung.');
 HELP_SEL.push(
   ['#app .pl-days button','pl_tag'], ['#app .pl-fac button','tagesfaktor'], ['#app input[data-plov]','pl_menge'], ['#app .pl-r','spanne'], ['#app .pl-tot','prognose'], ['#app .pl-fc .day-h','prognose'], ['#app .pl-basis','prognose'],
-  ['#app .pl-mise .day-h','mise'], ['#app [data-act="plDraft"]','pl_bestellung'], ['#app .pl-prep .day-h','prepliste'], ['#app .pl-c','pl_abhaken'], ['#app .pl-dash','prognose']);
+  ['#app .pl-mise .day-h','mise'], ['#app [data-act="plDraft"]','pl_bestellung'], ['#app .pl-prep .day-h','prepliste'], ['#app .pl-c','pl_abhaken'], ['#app .pl-have','pl_rest'], ['#app [data-act="plRest"]','pl_rest'], ['#app .pl-dash','prognose']);
 
 const _palDataPlus = palData;
 palData = function(){
   const a = _palDataPlus();
   a.push({g:'Aktion', n:'Prognose für morgen', s:'Vorbereitung: was morgen gebraucht wird', run:() => { view.pl.off = 1; go('vorb'); }},
-    {g:'Aktion', n:'Prep-Liste als PDF speichern', s:'Vorbereitung: Liste zum Ausdrucken', run:() => { if(view.tab !== 'vorb') go('vorb'); vbPrint(); }});
+    {g:'Aktion', n:'Vorbereitungsliste als PDF speichern', s:'Vorbereitung: Liste zum Ausdrucken', run:() => { if(view.tab !== 'vorb') go('vorb'); vbPrint(); }});
   return a;
 };

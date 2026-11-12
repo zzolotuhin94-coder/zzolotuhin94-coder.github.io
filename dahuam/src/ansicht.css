@@ -1,0 +1,197 @@
+/* ===================== Ansicht: Schriftgröße, Kontrast, Navigation, Platz (ansicht.js) ===================== */
+
+/* ---------- Schriftgröße (Einstellungen › Anzeige). build.py setzt jede Schriftgröße als calc(Npx * var(--fz)) ---------- */
+:root{--fz:1}
+html[data-fz="2"]{--fz:1.125}
+html[data-fz="3"]{--fz:1.25}
+#print,.gs-page,.gs-sheet,.ab-page{--fz:1}
+@media print{:root{--fz:1}}
+
+/* <small> ohne eigene Größe: nicht kleiner als 12 px (der Browser setzt sonst „smaller“) */
+small{font-size:max(calc(12px*var(--fz,1)),.833em)}
+#print small{font-size:smaller}
+
+/* ---------- Kontrast: kleiner grauer Text mindestens 4,5:1 ---------- */
+:root{--muted:#5a5e61;--faint:#64686c}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--muted:#a3a7aa;--faint:#8e9397;--bg:#17181a;--surface:#1e2023;--surface-2:#25272a}}
+:root[data-theme="dark"]{--muted:#a3a7aa;--faint:#8e9397;--bg:#17181a;--surface:#1e2023;--surface-2:#25272a}
+/* dunkles Design: die Seitenleiste bekommt eine feine goldene Kante, damit sie sich vom Inhalt abhebt */
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .side{box-shadow:inset -1px 0 0 color-mix(in srgb,var(--gold) 22%,transparent)}}
+:root[data-theme="dark"] .side{box-shadow:inset -1px 0 0 color-mix(in srgb,var(--gold) 22%,transparent)}
+
+/* ---------- Kleines Zeichen: ein goldener Ring mit „D“ statt der verkleinerten Illustration ---------- */
+.side .logo,.topbar .logo{-webkit-mask:none;mask:none;background:none;border:1.5px solid var(--gold-hi);border-radius:50%;display:grid;place-items:center;font-size:0;color:var(--gold-hi);flex:none}
+.side .logo::after,.topbar .logo::after{content:"D";font:italic 500 19px/1 "Fraunces",Georgia,serif;letter-spacing:0;transform:translateY(-1px)}
+.topbar .logo::after{font-size:17px}
+
+/* ---------- Abdunkeln über die ganze Breite (auch über der Bildlaufleiste) ---------- */
+html.ov-on{overflow:hidden;scrollbar-gutter:auto}
+html.ov-on body{padding-right:var(--sbw,0px)}
+html.ov-on .bottom{right:var(--sbw,0px)}
+
+/* ---------- Dialoge: Speichern bleibt unten sichtbar ---------- */
+dialog form > .dlg-actions{position:sticky;bottom:0;z-index:3;margin:6px -22px -22px;padding:12px 22px calc(12px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line);border-radius:0 0 10px 10px}
+
+/* ---------- Schnellsuche: Art des Treffers, Schließen statt Esc am Handy ---------- */
+#palList .pg{display:block}
+#palList button{align-items:center}
+.pal-t{flex:none;min-width:74px;font:600 11.5px/1.2 var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--gold-t,#7a5b2b)}
+#palList .pn{min-width:0}
+.pal-x{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:6px;padding:4px 10px;font:500 13px var(--f-body);cursor:pointer}
+#pal .pal-in kbd.pal-kbd{display:inline-block}
+@media (hover:none),(max-width:900px){#pal .pal-in kbd{display:none}}
+@media (hover:hover) and (min-width:901px){.pal-x{display:none}}
+@media (max-width:600px){
+  #palList button{display:grid!important;grid-template-columns:minmax(0,1fr);gap:1px;text-align:left}
+  #palList .pal-t{min-width:0;font-size:11px}
+  #palList .ps{display:block!important;white-space:normal;font-size:12.5px;color:var(--muted)}
+}
+
+/* ---------- Untere Leiste: deckend, Breite je nach Wort, nichts abgeschnitten ---------- */
+.bottom{background:var(--surface)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.bottom .nav-slot{display:flex!important;width:100%;gap:0}
+.bottom .nav-i{flex:1 1 auto!important;min-width:0;width:auto;padding:6px 3px 5px;gap:3px;color:var(--muted);font-weight:500;font-size:clamp(11px,calc(12px*var(--fz,1)),13.5px)!important;line-height:1.15}
+.bottom .nav-i .ico{width:22px;height:22px}
+.bottom .nav-i span{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;max-width:none!important;text-align:center;hyphens:manual;-webkit-hyphens:manual}
+.bottom .nav-i.on,.bottom .nav-i.on .ico{color:var(--gold-t,#7a5b2b)}
+@media (max-width:359px){
+  .topbar .theme-btn[data-act="theme"]{display:none}
+  .topbar .brand small{display:none}
+  .bottom .nav-i{padding-left:1px;padding-right:1px}
+}
+
+/* ---------- Handy: weniger Kopf vor dem Inhalt ---------- */
+@media (max-width:900px){
+  .topbar{padding-block:7px}
+  .topbar .theme-btn{width:40px;height:40px}
+}
+@media (max-width:600px){
+  main{padding-top:12px}
+  #app .page-h{gap:8px 12px;margin-bottom:10px}
+  #app .page-h h1{font-size:28px}
+  #app:is([data-view="menu"],[data-view="cards"],[data-view="stock"],[data-view="buy"],[data-view="products"],[data-view="report"],[data-view="setup"]) .page-h .sub{display:none}
+  #app .page-h:has(> .row-btns > .btn:only-child){flex-wrap:nowrap}
+  #app .page-h:has(> .row-btns > .btn:only-child) > div:first-child{min-width:0}
+  #app .page-h > .row-btns > .btn:only-child{white-space:nowrap}
+  #app .toolbar.tabs{margin-bottom:10px}
+}
+
+/* ---------- Tablet quer (901–1180 px): die Seitenleiste wird eine schmale Leiste mit Zeichen ---------- */
+@media (min-width:901px) and (max-width:1180px){
+  .shell{grid-template-columns:72px minmax(0,1fr)!important}
+  .side{padding:16px 10px 14px!important;align-items:center;gap:14px!important}
+  .side .brand{padding:0;justify-content:center}
+  .side .brand > span:not(.logo){display:none}
+  .side .kbd-btn{width:48px;height:42px;padding:0;justify-content:center;font-size:0}
+  .side .kbd-btn kbd{display:none}
+  .side .nav-slot{width:100%;align-items:center}
+  .side .nav-i{width:48px;justify-content:center;padding:10px 0!important}
+  .side .nav-i span,.side .sh-i span{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .side .nav-gap{width:36px;margin:8px auto}
+  .side .demo-line,.side #cloudChip,.side .sh-sw{display:none!important}
+  .side-help{width:100%;align-items:center}
+  .side .sh-i{width:48px;justify-content:center}
+  .side-foot{flex-direction:column;gap:10px;padding:0!important}
+  .side-foot .whoami{align-items:center;text-align:center;font-size:12px;max-width:60px;overflow:hidden}
+  .side-foot .whoami small{display:none}
+  .save-ind{display:none!important}
+}
+
+/* ---------- Tabellen bis Tablet hoch (≤ 900 px): wie am Handy die Nebenspalten weglassen, damit nichts seitlich wandert ---------- */
+@media (max-width:900px){
+  table.lt{min-width:0!important}
+  table.lt .hide-m{display:none}
+  table.lt td{padding-left:10px;padding-right:10px}
+  table.lt th{white-space:normal;letter-spacing:.03em;padding-left:10px;padding-right:10px;hyphens:auto}
+}
+
+/* ---------- Ware › Bestand bis Tablet hoch: eine Karte je Artikel, die Menge groß ---------- */
+@media (max-width:900px){
+  #app .tbl-wrap:has(> table.stock){overflow:visible}
+  table.stock{display:block;min-width:0!important;width:100%}
+  table.stock thead{display:none}
+  table.stock tbody,table.stock tfoot{display:block}
+  table.stock tr.grp{display:block}
+  table.stock tr.grp td{display:block;position:static}
+  table.stock tr.row{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"n q" "l l" "m a";gap:4px 12px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line)}
+  table.stock tr.row td{display:block;padding:0;border:0;min-width:0;white-space:normal}
+  table.stock tr.row td:nth-child(1){grid-area:n}
+  table.stock tr.row td:nth-child(1) .pn{white-space:normal;overflow-wrap:anywhere}
+  table.stock tr.row td:nth-child(1) small{display:block}
+  table.stock tr.row td:nth-child(2){grid-area:l}
+  table.stock tr.row td:nth-child(2) .lvl{display:block;width:100%;max-width:none}
+  table.stock tr.row td:nth-child(3){grid-area:q;font-size:19px;font-weight:600;text-align:right;align-self:start}
+  table.stock tr.row td:nth-child(4){grid-area:m;font-size:13px;text-align:left}
+  table.stock tr.row td:nth-child(4)::before{content:"Mindest "}
+  table.stock tr.row td:nth-child(5){display:none}
+  table.stock tr.row td:nth-child(6){grid-area:a;display:flex;justify-content:flex-end;gap:2px}
+  table.stock tr.row td:nth-child(6) .icon-btn{width:40px;height:40px}
+  table.stock tfoot tr{display:flex;justify-content:space-between;padding:10px 12px}
+  table.stock tfoot td{display:block;padding:0;border:0}
+  table.stock tfoot td:empty{display:none}
+}
+
+/* ---------- Rezept ohne Foto: kleines Zeichen statt einer halben Seite Platzhalter ---------- */
+.hero .hero-ph:has(> .ph-empty){aspect-ratio:auto!important;width:auto;max-width:none;height:auto;overflow:visible;background:transparent;display:flex;align-items:center;gap:12px;border-radius:0}
+.hero .hero-ph:has(> .ph-empty) > .ph-empty{position:static;width:56px;height:56px;flex:none;border-radius:8px;background-image:none;display:grid;place-items:center}
+.hero .hero-ph:has(> .ph-empty) > .ph-empty b{font-size:26px;background:transparent;padding:0}
+.hero .hero-ph:has(> .ph-empty) > .ph-btn{position:static;transform:none;background:transparent;color:var(--fg);padding:6px 0;border-radius:0;backdrop-filter:none;-webkit-backdrop-filter:none;text-decoration:underline;text-underline-offset:3px}
+.hero .hero-ph:has(> .ph-empty) > .ph-btn:hover{background:transparent;transform:none;color:var(--gold-t,#7a5b2b)}
+@media (min-width:901px){.hero:has(> .hero-ph > .ph-empty){grid-template-columns:auto minmax(0,1fr) auto auto}.hero .hero-ph:has(> .ph-empty){flex-direction:column;align-items:flex-start;align-self:start}}
+@media (max-width:900px){.hero .hero-acts{flex-direction:row!important;justify-content:flex-end;align-self:start}}
+
+/* ---------- Allergene: ausgewählt ist deutlich ausgewählt ---------- */
+.algc input:checked + span{background:var(--fg)!important;color:var(--bg)!important;border-color:var(--fg)!important;box-shadow:none}
+.algc input:checked + span b{color:inherit!important}
+.algc input[name="alg"]:checked + span{position:relative;padding-right:24px}
+.algc input[name="alg"]:checked + span::after{content:"✓";position:absolute;right:7px;top:50%;transform:translateY(-50%);font-weight:700}
+
+/* ---------- Einstellungen: Anzeige ---------- */
+.ans-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;padding:10px 0;border-top:1px solid var(--line)}
+.panel-h + .ans-row{border-top:0;padding-top:4px}
+.ans-row > span{font-weight:600}
+.ans-row .seg button{min-height:40px}
+.ans-demo{margin:10px 0 0;color:var(--muted)}
+
+/* ---------- Bestellung und Wareneingang auf dem Tablet ---------- */
+/* nur die Bestellung: die Rezeptur (Kalkulation) behält am iPad quer Teller links und Kostenstruktur/Produktionsmenge rechts (fix2tests/x05) */
+@media (max-width:1180px){.grid2.ord-grid{grid-template-columns:minmax(0,1fr)}}
+/* Wareneingang bis 1000 px: jede Position eine Zeile mit drei Feldern nebeneinander (Geliefert, Preis, Status), nichts seitlich */
+@media (min-width:701px) and (max-width:1000px){
+  .tbl-wrap:has(> table.otab.recv){overflow:visible}
+  table.otab.recv{min-width:0;display:block}
+  table.otab.recv thead{display:none}
+  table.otab.recv tbody{display:block}
+  table.otab.recv tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px 14px;padding:12px 16px;border-top:1px solid var(--line);align-items:end}
+  table.otab.recv tbody tr:first-child{border-top:0}
+  table.otab.recv td{display:block;padding:0!important;border:0!important;height:auto;text-align:left!important;min-width:0}
+  table.otab.recv td[data-l="Artikel"]{grid-column:1 / 2;grid-row:1}
+  table.otab.recv td[data-l="Bestellt"]{grid-column:2 / -1;grid-row:1;text-align:right!important}
+  table.otab.recv td[data-l]:not([data-l="Artikel"]):not([data-l="Bestellt"])::before{content:attr(data-l);display:block;font:500 12px var(--f-body);color:var(--muted);margin-bottom:2px}
+  table.otab.recv td select,table.otab.recv td input.num-in{width:100%;min-height:44px}
+  table.otab.recv td .qty{display:flex;gap:6px;align-items:center}
+}
+/* Preise am Handy: die Zeile selbst öffnet den Artikel; daneben bleibt nur „Stimmt“ */
+@media (max-width:600px){table.lt .lt-acts .icon-btn{display:none}}
+/* Speisekarte bis Tablet hoch: der Gerichtname bricht um statt die Tabelle zu verbreitern */
+@media (max-width:900px){table.lt.lt-menu td.lt-gripc + td{max-width:48vw}table.lt.lt-menu .lt-miss .link{white-space:normal}}
+@media (max-width:600px){table.lt .lt-n small{white-space:normal;max-width:none}}
+@media (max-width:600px){table.matrix{min-width:0!important;width:100%}table.matrix th,table.matrix td{padding-left:3px!important;padding-right:3px!important}table.matrix th{text-transform:none;letter-spacing:0}table.matrix td:first-child{white-space:normal;padding-left:10px!important}table.matrix td:first-child .pn{white-space:normal;overflow-wrap:anywhere}}
+/* Tablet quer (901–1180 px): Listen passen ohne abgeschnittene Spalten; die Zeile selbst öffnet zum Bearbeiten */
+@media (min-width:901px) and (max-width:1180px){
+  table.lt .lt-n small{max-width:24ch}
+  table.lt td,table.lt th{padding-left:10px;padding-right:10px}
+  table.lt th{letter-spacing:.03em}
+  table.lt .lt-acts .icon-btn{display:none}
+}
+/* Bestellung, Tablet hoch (601–900 px): alle Spalten bis „Rechnungspreis“ ohne seitliches Wischen (fix1tests/x04) */
+@media (min-width:601px) and (max-width:900px){
+  table.otab th,table.otab td{padding-left:7px;padding-right:7px}
+  table.otab th:first-child,table.otab td:first-child{padding-left:16px}
+  table.otab th{letter-spacing:.02em}
+}
+/* Bestellen, Tablet hoch: Knöpfe der Lieferanten-Zeile in eine eigene Zeile darunter */
+@media (min-width:601px) and (max-width:900px){
+  #app.v-list .oc{grid-template-columns:minmax(120px,1fr) minmax(0,1.4fr) 120px 96px 130px!important}
+  #app.v-list .oc .row-btns{grid-column:1 / -1!important;grid-row:3!important;justify-content:flex-start;flex-wrap:wrap!important;margin-top:6px}
+}

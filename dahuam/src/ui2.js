@@ -174,7 +174,7 @@ const ico = (n, cls='') => `<svg class="ico ${cls}" viewBox="0 0 24 24" aria-hid
 
 /* Seiten der App: [Schlüssel, Titel]. Die Navigation (nav.js) fasst sie zu sieben Bereichen zusammen. */
 const TABS = [['dash','Heute'],['vorb','Vorbereitung'],['checkl','Checklisten'],['menu','Speisekarte'],['cards','Rezepte'],['stock','Ware'],['buy','Ware'],['products','Ware'],['pcheck','Preis-Check'],['dienst','Team & Zahlen'],['report','Team & Zahlen'],['setup','Einstellungen'],['einr','Einrichtung'],['daten','Eigene Daten']];
-view = {tab:'dash', card:null, q:'', sec:'all', ctype:'all', pq:'', sim:null, portions:20, mtab:'calc', stab:'bestand', loc:'all', mtype:'all', order:null, more:{}};
+view = {tab:'dash', card:null, q:'', sec:'all', ctype:'dish', pq:'', sim:null, portions:20, mtab:'calc', stab:'bestand', loc:'all', mtype:'all', order:null, more:{}};
 
 /* ---------- Bausteine ---------- */
 function ring(fc, size=46, stroke=5){
@@ -466,11 +466,37 @@ function openDialog(title, body, onOk, opts={}){
     let r; try { r = onOk ? onOk(new FormData(f), f) : undefined; } finally { nums.forEach((i,k) => { if(i.isConnected) i.value = shown[k]; }); }
     if(r === false) return;
     d.close(); save(); render(); if(opts.toast!==false) toast(typeof opts.done==='function' ? opts.done() : (opts.done||'Gespeichert')); };
-  $('#dlgCancel').onclick = $('#dlgX').onclick = () => d.close();
+  $('#dlgCancel').onclick = () => d.close(); $('#dlgX').onclick = () => dlgTryClose();
   if(opts.del) $('#dlgDel').onclick = () => { d.close(); opts.del(); };
   d.showModal();
   opts.after && opts.after(f);
+  dlgSnap(f);
 }
+/* Ungespeicherte Eingaben: Esc, Klick daneben und × fragen erst nach („Abbrechen“ verwirft wie gewohnt) */
+function dlgState(f){ return [...f.querySelectorAll('input,select,textarea')].filter(e => e.type !== 'file' && e.type !== 'submit' && e.type !== 'button').map(e => e.type === 'checkbox' || e.type === 'radio' ? (e.checked ? 1 : 0) : e.value).join('\u0001'); }
+function dlgSnap(f){ f._snap = dlgState(f); f._touched = false; f.addEventListener('input', e => { if(e.isTrusted) f._touched = true; }, {once:true}); setTimeout(() => { if(!f._touched && $('#dlg').open) f._snap = dlgState(f); }, 80); }
+function dlgDirty(){ const f = $('#dlgForm'); return !!(f && $('#dlg').open && f._snap != null && dlgState(f) !== f._snap); }
+function dlgTryClose(){
+  const d = $('#dlg'), f = $('#dlgForm'); if(!d.open) return; if(!dlgDirty()){ d.close(); return; }
+  if(f.querySelector('.dlg-discard')){ f.querySelector('[data-dd="keep"]').focus(); return; }
+  const bar = document.createElement('div'); bar.className = 'dlg-discard'; bar.setAttribute('role', 'alert');
+  bar.innerHTML = '<span>Änderungen verwerfen?</span><button type="button" class="btn" data-dd="keep">Weiter bearbeiten</button><button type="button" class="btn danger" data-dd="drop">Verwerfen</button>';
+  const act = f.querySelector('.dlg-actions'); act.hidden = true; act.insertAdjacentElement('beforebegin', bar);
+  bar.onclick = e => { const b = e.target.closest('[data-dd]'); if(!b) return; if(b.dataset.dd === 'drop'){ d.close(); return; } bar.remove(); act.hidden = false; };
+  bar.querySelector('[data-dd="keep"]').focus();
+}
+(() => { const d = $('#dlg'); if(!d) return;
+  d.addEventListener('keydown', e => { if(e.key !== 'Escape') return; const bar = $('#dlgForm .dlg-discard');
+    if(bar){ e.preventDefault(); e.stopPropagation(); bar.querySelector('[data-dd="keep"]').click(); return; }
+    if(dlgDirty()){ e.preventDefault(); e.stopPropagation(); dlgTryClose(); } });
+  d.addEventListener('cancel', e => { if(dlgDirty()){ e.preventDefault(); dlgTryClose(); } }); })();
+/* Löschen mit Rückweg: der ganze Stand davor bleibt ein paar Sekunden griffbereit, mit allen Verknüpfungen und Fotos */
+function delUndo(label, mutate, imgs){
+  const snap = JSON.stringify(S); const keep = (imgs || []).filter(Boolean).map(id => [id, IMG[id]]).filter(x => x[1]);
+  mutate(); save(); render();
+  toast(`${label} gelöscht`, {ms:9000, action:() => { const o = JSON.parse(snap); Object.keys(S).forEach(k => { if(!(k in o)) delete S[k]; }); Object.assign(S, o); keep.forEach(([id, data]) => imgPut(id, data)); save(); render(); toast('Wiederhergestellt'); }});
+}
+function askDel(text, label, mutate, imgs){ openDialog('Bitte bestätigen', `<p class="dlg-p">${esc(text)}</p>`, () => { setTimeout(() => delUndo(label, mutate, imgs), 0); }, {ok:'Löschen', toast:false}); }
 /* Hinweis direkt am Feld; Dialog bleibt offen */
 function dlgErr(input, msg){
   const f = $('#dlgForm'); if(typeof input === 'string') input = f.elements[input] || f.querySelector(input);
@@ -484,7 +510,7 @@ function dlgErr(input, msg){
 (() => { const d = $('#dlg'); if(!d) return; let down = false;
   const outside = e => { const r = d.getBoundingClientRect(); return e.target === d && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom); };
   d.addEventListener('pointerdown', e => { down = outside(e); });
-  d.addEventListener('click', e => { if(down && outside(e)) d.close(); down = false; }); })();
+  d.addEventListener('click', e => { if(down && outside(e)) dlgTryClose(); down = false; }); })();
 function signedEur(n){ n = fin(n); return (n > 0.004 ? '+' : n < -0.004 ? '−' : '') + eur(Math.abs(n)); }
 function plural(n, one, many){ return `${num(n)} ${n === 1 ? one : many}`; }
 function dateTooFar(ds){ return !!ds && ds > addDays(todayStr(), 1); }
@@ -526,7 +552,7 @@ function menuDialog(m, prefill){
       if(ar.alg !== algClean(m.alg).join(' ') || ar.algNone !== !!m.algNone){ if(ar.alg || ar.algNone){ m.algAt = todayStr(); m.algBy = me().name; } else { m.algAt = ''; m.algBy = ''; } }
       Object.assign(m, {section:sec, name:fd.get('name').trim(), desc:fd.get('desc').trim(), price:+fd.get('price'), card:fd.get('card'), img, veg:fd.get('veg')||'', top:!!fd.get('top'), hidden:!fd.get('show'), seasons: fd.getAll('sea').length===4 ? [] : fd.getAll('sea'), days: fd.getAll('day').length===7 ? [] : fd.getAll('day').map(Number), alg: ar.alg, algNone: ar.algNone, vat: fd.get('vat') || (dc && dc.drink && vatClass({section:sec}) !== 'g' ? 'g' : '')}); if(isNew) S.menu.push(m); drinkAfterSave(m, isNew, oldTag); },
     {done: isNew ? ()=>`„${m.name}“ steht jetzt unter ${m.section}` : 'Gespeichert',
-     del: isNew ? null : () => ask(`„${m.name}“ von der Speisekarte löschen? Die Rezeptur bleibt erhalten.`, () => { imgDel(m.img); S.menu = S.menu.filter(x=>x!==m); }),
+     del: isNew ? null : () => askDel(`„${m.name}“ von der Speisekarte löschen? Die Rezeptur bleibt erhalten.`, `„${m.name}“`, () => { imgDel(m.img); S.menu = S.menu.filter(x=>x!==m); }, [m.img]),
      after: f => { const bind = () => { $('#dlgPhoto').onclick = () => pickImage(data => { const id = uid('img'); imgPut(id, data); img = id; $('#dlgThumb').innerHTML = thumb(); }); const del = $('#dlgPhotoDel'); if(del) del.onclick = () => { img = ''; $('#dlgThumb').innerHTML = thumb(); }; }; bind(); algControlBind(f);
        /* Getränk: Menge je Glas. Leer heißt: wie in der Schankrezeptur. */
        const volSync = () => { const c = f.elements.card.value ? C(f.elements.card.value) : null; const on = !!(c && c.drink) || vatClass({section:f.elements.section.value, vat:f.elements.vat.value}) === 'g'; const box = f.querySelector('#mdVol'); box.hidden = !on; box.querySelectorAll('input,select').forEach(i => { i.disabled = !on; }); f.elements.vol.placeholder = c && c.drink && +c.yieldG > 0 ? 'wie Rezeptur: ' + volTxt(+c.yieldG) : 'z. B. 0,5'; };
@@ -534,7 +560,7 @@ function menuDialog(m, prefill){
 }
 
 function prodDialog(p, pre){
-  const isNew = !p; p = p || {id:uid('p'), name:'', unit:'kg', price:'', lossCold:0, lossHot:0, alg:'', algNone:false, pieceG:'', stock:0, minStock:0, loc:'L', supplier:''};
+  const isNew = !p; p = p || {id:uid('p'), name:'', unit:'kg', price:'', lossCold:0, lossHot:0, alg:'', algNone:false, pieceG:'', stock:0, minStock:0, loc:'L', supplier:'', ean:[]};
   const dr = isDrink(p) || !!(isNew && pre && pre.drink); const L0 = dr && +p.gebL > 0 ? +p.gebL : 0;
   const r2 = v => Math.round(v*100)/100;
   openDialog(isNew ? 'Neuer Artikel' : 'Artikel bearbeiten', `
@@ -560,15 +586,16 @@ function prodDialog(p, pre){
       <label class="f">Lagerort<select name="loc">${Object.entries(LOCS).map(([k,l])=>`<option value="${k}" ${(isNew && dr ? 'W' : p.loc)===k?'selected':''}>${l}</option>`).join('')}</select></label>
       <label class="f">Lieferant<select name="supplier"><option value="">— keiner —</option>${(S.suppliers||[]).map(s=>`<option value="${s.id}" ${p.supplier===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select></label>
       <label class="f">Artikelnummer beim Lieferanten<input name="artNo" value="${esc(p.artNo||'')}"></label>
+      ${scanEanField(isNew && pre && pre.ean ? {ean:[pre.ean]} : p)}
       <label class="f" data-k="food">Gebinde<input name="pack" value="${esc(dr ? '' : p.pack||'')}" placeholder="z. B. Sack 10 kg"></label>
       <label class="f" data-k="food">Inhalt Gebinde in ${esc(p.unit)}<input name="packQty" class="num-in" type="text" inputmode="decimal" value="${dr ? '' : numIn(p.packQty||'')}"></label>
       <label class="f"><span data-gl="M">Mindestbestand</span><input name="minStock" class="num-in" type="text" inputmode="decimal" value="${numIn(L0 ? r2((+p.minStock||0)/L0) : p.minStock)}"></label>
       ${isNew?`<label class="f"><span data-gl="A">Anfangsbestand</span><input name="stock" class="num-in" type="text" inputmode="decimal" value="0"></label>`:''}
     </div>
     ${algControlHtml(algClean(p.alg), prodAlgState(p), {note:'„Keine Allergene“ ist eine bestätigte Angabe. „Noch nicht geprüft“ bleibt auf der Karte sichtbar offen.'})}
-    <div class="togs" data-k="food"><label class="tog"><input type="checkbox" name="basic" ${p.basic===true?'checked':''}><span></span>Grundzutat wie Salz, Gewürze, Öl: steht nicht auf der Prep-Liste</label></div>`,
-    fd => { const ar = algControlRead(fd); if(!ar) return false;
-      const common = {name:fd.get('name').trim(), alg:ar.alg, algNone:ar.algNone, loc:fd.get('loc'), supplier:fd.get('supplier'), artNo:fd.get('artNo').trim()};
+    <div class="togs" data-k="food"><label class="tog"><input type="checkbox" name="basic" ${p.basic===true?'checked':''}><span></span>Grundzutat wie Salz, Gewürze, Öl: steht nicht auf der Vorbereitungsliste</label></div>`,
+    fd => { const ar = algControlRead(fd); if(!ar) return false; const ean = scanEanRead(fd, p); if(ean === false) return false;   // Strichcodes: scan.js
+      const common = {name:fd.get('name').trim(), alg:ar.alg, algNone:ar.algNone, loc:fd.get('loc'), supplier:fd.get('supplier'), artNo:fd.get('artNo').trim(), ean};
       if(fd.get('kind') === 'g'){
         const geb = GEB[fd.get('geb')] ? fd.get('geb') : 'fl', L = +fd.get('gebL'), N = geb === 'kiste' ? Math.round(+fd.get('gebN')) : 1, gp = +fd.get('gprice') || 0;
         if(!(L > 0)) return dlgErr('gebL', 'Bitte den Inhalt in Litern eintragen, zum Beispiel 0,75.');
@@ -584,8 +611,8 @@ function prodDialog(p, pre){
       Object.assign(p, common, {unit:fd.get('unit'), price:+fd.get('price'), pieceG:fd.get('pieceG'), lossCold:+fd.get('lossCold')||0, lossHot:+fd.get('lossHot')||0, basic: fd.get('basic') ? true : (p.basic === true ? false : p.basic), pack:fd.get('pack').trim(), packQty:+fd.get('packQty')||0, minStock:+fd.get('minStock')||0});
       ['geb','gebL','gebN','pfand','pourLoss'].forEach(k => { delete p[k]; });
       if(isNew){ p.stock = 0; S.products.push(p); const s = +fd.get('stock')||0; if(s) addMove('in', p.id, s, 'Anfangsbestand'); } },
-    {del: isNew ? null : () => { const u = usage('p:'+p.id); if(u.length) return info('Artikel wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(c=>c.name).join(', ')}. Entfernen Sie es dort zuerst.`); ask(`Artikel „${p.name}“ löschen?`, () => { S.products = S.products.filter(x=>x!==p); }); },
-     after: f => { algControlBind(f);
+    {del: isNew ? null : () => { const u = usage('p:'+p.id); if(u.length) return info('Artikel wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(c=>c.name).join(', ')}. Entfernen Sie es dort zuerst.`); askDel(`Artikel „${p.name}“ löschen?`, `Artikel „${p.name}“`, () => { S.products = S.products.filter(x=>x!==p); }); },
+     after: f => { algControlBind(f); scanEanBind(f);
       const sync = () => { const g = f.elements.kind.value === 'g'; f.dataset.kind = g ? 'drink' : 'food';
         f.querySelectorAll('[data-k]').forEach(b => { const on = (b.dataset.k === 'drink') === g; b.hidden = !on; b.querySelectorAll('input,select').forEach(i => { i.disabled = !on; }); });
         const geb = f.elements.geb.value, one = GEB[geb] || 'Flasche', kiste = geb === 'kiste';
@@ -641,18 +668,21 @@ function demoSalesAskHtml(){ const n = demoSalesDays().length; return `<fieldset
 function clearDemoSales(){ const ds = demoSalesDays(); ds.forEach(d => { delete S.salesDays[d]; }); S.salesDemo = false; return ds.length; }
 function markRealDay(d){ S.salesReal = S.salesReal || {}; S.salesReal[d] = 1; }
 function salesDlg(){
-  const items = [...specialsFor(todayStr()).flatMap(sp => sp.items.map((it,i)=>({...it, id:'sp_'+sp.id+'_'+i, section:'Aktion · '+sp.name})).filter(it => it.card && C(it.card))), ...menuSorted().filter(m => m.card && C(m.card))];
+  // alle Gerichte der Karte zum Zählen (für die Prognose); abgebucht wird nur, was eine Rezeptur hat
+  const items = [...specialsFor(todayStr()).flatMap(sp => sp.items.map((it,i)=>({...it, id:'sp_'+sp.id+'_'+i, section:'Aktion · '+sp.name})).filter(it => it.card && C(it.card))), ...menuSorted().filter(m => !m.hidden)];
+  const hasCard = m => !!(m.card && C(m.card));
   const askDemo = !!S.salesDemo && demoSalesDays().length > 0;
-  openDialog('Verkäufe buchen', `<p class="dlg-p">Tragen Sie die verkauften Portionen ein, zum Beispiel aus dem Kassenbericht. Die Zutaten werden laut Rezeptur vom Lager abgebucht, auch aus Basisrezepten.</p>
-    <label class="f">Datum<input name="date" type="date" max="${addDays(todayStr(),1)}" value="${todayStr()}"></label>
-    <ul class="sales">${items.map(m=>`<li><span>${esc(dishLabel(m))}<small class="muted">${esc(m.section)}</small></span><span class="stepper"><button type="button" class="icon-btn" data-step="-1" aria-label="weniger">${ico('minus')}</button><input name="s_${m.id}" type="number" min="0" step="1" value="0" inputmode="numeric" aria-label="Portionen ${esc(dishLabel(m))}"><button type="button" class="icon-btn" data-step="1" aria-label="mehr">${ico('plus')}</button></span></li>`).join('') || '<li class="muted">Noch kein Gericht mit Rezeptur. Verkäufe lassen sich erst buchen, wenn eine Rezeptur verknüpft ist.</li>'}</ul>
+  const day0 = new Date().getHours() < 12 ? addDays(todayStr(), -1) : todayStr();   // vormittags bucht man den Kassenbericht von gestern
+  openDialog('Verkäufe buchen', `<p class="dlg-p">Tragen Sie die verkauften Portionen ein, zum Beispiel aus dem Kassenbericht. Bei Gerichten mit Rezeptur werden die Zutaten vom Lager abgebucht, auch aus Basisrezepten.</p>
+    <label class="f">Datum<input name="date" type="date" max="${addDays(todayStr(),1)}" value="${day0}"></label>
+    <ul class="sales">${items.map(m=>`<li><span>${esc(dishLabel(m))}<small class="muted">${esc(m.section)}${hasCard(m) ? '' : ' · ohne Rezeptur, nur gezählt'}</small></span><span class="stepper"><button type="button" class="icon-btn" data-step="-1" aria-label="weniger">${ico('minus')}</button><input name="s_${m.id}" type="number" min="0" step="1" value="0" inputmode="numeric" aria-label="Portionen ${esc(dishLabel(m))}"><button type="button" class="icon-btn" data-step="1" aria-label="mehr">${ico('plus')}</button></span></li>`).join('') || '<li class="muted">Noch kein Gericht mit Rezeptur. Verkäufe lassen sich erst buchen, wenn eine Rezeptur verknüpft ist.</li>'}</ul>
     <div class="kv"><span>Portionen gesamt</span><span id="salesN">0</span><span>Wareneinsatz</span><span id="salesC">${eur(0)}</span></div>
     ${askDemo ? demoSalesAskHtml() : ''}
     <div id="salesWarn"></div>`,
     (fd, f) => { const acc = new Map(); let n = 0; const dk = fd.get('date') || todayStr();
       if(dateTooFar(dk)) return dlgErr('date', 'Das Datum liegt in der Zukunft. Buchungen sind höchstens für morgen möglich.');
       const date = new Date(dk+'T20:00:00').toISOString(); const sold = [];
-      items.forEach(m => { const q = Math.max(0, Math.floor(+fd.get('s_'+m.id)||0)); if(q>0){ n += q; explode(C(m.card), q*menuFactor(m), acc); sold.push([m, q]); } });
+      items.forEach(m => { const q = Math.max(0, Math.floor(+fd.get('s_'+m.id)||0)); if(q>0){ n += q; if(hasCard(m)) explode(C(m.card), q*menuFactor(m), acc); sold.push([m, q]); } });
       if(!n){ $('#salesWarn').innerHTML = `<p class="f-err" role="alert">Noch keine Portionen eingetragen. Bitte bei mindestens einem Gericht die Menge erhöhen.</p>`; return false; }
       const short = [...acc.entries()].map(([pid,q]) => ({p:P(pid), q:Math.round(q*1000)/1000})).filter(x => x.p && x.q > (+x.p.stock||0) + 1e-9);
       const key = dk+'|'+sold.map(([m,q])=>m.id+':'+q).join(',');
@@ -668,7 +698,7 @@ function salesDlg(){
       S.saleGroups = S.saleGroups || {}; S.saleGroups[grp] = {day:dk, n, rows, gross: Math.round(rows.reduce((a,r)=>a+r[2],0)*100)/100};
       const neg = [...acc.keys()].map(P).filter(p => p && (+p.stock||0) < 0).length; salesDlg.last = `${plural(n,'Portion','Portionen')} gebucht, ${acc.size} Artikel abgebucht` + (neg ? ` · ${neg} Artikel im Minus, Wareneingang prüfen` : ''); },
     {ok:'Abbuchen', done:()=>salesDlg.last, after: f => {
-      const upd = () => { let n = 0, c = 0; items.forEach(m => { const q = +f.elements['s_'+m.id].value||0; n += q; c += q*menuCalc(m).cost; }); $('#salesN').textContent = num(n); $('#salesC').textContent = eur(c); $('#salesWarn').innerHTML = ''; delete f.dataset.force; };
+      const upd = () => { let n = 0, c = 0; items.forEach(m => { const q = +f.elements['s_'+m.id].value||0; n += q; if(hasCard(m)) c += q*(menuCalc(m).cost||0); }); $('#salesN').textContent = num(n); $('#salesC').textContent = eur(c); $('#salesWarn').innerHTML = ''; delete f.dataset.force; };
       f.oninput = upd;
       f.querySelectorAll('[data-step]').forEach(b => b.onclick = () => { const i = b.parentNode.querySelector('input'); i.value = Math.max(0, (+i.value||0) + +b.dataset.step); upd(); });
     }});
@@ -690,7 +720,7 @@ function newCard(type, fromMenu){
   const c = {id:uid(type==='semi'?'semi':'dish'), no:S.settings.nextNo++, name: fromMenu ? fromMenu.name : (type==='semi'?'Neues Basisrezept':drink?'Neues Getränk':'Neues Gericht'), type, category: fromMenu ? fromMenu.section : (type==='semi'?'Basisrezepte':drink?drinkSection():''), yieldG: drink && fromMenu && +fromMenu.vol > 0 ? +fromMenu.vol : '', img:'', steps: drink ? [] : [{t:'',img:''}], items:[{ref:'',qty:'',net:''}]};
   if(drink) c.drink = true;
   S.cards.push(c); if(fromMenu) fromMenu.card = c.id;
-  go('cards', c.id); save(); toast('Rezeptur angelegt');
+  view.cv = 'kalk'; go('cards', c.id); save(); toast('Rezeptur angelegt');
 }
 
 function printCard(id){
@@ -750,7 +780,7 @@ function palData(){
     sec('Dienstplan', 'Team & Zahlen', ()=>go('dienst')), sec('Auswertung', 'Team & Zahlen: was verkauft wurde', ()=>{ view.rp.tab='sales'; go('report'); }),
     sec('Einstellungen', NAV_DESC.setup, ()=>go('setup')), sec('Einrichtung', 'Sechs Schritte, bis der Betrieb in der App steht', ()=>go('einr')),
     {g:'Aktion', n:'Neue Aktion / Spezialität', s:'', run:()=>specialDialog()},
-    ...(S.suppliers||[]).map(sp=>({g:'Bestellen', n:sp.name, s:CHANNELS[sp.channel], run:()=>{ const o = newOrder(sp.id); save(); view.stab='bestellung'; view.order=o.id; go('buy'); }})),
+    ...(S.suppliers||[]).map(sp=>({g:'Bestellen', n:sp.name, s:CHANNELS[sp.channel], run:()=>{ const o = ordStart(sp.id); view.stab='bestellung'; view.order=o.id; go('buy'); }})),
     {g:'Aktion', n:'Lieferung ohne Bestellung buchen', s:'Wareneingang', run:()=>moveDlg('in')},
     {g:'Aktion', n:'Verkäufe buchen', s:'', run:()=>salesDlg()},
     {g:'Aktion', n:'Schwund buchen', s:'', run:()=>moveDlg('waste')},
@@ -758,8 +788,8 @@ function palData(){
     {g:'Aktion', n:'Neue Rezeptur anlegen', s:'', run:()=>newCard('dish')},
     {g:'Aktion', n:'Neuen Artikel anlegen', s:'', run:()=>prodDialog()},
     {g:'Aktion', n:'Preis-Check starten', s:'Richtwerte durch Ihre Preise ersetzen', run:()=>pcStart()},
-    ...S.menu.map(m=>({g:'Speisekarte', n:dishLabel(m), s:eur(m.price)+' · '+m.section, run:()=> m.card ? go('cards', m.card) : menuDialog(m)})),
-    ...S.cards.map(c=>({g:'Rezeptur', n:c.name, s:(c.type==='semi'?'Basisrezept':'Gericht')+' · Nr. '+c.no, run:()=>go('cards', c.id)})),
+    ...S.menu.map(m=>({g:'Speisekarte', n:dishLabel(m), s:eur(m.price)+' · '+m.section, run:()=> m.card ? (view.cv = 'kueche', go('cards', m.card)) : menuDialog(m)})),
+    ...S.cards.map(c=>({g:'Rezeptur', n:c.name, s:(c.type==='semi'?'Basisrezept':'Gericht')+' · Nr. '+c.no, run:()=>{ view.cv = 'kueche'; go('cards', c.id); }})),
     ...S.products.map(p=>({g:'Artikel', n:p.name, s:p.noStock?eur(p.price):qtyFmt(+p.stock||0,p)+' auf Lager', run:()=>prodDialog(p)})),
   ];
 }
@@ -829,9 +859,9 @@ document.addEventListener('click', e => {
     case 'stepPhotoDel': imgDel(c.steps[+id].img); c.steps[+id].img = ''; save(); render(); break;
     case 'simTo': { const r = $('#sim'); view.sim.price = Math.min(+r.max, Math.max(+r.min, +id)); r.value = view.sim.price; r.dispatchEvent(new Event('input',{bubbles:true})); break; }
     case 'applySim': { const m = S.menu.find(x=>x.id===id); m.price = Math.round(view.sim.price*10)/10; save(); render(); toast('Verkaufspreis auf '+eur(m.price)+' gesetzt'); break; }
-    case 'dupCard': { const src = C(id); const cp = JSON.parse(JSON.stringify(src)); cp.id = uid(src.type); cp.no = S.settings.nextNo++; cp.name += ' (Kopie)'; cp.img = ''; cp.steps.forEach(s=>s.img=''); S.cards.push(cp); save(); go('cards', cp.id); toast('Kopie angelegt (ohne Fotos)'); break; }
+    case 'dupCard': { const src = C(id); const cp = JSON.parse(JSON.stringify(src)); cp.id = uid(src.type); cp.no = S.settings.nextNo++; cp.name += ' (Kopie)'; cp.img = ''; cp.steps.forEach(s=>s.img=''); S.cards.push(cp); save(); view.cv = 'kalk'; go('cards', cp.id); toast('Kopie angelegt (ohne Fotos)'); break; }
     case 'delCard': { const src = C(id); const u = usage('c:'+id); if(u.length){ info('Basisrezept wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(x=>x.name).join(', ')}. Entfernen Sie es dort zuerst.`); break; }
-      ask(`Rezeptur „${src.name}“ löschen? Die Gerichte bleiben auf der Speisekarte, aber ohne Rezeptur.`, () => { imgDel(src.img); (src.steps||[]).forEach(s=>imgDel(s.img)); S.cards = S.cards.filter(x=>x.id!==id); S.menu.forEach(m=>{ if(m.card===id) m.card=''; }); view.card = null; }); break; }
+      askDel(`Rezeptur „${src.name}“ löschen? Die Gerichte bleiben auf der Speisekarte, aber ohne Rezeptur.`, `Rezeptur „${src.name}“`, () => { imgDel(src.img); (src.steps||[]).forEach(s=>imgDel(s.img)); S.cards = S.cards.filter(x=>x.id!==id); S.menu.forEach(m=>{ if(m.card===id) m.card=''; }); view.card = null; hashSync(); }, [src.img].concat((src.steps||[]).map(s=>s.img))); break; }
     case 'printCard': printCard(id); break;
     case 'printMenu': printMenu(); break;
     case 'itemHide': { const m = S.menu.find(x=>x.id===id); m.hidden = !m.hidden; save(); render(); toast(m.hidden ? `„${m.name}“ ausgeblendet` : `„${m.name}“ wird angezeigt`); break; }

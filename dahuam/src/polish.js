@@ -27,14 +27,17 @@ function renderDash(){
   // Stand je Lieferant kommt aus supToday(), genau wie im Einkauf
   const dueSt = due.map(sp => ({sp, st: supToday(sp)}));
   const openDue = dueSt.filter(x => x.st.state === 'open'), sentDue = dueSt.filter(x => x.st.state === 'sent'), pastDue = dueSt.filter(x => x.st.state === 'past');
-  const orderInfo = !due.length ? 'kein Bestelltag' : openDue.length ? `${openDue.length} ${openDue.length===1?'Bestellung':'Bestellungen'} offen, bis ${esc(openDue[openDue.length-1].sp.cutoff)} Uhr` : pastDue.length ? `Annahmeschluss vorbei${sentDue.length ? `, ${sentDue.length} bestellt` : ''}` : 'alles bestellt';
+  // offen zählt nur, wo etwas nötig ist oder ein Entwurf liegt; Lieferanten ohne Bedarf stehen ruhig darunter
+  const needDue = openDue.filter(x => x.st.draft || supNeed(x.sp.id, x.st.delivery).length);
+  const orderInfo = !due.length ? 'kein Bestelltag' : openDue.length && !needDue.length ? 'heute nichts nötig' : openDue.length ? `${needDue.length} ${needDue.length===1?'Bestellung':'Bestellungen'} offen, bis ${esc(needDue[needDue.length-1].sp.cutoff)} Uhr` : pastDue.length ? `Annahmeschluss vorbei${sentDue.length ? `, ${sentDue.length} bestellt` : ''}` : 'alles bestellt';
   const subParts = [closed ? `${DAYNAME[w]} ist Ruhetag` : 'Servicetag', esc(sTitle), orderInfo];
   const orderRow = ({sp, st}) => {
-    const lowN = lowStock().filter(p=>p.supplier===sp.id).length; const val = lowStock().filter(p=>p.supplier===sp.id).reduce((a,p)=>a+packSuggest(p)*(p.packQty||1)*p.price,0);
-    const sub = `${CHANNELS[sp.channel]} · Lieferung ${dayLabel(st.delivery)}${lowN?` · ${lowN} unter Mindestbestand, ${eur(val)}`:''}`;
-    const meta = st.state === 'open' ? `<span class="${st.urgent ? 'bad-t' : ''}">${esc(st.label)}</span>` : esc(st.label);
-    const act = st.state === 'sent' ? '' : st.draft ? `<button type="button" class="btn sm" data-act="ordOpen" data-id="${st.draft.id}">Entwurf öffnen</button>` : st.state === 'past' ? `<button type="button" class="btn sm" data-act="ordNew" data-id="${sp.id}">Für ${esc(dayLabel(st.delivery).split(',')[0])} vorbereiten</button>` : `<button type="button" class="btn sm" data-act="ordNew" data-id="${sp.id}">Vorbereiten</button>`;
-    return dayRow(`bis ${esc(sp.cutoff)}`, esc(sp.name), sub, meta, act, st.state === 'open' ? '' : 'past');
+    const need = st.state === 'sent' || st.draft ? [] : supNeed(sp.id, st.delivery); const val = need.reduce((a,x)=>a+x.n*(x.p.packQty||1)*x.p.price,0);
+    const none = st.state === 'open' && !st.draft && !need.length;   // nichts nötig: ruhig zeigen, ohne roten Countdown
+    const sub = `${CHANNELS[sp.channel]} · Lieferung ${dayLabel(st.delivery)}${need.length?` · ${need.length} ${need.length===1?'Artikel':'Artikel'} vorgeschlagen, ${eur(val)}`:''}`;
+    const meta = none ? '<span class="muted">nichts nötig</span>' : st.state === 'open' ? `<span class="${st.urgent ? 'bad-t' : ''}">${esc(st.label)}</span>` : esc(st.label);
+    const act = none ? `<button type="button" class="link" data-act="ordNew" data-id="${sp.id}">ansehen</button>` : st.state === 'sent' ? '' : st.draft ? `<button type="button" class="btn sm" data-act="ordOpen" data-id="${st.draft.id}">Entwurf öffnen</button>` : st.state === 'past' ? `<button type="button" class="btn sm" data-act="ordNew" data-id="${sp.id}">Für ${esc(dayLabel(st.delivery).split(',')[0])} vorbereiten</button>` : `<button type="button" class="btn sm" data-act="ordNew" data-id="${sp.id}">Vorbereiten</button>`;
+    return dayRow(`bis ${esc(sp.cutoff)}`, esc(sp.name), sub, meta, act, st.state === 'open' && !none ? '' : 'past');
   };
   const pastLine = pastDue.length ? `<li class="rw past rw-fold"><button type="button" class="rw-more" data-act="dashPast" aria-expanded="${view.dashPast?'true':'false'}">Annahmeschluss heute vorbei: ${pastDue.length} ${pastDue.length===1?'Lieferant':'Lieferanten'} · ${view.dashPast?'ausblenden':'anzeigen'}</button></li>` + (view.dashPast ? pastDue.map(orderRow).join('') : '') : '';
   const orderRows = [...openDue, ...sentDue].map(orderRow).join('');
@@ -57,7 +60,7 @@ function renderDash(){
     <div class="row-btns"><button type="button" class="btn" data-act="sales">Verkäufe buchen</button></div></div>
   ${einrLine()}
   <div class="day">
-    ${openDue.length ? daySec('Bestellen', `${openDue.length} offen, Annahmeschluss`, orderRows + pastLine) : ''}
+    ${openDue.length ? daySec('Bestellen', needDue.length ? `${needDue.length} offen, Annahmeschluss` : 'heute nichts nötig', orderRows + pastLine) : ''}
     ${recvRows ? daySec('Lieferungen prüfen', '', recvRows) : ''}
     ${!openDue.length && (orderRows || pastLine) ? daySec('Bestellen', sentDue.length ? `${sentDue.length} heute bestellt` : 'heute nichts mehr offen', orderRows + pastLine) : ''}
     ${cardRows ? daySec(live.length || dayDishes.length ? 'Heute auf der Karte' : 'Demnächst', '', cardRows) : ''}

@@ -19,13 +19,13 @@ const openDay=()=>ev(()=>{let o=0;while((S.settings.closed||[]).includes(dParse(
 // eine Darstellung für alle: Prep-Liste, Prognose, Warenprüfung; der Rückblick steht zugeklappt darunter
 await openDay();await w(250);
 const sv=await ev(()=>({h:[...document.querySelectorAll('#app .day-h')].map(x=>x.firstChild.textContent),how:!!document.querySelector('#app details.pl-how'),pdf:!!document.querySelector('#app [data-pdf="plPrint"]'),mode:typeof setMode}));
-ok(sv.h.join('|')==='Prep-Liste|Prognose|Reicht die Ware?'&&sv.how&&sv.pdf&&sv.mode==='undefined','one presentation (no mode switch): prep list, forecast, stock check',sv.h);
+ok(sv.h.join('|')==='Vorbereitungsliste|Prognose|Reicht die Ware?'&&sv.how&&sv.pdf&&sv.mode==='undefined','one presentation (no mode switch): prep list, forecast, stock check',sv.h);
 // keine Geld-Auswertung auf dieser Seite
 await openDay();await w(200);ok(await ev(()=>!/€|Deckungsbeitrag|Rohertrag|Wareneinsatz|Umsatz/.test(document.querySelector('#app').innerText)),'no money figures on the Vorbereitung screen');
 // Anleitung
 ok(await ev(()=>!!document.querySelector('#app .page-h h1 .wozu-q')),'„So geht’s hier“ button next to the title');
 await p.click('#app .page-h h1 .wozu-q');await w(250);const how=await ev(()=>({n:document.querySelectorAll('#gdHow li').length,gd:!!document.querySelector('#gd'),txt:(document.querySelector('#gdHow')||{textContent:''}).textContent}));
-ok(how.n>=3&&how.n<=4&&!how.gd&&/Prep-Liste/.test(how.txt),'„So geht’s hier“: a static card with 3–4 lines, no spotlight tour',how.n);await ev(()=>howHide());
+ok(how.n>=3&&how.n<=4&&!how.gd&&/Vorbereitungsliste/.test(how.txt),'„So geht’s hier“: a static card with 3–4 lines, no spotlight tour',how.n);await ev(()=>howHide());
 // Hilfe
 const hp=await ev(()=>{go('vorb');helpApply();const c=[...document.querySelectorAll('#app [data-help]')].map(e=>e.dataset.help);return {v:[...new Set(c)],bad:HELP_SEL.filter(x=>!HELP[x[1]]).length,len:Object.values(HELP).filter(h=>h.x.length<25||h.x.length>230).map(h=>h.k)}});
 ok(['prognose','spanne','pl_menge','tagesfaktor','mise','prepliste','pl_abhaken','pl_tag','pdf'].every(k=>hp.v.includes(k))&&hp.bad===0&&hp.len.length===0,'help mode: new elements carry explanations; all texts 25–230 characters',hp.v);
@@ -43,7 +43,7 @@ for(const mode of ['']){
 }
 ok(bad.length===0,`phone 390: scrollWidth === 390 and controls ≥ 40 px on ${views} views (7 days, missing stock, Heute, Einstellungen)`,bad);
 await ev(()=>go('dash'));await w(200);
-await p.tap('.bottom .nav-i[data-tab="vorb"]');await w(250);ok(await ev(()=>view.tab==='vorb'),'phone: Vorbereitung („Prep“) directly in the bottom bar');
+await p.tap('.bottom .nav-i[data-tab="vorb"]');await w(250);ok(await ev(()=>view.tab==='vorb'),'phone: Vorbereitung directly in the bottom bar');
 await ev(()=>{let o=0;while((S.settings.closed||[]).includes(dParse(dAdd(todayStr(),o)).getDay()))o++;view.pl.off=o;render()});await w(200);
 ok(await ev(()=>{const c=document.querySelector('#app .pl-c');return c&&parseFloat(getComputedStyle(c).fontSize)>=16&&c.getBoundingClientRect().height>=48}),'prep list: big type (≥ 16 px), rows ≥ 48 px');
 await p.tap('#app .pl-c');await w(150);ok(await ev(()=>document.querySelector('#app .pl-c').classList.contains('on')),'tap checks an item');

@@ -51,14 +51,42 @@ function cmpRange(rp, r, today){
   return c;
 }
 
+/* ---------- Wareneinsatz zum Verkaufstag festschreiben ----------
+   S.costSnap = {to:'JJJJ-MM-TT', v:[[gültig ab, {Gericht: Kosten je Portion}], …]}.
+   Vergangene Verkaufstage rechnen mit den Kosten, die galten, als der Tag vorbei war; eine spätere
+   Preisänderung ändert abgeschlossene Tage und Monate nicht mehr. Heute rechnet mit den aktuellen Preisen. */
+function costNow(){ const o = {}; for(const m of S.menu){ const k = menuCalc(m); if(k && k.cost != null && isFinite(k.cost)) o[m.id] = Math.round(k.cost * 10000) / 10000; } return o; }
+function costSnapTick(){
+  if(!S || !Array.isArray(S.menu)) return; const y = dAdd(isoDate(new Date()), -1);
+  let cs = S.costSnap; if(!cs || typeof cs !== 'object' || !Array.isArray(cs.v)) cs = S.costSnap = {to:'', v:[]};
+  if(cs.to >= y) return;
+  const cur = costNow(); const last = cs.v.length ? cs.v[cs.v.length - 1][1] : null;
+  const same = last && Object.keys(cur).length === Object.keys(last).length && Object.keys(cur).every(k => last[k] === cur[k]);
+  if(!same) cs.v.push([cs.to ? dAdd(cs.to, 1) : '0000-01-01', cur]);
+  cs.to = y;
+}
+function costFor(day, mid, live){
+  const cs = S.costSnap; if(!cs || !cs.to || day > cs.to || !cs.v.length) return live(mid);
+  // Kosten des Tages; kannte die App das Gericht damals noch nicht (Rezeptur oder Verkäufe kamen später dazu), die ersten bekannten
+  let hit = null, later = null; for(const [from, t] of cs.v){ if(t[mid] == null) continue; if(from <= day) hit = t[mid]; else if(later == null) later = t[mid]; }
+  return hit != null ? hit : later != null ? later : live(mid);
+}
+const _renderRp = render; render = function(){ try { costSnapTick(); } catch(e){ console.warn('Kosten:', e); } return _renderRp.apply(this, arguments); };
+
 /* ---------- Kennzahlen ---------- */
 function report(from, to){
+  costSnapTick();
   const a = salesAgg(from, to); const rows = [];
   let net = 0, we = 0, netCovered = 0, grossCovered = 0;
+  // Wareneinsatz je Gericht: je Verkaufstag mit den Kosten dieses Tages
+  const liveC = new Map(); const live = mid => { if(!liveC.has(mid)){ const m = S.menu.find(x=>x.id===mid); const k = m ? menuCalc(m) : null; liveC.set(mid, k && k.cost != null ? k.cost : null); } return liveC.get(mid); };
+  const weBy = new Map();
+  for(const [day, rs] of Object.entries(S.salesDays || {})){ if(day < from || day > to) continue;
+    for(const [mid, q] of rs){ const c = costFor(day, mid, live); const x = weBy.get(mid) || {w:0, qc:0}; if(c != null){ x.w += c * q; x.qc += q; } weBy.set(mid, x); } }
   for(const [mid, {q, g}] of a.by){
     const m = S.menu.find(x=>x.id===mid); const vat = +vatRate(m) || 0; const n = g/(1+vat/100);
-    const k = m ? menuCalc(m) : null; const cpp = k && k.cost != null ? k.cost : null;
-    const w = cpp != null ? cpp*q : null;
+    const wx = weBy.get(mid); const cpp = wx && wx.qc > 0 ? wx.w / wx.qc : null;
+    const w = cpp != null ? cpp*q : null;   // costFor liefert für jeden Tag einen Wert, sobald das Gericht irgendwann kalkuliert war
     rows.push({mid, m, vat, vc:vatClass(m), name: m ? dishLabel(m) : 'Gelöschtes Gericht', section: m ? m.section : '—', q, g, n, avg: q ? g/q : 0, we:w, cpp, fc: w != null && n ? w/n*100 : null, rg: w != null ? n - w : null});
     net += n; if(w != null){ we += w; netCovered += n; grossCovered += g; }
   }
@@ -130,7 +158,7 @@ function salesView(){
   ${specialsBlock(r.from, to, cur)}
   ${dDiff(r.from, to) > 62 ? monthTable(r.from, to) : ''}
   ${more}
-  <p class="hint">Interne Auswertung. Maßgeblich für Steuer und Buchhaltung sind die Daten der Registrierkasse (RKSV/DEP). Netto: Speisen 10 %, Getränke 20 % MwSt.</p>`;
+  <p class="hint">Interne Auswertung. Maßgeblich für Steuer und Buchhaltung sind die Daten der Registrierkasse (RKSV/DEP). Netto: Speisen 10 %, Getränke 20 % MwSt. Wareneinsatz zu den Einkaufspreisen am jeweiligen Verkaufstag: Spätere Preisänderungen ändern vergangene Tage nicht.</p>`;
   return h;
 }
 function buckets(from, to){

@@ -63,7 +63,7 @@ const WAKE = `(() => { const st = window.__wl = {req:0, rel:0, held:0, reject:fa
   L.ok(await ev(() => document.querySelectorAll('#app .rz li.done').length === 2), 'andere Portionszahl: die Häkchen bleiben stehen');
   await L.idle(p); L.ok(before === await ev(async () => JSON.stringify(await __store.read())), 'nichts davon wird gespeichert (Speicher unverändert)');
   await L.go(p, 'rezepte'); await L.go(p, 'rezepte/dish_elsasser/kueche');
-  L.ok(await ev(() => document.querySelectorAll('#app .rz li.done').length === 0 && document.querySelector('#rzN').value === '1'), 'nach dem Verlassen: Häkchen weg, wieder 1 Portion');
+  L.ok(await ev(() => document.querySelectorAll('#app .rz li.done').length === 2 && document.querySelector('#rzN').value === '2'), 'nach dem Verlassen und Zurückkommen: Häkchen und Portionen bleiben (bis zum Neuladen)');   // fix2: früher „Häkchen weg, wieder 1 Portion“
   // ---------- Bildschirm bleibt an ----------
   L.ok(await ev(() => __wl.held === 1 && __wl.req >= 1), 'Küchen-Ansicht offen: Bildschirmsperre angefordert', await ev(() => __wl));
   await L.go(p, 'rezepte/dish_elsasser/service'); await w(100); L.ok(await ev(() => __wl.held === 0), 'andere Ansicht: wieder freigegeben');
@@ -72,8 +72,11 @@ const WAKE = `(() => { const st = window.__wl = {req:0, rel:0, held:0, reject:fa
   L.ok(!!(await p.$('#app .rz-k')) && p.errs.length === 0, 'Gerät lehnt ab: die Ansicht läuft ohne Fehler weiter', p.errs);
   await ev(() => { __wl.reject = false; });
   // ---------- Rezepte-Liste: derselbe Schalter ----------
-  await L.go(p, 'rezepte'); await ev(() => { view.cv = null; render(); });
-  L.ok(await ev(() => /Wareneinsatz/.test(document.querySelector('#app table.lt thead').textContent) && document.querySelectorAll('#app .rz-sw [role=tab]').length === 3), 'Chef, Liste: Kalkulation mit Wareneinsatz; Schalter mit drei Ansichten');
+  await L.go(p, 'rezepte'); await ev(() => { view.cv = null; view.ctype = 'all'; render(); });
+  // fix2: die Liste zeigt ohne eigene Wahl die Küche (früher: Chef sah zuerst die Kalkulation); Kalkulation über ihren Reiter
+  L.ok(await ev(() => !/Wareneinsatz/.test(document.querySelector('#app table.lt thead').textContent) && document.querySelector('#app .rz-sw [role=tab].on').dataset.id === 'kueche' && document.querySelectorAll('#app .rz-sw [role=tab]').length === 3), 'Chef, Liste: zuerst Küche; Schalter mit drei Ansichten');
+  await p.click('#app .rz-sw [data-id="kalk"]'); await w(150);
+  L.ok(await ev(() => /Wareneinsatz/.test(document.querySelector('#app table.lt thead').textContent)), 'Reiter Kalkulation: Liste mit Wareneinsatz');
   await p.click('#app .rz-sw [data-id="kueche"]'); await w(150);
   L.ok(await ev(() => { const t = document.querySelector('#app .lt-wrap').innerText; return !/€|%|Wareneinsatz/i.test(t) && /Flammkuchenteig\s+Basisrezept · 1,65 kg/.test(t) && document.querySelectorAll('#app table.lt tbody tr').length === S.cards.length; }), 'Liste „Küche“: alle Rezepturen, ohne Preise');
   await p.click('#app table.lt tbody tr:first-child .row-open'); await w(200);
