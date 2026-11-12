@@ -1,7 +1,7 @@
 import os, sys, json, hashlib
 import re as _re
 APP_VERSION = '1.6.0'   # Speisekarte-Gestalter: ein Modus für die Gästekarte, Vorlagen statt Stil-Schalter
-SITE = '/home/user/wt-3/dahuam/'
+SITE = '/home/user/zzolotuhin94-coder.github.io/dahuam/'
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 R = lambda f: open(f, encoding='utf-8').read()
 

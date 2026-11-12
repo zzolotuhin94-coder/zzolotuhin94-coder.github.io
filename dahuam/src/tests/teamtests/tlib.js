@@ -1,6 +1,6 @@
 // Gemeinsames für die Team-Tests: feste Uhr (Donnerstag, 12.11.2026, 10:30, KW 46), frischer Speicher
 const {chromium}=require('playwright');
-const URL='http://127.0.0.1:8773/dahuam/index.html?nointro';
+const URL='http://127.0.0.1:8765/dahuam/index.html?nointro';
 exports.URL=URL;
 const clock=(y,mo,d,h,mi)=>`(()=>{const _D=Date;const FIX=new _D(${y},${mo-1},${d},${h},${mi},0).getTime();const T0=_D.now();class MD extends _D{constructor(...a){if(a.length===0)super(FIX+(_D.now()-T0));else super(...a);}static now(){return FIX+(_D.now()-T0);}}window.Date=MD;})();`;
 exports.clock=clock;

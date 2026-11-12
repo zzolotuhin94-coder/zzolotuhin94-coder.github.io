@@ -1,4 +1,4 @@
-Tests laufen gegen http://127.0.0.1:8773/dahuam/index.html (python3 -m http.server 8765 im Ordner über dahuam/).
+Tests laufen gegen http://127.0.0.1:8765/dahuam/index.html (python3 -m http.server 8765 im Ordner über dahuam/).
 Je Ordner: sh run_all.sh. fixtests ruft zusätzlich die älteren Abläufe t4 … t18 in diesem Ordner auf.
 btests = Paket B (Navigation, Einrichtung, Umstellung alter Stände, Rollen, Entferntes).
 ctests = Paket C (Eigene Daten: Importe, leer starten, Allergene, zweiter Steuersatz). Beispieldateien in ctests/samples.

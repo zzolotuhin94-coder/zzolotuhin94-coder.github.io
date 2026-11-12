@@ -1,6 +1,6 @@
 // Paket A: App-Symbole aus brand/logo.svg auf Schiefer (brand/slate.webp). Einmal ausführen: node icons.js (Server auf :8765)
 const {chromium} = require('playwright'); const fs = require('fs');
-const OUT = '/home/user/wt-3/dahuam/icons/';
+const OUT = '/home/user/zzolotuhin94-coder.github.io/dahuam/icons/';
 (async () => {
   fs.mkdirSync(OUT, {recursive:true});
   const b = await chromium.launch(); const p = await b.newPage({deviceScaleFactor:1});
@@ -14,7 +14,7 @@ const OUT = '/home/user/wt-3/dahuam/icons/';
       img{position:absolute;left:50%;top:50%;height:${Math.round(size*k)}px;transform:translate(-50%,-50%)}</style>
       <div class="bg"></div><div class="sh"></div><img src="brand/logo.svg">`;
     await p.route('**/__icon.html', r => r.fulfill({contentType:'text/html', body:html}));
-    await p.goto('http://127.0.0.1:8773/dahuam/__icon.html'); await p.unroute('**/__icon.html');
+    await p.goto('http://127.0.0.1:8765/dahuam/__icon.html'); await p.unroute('**/__icon.html');
     await p.waitForFunction(() => { const i = document.querySelector('img'); return i.complete && i.naturalWidth > 0; });
     await p.waitForTimeout(250);
     await p.screenshot({path:OUT + name, clip:{x:0, y:0, width:size, height:size}});
