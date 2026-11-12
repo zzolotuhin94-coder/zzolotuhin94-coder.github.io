@@ -2,7 +2,7 @@
 const {chromium}=require('playwright');
 (async()=>{const b=await chromium.launch();const ctx=await b.newContext({viewport:{width:1440,height:900}});await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/,r=>r.abort());const p=await ctx.newPage();
 await p.addInitScript(()=>{window.print=()=>{};try{localStorage.setItem('dahuam202_kueche_de_v1_guide',JSON.stringify({asked:1,mode:'full'}))}catch(e){}});
-await p.goto(process.argv[2]||'http://127.0.0.1:8765/dahuam/_before.html?nointro');await p.waitForTimeout(900);
+await p.goto(process.argv[2]||'http://127.0.0.1:8771/dahuam/_before.html?nointro');await p.waitForTimeout(900);
 const used={};
 const grab=async(tag)=>{const r=await p.evaluate(()=>{const o={};const KNOWN=/Figtree|Barlow Condensed|PT Sans|Saira Condensed|Roboto Condensed|Source Serif 4|Schibsted Grotesk|Bricolage Grotesque|JetBrains Mono|Fraunces|Caveat|Cormorant Garamond|Alegreya|Big Shoulders|Karla|Work Sans|Young Serif|Playfair|DM S/;
  for(const el of document.querySelectorAll('body *')){ if(el.closest('#intro'))continue; let txt=false;for(const n of el.childNodes)if(n.nodeType===3&&n.nodeValue.trim()){txt=true;break}
