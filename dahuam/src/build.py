@@ -1,4 +1,5 @@
 import os, sys, json, hashlib
+import re as _re
 APP_VERSION = '1.6.0'   # Speisekarte-Gestalter: ein Modus für die Gästekarte, Vorlagen statt Stil-Schalter
 SITE = '/home/user/wt-3/dahuam/'
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -7,14 +8,42 @@ R = lambda f: open(f, encoding='utf-8').read()
 # Reihenfolge zählt: spätere Dateien bauen auf früheren auf.
 JS_BEFORE = ['script_de.js', 'store.js']          # Rechenkern, Speicher
 JS_MODULES = ['season.js', 'season2.js', 'season3.js', 'einkauf.js', 'menu2.js', 'cloud.js', 'ui3.js', 'sales.js', 'report.js', 'menu3.js', 'prices.js',
-              'game.js', 'drag.js', 'polish.js', 'pdf.js', 'allergen.js', 'hauskarte.js', 'fixes.js', 'guide_txt.js', 'guide.js', 'vorbereitung.js', 'team.js', 'nav.js', 'reliab.js', 'daten.js', 'bar.js', 'rezept.js', 'eigen.js', 'apart.js', 'welcome.js', 'gestalter.js', 'gestalter_ed.js']
+              'game.js', 'drag.js', 'polish.js', 'pdf.js', 'allergen.js', 'hauskarte.js', 'fixes.js', 'guide_txt.js', 'guide.js', 'vorbereitung.js', 'team.js', 'nav.js', 'reliab.js', 'daten.js', 'bar.js', 'rezept.js', 'eigen.js', 'apart.js', 'welcome.js', 'gestalter.js', 'gestalter_ed.js', 'heute.js', 'ansicht.js']
 CSS_MODULES = ['season.css', 'einkauf.css', 'menu2.css', 'ui3.css', 'report.css', 'prices.css', 'game.css', 'drag.css', 'polish.css',
-               'fixes.css', 'guide.css', 'plus.css', 'team.css', 'reliab.css', 'nav.css', 'daten.css', 'bar.css', 'rezept.css', 'eigen.css', 'apart.css', 'welcome.css', 'gestalter.css']
+               'fixes.css', 'guide.css', 'plus.css', 'team.css', 'reliab.css', 'nav.css', 'daten.css', 'bar.css', 'rezept.css', 'eigen.css', 'apart.css', 'welcome.css', 'gestalter.css', 'heute.css', 'ansicht.css']
 start = '/* ---------- Start ---------- */'
 a, b = R('ui2.js').split(start)                   # ui2.js: Oberfläche; der Start-Block läuft erst nach allen Modulen
 js = '\n'.join([R(f) for f in JS_BEFORE] + [a] + [R(f) for f in JS_MODULES] + [start + b])
-shell = R('shell.html').replace('/*FONTS*/', R('fonts.css'), 1).replace('/*MODULE_CSS*/', ''.join(R(f) for f in CSS_MODULES), 1)
-import re as _re
+# Schriftgröße (Einstellungen › Anzeige): jede Schriftgröße in px wird zu calc(Npx * var(--fz,1)); am Bildschirm nichts unter 12 px.
+# Ausgenommen: Druck und PDF (@media print, #print), der Speisekarte-Gestalter (seine Seite ist ein festes A4-Blatt), @font-face.
+FZ_SKIP_FILES = {'fonts.css', 'gestalter.css'}
+def fz(css):
+    out = []; stack = []; i = 0; n = len(css); last = 0
+    def skip():
+        return any(p.startswith('@media print') or '#print' in p or '.pdf' in p or p.startswith('@font-face') or p.startswith('@page') or p.startswith('@keyframes') for p in stack)
+    def decl(txt):
+        if skip(): return txt
+        def one(m):
+            v = float(m.group(2)); v = max(v, 12.0)
+            return m.group(1) + 'calc(' + ('%g' % v) + 'px*var(--fz,1))'
+        txt = _re.sub(r'(font-size\s*:\s*)(\d*\.?\d+)px(?=\s*(?:!important)?\s*(?:;|$))', one, txt)
+        txt = _re.sub(r'(font\s*:\s*(?:italic\s+|normal\s+|small-caps\s+)*(?:\d{3}\s+|bold\s+|normal\s+)?)(\d*\.?\d+)px', one, txt)
+        return txt
+    while i < n:
+        c = css[i]
+        if c == '/' and css.startswith('/*', i):
+            j = css.find('*/', i + 2); j = n if j < 0 else j + 2; i = j; continue
+        if c == '{':
+            seg = css[last:i]; k = max(seg.rfind(';'), seg.rfind('}'))
+            pre = _re.sub(r'/\*.*?\*/', '', seg[k + 1:], flags=_re.S).strip()
+            out.append(decl(seg)); out.append('{'); stack.append(pre); last = i + 1
+        elif c == '}':
+            out.append(decl(css[last:i])); out.append('}'); stack and stack.pop(); last = i + 1
+        i += 1
+    out.append(css[last:]); return ''.join(out)
+_sh = R('shell.html'); _a, _b = _sh.split('<style>', 1); _st, _c = _b.split('</style>', 1)
+shell = _a + '<style>' + fz(_st) + '</style>' + _c
+shell = shell.replace('/*FONTS*/', R('fonts.css'), 1).replace('/*MODULE_CSS*/', ''.join(R(f) if f in FZ_SKIP_FILES else fz(R(f)) for f in CSS_MODULES), 1)
 def _pdfcss(css):
     out=[]; i=0
     while True:
