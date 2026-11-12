@@ -641,18 +641,21 @@ function demoSalesAskHtml(){ const n = demoSalesDays().length; return `<fieldset
 function clearDemoSales(){ const ds = demoSalesDays(); ds.forEach(d => { delete S.salesDays[d]; }); S.salesDemo = false; return ds.length; }
 function markRealDay(d){ S.salesReal = S.salesReal || {}; S.salesReal[d] = 1; }
 function salesDlg(){
-  const items = [...specialsFor(todayStr()).flatMap(sp => sp.items.map((it,i)=>({...it, id:'sp_'+sp.id+'_'+i, section:'Aktion · '+sp.name})).filter(it => it.card && C(it.card))), ...menuSorted().filter(m => m.card && C(m.card))];
+  // alle Gerichte der Karte zum Zählen (für die Prognose); abgebucht wird nur, was eine Rezeptur hat
+  const items = [...specialsFor(todayStr()).flatMap(sp => sp.items.map((it,i)=>({...it, id:'sp_'+sp.id+'_'+i, section:'Aktion · '+sp.name})).filter(it => it.card && C(it.card))), ...menuSorted().filter(m => !m.hidden)];
+  const hasCard = m => !!(m.card && C(m.card));
   const askDemo = !!S.salesDemo && demoSalesDays().length > 0;
-  openDialog('Verkäufe buchen', `<p class="dlg-p">Tragen Sie die verkauften Portionen ein, zum Beispiel aus dem Kassenbericht. Die Zutaten werden laut Rezeptur vom Lager abgebucht, auch aus Basisrezepten.</p>
-    <label class="f">Datum<input name="date" type="date" max="${addDays(todayStr(),1)}" value="${todayStr()}"></label>
-    <ul class="sales">${items.map(m=>`<li><span>${esc(dishLabel(m))}<small class="muted">${esc(m.section)}</small></span><span class="stepper"><button type="button" class="icon-btn" data-step="-1" aria-label="weniger">${ico('minus')}</button><input name="s_${m.id}" type="number" min="0" step="1" value="0" inputmode="numeric" aria-label="Portionen ${esc(dishLabel(m))}"><button type="button" class="icon-btn" data-step="1" aria-label="mehr">${ico('plus')}</button></span></li>`).join('') || '<li class="muted">Noch kein Gericht mit Rezeptur. Verkäufe lassen sich erst buchen, wenn eine Rezeptur verknüpft ist.</li>'}</ul>
+  const day0 = new Date().getHours() < 12 ? addDays(todayStr(), -1) : todayStr();   // vormittags bucht man den Kassenbericht von gestern
+  openDialog('Verkäufe buchen', `<p class="dlg-p">Tragen Sie die verkauften Portionen ein, zum Beispiel aus dem Kassenbericht. Bei Gerichten mit Rezeptur werden die Zutaten vom Lager abgebucht, auch aus Basisrezepten.</p>
+    <label class="f">Datum<input name="date" type="date" max="${addDays(todayStr(),1)}" value="${day0}"></label>
+    <ul class="sales">${items.map(m=>`<li><span>${esc(dishLabel(m))}<small class="muted">${esc(m.section)}${hasCard(m) ? '' : ' · ohne Rezeptur, nur gezählt'}</small></span><span class="stepper"><button type="button" class="icon-btn" data-step="-1" aria-label="weniger">${ico('minus')}</button><input name="s_${m.id}" type="number" min="0" step="1" value="0" inputmode="numeric" aria-label="Portionen ${esc(dishLabel(m))}"><button type="button" class="icon-btn" data-step="1" aria-label="mehr">${ico('plus')}</button></span></li>`).join('') || '<li class="muted">Noch kein Gericht mit Rezeptur. Verkäufe lassen sich erst buchen, wenn eine Rezeptur verknüpft ist.</li>'}</ul>
     <div class="kv"><span>Portionen gesamt</span><span id="salesN">0</span><span>Wareneinsatz</span><span id="salesC">${eur(0)}</span></div>
     ${askDemo ? demoSalesAskHtml() : ''}
     <div id="salesWarn"></div>`,
     (fd, f) => { const acc = new Map(); let n = 0; const dk = fd.get('date') || todayStr();
       if(dateTooFar(dk)) return dlgErr('date', 'Das Datum liegt in der Zukunft. Buchungen sind höchstens für morgen möglich.');
       const date = new Date(dk+'T20:00:00').toISOString(); const sold = [];
-      items.forEach(m => { const q = Math.max(0, Math.floor(+fd.get('s_'+m.id)||0)); if(q>0){ n += q; explode(C(m.card), q*menuFactor(m), acc); sold.push([m, q]); } });
+      items.forEach(m => { const q = Math.max(0, Math.floor(+fd.get('s_'+m.id)||0)); if(q>0){ n += q; if(hasCard(m)) explode(C(m.card), q*menuFactor(m), acc); sold.push([m, q]); } });
       if(!n){ $('#salesWarn').innerHTML = `<p class="f-err" role="alert">Noch keine Portionen eingetragen. Bitte bei mindestens einem Gericht die Menge erhöhen.</p>`; return false; }
       const short = [...acc.entries()].map(([pid,q]) => ({p:P(pid), q:Math.round(q*1000)/1000})).filter(x => x.p && x.q > (+x.p.stock||0) + 1e-9);
       const key = dk+'|'+sold.map(([m,q])=>m.id+':'+q).join(',');
@@ -668,7 +671,7 @@ function salesDlg(){
       S.saleGroups = S.saleGroups || {}; S.saleGroups[grp] = {day:dk, n, rows, gross: Math.round(rows.reduce((a,r)=>a+r[2],0)*100)/100};
       const neg = [...acc.keys()].map(P).filter(p => p && (+p.stock||0) < 0).length; salesDlg.last = `${plural(n,'Portion','Portionen')} gebucht, ${acc.size} Artikel abgebucht` + (neg ? ` · ${neg} Artikel im Minus, Wareneingang prüfen` : ''); },
     {ok:'Abbuchen', done:()=>salesDlg.last, after: f => {
-      const upd = () => { let n = 0, c = 0; items.forEach(m => { const q = +f.elements['s_'+m.id].value||0; n += q; c += q*menuCalc(m).cost; }); $('#salesN').textContent = num(n); $('#salesC').textContent = eur(c); $('#salesWarn').innerHTML = ''; delete f.dataset.force; };
+      const upd = () => { let n = 0, c = 0; items.forEach(m => { const q = +f.elements['s_'+m.id].value||0; n += q; if(hasCard(m)) c += q*(menuCalc(m).cost||0); }); $('#salesN').textContent = num(n); $('#salesC').textContent = eur(c); $('#salesWarn').innerHTML = ''; delete f.dataset.force; };
       f.oninput = upd;
       f.querySelectorAll('[data-step]').forEach(b => b.onclick = () => { const i = b.parentNode.querySelector('input'); i.value = Math.max(0, (+i.value||0) + +b.dataset.step); upd(); });
     }});
@@ -750,7 +753,7 @@ function palData(){
     sec('Dienstplan', 'Team & Zahlen', ()=>go('dienst')), sec('Auswertung', 'Team & Zahlen: was verkauft wurde', ()=>{ view.rp.tab='sales'; go('report'); }),
     sec('Einstellungen', NAV_DESC.setup, ()=>go('setup')), sec('Einrichtung', 'Sechs Schritte, bis der Betrieb in der App steht', ()=>go('einr')),
     {g:'Aktion', n:'Neue Aktion / Spezialität', s:'', run:()=>specialDialog()},
-    ...(S.suppliers||[]).map(sp=>({g:'Bestellen', n:sp.name, s:CHANNELS[sp.channel], run:()=>{ const o = newOrder(sp.id); save(); view.stab='bestellung'; view.order=o.id; go('buy'); }})),
+    ...(S.suppliers||[]).map(sp=>({g:'Bestellen', n:sp.name, s:CHANNELS[sp.channel], run:()=>{ const o = ordStart(sp.id); view.stab='bestellung'; view.order=o.id; go('buy'); }})),
     {g:'Aktion', n:'Lieferung ohne Bestellung buchen', s:'Wareneingang', run:()=>moveDlg('in')},
     {g:'Aktion', n:'Verkäufe buchen', s:'', run:()=>salesDlg()},
     {g:'Aktion', n:'Schwund buchen', s:'', run:()=>moveDlg('waste')},
