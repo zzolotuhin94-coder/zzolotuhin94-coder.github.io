@@ -174,7 +174,7 @@ const ico = (n, cls='') => `<svg class="ico ${cls}" viewBox="0 0 24 24" aria-hid
 
 /* Seiten der App: [Schlüssel, Titel]. Die Navigation (nav.js) fasst sie zu sieben Bereichen zusammen. */
 const TABS = [['dash','Heute'],['vorb','Vorbereitung'],['checkl','Checklisten'],['menu','Speisekarte'],['cards','Rezepte'],['stock','Ware'],['buy','Ware'],['products','Ware'],['pcheck','Preis-Check'],['dienst','Team & Zahlen'],['report','Team & Zahlen'],['setup','Einstellungen'],['einr','Einrichtung'],['daten','Eigene Daten']];
-view = {tab:'dash', card:null, q:'', sec:'all', ctype:'all', pq:'', sim:null, portions:20, mtab:'calc', stab:'bestand', loc:'all', mtype:'all', order:null, more:{}};
+view = {tab:'dash', card:null, q:'', sec:'all', ctype:'dish', pq:'', sim:null, portions:20, mtab:'calc', stab:'bestand', loc:'all', mtype:'all', order:null, more:{}};
 
 /* ---------- Bausteine ---------- */
 function ring(fc, size=46, stroke=5){
@@ -466,11 +466,37 @@ function openDialog(title, body, onOk, opts={}){
     let r; try { r = onOk ? onOk(new FormData(f), f) : undefined; } finally { nums.forEach((i,k) => { if(i.isConnected) i.value = shown[k]; }); }
     if(r === false) return;
     d.close(); save(); render(); if(opts.toast!==false) toast(typeof opts.done==='function' ? opts.done() : (opts.done||'Gespeichert')); };
-  $('#dlgCancel').onclick = $('#dlgX').onclick = () => d.close();
+  $('#dlgCancel').onclick = () => d.close(); $('#dlgX').onclick = () => dlgTryClose();
   if(opts.del) $('#dlgDel').onclick = () => { d.close(); opts.del(); };
   d.showModal();
   opts.after && opts.after(f);
+  dlgSnap(f);
 }
+/* Ungespeicherte Eingaben: Esc, Klick daneben und × fragen erst nach („Abbrechen“ verwirft wie gewohnt) */
+function dlgState(f){ return [...f.querySelectorAll('input,select,textarea')].filter(e => e.type !== 'file' && e.type !== 'submit' && e.type !== 'button').map(e => e.type === 'checkbox' || e.type === 'radio' ? (e.checked ? 1 : 0) : e.value).join('\u0001'); }
+function dlgSnap(f){ f._snap = dlgState(f); f._touched = false; f.addEventListener('input', e => { if(e.isTrusted) f._touched = true; }, {once:true}); setTimeout(() => { if(!f._touched && $('#dlg').open) f._snap = dlgState(f); }, 80); }
+function dlgDirty(){ const f = $('#dlgForm'); return !!(f && $('#dlg').open && f._snap != null && dlgState(f) !== f._snap); }
+function dlgTryClose(){
+  const d = $('#dlg'), f = $('#dlgForm'); if(!d.open) return; if(!dlgDirty()){ d.close(); return; }
+  if(f.querySelector('.dlg-discard')){ f.querySelector('[data-dd="keep"]').focus(); return; }
+  const bar = document.createElement('div'); bar.className = 'dlg-discard'; bar.setAttribute('role', 'alert');
+  bar.innerHTML = '<span>Änderungen verwerfen?</span><button type="button" class="btn" data-dd="keep">Weiter bearbeiten</button><button type="button" class="btn danger" data-dd="drop">Verwerfen</button>';
+  const act = f.querySelector('.dlg-actions'); act.hidden = true; act.insertAdjacentElement('beforebegin', bar);
+  bar.onclick = e => { const b = e.target.closest('[data-dd]'); if(!b) return; if(b.dataset.dd === 'drop'){ d.close(); return; } bar.remove(); act.hidden = false; };
+  bar.querySelector('[data-dd="keep"]').focus();
+}
+(() => { const d = $('#dlg'); if(!d) return;
+  d.addEventListener('keydown', e => { if(e.key !== 'Escape') return; const bar = $('#dlgForm .dlg-discard');
+    if(bar){ e.preventDefault(); e.stopPropagation(); bar.querySelector('[data-dd="keep"]').click(); return; }
+    if(dlgDirty()){ e.preventDefault(); e.stopPropagation(); dlgTryClose(); } });
+  d.addEventListener('cancel', e => { if(dlgDirty()){ e.preventDefault(); dlgTryClose(); } }); })();
+/* Löschen mit Rückweg: der ganze Stand davor bleibt ein paar Sekunden griffbereit, mit allen Verknüpfungen und Fotos */
+function delUndo(label, mutate, imgs){
+  const snap = JSON.stringify(S); const keep = (imgs || []).filter(Boolean).map(id => [id, IMG[id]]).filter(x => x[1]);
+  mutate(); save(); render();
+  toast(`${label} gelöscht`, {ms:9000, action:() => { const o = JSON.parse(snap); Object.keys(S).forEach(k => { if(!(k in o)) delete S[k]; }); Object.assign(S, o); keep.forEach(([id, data]) => imgPut(id, data)); save(); render(); toast('Wiederhergestellt'); }});
+}
+function askDel(text, label, mutate, imgs){ openDialog('Bitte bestätigen', `<p class="dlg-p">${esc(text)}</p>`, () => { setTimeout(() => delUndo(label, mutate, imgs), 0); }, {ok:'Löschen', toast:false}); }
 /* Hinweis direkt am Feld; Dialog bleibt offen */
 function dlgErr(input, msg){
   const f = $('#dlgForm'); if(typeof input === 'string') input = f.elements[input] || f.querySelector(input);
@@ -484,7 +510,7 @@ function dlgErr(input, msg){
 (() => { const d = $('#dlg'); if(!d) return; let down = false;
   const outside = e => { const r = d.getBoundingClientRect(); return e.target === d && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom); };
   d.addEventListener('pointerdown', e => { down = outside(e); });
-  d.addEventListener('click', e => { if(down && outside(e)) d.close(); down = false; }); })();
+  d.addEventListener('click', e => { if(down && outside(e)) dlgTryClose(); down = false; }); })();
 function signedEur(n){ n = fin(n); return (n > 0.004 ? '+' : n < -0.004 ? '−' : '') + eur(Math.abs(n)); }
 function plural(n, one, many){ return `${num(n)} ${n === 1 ? one : many}`; }
 function dateTooFar(ds){ return !!ds && ds > addDays(todayStr(), 1); }
@@ -526,7 +552,7 @@ function menuDialog(m, prefill){
       if(ar.alg !== algClean(m.alg).join(' ') || ar.algNone !== !!m.algNone){ if(ar.alg || ar.algNone){ m.algAt = todayStr(); m.algBy = me().name; } else { m.algAt = ''; m.algBy = ''; } }
       Object.assign(m, {section:sec, name:fd.get('name').trim(), desc:fd.get('desc').trim(), price:+fd.get('price'), card:fd.get('card'), img, veg:fd.get('veg')||'', top:!!fd.get('top'), hidden:!fd.get('show'), seasons: fd.getAll('sea').length===4 ? [] : fd.getAll('sea'), days: fd.getAll('day').length===7 ? [] : fd.getAll('day').map(Number), alg: ar.alg, algNone: ar.algNone, vat: fd.get('vat') || (dc && dc.drink && vatClass({section:sec}) !== 'g' ? 'g' : '')}); if(isNew) S.menu.push(m); drinkAfterSave(m, isNew, oldTag); },
     {done: isNew ? ()=>`„${m.name}“ steht jetzt unter ${m.section}` : 'Gespeichert',
-     del: isNew ? null : () => ask(`„${m.name}“ von der Speisekarte löschen? Die Rezeptur bleibt erhalten.`, () => { imgDel(m.img); S.menu = S.menu.filter(x=>x!==m); }),
+     del: isNew ? null : () => askDel(`„${m.name}“ von der Speisekarte löschen? Die Rezeptur bleibt erhalten.`, `„${m.name}“`, () => { imgDel(m.img); S.menu = S.menu.filter(x=>x!==m); }, [m.img]),
      after: f => { const bind = () => { $('#dlgPhoto').onclick = () => pickImage(data => { const id = uid('img'); imgPut(id, data); img = id; $('#dlgThumb').innerHTML = thumb(); }); const del = $('#dlgPhotoDel'); if(del) del.onclick = () => { img = ''; $('#dlgThumb').innerHTML = thumb(); }; }; bind(); algControlBind(f);
        /* Getränk: Menge je Glas. Leer heißt: wie in der Schankrezeptur. */
        const volSync = () => { const c = f.elements.card.value ? C(f.elements.card.value) : null; const on = !!(c && c.drink) || vatClass({section:f.elements.section.value, vat:f.elements.vat.value}) === 'g'; const box = f.querySelector('#mdVol'); box.hidden = !on; box.querySelectorAll('input,select').forEach(i => { i.disabled = !on; }); f.elements.vol.placeholder = c && c.drink && +c.yieldG > 0 ? 'wie Rezeptur: ' + volTxt(+c.yieldG) : 'z. B. 0,5'; };
@@ -584,7 +610,7 @@ function prodDialog(p, pre){
       Object.assign(p, common, {unit:fd.get('unit'), price:+fd.get('price'), pieceG:fd.get('pieceG'), lossCold:+fd.get('lossCold')||0, lossHot:+fd.get('lossHot')||0, basic: fd.get('basic') ? true : (p.basic === true ? false : p.basic), pack:fd.get('pack').trim(), packQty:+fd.get('packQty')||0, minStock:+fd.get('minStock')||0});
       ['geb','gebL','gebN','pfand','pourLoss'].forEach(k => { delete p[k]; });
       if(isNew){ p.stock = 0; S.products.push(p); const s = +fd.get('stock')||0; if(s) addMove('in', p.id, s, 'Anfangsbestand'); } },
-    {del: isNew ? null : () => { const u = usage('p:'+p.id); if(u.length) return info('Artikel wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(c=>c.name).join(', ')}. Entfernen Sie es dort zuerst.`); ask(`Artikel „${p.name}“ löschen?`, () => { S.products = S.products.filter(x=>x!==p); }); },
+    {del: isNew ? null : () => { const u = usage('p:'+p.id); if(u.length) return info('Artikel wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(c=>c.name).join(', ')}. Entfernen Sie es dort zuerst.`); askDel(`Artikel „${p.name}“ löschen?`, `Artikel „${p.name}“`, () => { S.products = S.products.filter(x=>x!==p); }); },
      after: f => { algControlBind(f);
       const sync = () => { const g = f.elements.kind.value === 'g'; f.dataset.kind = g ? 'drink' : 'food';
         f.querySelectorAll('[data-k]').forEach(b => { const on = (b.dataset.k === 'drink') === g; b.hidden = !on; b.querySelectorAll('input,select').forEach(i => { i.disabled = !on; }); });
@@ -690,7 +716,7 @@ function newCard(type, fromMenu){
   const c = {id:uid(type==='semi'?'semi':'dish'), no:S.settings.nextNo++, name: fromMenu ? fromMenu.name : (type==='semi'?'Neues Basisrezept':drink?'Neues Getränk':'Neues Gericht'), type, category: fromMenu ? fromMenu.section : (type==='semi'?'Basisrezepte':drink?drinkSection():''), yieldG: drink && fromMenu && +fromMenu.vol > 0 ? +fromMenu.vol : '', img:'', steps: drink ? [] : [{t:'',img:''}], items:[{ref:'',qty:'',net:''}]};
   if(drink) c.drink = true;
   S.cards.push(c); if(fromMenu) fromMenu.card = c.id;
-  go('cards', c.id); save(); toast('Rezeptur angelegt');
+  view.cv = 'kalk'; go('cards', c.id); save(); toast('Rezeptur angelegt');
 }
 
 function printCard(id){
@@ -758,8 +784,8 @@ function palData(){
     {g:'Aktion', n:'Neue Rezeptur anlegen', s:'', run:()=>newCard('dish')},
     {g:'Aktion', n:'Neuen Artikel anlegen', s:'', run:()=>prodDialog()},
     {g:'Aktion', n:'Preis-Check starten', s:'Richtwerte durch Ihre Preise ersetzen', run:()=>pcStart()},
-    ...S.menu.map(m=>({g:'Speisekarte', n:dishLabel(m), s:eur(m.price)+' · '+m.section, run:()=> m.card ? go('cards', m.card) : menuDialog(m)})),
-    ...S.cards.map(c=>({g:'Rezeptur', n:c.name, s:(c.type==='semi'?'Basisrezept':'Gericht')+' · Nr. '+c.no, run:()=>go('cards', c.id)})),
+    ...S.menu.map(m=>({g:'Speisekarte', n:dishLabel(m), s:eur(m.price)+' · '+m.section, run:()=> m.card ? (view.cv = 'kueche', go('cards', m.card)) : menuDialog(m)})),
+    ...S.cards.map(c=>({g:'Rezeptur', n:c.name, s:(c.type==='semi'?'Basisrezept':'Gericht')+' · Nr. '+c.no, run:()=>{ view.cv = 'kueche'; go('cards', c.id); }})),
     ...S.products.map(p=>({g:'Artikel', n:p.name, s:p.noStock?eur(p.price):qtyFmt(+p.stock||0,p)+' auf Lager', run:()=>prodDialog(p)})),
   ];
 }
@@ -829,9 +855,9 @@ document.addEventListener('click', e => {
     case 'stepPhotoDel': imgDel(c.steps[+id].img); c.steps[+id].img = ''; save(); render(); break;
     case 'simTo': { const r = $('#sim'); view.sim.price = Math.min(+r.max, Math.max(+r.min, +id)); r.value = view.sim.price; r.dispatchEvent(new Event('input',{bubbles:true})); break; }
     case 'applySim': { const m = S.menu.find(x=>x.id===id); m.price = Math.round(view.sim.price*10)/10; save(); render(); toast('Verkaufspreis auf '+eur(m.price)+' gesetzt'); break; }
-    case 'dupCard': { const src = C(id); const cp = JSON.parse(JSON.stringify(src)); cp.id = uid(src.type); cp.no = S.settings.nextNo++; cp.name += ' (Kopie)'; cp.img = ''; cp.steps.forEach(s=>s.img=''); S.cards.push(cp); save(); go('cards', cp.id); toast('Kopie angelegt (ohne Fotos)'); break; }
+    case 'dupCard': { const src = C(id); const cp = JSON.parse(JSON.stringify(src)); cp.id = uid(src.type); cp.no = S.settings.nextNo++; cp.name += ' (Kopie)'; cp.img = ''; cp.steps.forEach(s=>s.img=''); S.cards.push(cp); save(); view.cv = 'kalk'; go('cards', cp.id); toast('Kopie angelegt (ohne Fotos)'); break; }
     case 'delCard': { const src = C(id); const u = usage('c:'+id); if(u.length){ info('Basisrezept wird verwendet', `Es steckt in diesen Rezepturen: ${u.map(x=>x.name).join(', ')}. Entfernen Sie es dort zuerst.`); break; }
-      ask(`Rezeptur „${src.name}“ löschen? Die Gerichte bleiben auf der Speisekarte, aber ohne Rezeptur.`, () => { imgDel(src.img); (src.steps||[]).forEach(s=>imgDel(s.img)); S.cards = S.cards.filter(x=>x.id!==id); S.menu.forEach(m=>{ if(m.card===id) m.card=''; }); view.card = null; }); break; }
+      askDel(`Rezeptur „${src.name}“ löschen? Die Gerichte bleiben auf der Speisekarte, aber ohne Rezeptur.`, `Rezeptur „${src.name}“`, () => { imgDel(src.img); (src.steps||[]).forEach(s=>imgDel(s.img)); S.cards = S.cards.filter(x=>x.id!==id); S.menu.forEach(m=>{ if(m.card===id) m.card=''; }); view.card = null; hashSync(); }, [src.img].concat((src.steps||[]).map(s=>s.img))); break; }
     case 'printCard': printCard(id); break;
     case 'printMenu': printMenu(); break;
     case 'itemHide': { const m = S.menu.find(x=>x.id===id); m.hidden = !m.hidden; save(); render(); toast(m.hidden ? `„${m.name}“ ausgeblendet` : `„${m.name}“ wird angezeigt`); break; }

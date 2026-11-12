@@ -139,7 +139,7 @@ function specialDialog(sp){
       Object.assign(sp, {name:fd.get('name').trim(), from, to, note:fd.get('note').trim(), mode:fd.get('mode'), style:fd.get('style'), items:rows});
       const i = S.specials.findIndex(x=>x.id===sp.id); if(i>=0) S.specials[i] = sp; else S.specials.push(sp);
       view.gdate = sp.from; },
-    {done:()=>`„${sp.name}“ gespeichert · ${fmtRange(sp)}`, del: isNew ? null : () => ask(`Aktion „${sp.name}“ löschen?`, () => { S.specials = S.specials.filter(x=>x.id!==sp.id); }),
+    {done:()=>`„${sp.name}“ gespeichert · ${fmtRange(sp)}`, del: isNew ? null : () => askDel(`Aktion „${sp.name}“ löschen?`, `Aktion „${sp.name}“`, () => { S.specials = S.specials.filter(x=>x.id!==sp.id); }),
      after: f => {
       const rows = $('#spRows');
       $('#spAdd').onclick = () => { rows.insertAdjacentHTML('beforeend', row({name:'',desc:'',price:'',veg:'',card:''})); rows.lastElementChild.querySelector('input').focus(); };
