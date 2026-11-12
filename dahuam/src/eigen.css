@@ -98,7 +98,7 @@
 /* Entweder-oder: zwei große Knöpfe statt zwei Schalter */
 .ek-pick{border:0;margin:0 0 4px;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .ek-pick legend{padding:0;margin-bottom:6px;font-weight:600;font-size:13.5px}
-.ek-pick label{position:relative;display:flex;align-items:center;justify-content:center;min-height:52px;padding:8px 12px;border:1px solid var(--line-strong);border-radius:var(--r-s,8px);background:var(--card,transparent);font-weight:500;font-size:15.5px;cursor:pointer;text-align:center}
+.ek-pick label{position:relative;display:flex;align-items:center;justify-content:center;min-height:52px;padding:8px 12px;border:1px solid var(--line-strong);border-radius:var(--r-s,8px);background:none;color:var(--fg);font-weight:500;font-size:15.5px;cursor:pointer;text-align:center}
 .ek-pick input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
 .ek-pick label:has(input:checked){border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold);font-weight:600}
 .ek-pick label:has(input:focus-visible){outline:2px solid var(--gold);outline-offset:2px}

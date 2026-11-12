@@ -131,7 +131,8 @@ function abPages(){
   host.innerHTML = ''; const pages = [];
   const newPage = () => { const p = document.createElement('article'); p.className = 'ab-page'; p.innerHTML = `${head(pages.length + 1)}<div class="ab-body"><table class="ab-t">${thead}<tbody></tbody></table></div>${foot}`; host.appendChild(p); pages.push(p); return p; };
   let p = newPage(); let body = p.querySelector('.ab-body'), tb = p.querySelector('tbody');
-  const fits = () => body.scrollHeight <= body.clientHeight + 1;
+  // etwas Luft am Blattende: die grauen Zeilen mit „?“ messen je nach Umgebung 1–2 px höher
+  const fits = () => { const last = body.querySelector('tbody').lastElementChild; return body.scrollHeight <= body.clientHeight + 1 && (!last || last.getBoundingClientRect().bottom <= body.getBoundingClientRect().bottom - 4); };   // etwas Luft: die grauen Zeilen mit „?“ messen je nach Umgebung 1–2 px höher
   if(!dishes.length) tb.innerHTML = `<tr><td colspan="${cols.length + 2}" class="ab-empty">Für dieses Datum stehen keine Gerichte auf der Karte.</td></tr>`;
   for(let i = 0; i < rows.length; i++){
     const group = rows[i].sec != null && rows[i + 1] ? [rows[i], rows[i + 1]] : [rows[i]];
