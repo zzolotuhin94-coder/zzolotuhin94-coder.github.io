@@ -9,7 +9,7 @@ ok(!nav.tabs.includes('berater')&&!nav.side.includes('berater')&&await ev(()=>ty
 // ---------- Vorbereitung ----------
 const off=await ev(()=>{let o=0;while((S.settings.closed||[]).includes(dParse(dAdd(todayStr(),o)).getDay()))o++;view.pl.off=o;go('vorb');return o});await w(300);
 const vb=await ev(()=>({h:[...document.querySelectorAll('#app .day-h')].map(x=>x.firstChild.textContent),rows:document.querySelectorAll('#app .pl-fc .pl-row').length,tot:(document.querySelector('#app .page-h .sub').textContent.match(/(\d+) Portionen erwartet/)||[])[1],sum:vbPlan(vbDay()).total,basis:document.querySelector('#app .pl-basis').textContent,pdf:!!document.querySelector('#app .page-h [data-pdf="plPrint"]'),days:document.querySelectorAll('#app .pl-days button').length,range:document.querySelector('#app .pl-row .pl-r').textContent}));
-ok(vb.h.join('|')==='Prep-Liste|Prognose|Reicht die Ware?'&&vb.days===7&&vb.rows>=5&&vb.tot===String(vb.sum),'Vorbereitung: prep list first, then forecast and stock check; 7 days to pick',vb.h);
+ok(vb.h.join('|')==='Vorbereitungsliste|Prognose|Reicht die Ware?'&&vb.days===7&&vb.rows>=5&&vb.tot===String(vb.sum),'Vorbereitung: prep list first, then forecast and stock check; 7 days to pick',vb.h);
 ok(/Prognose aus den letzten \d+ \w+tagen/.test(vb.basis)&&/Rückblick: In den letzten 4 Wochen \(\d+ Verkaufstage\) lag die Prognose je Gericht im Schnitt ± [\d,]+ Portionen daneben/.test(vb.basis)&&!/Beispieldaten/.test(vb.basis),'method and back-test line under „Wie die Prognose rechnet“; no per-page demo notice',vb.basis);
 ok(/^meist \d+–\d+$/.test(vb.range)&&vb.pdf,'row shows a plausible range; „Als PDF speichern“ present',vb.range);
 // überschreiben
@@ -38,7 +38,7 @@ ok(ck.st&&ck.aria&&/^3 von \d+ erledigt$/.test(ck.prog)&&ck.over===0,'three prep
 await ev(()=>{window.__pr=0;window.print=()=>{window.__pr=$('#print').innerHTML.length;window.__pn=PDF_NAME}});
 await p.click('#app [data-pdf="plPrint"]');await w(200);
 const pr=await ev(()=>({n:window.__pr,name:window.__pn,h:$('#print h1')?.textContent,li:$('#print').querySelectorAll('.pp-l li').length,box:$('#print').querySelectorAll('.pp-l li i').length}));
-ok(pr.n>500&&/^Prep-Liste-\d{4}-\d\d-\d\d\.pdf$/.test(pr.name)&&/^Prep-Liste · /.test(pr.h)&&pr.box>5,'PDF: #print filled with the list, file name Prep-Liste-<date>.pdf',pr);
+ok(pr.n>500&&/^Vorbereitungsliste-\d{4}-\d\d-\d\d\.pdf$/.test(pr.name)&&/^Vorbereitungsliste · /.test(pr.h)&&pr.box>5,'PDF: #print filled with the list, file name Prep-Liste-<date>.pdf',pr);
 // bleibt nach Neuladen
 const before=await ev(k=>({ov:S.plan.ov[vbDay()][k],fac:S.plan.fac[vbDay()],chk:Object.keys(S.plan.chk[vbDay()]).length}),k0.key);
 await p.reload();await w(800);await ev(o=>{view.pl.off=o;go('vorb')},off);await w(250);
@@ -52,8 +52,8 @@ await ev(()=>go('dash'));await w(250);
 const dh=await ev(()=>{const s=document.querySelector('#app .pl-dash');return s?{t:s.innerText.replace(/\n/g,' '),btn:!!s.querySelector('[data-act="plGo"]')}:null});ok(dh&&/Vorbereitung/.test(dh.t)&&/Portionen erwartet/.test(dh.t)&&dh.btn,'Heute: compact block with expected portions and a link',dh&&dh.t.slice(0,110));
 await p.click('#app .pl-dash [data-act="plGo"]');await w(250);ok(await ev(()=>view.tab==='vorb'),'…opens Vorbereitung');
 // ---------- Schnellsuche ----------
-const pal=await ev(()=>{const a=palData();return ['Vorbereitung','Prognose für morgen','Prep-Liste als PDF speichern'].map(n=>{const x=a.find(y=>y.n===n);return !!x&&!!x.s})});ok(pal.every(Boolean),'command palette: the area (with description) and two actions',pal);
-ok(await ev(()=>['Prognose','Spanne','Charge','Prep-Liste','Rückblick'].every(t=>Object.values(HELP).some(h=>h.g&&h.t===t))),'glossary has the new terms');
+const pal=await ev(()=>{const a=palData();return ['Vorbereitung','Prognose für morgen','Vorbereitungsliste als PDF speichern'].map(n=>{const x=a.find(y=>y.n===n);return !!x&&!!x.s})});ok(pal.every(Boolean),'command palette: the area (with description) and two actions',pal);
+ok(await ev(()=>['Prognose','Spanne','Charge','Vorbereitungsliste','Rückblick'].every(t=>Object.values(HELP).some(h=>h.g&&h.t===t))),'glossary has the new terms');
 // ---------- Rolle Team: nur ansehen und abhaken ----------
 await ev(()=>{S.settings.currentUser='u_staff';save()});
 await ev(o=>{view.pl.off=o;go('vorb')},off);await w(250);

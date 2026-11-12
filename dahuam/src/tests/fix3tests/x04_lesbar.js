@@ -46,7 +46,7 @@ const tiny = p => p.evaluate(() => [...document.querySelectorAll('#app *, .botto
     await ev(() => { const s = document.querySelector('#dlgForm .alg3-l'); if(s && s.hidden){ const r = document.querySelector('#dlgForm input[value="has"]'); if(r){ r.checked = true; r.dispatchEvent(new Event('change', {bubbles:true})); } } });
     await p.evaluate(CONTRAST);
     const a = await ev(() => { const on = document.querySelector('#dlgForm .algc input:checked + span'), off = document.querySelector('#dlgForm .algc input:not(:checked) + span'); const bg = e => getComputedStyle(e).backgroundColor;
-      return {on:!!on, off:!!off, bgOn:on && bg(on), bgOff:off && bg(off), mark:on && getComputedStyle(on, '::before').content, txt:on && __cr(on)}; });
+      return {on:!!on, off:!!off, bgOn:on && bg(on), bgOff:off && bg(off), mark:on && getComputedStyle(on, '::after').content, txt:on && __cr(on)}; });
     L.ok(a.on && a.off && a.bgOn !== a.bgOff && a.mark === '"✓"' && a.txt >= 4.5, 'gewählte Allergene: dunkel gefüllt mit Häkchen, nicht gewählte hell', a);
     await ev(() => document.querySelector('#dlgForm .algc input:checked + span').scrollIntoView({block:'center'})); await p.waitForTimeout(100); await L.shot(p, 'nachher-allergene'); errs.push(...p.errs); await p.context().close(); }
   await L.done(b, errs);

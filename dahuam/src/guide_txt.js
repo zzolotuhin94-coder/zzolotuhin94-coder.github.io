@@ -7,7 +7,7 @@
 
 /* ---------- Bereiche: ein Satz, wozu ---------- */
 const NAV_DESC = {
-  dash:'Was heute zu tun ist: bestellen, Lieferungen prüfen, Checklisten.',
+  dash:'Was heute zu tun ist: Vorbereitung, bestellen, Eigenkontrolle, Lieferungen, Dienst.',
   vorb:'Die Vorbereitungsliste für heute und morgen, aus der Prognose gerechnet.',
   checkl:'Listen zum Abhaken beim Aufsperren, Zusperren und Putzen.',
   menu:'Alle Gerichte mit Preis. Hier machen Sie auch die Karte für die Gäste.',
@@ -268,7 +268,7 @@ const RUNDGANG = [
 
 /* ---------- „So geht’s hier“: drei, vier Sätze je Seite ---------- */
 const HOWTO = {
-  dash:['Oben steht, was heute zu bestellen ist und welche Lieferung kommt.', 'Der Knopf rechts in jeder Zeile führt direkt hin.', 'Unter „Offen“ steht, was an der Karte noch fehlt.'],
+  dash:['Oben steht, was heute zu tun ist: Vorbereitung, Bestellen bis wann, Eigenkontrolle, Lieferungen.', 'Ein Tipp auf eine Zeile führt direkt hin. „Öl gewechselt“ trägt den Ölwechsel gleich ein.', 'Ganz unten, eingeklappt: was bei der Einrichtung noch fehlt.'],
   vorb:['Oben wählen Sie den Tag: heute, morgen oder später in der Woche.', 'Die Vorbereitungsliste zeigt, was vorzukochen und herzurichten ist. Ein Tipp hakt ab.', 'Die Prognose darunter können Sie überschreiben, zum Beispiel bei einer Reservierung.', 'Fehlt Ware, legen Sie sie mit einem Tipp in die Bestellung.'],
   checkl:['Jeden Tag gibt es frische Listen. Tippen Sie auf eine Liste und dann auf jeden erledigten Punkt.', 'Manche Punkte brauchen eine Zahl, zum Beispiel die Temperatur im Kühlhaus.', 'Darunter steht die Eigenkontrolle: Reinigungsplan, Frittieröl, Temperatur der Lieferungen.', 'Im Verlauf sehen Sie die letzten 14 Tage und speichern die Monatsmappe als PDF.'],
   menu:['Eine Zeile je Gericht: Preis, Wareneinsatz und was übrig bleibt.', 'Den Preis ändern Sie direkt in der Zeile.', 'Am Griff links ziehen Sie ein Gericht an eine andere Stelle seiner Kategorie.', '„Ohne Rezeptur“ und „Allergene offen“ zeigen, wo noch etwas fehlt.'],

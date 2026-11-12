@@ -43,7 +43,7 @@ const SITE = '/home/user/wt-3/dahuam/';
     const tag = `${name} ${dark ? 'dunkel' : 'hell'}`;
     L.ok(m.sw <= m.cw && m.over.length === 0 && m.doc <= vp.width, `${tag}: kein Querscrollen, nichts ragt hinaus`, {sw:m.sw, cw:m.cw, over:m.over.slice(0, 4)});
     L.ok(m.cr >= 4.5, `${tag}: Fließtext ausreichend kontrastreich (≥ 4,5:1)`, m.cr);
-    L.ok(dark ? /rgb\(18, 20, 22\)/.test(m.bg) : /rgb\(247, 245, 240\)/.test(m.bg), `${tag}: Hintergrund wie die App`, m.bg);
+    L.ok(dark ? /rgb\(23, 24, 26\)/.test(m.bg) /* fix-3: dunkles Design etwas heller, damit die Seitenleiste sich abhebt */ : /rgb\(247, 245, 240\)/.test(m.bg), `${tag}: Hintergrund wie die App`, m.bg);
     L.ok(m.mask && m.btnH >= 44 && m.opacity === '1' && (name === 'phone' ? m.inW === 390 : m.inW <= 560), `${tag}: Logo, Knöpfe ≥ 44 px, Spalte ${name === 'phone' ? 'volle Breite' : 'höchstens 560 px'}`, {btnH:m.btnH, inW:m.inW});
     await p.screenshot({path:path.join(L.OUT, `w-${name}-${dark ? 'dunkel' : 'hell'}.png`), fullPage:false});
     if(name === 'phone'){ await p.evaluate(() => { const w = document.getElementById('wl'); w.scrollTop = w.scrollHeight; }); await p.waitForTimeout(150); await p.screenshot({path:path.join(L.OUT, `w-${name}-${dark ? 'dunkel' : 'hell'}-unten.png`)}); }

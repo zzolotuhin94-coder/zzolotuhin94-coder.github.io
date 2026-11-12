@@ -143,7 +143,8 @@ dialog form > .dlg-actions{position:sticky;bottom:0;z-index:3;margin:6px -22px -
 /* ---------- Allergene: ausgewählt ist deutlich ausgewählt ---------- */
 .algc input:checked + span{background:var(--fg)!important;color:var(--bg)!important;border-color:var(--fg)!important;box-shadow:none}
 .algc input:checked + span b{color:inherit!important}
-.algc input:checked + span::before{content:"✓";font-weight:700;margin-right:2px}
+.algc input[name="alg"]:checked + span{position:relative;padding-right:24px}
+.algc input[name="alg"]:checked + span::after{content:"✓";position:absolute;right:7px;top:50%;transform:translateY(-50%);font-weight:700}
 
 /* ---------- Einstellungen: Anzeige ---------- */
 .ans-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;padding:10px 0;border-top:1px solid var(--line)}

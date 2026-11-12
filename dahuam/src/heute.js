@@ -44,7 +44,8 @@ function dhOrders(){
   };
   const open = due.filter(x => x.st.state === 'open'), rest = due.filter(x => x.st.state !== 'open');
   const fold = rest.length ? `<li class="rw past rw-fold"><button type="button" class="rw-more" data-act="dashPast" aria-expanded="${view.dashPast ? 'true' : 'false'}">${dhRestTxt(rest)} · ${view.dashPast ? 'ausblenden' : 'anzeigen'}</button></li>` + (view.dashPast ? rest.map(row).join('') : '') : '';
-  return open.map(row).join('') + fold;
+  dhOrders.fold = fold;   // die eingeklappte Zeile steht am Ende von „Heute zu tun“, nach allem, was noch zu tun ist
+  return open.map(row).join('');
 }
 function dhRestTxt(rest){
   const sent = rest.filter(x => x.st.state === 'sent').length, past = rest.length - sent;
@@ -153,8 +154,8 @@ renderDash = function(){
   const dateStr = new Date().toLocaleDateString('de-AT', {weekday:'long', day:'numeric', month:'long'});
   const line = [closed ? `${DAYNAME[w]} ist Ruhetag` : 'Servicetag', esc(sTitle)].filter(Boolean).join(' · ');
   const backup = dhTry(() => typeof relBackupDue === 'function' && relBackupDue() ? dhRow({lead:ico('download'), title:'Sicherung speichern', sub:esc(relBackupLine()), rel:'backup', cls:'rel-remind'}) : '', 'Sicherung');
-  const now = [dhTry(dhPrep, 'Vorbereitung'), dhTry(dhOrders, 'Bestellen'), dhTry(() => dhEk(D), 'Eigenkontrolle'), dhTry(dhDeliveries, 'Lieferungen'), dhTry(dhApart, 'Apartments'),
-    dhRow({lead:ico('report'), title:'Verkäufe buchen', sub:'Zutaten werden vom Lager abgebucht', act:'sales', cls:'dh-sales past'}), backup].join('');
+  dhOrders.fold = ''; const now = [dhTry(dhPrep, 'Vorbereitung'), dhTry(dhOrders, 'Bestellen'), dhTry(() => dhEk(D), 'Eigenkontrolle'), dhTry(dhDeliveries, 'Lieferungen'), dhTry(dhApart, 'Apartments'),
+    dhOrders.fold || '', dhRow({lead:ico('report'), title:'Verkäufe buchen', sub:'Zutaten werden vom Lager abgebucht', act:'sales', cls:'dh-sales past'}), backup].join('');
   const team = [dhTry(dhWho, 'Dienst'), dhTry(() => dhChecks(D), 'Checklisten')].join('');
   const card = dhTry(dhCard, 'Karte');
   const live = specialsFor(t).length || S.menu.some(m => !m.hidden && m.days && m.days.includes(w));

@@ -6,7 +6,7 @@
 /* Kopf im Ton der Willkommensseite: Datum, darunter eine kursive Zeile */
 .dh-h{margin-bottom:10px}
 .dh-sub{margin:6px 0 0;font:italic 400 17px/1.35 "Fraunces",Georgia,serif;color:var(--muted)}
-.dh-l{margin:0;font:600 12px/1.2 var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-t)}
+.dh-l{margin:0;font:600 13px/1.2 var(--f-body);letter-spacing:.13em;text-transform:uppercase;color:var(--gold-t)}
 
 .day.dh{max-width:980px;gap:0}
 .dh-sec{margin:22px 0 0}
