@@ -20,6 +20,6 @@ const L = require('./lib');
     L.ok(pe.length === 0, label + ': keine Fehler', pe); errs.push(...pe); await c.close(); }
   { // als Datei geöffnet (file://): kein Service Worker
     const c = await L.ctx(b, {sw:true}); const p = await c.newPage(); const pe = []; p.on('pageerror', e => pe.push(e.message));
-    await p.goto('file://' + (process.env.SITE || '/home/user/wt-1/dahuam/') + 'index.html?nointro'); await L.ready(p); await p.waitForTimeout(800);
+    await p.goto('file://' + (process.env.SITE || '/home/user/zzolotuhin94-coder.github.io/dahuam/') + 'index.html?nointro'); await L.ready(p); await p.waitForTimeout(800);
     L.ok(await p.evaluate(() => S.menu.length > 50 && !swOk() && !document.querySelector('link[rel=manifest]')) && pe.length === 0, 'als Datei geöffnet: App läuft, kein Service Worker, keine Fehler', pe); await c.close(); }
   await L.done(b, errs); })();

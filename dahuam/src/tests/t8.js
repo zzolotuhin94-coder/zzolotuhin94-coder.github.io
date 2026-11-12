@@ -1,6 +1,6 @@
 const {chromium}=require('playwright');
 (async()=>{const b=await chromium.launch();const errs=[];
-const F='http://127.0.0.1:8771/dahuam/index.html?nointro';
+const F='http://127.0.0.1:8765/dahuam/index.html?nointro';
 const p=await b.newPage({viewport:{width:1440,height:1000},timezoneId:'Europe/Vienna',deviceScaleFactor:1});p.on('pageerror',e=>errs.push(e.message));
 await p.goto(F);await p.evaluate(()=>__store.wipe(true));await p.reload();await p.waitForTimeout(1300);const ev=(f,a)=>p.evaluate(f,a);await ev(()=>{gsState().cur='schlicht';save()}); /* Vorlage „Schlicht“ im Gestalter (früher Stil „Schlicht“) */
 console.log('sections',await ev(()=>secList().join(' | ')));

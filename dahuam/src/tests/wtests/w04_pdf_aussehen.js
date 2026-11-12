@@ -1,6 +1,6 @@
 // Anleitung als PDF (Links, Datei, offline) und das Aussehen der Willkommensseite: Handy 390 ohne Querscrollen, Tablet, Computer, hell und dunkel.
 const L = require('./lib'); const fs = require('fs'); const path = require('path');
-const SITE = '/home/user/wt-1/dahuam/';
+const SITE = '/home/user/zzolotuhin94-coder.github.io/dahuam/';
 (async () => { const b = await L.launch(); const errs = [];
   // ---------- PDF ----------
   { const c = await L.ctx(b); const p = await L.page(c, 'index.html?fresh=1'); await p.waitForTimeout(600);
