@@ -15,7 +15,8 @@ const SV_NOTE_MAX = 300;
 
 function rzDefault(){ return canEditAll() ? 'kalk' : 'kueche'; }
 /* Ansicht einer Rezeptur. Basisrezepte stehen nicht auf der Karte: statt „Service“ gilt dort „Küche“. */
-function rzMode(c){ let m = RZ_HASH[view.cv] ? view.cv : rzDefault(); if(c && c.type === 'semi' && m === 'service') m = 'kueche'; return m; }
+/* Die Liste zeigt ohne eigene Wahl die Küche; Kalkulation über ihren Reiter oder Links rund um Preise */
+function rzMode(c){ let m = RZ_HASH[view.cv] ? view.cv : c ? rzDefault() : 'kueche'; if(c && c.type === 'semi' && m === 'service') m = 'kueche'; return m; }
 function rzSwitch(c){ const semi = c && c.type === 'semi'; return `<div class="toolbar tabs rz-sw">${seg('rzView', rzMode(c), semi ? RZ_MODES.slice(0, 2) : RZ_MODES)}</div>`; }
 function rzMigrate(d){
   if(!d || typeof d !== 'object' || !d.settings || d.settings.d2V) return d;
@@ -51,7 +52,9 @@ function rzNTxt(n){ return num(Math.round(n * 100) / 100, 2); }
 function rzForTxt(c, n){ const y = rzYield(c);
   if(c.type === 'semi') return y > 0 ? `für ${rzAmount(y * n, 'g')}${Math.abs(n - 1) < 1e-9 ? ' (1 Charge)' : ` (${rzNTxt(n)} ${rzWord(c, n)})`}` : `für ${rzNTxt(n)} ${rzWord(c, n)}`;
   return `für ${rzNTxt(n)} ${rzWord(c, n)}`; }
-function rzState(c){ if(!view.rz || view.rz.id !== c.id) view.rz = {id:c.id, n:1, stack:[]}; if(!(view.rz.n > 0)) view.rz.n = 1; if(!Array.isArray(view.rz.stack)) view.rz.stack = []; return view.rz; }
+/* Portionen und Häkchen je Rezeptur bleiben bis zum Neuladen stehen, auch wenn man kurz in einen anderen Bereich wechselt */
+const RZ_N = new Map();
+function rzState(c){ if(!view.rz || view.rz.id !== c.id) view.rz = {id:c.id, n:RZ_N.get(c.id) || 1, stack:[]}; if(!(view.rz.n > 0)) view.rz.n = 1; if(!Array.isArray(view.rz.stack)) view.rz.stack = []; RZ_N.set(c.id, view.rz.n); return view.rz; }
 const RZ_TICKS = new Map();
 function rzTicks(id){ if(!RZ_TICKS.has(id)) RZ_TICKS.set(id, new Set()); return RZ_TICKS.get(id); }
 
@@ -88,10 +91,21 @@ function rzKitchenHtml(c){
 function rzOpenSub(i){
   const c = C(view.card); if(!c) return; const st = rzState(c); const l = rzLines(c, st.n).find(x => x.i === +i); if(!l || !l.sub) return;
   const y = rzYield(l.sub); const n = y > 0 && l.q > 0 ? l.q / y : 1;
-  view.rz = {id:l.sub.id, n, stack:st.stack.concat([{id:c.id, n:st.n}])}; view.card = l.sub.id; render(); hashSync(); window.scrollTo({top:0});
+  view.rz = {id:l.sub.id, n, stack:st.stack.concat([{id:c.id, n:st.n}])}; RZ_N.set(l.sub.id, n); view.card = l.sub.id; render(); hashSync(); window.scrollTo({top:0});
 }
-function rzUp(){ const st = view.rz; const p = st && st.stack && st.stack[st.stack.length - 1]; if(!p || !C(p.id)){ go('cards'); return; } view.rz = {id:p.id, n:p.n, stack:st.stack.slice(0, -1)}; view.card = p.id; render(); hashSync(); window.scrollTo({top:0}); }
-function rzSetN(n){ const c = C(view.card); if(!c) return; if(!(n > 0) || n > 9999){ toast('Bitte eine Zahl größer als 0 eingeben, zum Beispiel 4 oder 2,5.'); render(); return; } rzState(c).n = n; render(); }
+function rzUp(){ const st = view.rz; const p = st && st.stack && st.stack[st.stack.length - 1]; if(!p || !C(p.id)){ go('cards'); return; } view.rz = {id:p.id, n:p.n, stack:st.stack.slice(0, -1)}; RZ_N.set(p.id, p.n); view.card = p.id; render(); hashSync(); window.scrollTo({top:0}); }
+function rzSetN(n){ const c = C(view.card); if(!c) return; if(!(n > 0) || n > 9999){ toast('Bitte eine Zahl größer als 0 eingeben, zum Beispiel 4 oder 2,5.'); render(); return; } rzState(c).n = n; RZ_N.set(c.id, n); render(); }
+/* beim Tippen sofort mitrechnen, ohne das Feld neu zu zeichnen */
+function rzLive(t){
+  const c = C(view.card); if(!c) return; const v = numParse(t.value); let n = v;
+  if(t.dataset.rzy){ const y = rzYield(c); n = y > 0 ? v / y : NaN; }
+  if(!(n > 0) || n > 9999) return; const st = rzState(c); st.n = n; RZ_N.set(c.id, n);
+  const old = document.querySelector('#app .rz-k'); if(!old) return; const tmp = document.createElement('div'); tmp.innerHTML = rzKitchenHtml(c); const nw = tmp.querySelector('.rz-k'); if(!nw) return;
+  const swap = sel => { const a = old.querySelector(sel), b = nw.querySelector(sel); if(a && b) a.replaceWith(b); };
+  swap('.rz-chips'); swap('.rz-sec');
+  const w = old.querySelector('.rz-free > span'), w2 = nw.querySelector('.rz-free > span'); if(w && w2) w.textContent = w2.textContent;
+  const other = t.dataset.rzy ? null : old.querySelector('#rzY'); if(other) other.value = nw.querySelector('#rzY').value;
+}
 
 /* Bildschirm bleibt an, solange die Küchen-Ansicht offen ist. Lehnt das Gerät ab, geht alles andere trotzdem. */
 let RZ_WL = null, RZ_WL_BUSY = false;
@@ -105,7 +119,7 @@ async function rzWake(on){
     if(!rzKitchenOpen()){ RZ_WL = null; await l.release(); }
   } catch(e){ /* nicht erlaubt oder nicht vorhanden */ } finally { if(on) RZ_WL_BUSY = false; }
 }
-function rzAfter(){ const on = rzKitchenOpen(); if(!on){ if(RZ_TICKS.size) RZ_TICKS.clear(); if(view.rz && !(view.tab === 'cards' && view.card)) view.rz = null; } rzWake(on); }
+function rzAfter(){ const on = rzKitchenOpen(); if(!on){ if(view.rz && !(view.tab === 'cards' && view.card)) view.rz = null; } rzWake(on); }
 document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible' && rzKitchenOpen()) rzWake(true); });
 
 /* ---------- Küchen-Rezept als PDF: Mengen für die gewählte Zahl, ohne Preise ---------- */
@@ -224,12 +238,27 @@ document.addEventListener('change', e => { const t = e.target; if(!t.dataset) re
   if(t.dataset.rzy){ const c = C(view.card); const y = c ? rzYield(c) : 0; const v = numParse(t.value); rzSetN(y > 0 ? v / y : NaN); return; }
   if(t.dataset.svf){ const v = svView(); v.f = ALG[t.value] ? t.value : ''; v.open = null; render(); } });
 document.addEventListener('keydown', e => { const t = e.target; if(e.key === 'Enter' && t.matches && t.matches('#rzN,#rzY')){ e.preventDefault(); t.blur(); } });
+document.addEventListener('input', e => { const t = e.target; if(t.matches && t.matches('#rzN,#rzY')) rzLive(t); });
+/* Antippen markiert die ganze Zahl: „12“ ersetzt die 1, statt „121“ zu ergeben */
+document.addEventListener('focusin', e => { const t = e.target; if(!t.matches || !t.matches('#rzN,#rzY')) return; t._sel = true; try { t.select(); } catch(err){} setTimeout(() => { if(document.activeElement === t && t._sel) try { t.select(); } catch(err){} }, 0); });
+document.addEventListener('mouseup', e => { const t = e.target; if(t.matches && t.matches('#rzN,#rzY') && t._sel){ e.preventDefault(); t._sel = false; } });
+document.addEventListener('keydown', e => { const t = e.target; if(t.matches && t.matches('#rzN,#rzY')) t._sel = false; }, true);
+/* Woher man kommt, bestimmt die Ansicht: Vorbereitung, Heute, Checklisten und Suche öffnen die Küche; Speisekarte, Auswertung und Ware die Kalkulation */
+document.addEventListener('click', e => { const el = e.target.closest && e.target.closest('[data-act="openCard"]'); if(!el || document.body.classList.contains('gd-help')) return;
+  if(view.tab === 'cards' && !view.card) view.cv = rzMode(null);
+  else if(['vorb', 'dash', 'checkl'].includes(view.tab)) view.cv = 'kueche';
+  else if(canEditAll()) view.cv = 'kalk'; }, true);
+/* In der App vor und zurück: ein neuer Ort ist ein neuer Eintrag im Verlauf, damit die Zurück-Geste einen Schritt zurückgeht
+   (nur die Ansicht einer Rezeptur oder ein Ordnen der Adresse ersetzt den Eintrag) */
+let RZ_HLAST = null;
+hashSync = function(){ try { const w = hashWant(); const cur = decodeURIComponent(location.hash.slice(1)); const base = x => String(x).replace(/\/(kalkulation|kueche|service)$/, '');
+  if(cur !== w){ if(RZ_HLAST !== null && cur && base(cur) !== base(w)) history.pushState(null, '', '#' + w); else history.replaceState(null, '', '#' + w); } RZ_HLAST = w; } catch(e){} };
 document.addEventListener('input', e => { const t = e.target; if(t.id !== 'svq') return; const v = svView(); v.q = t.value; v.open = null; const pos = t.selectionStart; render(); const n = $('#svq'); if(n){ n.focus(); try { n.setSelectionRange(pos, pos); } catch(err){} } });
 
 /* ---------- Hilfe ---------- */
 H('rz_ansicht','Kalkulation, Küche, Service','Dieselbe Rezeptur in drei Ansichten. Kalkulation: Preise und Wareneinsatz, hier ändert der Chef. Küche: Mengen und Schritte zum Kochen. Service: was am Teller ist und welche Allergene drin sind.');
 H('rz_portionen','Portionen','Tippen Sie auf ×2, ×5 oder ×10, oder tragen Sie eine Zahl ein. Alle Mengen rechnen sofort mit. Bei einem Basisrezept wählen Sie Chargen oder die Menge in Gramm.');
-H('rz_haken','Antippen zum Abhaken','Ein Tipp auf eine Zutat oder einen Schritt streicht sie durch, damit Sie wissen, wo Sie sind. Das wird nicht gespeichert.');
+H('rz_haken','Antippen zum Abhaken','Ein Tipp auf eine Zutat oder einen Schritt streicht sie durch, damit Sie wissen, wo Sie sind. Die Häkchen bleiben stehen, bis die App neu geladen wird.');
 H('rz_basis','Basisrezept öffnen','Zeigt das Basisrezept mit genau der Menge, die das Gericht gerade braucht. Oben geht es zurück zum Gericht.');
 H('rz_pdf','Rezept als PDF','Das Rezept für die Küche mit den Mengen für die gewählte Zahl, ohne Preise. Basisrezepte stehen darunter.');
 H('sv_liste','Service-Liste','Alles, was heute auf der Karte steht. Ein Tipp auf ein Gericht zeigt, was am Teller ist und welche Allergene drin sind.');
