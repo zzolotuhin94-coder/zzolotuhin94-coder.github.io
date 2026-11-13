@@ -4645,7 +4645,7 @@ function usage(ref){ return S.cards.filter(c => c.items.some(i => i.ref === ref)
    Ohne IndexedDB: localStorage wie früher, aber Fehler werden sichtbar.
    ===================================================================== */
 const APP_SCHEMA = 2;                       // Datenformat; ohne Angabe = 1 (vor Paket A)
-const APP_VERSION = '1.6.0', APP_BUILD = 'a0df13ea5c';
+const APP_VERSION = '1.6.0', APP_BUILD = '7a8efbbf29';
 function schemaNewer(d){ return !!d && typeof d === 'object' && +d.schema > APP_SCHEMA; }
 
 const STORE = (() => {
@@ -14163,6 +14163,29 @@ function wlTake(){
 wlTake();
 const _fromHashWl = fromHash;
 fromHash = function(){ if(wlTake()){ if(S && WL.pending) wlFromLink(); try { hashSync(); } catch(e){} return; } return _fromHashWl(); };
+
+/* Cloud-Link (…#cloud=…): Adresse und öffentlicher Schlüssel des Projekts werden ins Anmeldeformular übernommen.
+   E-Mail und Passwort stehen nie im Link. Geheime Schlüssel (service_role, sb_secret_) werden abgelehnt. */
+let CL_LINK = false;
+function clKeyOk(k){ k = String(k || '').trim(); if(k.length < 20 || k.length > 2000 || /^sb_secret_/i.test(k)) return false;
+  if(/^eyJ/.test(k)){ try { const b = k.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'); const o = JSON.parse(atob(b + '==='.slice((b.length + 3) % 4))); if(o.role !== 'anon') return false; } catch(e){ return false; } }
+  return true; }
+function clTake(){
+  let h = ''; try { h = location.hash.slice(1); } catch(e){ return false; }
+  try { h = decodeURIComponent(h); } catch(e){}
+  const m = /(?:^|[&/?])cloud=([^&]*)/.exec(h); if(!m) return false;
+  try { history.replaceState(null, '', location.pathname + location.search); } catch(e){}
+  try { const b = m[1].trim().replace(/-/g, '+').replace(/_/g, '/'); const o = JSON.parse(atob(b + '==='.slice((b.length + 3) % 4)));
+    const u = String(o.u || '').trim();
+    if(/^https:\/\/[^\s/]+\.[^\s/]+/i.test(u) && clKeyOk(o.k) && !(typeof cloudReady === 'function' && cloudReady())){ CL.url = u; CL.anon = String(o.k).trim(); clSave(); CL_LINK = true; }
+  } catch(e){}
+  return true;
+}
+function clLinkShow(){ if(!CL_LINK || !S) return; CL_LINK = false; try { go('setup'); setTimeout(() => { const f = document.querySelector('#cloudForm'); toast('Cloud-Adresse und Schlüssel sind eingetragen. Jetzt E-Mail und Passwort eingeben.'); }, 120);
+  setTimeout(() => { const f = document.querySelector('#cloudForm'); if(!f) return; let d = f.closest('details'); while(d){ d.open = true; d = d.parentElement && d.parentElement.closest('details'); } f.scrollIntoView({block:'center'}); }, 700); } catch(e){} }
+clTake();
+window.addEventListener('load', () => setTimeout(clLinkShow, 400));
+{ const _fh = fromHash; fromHash = function(){ if(clTake()){ clLinkShow(); try { hashSync(); } catch(e){} return; } return _fh(); }; }
 
 /* Widmung aus dem Link: ist noch keine da, wird sie gespeichert; sonst fragt die Willkommensseite leise nach */
 function wlFromLink(){
