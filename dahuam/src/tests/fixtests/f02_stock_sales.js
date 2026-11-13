@@ -53,10 +53,10 @@ const idx=await ev(()=>[...document.querySelectorAll('#dlg .sales li')].findInde
 const inp=p.locator('#dlg .sales input').nth(idx);
 await inp.fill('500');await submit();
 ok(await dlgOpen() && /Bestand reicht nicht/.test(await dlgText()) && await p.locator('#salesForce').count()===1,'sale exceeding stock blocked with list');
-const before=await ev(()=>({pork:+P('pork').stock,fries:+P('fries').stock,moves:S.moves.length,day:JSON.stringify(S.salesDays[todayStr()]||null),days:Object.keys(S.salesDays).length}));
+const before=await ev(()=>({pork:+P('pork').stock,fries:+P('fries').stock,moves:S.moves.length,day:JSON.stringify(S.salesDays[new Date().getHours()<12?addDays(todayStr(),-1):todayStr()]||null),days:Object.keys(S.salesDays).length}));
 await inp.fill('4');await submit();
 ok(!(await dlgOpen()),'4 portions booked'); ok(/4 Portionen gebucht/.test(await toastT()),'toast',await toastT());
-const after=await ev(()=>({pork:+P('pork').stock,moves:S.moves.length,day:S.salesDays[todayStr()],grp:[...new Set(S.moves.filter(m=>m.type==='sale').map(m=>m.grp))],groups:S.saleGroups,demo:S.salesDemo,days:Object.keys(S.salesDays).length}));
+const after=await ev(()=>({pork:+P('pork').stock,moves:S.moves.length,day:S.salesDays[new Date().getHours()<12?addDays(todayStr(),-1):todayStr()],grp:[...new Set(S.moves.filter(m=>m.type==='sale').map(m=>m.grp))],groups:S.saleGroups,demo:S.salesDemo,days:Object.keys(S.salesDays).length}));
 ok(after.pork<before.pork && after.grp.length===1 && after.grp[0],'all ingredient moves share one group id',after.grp);
 ok(after.demo===true && after.days===before.days+ (before.day==='null'?1:0),'demo sales kept as chosen');
 const mid=await ev(()=>S.menu.find(m=>m.vlabel==='vom Schwein').id);
@@ -66,7 +66,7 @@ ok(await p.locator('.moves li.mv-grp').count()===1,'booking shown as ONE row'); 
 await p.locator('.moves li.mv-grp [data-act=moveUndo]').click();await p.waitForTimeout(200);
 ok(/Verkaufsbuchung .* komplett stornieren/.test(await dlgText()) && /Umsatz/.test(await dlgText()),'storno confirm names whole booking',await dlgText());
 await submit();
-const und=await ev(()=>({pork:+P('pork').stock,fries:+P('fries').stock,moves:S.moves.length,day:JSON.stringify(S.salesDays[todayStr()]||null),sale:S.moves.filter(m=>m.type==='sale').length,groups:Object.keys(S.saleGroups).length}));
+const und=await ev(()=>({pork:+P('pork').stock,fries:+P('fries').stock,moves:S.moves.length,day:JSON.stringify(S.salesDays[new Date().getHours()<12?addDays(todayStr(),-1):todayStr()]||null),sale:S.moves.filter(m=>m.type==='sale').length,groups:Object.keys(S.saleGroups).length}));
 ok(Math.abs(und.pork-before.pork)<1e-9 && Math.abs(und.fries-before.fries)<1e-9 && und.moves===before.moves && und.sale===0,'storno reverses ALL ingredient moves',und);
 ok(und.day===before.day && und.groups===0,'storno removes revenue from salesDays',und.day);
 // demo delete choice
