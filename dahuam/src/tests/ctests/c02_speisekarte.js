@@ -66,7 +66,7 @@ const L = require('./lib'); const fs = require('fs');
   // ---------- Excel mit Titelzeile ----------
   await L.openImp(p, 'menu'); await L.upload(p, L.sample('speisekarte.xlsx'));
   const x = await p.evaluate(() => ({fact:document.querySelector('#app .fact').textContent, hi:view.daten.hi, c:impCounts(view.daten.res), first:view.daten.res.items[0], raw:document.querySelector('#impList .imp-raw').textContent}));
-  L.ok(/Excel/.test(x.fact) && x.hi === 1 && x.c.gleich === 30 && x.c.fehler === 0 && x.first.price === 6.5 && /„6\.5“/.test(x.raw), 'Excel: Titelzeile übersprungen, Preise als Zahlen gelesen (6.5 → 6,50), 30 unverändert', [x.fact, x.c]);
+  L.ok(/Excel/.test(x.fact) && x.hi === 1 && x.c.gleich === 30 && x.c.fehler === 0 && x.first.price === 6.5 && /„6[.,]5“/.test(x.raw), 'Excel: Titelzeile übersprungen, Preise als Zahlen gelesen (6.5 → 6,50), 30 unverändert', [x.fact, x.c]);
   // ---------- Komma und Tabulator ----------
   await L.openImp(p, 'menu'); await L.upload(p, L.sample('speisekarte-komma.csv'));
   const k = await p.evaluate(() => ({d:view.daten.src.delim, c:impCounts(view.daten.res), pr:view.daten.res.items.map(i => i.price).join()}));

@@ -50,7 +50,7 @@ async function impReadFile(file){
   if(/\.(xlsx|xlsm|xls|ods)$/i.test(file.name)){
     const X = await impXlsx(); let wb; try { wb = X.read(buf, {type:'array'}); } catch(e){ throw new Error('Die Excel-Datei ist nicht lesbar. Bitte als CSV speichern und noch einmal versuchen.'); }
     const sheets = wb.SheetNames.map(name => { const aoa = X.utils.sheet_to_json(wb.Sheets[name], {header:1, raw:true, defval:''}); const rows = [];
-      aoa.forEach((r, i) => { const row = r.map(c => typeof c === 'number' ? String(Math.round(c * 1e6) / 1e6) : String(c == null ? '' : c).replace(/ /g, ' ').trim()); if(row.some(c => c !== '')){ row.n = i + 1; rows.push(row); } });
+      aoa.forEach((r, i) => { const row = r.map(c => typeof c === 'number' ? String(Math.round(c * 1e6) / 1e6).replace('.', ',') : String(c == null ? '' : c).replace(/ /g, ' ').trim()); if(row.some(c => c !== '')){ row.n = i + 1; rows.push(row); } });
       return {name, rows}; }).filter(s => s.rows.length);
     if(!sheets.length) throw new Error('Die Excel-Datei enthält keine Zeilen.');
     return {name:file.name, enc:'Excel', sheets};
