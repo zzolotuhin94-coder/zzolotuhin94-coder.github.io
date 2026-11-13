@@ -152,7 +152,15 @@ begin
       where restaurant_id = p_rid returning version into v;
   end if;
 
-  insert into public.kitchen_state_history (restaurant_id, version, data, saved_by) values (p_rid, v, p_data, auth.uid());
+  -- Verlauf sparsam: höchstens eine Kopie pro Stunde; nach 2 Tagen nur die letzte Kopie jedes Tages; nach 60 Tagen weg.
+  if not exists (select 1 from public.kitchen_state_history where restaurant_id = p_rid and saved_at > now() - interval '1 hour') then
+    insert into public.kitchen_state_history (restaurant_id, version, data, saved_by) values (p_rid, v, p_data, auth.uid());
+  else
+    update public.kitchen_state_history set version = v, data = p_data, saved_at = now(), saved_by = auth.uid()
+      where id = (select id from public.kitchen_state_history where restaurant_id = p_rid order by saved_at desc limit 1);
+  end if;
+  delete from public.kitchen_state_history h where h.restaurant_id = p_rid and h.saved_at < now() - interval '2 days'
+    and exists (select 1 from public.kitchen_state_history n where n.restaurant_id = p_rid and n.saved_at::date = h.saved_at::date and n.saved_at > h.saved_at);
   delete from public.kitchen_state_history where restaurant_id = p_rid and saved_at < now() - interval '60 days';
   return jsonb_build_object('ok', true, 'version', v);
 end $$;
