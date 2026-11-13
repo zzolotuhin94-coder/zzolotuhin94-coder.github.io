@@ -312,7 +312,7 @@ function phCountHtml(){
       <button type="button" data-act="phCntStep" data-id="1" aria-label="mehr">${ico('plus')}</button></div>${tenths}
     <p class="hy-was">Laut App ${/^1([ ,]|$)/.test(stockTxt) && !/^1,/.test(stockTxt) ? 'ist' : 'sind'} <b>${esc(stockTxt)}</b> da.${c.inv && !c.seq ? ' Die Zählung geht in die laufende Inventur.' : ''}</p>
     <button type="button" class="hy-btn" data-act="phCntSave">${c.seq ? 'Speichern und weiter' : 'Zählung speichern'}</button>
-    ${c.seq ? `<div class="hy-two"><button type="button" class="hy-btn t" data-act="phCntSame">Stimmt, ${esc(stockTxt)}</button><button type="button" class="hy-btn t" data-act="phCntSkip">Überspringen</button></div>` : edit}`;
+    ${c.seq ? `<div class="hy-two"><button type="button" class="hy-btn t" data-act="phCntSame">Stimmt, ${esc(stockTxt)}</button><button type="button" class="hy-btn t" data-act="phCntSkip">Überspringen</button></div>${c.inv ? `<p class="hy-offb"><button type="button" class="hy-lnk" data-act="phCntOff">Nicht im Lager</button></p>` : ''}` : edit}`;
 }
 function phCntRead(){ const i = document.getElementById('phCntV'); const c = PH.cnt; if(!i || !c) return true; const raw = i.value.trim(); if(raw === ''){ c.v = ''; return true; } const v = numParse(raw); if(!isFinite(v) || v < 0 || v > 99999){ i.classList.add('bad-in'); toast('Bitte eine Zahl eingeben, zum Beispiel 12,5.'); return false; } c.v = Math.round(v * 1000) / 1000; return true; }
 function phCntValue(){ const c = PH.cnt; const p = P(c.pid); if(c.v === '' && !c.t) return null; return isDrink(p) ? Math.round(((+c.v || 0) + c.t / 10) * p.gebL * 1000) / 1000 : +c.v; }
@@ -323,7 +323,7 @@ function phCntSave(same){
   let val = same && !isDrink(p) ? (+p.stock || 0) : phCntValue();
   if(val == null){ if(c.seq){ phCntNext(); return; } toast('Bitte die gezählte Menge eintragen.'); const i = document.getElementById('phCntV'); if(i) i.focus(); return; }
   if(S.invDraft){
-    const d = S.invDraft; if(isDrink(p)){ d.bar = d.bar || {}; d.bar[p.id] = {f:c.v === '' ? 0 : +c.v, t:c.t}; } d.counts[p.id] = val; save();
+    const d = S.invDraft; if(isDrink(p)){ d.bar = d.bar || {}; d.bar[p.id] = {f:c.v === '' ? 0 : +c.v, t:c.t}; } d.counts[p.id] = val; if(val > 0) invBack(p); save();
     if(c.seq){ phCntNext(); return; }
     phSheetClose(); render(); toast(`${p.name}: ${qtyFmt(val, p)} in der Inventur eingetragen`); return;
   }
@@ -334,7 +334,9 @@ function phCntSave(same){
 }
 function phCntNext(){
   const c = PH.cnt; const list = phInvList(c.loc); const d = S.invDraft; const isOpen = x => d.counts[x.id] === undefined || d.counts[x.id] === '';
-  const i = list.findIndex(x => x.id === c.pid); const next = list.slice(i + 1).find(isOpen) || (list.slice(0, i).find(isOpen));
+  let i = list.findIndex(x => x.id === c.pid), j = i; const cp = P(c.pid);
+  if(i < 0 && cp){ const k = list.findIndex(x => byName(x, cp) > 0); i = k < 0 ? list.length - 1 : k - 1; j = i + 1; }   // eben „nicht im Lager“: an seiner Stelle weiter
+  const next = list.slice(i + 1).find(isOpen) || (list.slice(0, j).find(isOpen));
   if(next && next.id !== c.pid){ const loc = c.loc; phCount(next.id, {loc, seq:true}); render(); const f = document.getElementById('phCntV'); if(f) f.focus({preventScroll:true}); return; }
   const name = phLocName(c.loc); const allDone = list.every(x => !isOpen(x)); phSheetClose(true); if(allDone) phS().loc = null; render(); if(allDone) hashSync(); toast(allDone ? `${name} fertig gezählt` : `${name}: Ende der Liste`);
 }
@@ -356,7 +358,16 @@ function phBestand(){
 }
 
 /* ---------- Inventur: ein Lagerort nach dem anderen ---------- */
-function phInvList(loc){ return stockProducts().filter(p => phLocOf(p) === (loc || '')).sort(byName); }
+function phInvList(loc){ return invProducts().filter(p => phLocOf(p) === (loc || '')).sort(byName); }
+function phInvOff(loc){ return stockProducts().filter(p => p.invOff && phLocOf(p) === (loc || '')).sort(byName); }
+/* „Nicht im Lager“ im Zähl-Blatt: Bestand bleibt, weiter zum nächsten Artikel, mit Rückgängig */
+function phCntOff(){
+  const c = PH.cnt; const p = c && P(c.pid); const d = S.invDraft; if(!p || !d) return;
+  const prev = {c:d.counts[p.id], bar:d.bar && d.bar[p.id]}; const loc = c.loc;
+  invOffSet(p, true); save(); phCntNext();
+  const end = !phSheetOpen() && !phInvList(loc).some(x => !phInvDone(x));
+  toast(`${p.name}: nicht im Lager${end ? `. ${phLocName(loc)} fertig gezählt` : ''}`, {action:() => { invOffSet(p, false); if(prev.c !== undefined){ d.counts[p.id] = prev.c; if(prev.bar){ d.bar = d.bar || {}; d.bar[p.id] = prev.bar; } } save(); phS().loc = loc; render(); hashSync(); phCount(p.id, {loc, seq:true}); }});
+}
 function phInvDone(p){ const d = S.invDraft; return !!d && d.counts[p.id] !== undefined && d.counts[p.id] !== ''; }
 function phInventur(){
   const d = S.invDraft; const s = phS();
@@ -366,19 +377,22 @@ function phInventur(){
       + `<p class="hy-text">Sie gehen einmal durch Kühlhaus, Tiefkühler und Lager. Was Sie nicht zählen, bleibt unverändert.${stockProducts().some(isDrink) ? ' Getränke zählen Sie in vollen Flaschen oder Fässern, die angebrochene dazu in Zehnteln.' : ''}</p>
       <button type="button" class="hy-btn" data-act="invStart">Inventur starten</button>${old}`;
   }
-  const locs = phLocs().map(k => ({k, list:phInvList(k)})).filter(x => x.list.length).map(x => ({...x, done:x.list.filter(phInvDone).length}));
-  if(s.loc != null && locs.some(x => x.k === s.loc)){
-    const L = locs.find(x => x.k === s.loc);
+  const all = phLocs().map(k => ({k, list:phInvList(k), off:phInvOff(k)})).filter(x => x.list.length || x.off.length).map(x => ({...x, done:x.list.filter(phInvDone).length}));
+  const locs = all.filter(x => x.list.length);
+  if(s.loc != null && all.some(x => x.k === s.loc)){
+    const L = all.find(x => x.k === s.loc);
+    const offL = L.off.length ? `<p class="hy-offl">${L.off.length} nicht im Lager · <button type="button" class="hy-lnk" data-act="phInvOffShow" aria-expanded="${!!s.offOpen}">${s.offOpen ? 'ausblenden' : 'anzeigen'}</button></p>`
+      + (s.offOpen ? `<ul class="hy-board hy-offs">${L.off.map(p => `<li><div class="hy-row hy-static"><span class="hy-tm"><b>${esc(p.name)}</b><small>laut App ${esc(qtyFmt(+p.stock || 0, p))}</small></span><button type="button" class="hy-btn q" data-act="phInvOn" data-id="${p.id}">Wieder zählen</button></div></li>`).join('')}</ul>` : '') : '';
     return phHead(phLocName(L.k), '', phBackBtn('Inventur', 'phInvLoc', '~'))
-      + `<div class="hy-bar"><i style="width:${(L.done / L.list.length * 100).toFixed(1)}%"></i></div><p class="hy-prog" id="phInvProg">${L.done} von ${L.list.length} gezählt</p>
+      + `<div class="hy-bar"><i style="width:${(L.done / (L.list.length || 1) * 100).toFixed(1)}%"></i></div><p class="hy-prog" id="phInvProg">${L.done} von ${L.list.length} gezählt</p>
       <button type="button" class="hy-btn q hy-scanb" data-scan="inv">${ico('phScan')}Mit dem Scanner zählen</button>
-      <ul class="hy-board">${L.list.map(p => { const on = phInvDone(p); return `<li><button type="button" class="hy-ck ${on ? 'on' : ''}" data-act="phInvArt" data-id="${p.id}"><span class="hy-o" aria-hidden="true">${on ? ico('check') : ''}</span><span class="hy-tm"><b>${esc(p.name)}</b><small>laut App ${esc(qtyFmt(+p.stock || 0, p))}</small></span><span class="hy-cq">${on ? phQty(qtyFmt(+d.counts[p.id], p)) : ''}</span></button></li>`; }).join('')}</ul>`;
+      <ul class="hy-board">${L.list.map(p => { const on = phInvDone(p); return `<li><button type="button" class="hy-ck ${on ? 'on' : ''}" data-act="phInvArt" data-id="${p.id}"><span class="hy-o" aria-hidden="true">${on ? ico('check') : ''}</span><span class="hy-tm"><b>${esc(p.name)}</b><small>laut App ${esc(qtyFmt(+p.stock || 0, p))}</small></span><span class="hy-cq">${on ? phQty(qtyFmt(+d.counts[p.id], p)) : ''}</span></button></li>`; }).join('')}</ul>${offL}`;
   }
   s.loc = null;
   const tot = locs.reduce((a, x) => a + x.list.length, 0), dn = locs.reduce((a, x) => a + x.done, 0); const next = locs.find(x => x.done < x.list.length);
-  const diff = stockProducts().reduce((a, p) => phInvDone(p) ? a + (d.counts[p.id] - (+p.stock || 0)) * (+p.price || 0) : a, 0);
+  const diff = invProducts().reduce((a, p) => phInvDone(p) ? a + (d.counts[p.id] - (+p.stock || 0)) * (+p.price || 0) : a, 0);
   return phHead('Inventur', 'Ein Lagerort nach dem anderen.', phBackBtn(phBackLabel()))
-    + `<ul class="hy-board">${locs.map(x => phRow({n:`${x.done}/${x.list.length}`, t:esc(phLocName(x.k)), m:x.done === x.list.length ? 'Fertig gezählt' : x.done ? `${x.list.length - x.done} ${x.list.length - x.done === 1 ? 'Artikel fehlt' : 'Artikel fehlen'} noch` : 'Noch nicht begonnen', cls:x.done === x.list.length ? 'done' : next && x.k === next.k ? 'now' : '', act:'phInvLoc', id:x.k || '-'})).join('')}</ul>
+    + `<ul class="hy-board">${all.map(x => phRow({n:`${x.done}/${x.list.length}`, t:esc(phLocName(x.k)), m:!x.list.length ? 'Alles nicht im Lager' : x.done === x.list.length ? 'Fertig gezählt' : x.done ? `${x.list.length - x.done} ${x.list.length - x.done === 1 ? 'Artikel fehlt' : 'Artikel fehlen'} noch` : 'Noch nicht begonnen', cls:x.done === x.list.length ? 'done' : next && x.k === next.k ? 'now' : '', act:'phInvLoc', id:x.k || '-'})).join('')}</ul>
     <p class="hy-text">${dn} von ${tot} Artikeln gezählt${dn && canEditAll() ? `, Differenz <b class="${diff < 0 ? 'hy-bad' : ''}">${signedEur(diff)}</b>` : ''}. Was Sie nicht zählen, bleibt unverändert.</p>
     <div class="hy-foot">${next ? `<button type="button" class="hy-btn" data-act="phInvNext" data-id="${next.k || '-'}">${next.done ? 'Im' : 'Mit'} ${esc(phLocName(next.k))} ${next.done ? 'weiterzählen' : 'beginnen'}</button>` : ''}
       <button type="button" class="hy-btn q hy-scanb" data-scan="inv">${ico('phScan')}Mit dem Scanner zählen</button>
@@ -652,7 +666,10 @@ document.addEventListener('click', e => {
     case 'phCntSave': phCntSave(false); break;
     case 'phCntSame': phCntSave(true); break;
     case 'phCntSkip': phCntNext(); break;
-    case 'phInvLoc': s.loc = id === '~' ? null : id === '-' ? '' : id; render(); hashSync(); window.scrollTo({top:0}); break;
+    case 'phCntOff': phCntOff(); break;
+    case 'phInvOffShow': s.offOpen = !s.offOpen; render(); break;
+    case 'phInvOn': { const p = P(id); if(!p) break; invOffSet(p, false); save(); render(); toast(`${p.name} wird wieder gezählt`); break; }
+    case 'phInvLoc': s.loc = id === '~' ? null : id === '-' ? '' : id; s.offOpen = false; render(); hashSync(); window.scrollTo({top:0}); break;
     case 'phInvNext': { const loc = id === '-' ? '' : id; s.loc = loc; render(); hashSync(); window.scrollTo({top:0}); const nx = phInvList(loc).find(p => !phInvDone(p)); if(nx) phCount(nx.id, {loc, seq:true}); break; }
     case 'phInvArt': phCount(id, {loc:s.loc, seq:true}); break;
   }
