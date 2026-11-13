@@ -266,3 +266,13 @@ html.ph body::before{background:var(--bg)}
 html.ph #app[data-ph="vorb"] .pl-rest{display:inline-flex;align-items:center;min-height:44px;min-width:44px;font-size:15px}
 html.ph #app[data-ph="vorb"] .pl-chk li .pl-lk{width:100%;justify-content:flex-start;margin:-12px 0 0;padding:0 var(--hy-pad) 2px calc(var(--hy-pad) + 44px);box-sizing:border-box}
 html.ph #app[data-ph="vorb"] .pl-chk li .pl-rest{color:var(--accent);font-weight:500}
+/* Inventur: „Nicht im Lager“ – leise unter den Zähl-Knöpfen; je Lagerort eine Zeile zum Anzeigen und Zurückholen */
+html.ph #phSheet .hy-offb{margin:6px 0 0;text-align:center}
+html.ph #phSheet .hy-offb .hy-lnk{font-weight:500;font-size:16px;color:var(--muted)}
+html.ph .hy-offl{font-size:16px;color:var(--muted);margin:14px 0 0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+html.ph .hy-offl .hy-lnk{font-weight:500;font-size:16px}
+html.ph .hy-offs .hy-row{grid-template-columns:minmax(0,1fr) auto;column-gap:12px}
+html.ph .hy-offs .hy-btn{width:auto;min-height:48px;font-size:16px;padding:6px 14px}
+/* Hinweis mit „Rückgängig“: eine Zeile breit; über einem offenen Blatt oben, damit er die Knöpfe des Blatts nicht verdeckt */
+html.ph #toast.has-act{width:max-content;max-width:calc(100vw - 32px)}
+html.ph body:has(#phSheet:not([hidden])) #toast{bottom:auto;top:calc(16px + env(safe-area-inset-top,0px))}

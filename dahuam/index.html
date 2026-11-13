@@ -2615,6 +2615,16 @@ table.lt.drag td.lt-gripc + td{white-space:normal;max-width:420px}
   #app[data-view="buy"] .oc-grid{gap:0}
 }
 @media (max-width:760px){table.lt .lt-n b{white-space:normal;overflow-wrap:anywhere}}
+/* Inventur: „Nicht im Lager“ je Zeile, darunter je Lagerort die ausgenommenen Artikel zum Zurückholen */
+.inv-sub{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:10px}
+.inv-n .inv-off-b{font:500 calc(12.5px*var(--fz,1)) var(--f-body);color:var(--muted);text-decoration:underline;text-decoration-thickness:1px}
+.inv-n .inv-off-b:hover,.inv-n .inv-off-b:focus-visible{color:var(--accent)}
+.inv-offl{margin:8px 0 0;font-size:calc(13.5px*var(--fz,1));color:var(--muted)}
+.inv-offl .link,.inv-offl{font-family:var(--f-body)}
+.inv-offl .link{font-size:inherit}
+.inv-offs{list-style:none;margin:6px 0 0;padding:0;border-top:1px solid var(--line)}
+.inv-offs li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0 6px 10px;border-bottom:1px solid var(--line)}
+.inv-offs li small{display:block;font-size:calc(12.5px*var(--fz,1))}
 
 /* ===== Paket C · Eigene Daten, Importe, Allergene in drei Zuständen, Allergen-Blatt ===== */
 .ed-list .au-row{grid-template-columns:32px minmax(0,1fr) auto}
@@ -4294,6 +4304,16 @@ html.ph body::before{background:var(--bg)}
 html.ph #app[data-ph="vorb"] .pl-rest{display:inline-flex;align-items:center;min-height:44px;min-width:44px;font-size:calc(15px*var(--fz,1))}
 html.ph #app[data-ph="vorb"] .pl-chk li .pl-lk{width:100%;justify-content:flex-start;margin:-12px 0 0;padding:0 var(--hy-pad) 2px calc(var(--hy-pad) + 44px);box-sizing:border-box}
 html.ph #app[data-ph="vorb"] .pl-chk li .pl-rest{color:var(--accent);font-weight:500}
+/* Inventur: „Nicht im Lager“ – leise unter den Zähl-Knöpfen; je Lagerort eine Zeile zum Anzeigen und Zurückholen */
+html.ph #phSheet .hy-offb{margin:6px 0 0;text-align:center}
+html.ph #phSheet .hy-offb .hy-lnk{font-weight:500;font-size:calc(16px*var(--fz,1));color:var(--muted)}
+html.ph .hy-offl{font-size:calc(16px*var(--fz,1));color:var(--muted);margin:14px 0 0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+html.ph .hy-offl .hy-lnk{font-weight:500;font-size:calc(16px*var(--fz,1))}
+html.ph .hy-offs .hy-row{grid-template-columns:minmax(0,1fr) auto;column-gap:12px}
+html.ph .hy-offs .hy-btn{width:auto;min-height:48px;font-size:calc(16px*var(--fz,1));padding:6px 14px}
+/* Hinweis mit „Rückgängig“: eine Zeile breit; über einem offenen Blatt oben, damit er die Knöpfe des Blatts nicht verdeckt */
+html.ph #toast.has-act{width:max-content;max-width:calc(100vw - 32px)}
+html.ph body:has(#phSheet:not([hidden])) #toast{bottom:auto;top:calc(16px + env(safe-area-inset-top,0px))}
 
 .m-only{display:none}@media (max-width:900px){.m-only{display:flex}}
 .rc:focus-visible{outline-offset:-3px}
@@ -4645,7 +4665,7 @@ function usage(ref){ return S.cards.filter(c => c.items.some(i => i.ref === ref)
    Ohne IndexedDB: localStorage wie früher, aber Fehler werden sichtbar.
    ===================================================================== */
 const APP_SCHEMA = 2;                       // Datenformat; ohne Angabe = 1 (vor Paket A)
-const APP_VERSION = '1.6.0', APP_BUILD = '7a8efbbf29';
+const APP_VERSION = '1.6.0', APP_BUILD = 'deccf233f4';
 function schemaNewer(d){ return !!d && typeof d === 'object' && +d.schema > APP_SCHEMA; }
 
 const STORE = (() => {
@@ -5252,11 +5272,16 @@ function qtyFmt(q, p){
   if(isDrink(p)){ const n = q / p.gebL; return Math.abs(n) >= 1 || !q ? num(n, 1) + ' ' + cntWord(p) : num(q, 2) + ' l'; }   // Getränke: in Flaschen oder Fässern, kleine Mengen in Litern
   const d = p && p.unit==='Stk' ? 0 : (Math.abs(q) < 10 ? 2 : 1); return num(q, d)+' '+unitOf(p); }
 function stockProducts(){ return S.products.filter(p => !p.noStock); }
+/* „Nicht im Lager“ (p.invOff): die Inventur zählt den Artikel nicht mit, sonst bleibt er überall. Fehlt das Feld, wird gezählt.
+   Kommt wieder Ware (Wareneingang, Buchung mit Plus, Zählung über 0, Scan in der Inventur), ist er von selbst wieder dabei. */
+function invProducts(){ return stockProducts().filter(p => !p.invOff); }
+function invBack(p){ if(p && p.invOff){ delete p.invOff; return true; } return false; }
+function invOffSet(p, on){ if(!p) return; if(on){ p.invOff = true; const d = S.invDraft; if(d){ delete d.counts[p.id]; if(d.bar) delete d.bar[p.id]; } } else delete p.invOff; }
 function stockValue(){ return stockProducts().reduce((s,p)=>s + Math.max(0,+p.stock||0)*(+p.price||0), 0); }
 function lowStock(){ return stockProducts().filter(p => (+p.minStock||0) > 0 && (+p.stock||0) < +p.minStock); }
 function addMove(type, pid, delta, note='', price=null, date=null){
   const p = P(pid); if(!p || !delta) return;
-  p.stock = Math.round(((+p.stock||0) + delta)*1000)/1000;
+  p.stock = Math.round(((+p.stock||0) + delta)*1000)/1000; if(delta > 0 || (type === 'inv' && p.stock > 0)) invBack(p);
   S.moves.unshift({id:uid('mv'), date: date || new Date().toISOString(), type, pid, qty:delta, price: price ?? p.price, note});
 }
 function explode(c, f, acc=new Map(), d=0){
@@ -5555,21 +5580,21 @@ function invView(){
       <h2 class="sec-h">Bisherige Inventuren</h2>
       ${S.inventories.length ? `<ul class="rows inv-old">${S.inventories.map(i=>`<li class="rw"><span class="rw-lead mono">${fmtDate(i.date)}</span><span class="rw-main"><b>${i.counted} Artikel gezählt</b>${i.demo?'<small>Beispiel</small>':''}</span><span class="rw-meta mono">${eur(i.value)}</span><span class="rw-act mono ${i.diff<0?'bad-t':'good-t'}">${signedEur(i.diff)}</span></li>`).join('')}</ul>` : '<p class="hint">Noch keine abgeschlossene Inventur.</p>'}`;
   }
-  const items = stockProducts().sort((a,b)=>(a.loc||'').localeCompare(b.loc||'') || byName(a,b));
+  const items = invProducts().sort((a,b)=>(a.loc||'').localeCompare(b.loc||'') || byName(a,b)); const off = stockProducts().filter(p => p.invOff).sort(byName); const open = view.invOffOpen || {};
   const done = items.filter(p => d.counts[p.id] !== undefined && d.counts[p.id] !== '').length;
   const diffSum = items.reduce((s,p)=>{ const c = d.counts[p.id]; return c===undefined||c==='' ? s : s + (c-(+p.stock||0))*(+p.price||0); }, 0);
   let h = `<section class="inv-bar" id="invBar"><div class="inv-bar-t"><span><b class="mono" id="invProg">${done} / ${items.length}</b> gezählt · Differenz <b class="mono ${diffSum<0?'bad-t':''}" id="invDiff">${signedEur(diffSum)}</b></span>
     <span class="row-btns"><button type="button" class="btn sm" data-act="invCancel">Verwerfen</button><button type="button" class="btn sm primary" data-act="invFinish">Abschließen</button></span></div>
-    <div class="meter"><i id="invMeter" style="width:${(done/items.length*100).toFixed(1)}%"></i></div></section>`;
+    <div class="meter"><i id="invMeter" style="width:${(done/(items.length||1)*100).toFixed(1)}%"></i></div></section>`;
   for(const [k,l] of Object.entries(LOCS).concat([['','Ohne Lagerort']])){
-    const list = items.filter(p => (LOCS[p.loc] ? p.loc : '') === k); if(!list.length) continue;
+    const list = items.filter(p => (LOCS[p.loc] ? p.loc : '') === k); const lo = off.filter(p => (LOCS[p.loc] ? p.loc : '') === k); if(!list.length && !lo.length) continue;
     h += `<h2 class="sec-h">${esc(l)}<small class="muted sm">${list.length} Artikel</small></h2><ul class="inv-l">
       ${list.map(p=>{ const c = d.counts[p.id]; const has = c!==undefined && c!==''; const df = has ? c-(+p.stock||0) : 0; const cls = df<0?'bad-t':df>0?'good-t':''; const bar = isDrink(p), b = bar ? barCount(p.id) : null; return `<li id="ir-${p.id}" class="${has?'counted':''}${bar?' bar':''}">
         <span class="qty inv-q">${bar ? `<input id="inv-${p.id}" class="num-in" type="text" inputmode="decimal" data-num="self" data-invf="${p.id}" value="${b.f === '' ? '' : numIn(b.f)}" placeholder="—" aria-label="Volle ${p.geb === 'fass' ? 'Fässer' : 'Flaschen'} ${esc(p.name)}"><em>${cntWord(p)}</em>`
           : `<input id="inv-${p.id}" class="num-in" type="text" inputmode="decimal" data-num="de" data-msg="Ungültige Zählmenge, nicht übernommen" data-inv="${p.id}" data-old="${has?numIn(c):''}" value="${has?numIn(c):''}" placeholder="—" aria-label="Gezählt ${esc(p.name)}"><em>${esc(p.unit)}</em>`}</span>
-        <span class="inv-n"><b class="pn">${esc(p.name)}</b><small class="muted">Soll ${qtyFmt(+p.stock||0,p)}</small></span>
+        <span class="inv-n"><b class="pn">${esc(p.name)}</b><span class="inv-sub"><small class="muted">Soll ${qtyFmt(+p.stock||0,p)}</small><button type="button" class="link inv-off-b" data-act="invOff" data-id="${p.id}">Nicht im Lager</button></span></span>
         <span class="inv-d"><span class="mono idf ${cls}">${has?(df>0?'+':'')+qtyFmt(df,p):''}</span><span class="mono idv ${cls}">${has?eur(df*(+p.price||0)):''}</span></span>${bar ? barTenths(p, b) : ''}</li>`; }).join('')}
-      </ul>`;
+      </ul>${lo.length ? `<p class="inv-offl">${lo.length} nicht im Lager · <button type="button" class="link" data-act="invOffShow" data-id="${k || '-'}" aria-expanded="${!!open[k || '-']}">${open[k || '-'] ? 'ausblenden' : 'anzeigen'}</button></p>${open[k || '-'] ? `<ul class="inv-offs">${lo.map(p => `<li><span>${esc(p.name)}<small class="muted">laut App ${qtyFmt(+p.stock||0,p)}</small></span><button type="button" class="btn sm" data-act="invOn" data-id="${p.id}">Wieder zählen</button></li>`).join('')}</ul>` : ''}` : ''}`;
   }
   return h;
 }
@@ -5579,9 +5604,9 @@ function invUpdate(pid){
   row.classList.toggle('counted', has);
   const a = row.querySelector('.idf'), b = row.querySelector('.idv'); a.className = 'mono idf '+cls; b.className = 'mono idv '+cls;
   a.textContent = has ? (df>0?'+':'')+qtyFmt(df,p) : ''; b.textContent = has ? eur(df*(+p.price||0)) : '';
-  const items = stockProducts(); const done = items.filter(x => d.counts[x.id] !== undefined && d.counts[x.id] !== '').length;
+  const items = invProducts(); const done = items.filter(x => d.counts[x.id] !== undefined && d.counts[x.id] !== '').length;
   const sum = items.reduce((s,x)=>{ const v = d.counts[x.id]; return v===undefined||v==='' ? s : s + (v-(+x.stock||0))*(+x.price||0); }, 0);
-  $('#invProg').textContent = `${done} / ${items.length}`; $('#invDiff').textContent = signedEur(sum); $('#invDiff').className = 'mono '+(sum<0?'bad-t':''); $('#invMeter').style.width = (done/items.length*100).toFixed(1)+'%';
+  $('#invProg').textContent = `${done} / ${items.length}`; $('#invDiff').textContent = signedEur(sum); $('#invDiff').className = 'mono '+(sum<0?'bad-t':''); $('#invMeter').style.width = (done/(items.length||1)*100).toFixed(1)+'%';
 }
 
 /* ---------- Produkte ---------- */
@@ -5730,7 +5755,8 @@ function prodDialog(p, pre){
       ${isNew?`<label class="f"><span data-gl="A">Anfangsbestand</span><input name="stock" class="num-in" type="text" inputmode="decimal" value="0"></label>`:''}
     </div>
     ${algControlHtml(algClean(p.alg), prodAlgState(p), {note:'„Keine Allergene“ ist eine bestätigte Angabe. „Noch nicht geprüft“ bleibt auf der Karte sichtbar offen.'})}
-    <div class="togs" data-k="food"><label class="tog"><input type="checkbox" name="basic" ${p.basic===true?'checked':''}><span></span>Grundzutat wie Salz, Gewürze, Öl: steht nicht auf der Vorbereitungsliste</label></div>`,
+    <div class="togs" data-k="food"><label class="tog"><input type="checkbox" name="basic" ${p.basic===true?'checked':''}><span></span>Grundzutat wie Salz, Gewürze, Öl: steht nicht auf der Vorbereitungsliste</label></div>
+    <div class="togs"><label class="tog"><input type="checkbox" name="invOn" ${p.invOff ? '' : 'checked'}><span></span>In der Inventur zählen</label></div>`,
     fd => { const ar = algControlRead(fd); if(!ar) return false; const ean = scanEanRead(fd, p); if(ean === false) return false;   // Strichcodes: scan.js
       const common = {name:fd.get('name').trim(), alg:ar.alg, algNone:ar.algNone, loc:fd.get('loc'), supplier:fd.get('supplier'), artNo:fd.get('artNo').trim(), ean};
       if(fd.get('kind') === 'g'){
@@ -5739,12 +5765,12 @@ function prodDialog(p, pre){
         if(geb === 'kiste' && !(N >= 1)) return dlgErr('gebN', 'Bitte eintragen, wie viele Flaschen in der Kiste sind.');
         if(!isNew && p.unit !== 'l' && usage('p:'+p.id).length) return dlgErr('gebL', `Dieser Artikel steckt in ${plural(usage('p:'+p.id).length, 'Rezeptur', 'Rezepturen')} und wird dort in ${p.unit === 'Stk' ? 'Stück' : 'Gramm'} gerechnet. Bitte für das Getränk einen neuen Artikel anlegen.`);
         const pq = Math.round(L*N*10000)/10000, price = Math.round(gp/pq*10000)/10000;
-        if(Math.abs(price - (+p.price||0)) > 0.00006 || isNew) markPrice(p, 'manuell');
+        if(Math.abs(price - (+p.price||0)) > 0.00006 || isNew) markPrice(p, 'manuell'); invOffSet(p, !fd.get('invOn'));
         Object.assign(p, common, {unit:'l', price, pieceG:'', lossCold:0, lossHot:0, geb, gebL:L, gebN:N, pack:gebLabel(geb, L, N), packQty:pq, pfand:Math.round((+fd.get('pfand')||0)*100)/100, pourLoss:+fd.get('pourLoss')||0, minStock:Math.round((+fd.get('minStock')||0)*L*1000)/1000});
         if(isNew){ p.stock = 0; S.products.push(p); const s = (+fd.get('stock')||0)*L; if(s) addMove('in', p.id, Math.round(s*1000)/1000, 'Anfangsbestand'); }
         return;
       }
-      if(+fd.get('price') !== +p.price) markPrice(p, 'manuell');
+      if(+fd.get('price') !== +p.price) markPrice(p, 'manuell'); invOffSet(p, !fd.get('invOn'));
       Object.assign(p, common, {unit:fd.get('unit'), price:+fd.get('price'), pieceG:fd.get('pieceG'), lossCold:+fd.get('lossCold')||0, lossHot:+fd.get('lossHot')||0, basic: fd.get('basic') ? true : (p.basic === true ? false : p.basic), pack:fd.get('pack').trim(), packQty:+fd.get('packQty')||0, minStock:+fd.get('minStock')||0});
       ['geb','gebL','gebN','pfand','pourLoss'].forEach(k => { delete p[k]; });
       if(isNew){ p.stock = 0; S.products.push(p); const s = +fd.get('stock')||0; if(s) addMove('in', p.id, s, 'Anfangsbestand'); } },
@@ -6011,7 +6037,11 @@ document.addEventListener('click', e => {
     case 'invT': { const [pid, k] = id.split(':'); barTenth(pid, +k); break; }
     case 'invStart': S.invDraft = {date:new Date().toISOString(), counts:{}}; save(); render(); toast('Inventur gestartet'); break;
     case 'invCancel': ask('Laufende Inventur verwerfen? Die gezählten Mengen gehen verloren.', () => { S.invDraft = null; }, 'Verwerfen'); break;
-    case 'invFinish': { const d = S.invDraft; const items = stockProducts().filter(p => d.counts[p.id]!==undefined && d.counts[p.id]!=='' && +d.counts[p.id] >= 0);
+    case 'invOff': case 'invOn': { const p = P(id); if(!p) break; const d = S.invDraft; const prev = d ? {c:d.counts[p.id], bar:d.bar && d.bar[p.id]} : null; invOffSet(p, act === 'invOff'); save(); render();
+      if(act === 'invOff') toast(`${p.name}: nicht im Lager, wird nicht gezählt`, {action:() => { invOffSet(p, false); if(d && prev.c !== undefined){ d.counts[p.id] = prev.c; if(prev.bar){ d.bar = d.bar || {}; d.bar[p.id] = prev.bar; } } save(); render(); }});
+      else toast(`${p.name} wird wieder gezählt`); break; }
+    case 'invOffShow': { view.invOffOpen = view.invOffOpen || {}; view.invOffOpen[id] = !view.invOffOpen[id]; render(); break; }
+    case 'invFinish': { const d = S.invDraft; const items = invProducts().filter(p => d.counts[p.id]!==undefined && d.counts[p.id]!=='' && +d.counts[p.id] >= 0);
       if(!items.length){ info('Noch nichts gezählt', 'Tragen Sie mindestens eine gezählte Menge ein.'); break; }
       const diff = items.reduce((s,p)=>s+(d.counts[p.id]-(+p.stock||0))*(+p.price||0),0);
       ask(`Inventur mit ${items.length} gezählten Artikeln abschließen? Differenz: ${signedEur(diff)}${diff < -0.005 ? ' (Fehlbestand)' : diff > 0.005 ? ' (Mehrbestand)' : ''}. Die Bestände werden auf die gezählten Mengen gesetzt.`, () => {
@@ -15517,7 +15547,7 @@ function scanOrder(){ return SC.mode === 'recv' && SC.opt.order ? (S.orders || [
 function scanCounted(pid){ const d = S.invDraft; return !!d && d.counts[pid] !== undefined && d.counts[pid] !== ''; }
 function scanHead(){
   const t = $('#scTitle'), s = $('#scSub'); if(!t) return; const d = scanInv(), o = scanOrder();
-  if(d){ const items = stockProducts(); const done = items.filter(p => scanCounted(p.id)).length; t.textContent = 'Inventur'; s.textContent = `${done} von ${items.length} gezählt`; }
+  if(d){ const items = invProducts(); const done = items.filter(p => scanCounted(p.id)).length; t.textContent = 'Inventur'; s.textContent = `${done} von ${items.length} gezählt`; }
   else if(o){ t.textContent = 'Wareneingang'; s.textContent = `${o.no} · ${SC.recvSeen.size} von ${o.lines.length} Positionen gescannt`; }
   else if(SC.mode === 'pick'){ t.textContent = 'Code scannen'; s.textContent = 'für den Artikel'; }
   else { t.textContent = 'Artikel scannen'; s.textContent = 'Bestand, Lagerort, Preis'; }
@@ -15629,7 +15659,7 @@ function scanGot(code, format, via){
   scanLearn(code, format, via);
 }
 function scanFor(p){
-  if(scanInv()) return scanCount(p);
+  if(scanInv()){ if(invBack(p)) save(); return scanCount(p); }   // gescannt heißt: er ist da, „nicht im Lager“ fällt weg
   if(scanOrder()) return scanRecv(p);
   return scanInfo(p);
 }
@@ -15712,7 +15742,7 @@ function scanCountSave(){
   if(r.empty && !(c.mode === 'add' && c.had)){ const o = $('#scRes'); o.textContent = 'Bitte die gezählte Menge eingeben (auch 0 ist möglich).'; o.className = 'sc-res bad'; return; }
   const prev = {c:d.counts[p.id], bar:d.bar && d.bar[p.id] ? {...d.bar[p.id]} : undefined};
   if(c.dr){ d.bar = d.bar || {}; d.bar[p.id] = {f:r.f, t:r.t}; }
-  d.counts[p.id] = r.v; save();
+  d.counts[p.id] = r.v; if(r.v > 0) invBack(p); save();
   scanRowSync(p.id);
   SC.lastLoc = p.loc || ''; SC.undo = {pid:p.id, prev};
   SC.last = {name:p.name, txt:`${qtyFmt(r.v, p)} gezählt`, undo:true, pid:p.id};
@@ -15755,7 +15785,7 @@ function scanLearnList(){
 }
 function scanRow(p, act, noLoc){
   const d = S.invDraft, counted = scanCounted(p.id); const n = eanOf(p).length; const mark = SC.listNext === p.id && act === 'listArt';
-  const sub = [noLoc ? '' : LOCS[p.loc] || 'Ohne Lagerort', d && SC.mode === 'inv' ? (counted ? 'gezählt ' + qtyFmt(+d.counts[p.id] || 0, p) : 'Soll ' + qtyFmt(+p.stock || 0, p)) : qtyFmt(+p.stock || 0, p) + ' auf Lager'].filter(Boolean).join(' · ');
+  const sub = [noLoc ? '' : LOCS[p.loc] || 'Ohne Lagerort', d && SC.mode === 'inv' && p.invOff ? 'nicht im Lager' : '', d && SC.mode === 'inv' ? (counted ? 'gezählt ' + qtyFmt(+d.counts[p.id] || 0, p) : 'Soll ' + qtyFmt(+p.stock || 0, p)) : qtyFmt(+p.stock || 0, p) + ' auf Lager'].filter(Boolean).join(' · ');
   return `<li><button type="button" class="sc-row${counted && SC.mode === 'inv' ? ' done' : ''}${mark ? ' next' : ''}" data-sc="${act}" data-id="${esc(p.id)}"><span class="sc-row-n"><b>${esc(p.name)}</b><small>${esc(sub)}</small></span>${n ? `<span class="sc-tag" title="${esc(eanOf(p).join(', '))}">${n === 1 ? '1 Code' : n + ' Codes'}</span>` : ''}${counted && SC.mode === 'inv' ? `<span class="sc-ok-ic">${ico('check')}</span>` : `<span class="sc-chev">${ico('arrow', 'flip')}</span>`}</button></li>`;
 }
 function scanLearnPick(pid){
@@ -15789,14 +15819,14 @@ function scanListDraw(scroll){
   let h = '';
   if(q){ const l = pool.map(p => ({p, r:scanRank(p, q)})).filter(x => x.r < 9).sort((a, b) => a.r - b.r || scanLocRank(a.p) - scanLocRank(b.p) || byName(a.p, b.p)).slice(0, 60);
     h = l.length ? l.map(x => scanRow(x.p, 'listArt')).join('') : '<li class="sc-empty">Nichts gefunden.</li>'; }
-  else for(const k of scLocOrder()){ const part = pool.filter(p => (LOCS[p.loc] ? p.loc : '') === k).sort(byName); if(!part.length) continue;
+  else for(const k of scLocOrder()){ const part = pool.filter(p => !(inv && p.invOff) && (LOCS[p.loc] ? p.loc : '') === k).sort(byName); if(!part.length) continue;
     const done = inv ? part.filter(p => scanCounted(p.id)).length : 0;
     h += `<li class="sc-grp"><span>${esc(LOCS[k] || 'Ohne Lagerort')}</span><small>${inv ? `${done} / ${part.length}` : part.length}</small></li>` + part.map(p => scanRow(p, 'listArt', true)).join(''); }
   $('#scLs').innerHTML = h;
-  const sub = $('#scLsub'); if(sub){ if(inv){ const items = stockProducts(); sub.textContent = `${items.filter(p => scanCounted(p.id)).length} von ${items.length} gezählt`; } else sub.textContent = `${pool.length} Artikel`; }
+  const sub = $('#scLsub'); if(sub){ if(inv){ const items = invProducts(); sub.textContent = `${items.filter(p => scanCounted(p.id)).length} von ${items.length} gezählt`; } else sub.textContent = `${pool.length} Artikel`; }
   if(scroll){ // nach dem Speichern: zum nächsten noch nicht gezählten Artikel in derselben Reihenfolge
     let target = null;
-    if(SC.listNext && inv && !q){ const flat = scLocOrder().flatMap(k => pool.filter(p => (LOCS[p.loc] ? p.loc : '') === k).sort(byName)); const i = flat.findIndex(p => p.id === SC.listNext); const nx = flat.slice(i + 1).find(p => !scanCounted(p.id)); SC.listNext = nx ? nx.id : null; if(nx) target = nx.id; }
+    if(SC.listNext && inv && !q){ const flat = scLocOrder().flatMap(k => pool.filter(p => !p.invOff && (LOCS[p.loc] ? p.loc : '') === k).sort(byName)); const i = flat.findIndex(p => p.id === SC.listNext); const nx = flat.slice(i + 1).find(p => !scanCounted(p.id)); SC.listNext = nx ? nx.id : null; if(nx) target = nx.id; }
     $('#scLs').querySelectorAll('.sc-row.next').forEach(n => n.classList.remove('next'));
     const el = target ? $('#scLs').querySelector(`[data-id="${CSS.escape(target)}"]`) : null;
     if(el){ el.classList.add('next'); requestAnimationFrame(() => { const w = $('#scLw'); if(w) w.scrollTop = Math.max(0, el.offsetTop - w.clientHeight / 3); }); }
@@ -16224,7 +16254,7 @@ function phCountHtml(){
       <button type="button" data-act="phCntStep" data-id="1" aria-label="mehr">${ico('plus')}</button></div>${tenths}
     <p class="hy-was">Laut App ${/^1([ ,]|$)/.test(stockTxt) && !/^1,/.test(stockTxt) ? 'ist' : 'sind'} <b>${esc(stockTxt)}</b> da.${c.inv && !c.seq ? ' Die Zählung geht in die laufende Inventur.' : ''}</p>
     <button type="button" class="hy-btn" data-act="phCntSave">${c.seq ? 'Speichern und weiter' : 'Zählung speichern'}</button>
-    ${c.seq ? `<div class="hy-two"><button type="button" class="hy-btn t" data-act="phCntSame">Stimmt, ${esc(stockTxt)}</button><button type="button" class="hy-btn t" data-act="phCntSkip">Überspringen</button></div>` : edit}`;
+    ${c.seq ? `<div class="hy-two"><button type="button" class="hy-btn t" data-act="phCntSame">Stimmt, ${esc(stockTxt)}</button><button type="button" class="hy-btn t" data-act="phCntSkip">Überspringen</button></div>${c.inv ? `<p class="hy-offb"><button type="button" class="hy-lnk" data-act="phCntOff">Nicht im Lager</button></p>` : ''}` : edit}`;
 }
 function phCntRead(){ const i = document.getElementById('phCntV'); const c = PH.cnt; if(!i || !c) return true; const raw = i.value.trim(); if(raw === ''){ c.v = ''; return true; } const v = numParse(raw); if(!isFinite(v) || v < 0 || v > 99999){ i.classList.add('bad-in'); toast('Bitte eine Zahl eingeben, zum Beispiel 12,5.'); return false; } c.v = Math.round(v * 1000) / 1000; return true; }
 function phCntValue(){ const c = PH.cnt; const p = P(c.pid); if(c.v === '' && !c.t) return null; return isDrink(p) ? Math.round(((+c.v || 0) + c.t / 10) * p.gebL * 1000) / 1000 : +c.v; }
@@ -16235,7 +16265,7 @@ function phCntSave(same){
   let val = same && !isDrink(p) ? (+p.stock || 0) : phCntValue();
   if(val == null){ if(c.seq){ phCntNext(); return; } toast('Bitte die gezählte Menge eintragen.'); const i = document.getElementById('phCntV'); if(i) i.focus(); return; }
   if(S.invDraft){
-    const d = S.invDraft; if(isDrink(p)){ d.bar = d.bar || {}; d.bar[p.id] = {f:c.v === '' ? 0 : +c.v, t:c.t}; } d.counts[p.id] = val; save();
+    const d = S.invDraft; if(isDrink(p)){ d.bar = d.bar || {}; d.bar[p.id] = {f:c.v === '' ? 0 : +c.v, t:c.t}; } d.counts[p.id] = val; if(val > 0) invBack(p); save();
     if(c.seq){ phCntNext(); return; }
     phSheetClose(); render(); toast(`${p.name}: ${qtyFmt(val, p)} in der Inventur eingetragen`); return;
   }
@@ -16246,7 +16276,9 @@ function phCntSave(same){
 }
 function phCntNext(){
   const c = PH.cnt; const list = phInvList(c.loc); const d = S.invDraft; const isOpen = x => d.counts[x.id] === undefined || d.counts[x.id] === '';
-  const i = list.findIndex(x => x.id === c.pid); const next = list.slice(i + 1).find(isOpen) || (list.slice(0, i).find(isOpen));
+  let i = list.findIndex(x => x.id === c.pid), j = i; const cp = P(c.pid);
+  if(i < 0 && cp){ const k = list.findIndex(x => byName(x, cp) > 0); i = k < 0 ? list.length - 1 : k - 1; j = i + 1; }   // eben „nicht im Lager“: an seiner Stelle weiter
+  const next = list.slice(i + 1).find(isOpen) || (list.slice(0, j).find(isOpen));
   if(next && next.id !== c.pid){ const loc = c.loc; phCount(next.id, {loc, seq:true}); render(); const f = document.getElementById('phCntV'); if(f) f.focus({preventScroll:true}); return; }
   const name = phLocName(c.loc); const allDone = list.every(x => !isOpen(x)); phSheetClose(true); if(allDone) phS().loc = null; render(); if(allDone) hashSync(); toast(allDone ? `${name} fertig gezählt` : `${name}: Ende der Liste`);
 }
@@ -16268,7 +16300,16 @@ function phBestand(){
 }
 
 /* ---------- Inventur: ein Lagerort nach dem anderen ---------- */
-function phInvList(loc){ return stockProducts().filter(p => phLocOf(p) === (loc || '')).sort(byName); }
+function phInvList(loc){ return invProducts().filter(p => phLocOf(p) === (loc || '')).sort(byName); }
+function phInvOff(loc){ return stockProducts().filter(p => p.invOff && phLocOf(p) === (loc || '')).sort(byName); }
+/* „Nicht im Lager“ im Zähl-Blatt: Bestand bleibt, weiter zum nächsten Artikel, mit Rückgängig */
+function phCntOff(){
+  const c = PH.cnt; const p = c && P(c.pid); const d = S.invDraft; if(!p || !d) return;
+  const prev = {c:d.counts[p.id], bar:d.bar && d.bar[p.id]}; const loc = c.loc;
+  invOffSet(p, true); save(); phCntNext();
+  const end = !phSheetOpen() && !phInvList(loc).some(x => !phInvDone(x));
+  toast(`${p.name}: nicht im Lager${end ? `. ${phLocName(loc)} fertig gezählt` : ''}`, {action:() => { invOffSet(p, false); if(prev.c !== undefined){ d.counts[p.id] = prev.c; if(prev.bar){ d.bar = d.bar || {}; d.bar[p.id] = prev.bar; } } save(); phS().loc = loc; render(); hashSync(); phCount(p.id, {loc, seq:true}); }});
+}
 function phInvDone(p){ const d = S.invDraft; return !!d && d.counts[p.id] !== undefined && d.counts[p.id] !== ''; }
 function phInventur(){
   const d = S.invDraft; const s = phS();
@@ -16278,19 +16319,22 @@ function phInventur(){
       + `<p class="hy-text">Sie gehen einmal durch Kühlhaus, Tiefkühler und Lager. Was Sie nicht zählen, bleibt unverändert.${stockProducts().some(isDrink) ? ' Getränke zählen Sie in vollen Flaschen oder Fässern, die angebrochene dazu in Zehnteln.' : ''}</p>
       <button type="button" class="hy-btn" data-act="invStart">Inventur starten</button>${old}`;
   }
-  const locs = phLocs().map(k => ({k, list:phInvList(k)})).filter(x => x.list.length).map(x => ({...x, done:x.list.filter(phInvDone).length}));
-  if(s.loc != null && locs.some(x => x.k === s.loc)){
-    const L = locs.find(x => x.k === s.loc);
+  const all = phLocs().map(k => ({k, list:phInvList(k), off:phInvOff(k)})).filter(x => x.list.length || x.off.length).map(x => ({...x, done:x.list.filter(phInvDone).length}));
+  const locs = all.filter(x => x.list.length);
+  if(s.loc != null && all.some(x => x.k === s.loc)){
+    const L = all.find(x => x.k === s.loc);
+    const offL = L.off.length ? `<p class="hy-offl">${L.off.length} nicht im Lager · <button type="button" class="hy-lnk" data-act="phInvOffShow" aria-expanded="${!!s.offOpen}">${s.offOpen ? 'ausblenden' : 'anzeigen'}</button></p>`
+      + (s.offOpen ? `<ul class="hy-board hy-offs">${L.off.map(p => `<li><div class="hy-row hy-static"><span class="hy-tm"><b>${esc(p.name)}</b><small>laut App ${esc(qtyFmt(+p.stock || 0, p))}</small></span><button type="button" class="hy-btn q" data-act="phInvOn" data-id="${p.id}">Wieder zählen</button></div></li>`).join('')}</ul>` : '') : '';
     return phHead(phLocName(L.k), '', phBackBtn('Inventur', 'phInvLoc', '~'))
-      + `<div class="hy-bar"><i style="width:${(L.done / L.list.length * 100).toFixed(1)}%"></i></div><p class="hy-prog" id="phInvProg">${L.done} von ${L.list.length} gezählt</p>
+      + `<div class="hy-bar"><i style="width:${(L.done / (L.list.length || 1) * 100).toFixed(1)}%"></i></div><p class="hy-prog" id="phInvProg">${L.done} von ${L.list.length} gezählt</p>
       <button type="button" class="hy-btn q hy-scanb" data-scan="inv">${ico('phScan')}Mit dem Scanner zählen</button>
-      <ul class="hy-board">${L.list.map(p => { const on = phInvDone(p); return `<li><button type="button" class="hy-ck ${on ? 'on' : ''}" data-act="phInvArt" data-id="${p.id}"><span class="hy-o" aria-hidden="true">${on ? ico('check') : ''}</span><span class="hy-tm"><b>${esc(p.name)}</b><small>laut App ${esc(qtyFmt(+p.stock || 0, p))}</small></span><span class="hy-cq">${on ? phQty(qtyFmt(+d.counts[p.id], p)) : ''}</span></button></li>`; }).join('')}</ul>`;
+      <ul class="hy-board">${L.list.map(p => { const on = phInvDone(p); return `<li><button type="button" class="hy-ck ${on ? 'on' : ''}" data-act="phInvArt" data-id="${p.id}"><span class="hy-o" aria-hidden="true">${on ? ico('check') : ''}</span><span class="hy-tm"><b>${esc(p.name)}</b><small>laut App ${esc(qtyFmt(+p.stock || 0, p))}</small></span><span class="hy-cq">${on ? phQty(qtyFmt(+d.counts[p.id], p)) : ''}</span></button></li>`; }).join('')}</ul>${offL}`;
   }
   s.loc = null;
   const tot = locs.reduce((a, x) => a + x.list.length, 0), dn = locs.reduce((a, x) => a + x.done, 0); const next = locs.find(x => x.done < x.list.length);
-  const diff = stockProducts().reduce((a, p) => phInvDone(p) ? a + (d.counts[p.id] - (+p.stock || 0)) * (+p.price || 0) : a, 0);
+  const diff = invProducts().reduce((a, p) => phInvDone(p) ? a + (d.counts[p.id] - (+p.stock || 0)) * (+p.price || 0) : a, 0);
   return phHead('Inventur', 'Ein Lagerort nach dem anderen.', phBackBtn(phBackLabel()))
-    + `<ul class="hy-board">${locs.map(x => phRow({n:`${x.done}/${x.list.length}`, t:esc(phLocName(x.k)), m:x.done === x.list.length ? 'Fertig gezählt' : x.done ? `${x.list.length - x.done} ${x.list.length - x.done === 1 ? 'Artikel fehlt' : 'Artikel fehlen'} noch` : 'Noch nicht begonnen', cls:x.done === x.list.length ? 'done' : next && x.k === next.k ? 'now' : '', act:'phInvLoc', id:x.k || '-'})).join('')}</ul>
+    + `<ul class="hy-board">${all.map(x => phRow({n:`${x.done}/${x.list.length}`, t:esc(phLocName(x.k)), m:!x.list.length ? 'Alles nicht im Lager' : x.done === x.list.length ? 'Fertig gezählt' : x.done ? `${x.list.length - x.done} ${x.list.length - x.done === 1 ? 'Artikel fehlt' : 'Artikel fehlen'} noch` : 'Noch nicht begonnen', cls:x.done === x.list.length ? 'done' : next && x.k === next.k ? 'now' : '', act:'phInvLoc', id:x.k || '-'})).join('')}</ul>
     <p class="hy-text">${dn} von ${tot} Artikeln gezählt${dn && canEditAll() ? `, Differenz <b class="${diff < 0 ? 'hy-bad' : ''}">${signedEur(diff)}</b>` : ''}. Was Sie nicht zählen, bleibt unverändert.</p>
     <div class="hy-foot">${next ? `<button type="button" class="hy-btn" data-act="phInvNext" data-id="${next.k || '-'}">${next.done ? 'Im' : 'Mit'} ${esc(phLocName(next.k))} ${next.done ? 'weiterzählen' : 'beginnen'}</button>` : ''}
       <button type="button" class="hy-btn q hy-scanb" data-scan="inv">${ico('phScan')}Mit dem Scanner zählen</button>
@@ -16564,7 +16608,10 @@ document.addEventListener('click', e => {
     case 'phCntSave': phCntSave(false); break;
     case 'phCntSame': phCntSave(true); break;
     case 'phCntSkip': phCntNext(); break;
-    case 'phInvLoc': s.loc = id === '~' ? null : id === '-' ? '' : id; render(); hashSync(); window.scrollTo({top:0}); break;
+    case 'phCntOff': phCntOff(); break;
+    case 'phInvOffShow': s.offOpen = !s.offOpen; render(); break;
+    case 'phInvOn': { const p = P(id); if(!p) break; invOffSet(p, false); save(); render(); toast(`${p.name} wird wieder gezählt`); break; }
+    case 'phInvLoc': s.loc = id === '~' ? null : id === '-' ? '' : id; s.offOpen = false; render(); hashSync(); window.scrollTo({top:0}); break;
     case 'phInvNext': { const loc = id === '-' ? '' : id; s.loc = loc; render(); hashSync(); window.scrollTo({top:0}); const nx = phInvList(loc).find(p => !phInvDone(p)); if(nx) phCount(nx.id, {loc, seq:true}); break; }
     case 'phInvArt': phCount(id, {loc:s.loc, seq:true}); break;
   }

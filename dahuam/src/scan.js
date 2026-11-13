@@ -135,7 +135,7 @@ function scanOrder(){ return SC.mode === 'recv' && SC.opt.order ? (S.orders || [
 function scanCounted(pid){ const d = S.invDraft; return !!d && d.counts[pid] !== undefined && d.counts[pid] !== ''; }
 function scanHead(){
   const t = $('#scTitle'), s = $('#scSub'); if(!t) return; const d = scanInv(), o = scanOrder();
-  if(d){ const items = stockProducts(); const done = items.filter(p => scanCounted(p.id)).length; t.textContent = 'Inventur'; s.textContent = `${done} von ${items.length} gezählt`; }
+  if(d){ const items = invProducts(); const done = items.filter(p => scanCounted(p.id)).length; t.textContent = 'Inventur'; s.textContent = `${done} von ${items.length} gezählt`; }
   else if(o){ t.textContent = 'Wareneingang'; s.textContent = `${o.no} · ${SC.recvSeen.size} von ${o.lines.length} Positionen gescannt`; }
   else if(SC.mode === 'pick'){ t.textContent = 'Code scannen'; s.textContent = 'für den Artikel'; }
   else { t.textContent = 'Artikel scannen'; s.textContent = 'Bestand, Lagerort, Preis'; }
@@ -247,7 +247,7 @@ function scanGot(code, format, via){
   scanLearn(code, format, via);
 }
 function scanFor(p){
-  if(scanInv()) return scanCount(p);
+  if(scanInv()){ if(invBack(p)) save(); return scanCount(p); }   // gescannt heißt: er ist da, „nicht im Lager“ fällt weg
   if(scanOrder()) return scanRecv(p);
   return scanInfo(p);
 }
@@ -330,7 +330,7 @@ function scanCountSave(){
   if(r.empty && !(c.mode === 'add' && c.had)){ const o = $('#scRes'); o.textContent = 'Bitte die gezählte Menge eingeben (auch 0 ist möglich).'; o.className = 'sc-res bad'; return; }
   const prev = {c:d.counts[p.id], bar:d.bar && d.bar[p.id] ? {...d.bar[p.id]} : undefined};
   if(c.dr){ d.bar = d.bar || {}; d.bar[p.id] = {f:r.f, t:r.t}; }
-  d.counts[p.id] = r.v; save();
+  d.counts[p.id] = r.v; if(r.v > 0) invBack(p); save();
   scanRowSync(p.id);
   SC.lastLoc = p.loc || ''; SC.undo = {pid:p.id, prev};
   SC.last = {name:p.name, txt:`${qtyFmt(r.v, p)} gezählt`, undo:true, pid:p.id};
@@ -373,7 +373,7 @@ function scanLearnList(){
 }
 function scanRow(p, act, noLoc){
   const d = S.invDraft, counted = scanCounted(p.id); const n = eanOf(p).length; const mark = SC.listNext === p.id && act === 'listArt';
-  const sub = [noLoc ? '' : LOCS[p.loc] || 'Ohne Lagerort', d && SC.mode === 'inv' ? (counted ? 'gezählt ' + qtyFmt(+d.counts[p.id] || 0, p) : 'Soll ' + qtyFmt(+p.stock || 0, p)) : qtyFmt(+p.stock || 0, p) + ' auf Lager'].filter(Boolean).join(' · ');
+  const sub = [noLoc ? '' : LOCS[p.loc] || 'Ohne Lagerort', d && SC.mode === 'inv' && p.invOff ? 'nicht im Lager' : '', d && SC.mode === 'inv' ? (counted ? 'gezählt ' + qtyFmt(+d.counts[p.id] || 0, p) : 'Soll ' + qtyFmt(+p.stock || 0, p)) : qtyFmt(+p.stock || 0, p) + ' auf Lager'].filter(Boolean).join(' · ');
   return `<li><button type="button" class="sc-row${counted && SC.mode === 'inv' ? ' done' : ''}${mark ? ' next' : ''}" data-sc="${act}" data-id="${esc(p.id)}"><span class="sc-row-n"><b>${esc(p.name)}</b><small>${esc(sub)}</small></span>${n ? `<span class="sc-tag" title="${esc(eanOf(p).join(', '))}">${n === 1 ? '1 Code' : n + ' Codes'}</span>` : ''}${counted && SC.mode === 'inv' ? `<span class="sc-ok-ic">${ico('check')}</span>` : `<span class="sc-chev">${ico('arrow', 'flip')}</span>`}</button></li>`;
 }
 function scanLearnPick(pid){
@@ -407,14 +407,14 @@ function scanListDraw(scroll){
   let h = '';
   if(q){ const l = pool.map(p => ({p, r:scanRank(p, q)})).filter(x => x.r < 9).sort((a, b) => a.r - b.r || scanLocRank(a.p) - scanLocRank(b.p) || byName(a.p, b.p)).slice(0, 60);
     h = l.length ? l.map(x => scanRow(x.p, 'listArt')).join('') : '<li class="sc-empty">Nichts gefunden.</li>'; }
-  else for(const k of scLocOrder()){ const part = pool.filter(p => (LOCS[p.loc] ? p.loc : '') === k).sort(byName); if(!part.length) continue;
+  else for(const k of scLocOrder()){ const part = pool.filter(p => !(inv && p.invOff) && (LOCS[p.loc] ? p.loc : '') === k).sort(byName); if(!part.length) continue;
     const done = inv ? part.filter(p => scanCounted(p.id)).length : 0;
     h += `<li class="sc-grp"><span>${esc(LOCS[k] || 'Ohne Lagerort')}</span><small>${inv ? `${done} / ${part.length}` : part.length}</small></li>` + part.map(p => scanRow(p, 'listArt', true)).join(''); }
   $('#scLs').innerHTML = h;
-  const sub = $('#scLsub'); if(sub){ if(inv){ const items = stockProducts(); sub.textContent = `${items.filter(p => scanCounted(p.id)).length} von ${items.length} gezählt`; } else sub.textContent = `${pool.length} Artikel`; }
+  const sub = $('#scLsub'); if(sub){ if(inv){ const items = invProducts(); sub.textContent = `${items.filter(p => scanCounted(p.id)).length} von ${items.length} gezählt`; } else sub.textContent = `${pool.length} Artikel`; }
   if(scroll){ // nach dem Speichern: zum nächsten noch nicht gezählten Artikel in derselben Reihenfolge
     let target = null;
-    if(SC.listNext && inv && !q){ const flat = scLocOrder().flatMap(k => pool.filter(p => (LOCS[p.loc] ? p.loc : '') === k).sort(byName)); const i = flat.findIndex(p => p.id === SC.listNext); const nx = flat.slice(i + 1).find(p => !scanCounted(p.id)); SC.listNext = nx ? nx.id : null; if(nx) target = nx.id; }
+    if(SC.listNext && inv && !q){ const flat = scLocOrder().flatMap(k => pool.filter(p => !p.invOff && (LOCS[p.loc] ? p.loc : '') === k).sort(byName)); const i = flat.findIndex(p => p.id === SC.listNext); const nx = flat.slice(i + 1).find(p => !scanCounted(p.id)); SC.listNext = nx ? nx.id : null; if(nx) target = nx.id; }
     $('#scLs').querySelectorAll('.sc-row.next').forEach(n => n.classList.remove('next'));
     const el = target ? $('#scLs').querySelector(`[data-id="${CSS.escape(target)}"]`) : null;
     if(el){ el.classList.add('next'); requestAnimationFrame(() => { const w = $('#scLw'); if(w) w.scrollTop = Math.max(0, el.offsetTop - w.clientHeight / 3); }); }
