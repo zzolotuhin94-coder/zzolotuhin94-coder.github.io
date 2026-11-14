@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round">
+<!-- Produktzeichen: ein offener Bogen („C“) über einer ruhigen Tischlinie. Selbst gezeichnet, frei von fremden Vorlagen.
+     Einfarbig, weil es in der App als Maske dient; icons.js färbt die Tischlinie (Klasse acc) golden. -->
+<path d="M45.4 16.2A18.5 18.5 0 1 0 45.4 39.8" stroke-width="4.4"/>
+<path class="acc" d="M11 53.5H53" stroke-width="3.2"/>
+</svg>
